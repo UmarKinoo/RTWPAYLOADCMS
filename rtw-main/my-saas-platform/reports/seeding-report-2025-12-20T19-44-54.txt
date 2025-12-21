@@ -1,0 +1,60 @@
+============================================================
+SEEDING COMPLETE - SUMMARY REPORT
+============================================================
+
+STATISTICS:
+   Total rows processed: 390
+   Skills created: 0
+   Rows skipped: 35
+   Success rate: 0.0%
+
+ENTITIES CREATED:
+   Disciplines: 0 (Total unique: 17)
+   Categories: 0 (Total unique: 65)
+   SubCategories: 0 (Total unique: 66)
+   Skills: 0
+
+SKIPPED ROWS (35):
+------------------------------------------------------------
+
+
+Missing required fields: SubCategory: 31 row(s)
+   Row 262: Carpenter | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 263: Woodwork | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 264: Furniture | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 265: cabinets | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 266: doors. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 267: Painting / interior and exterior painting. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 268: Tiler / tile cutting and installation. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 269: Waterproofing | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 270: Metalwork / welder - metal cutting | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 271: welding. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 272: Waterproofing | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 273: Out door advertisement | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 274: Interiour advertuisement | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 275: Cad draft technicion | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 276: Concrete | Construction > Heavy Construction > N/A | Class: C
+   Row 277: Blocks / masonry | Construction > Heavy Construction > N/A | Class: C
+   Row 278: Electrical | Construction > Heavy Construction > N/A | Class: C
+   Row 279: Mechanical | Construction > Heavy Construction > N/A | Class: C
+   Row 280: Waterproofing | Construction > Heavy Construction > N/A | Class: C
+   Row 281: Scalfolding | Construction > Heavy Construction > N/A | Class: C
+   Row 282: Track driver | Construction > Heavy Construction > N/A | Class: C
+   Row 283: Safety | Construction > Heavy Construction > N/A | Class: C
+   Row 284: Quantity survey | Construction > Heavy Construction > N/A | Class: C
+   Row 285: Itc | Construction > Heavy Construction > N/A | Class: C
+   Row 301: Camping | Entertainment & Leisure > Outdoor Activities > N/A | Class: D
+   Row 302: Hourse Riding | Entertainment & Leisure > Outdoor Activities > N/A | Class: D
+   Row 303: Auto sports | Entertainment & Leisure > Outdoor Activities > N/A | Class: D
+   Row 304: Scuba assistant / helping divers prepare equipment. | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+   Row 305: Snorkeling Guide / Guiding Customers In Snorkeling Areas. | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+   Row 306: Beach/resort activity guide / managing beach games | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+   Row 307: rentals and safety. | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+
+Missing required fields: Skill: 4 row(s)
+   Row 327: N/A | Cafee And Resturnant > Coffees > Coffeee Maker | Class: D
+   Row 384: N/A | IT > IT support > IT and Softoware | Class: D
+   Row 385: N/A | IT > IT support > Information Technology | Class: D
+   Row 386: N/A | IT > IT support > Mechatronics / Electro-Mechanical Engineering | Class: D
+
+============================================================

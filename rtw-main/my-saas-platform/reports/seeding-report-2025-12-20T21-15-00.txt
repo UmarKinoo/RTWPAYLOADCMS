@@ -1,0 +1,91 @@
+============================================================
+SEEDING COMPLETE - SUMMARY REPORT
+============================================================
+
+STATISTICS:
+   Total rows processed: 390
+   Skills created: 328
+   Rows skipped: 62
+   Success rate: 84.1%
+
+ENTITIES CREATED:
+   Disciplines: 13 (Total unique: 13)
+   Categories: 53 (Total unique: 53)
+   SubCategories: 54 (Total unique: 54)
+   Skills: 328
+
+SKIPPED ROWS (62):
+------------------------------------------------------------
+
+
+Missing required fields: SubCategory, Skill: 10 row(s)
+   Row 203: Nan | Retail > Laundry/Dry Cleaning Assistant / Clothing Washing And Pressing. > Nan | Class: C
+   Row 222: Nan | Retail > Petrolian Buisness > Nan | Class: C
+   Row 352: Nan | Trasport & Speciality Vehicle > Passenger Transport > Nan | Class: D
+   Row 353: Nan | Trasport & Speciality Vehicle > Commercial Goods Transport > Nan | Class: D
+   Row 354: Nan | Trasport & Speciality Vehicle > Specialty Vehicles (Operational & Industrial) > Nan | Class: D
+   Row 355: Nan | Trasport & Speciality Vehicle > Municipal & Service Vehicles > Nan | Class: D
+   Row 356: Nan | Trasport & Speciality Vehicle > Construction Site Transport > Nan | Class: D
+   Row 357: Nan | Trasport & Speciality Vehicle > Marine Transport > Nan | Class: D
+   Row 358: Nan | Trasport & Speciality Vehicle > Delivary & Carrier > Nan | Class: D
+   Row 359: Nan | Sustinability And Wastemanagement > Sustinability And Wastemanagement > Nan | Class: D
+
+Missing required fields: SubCategory: 41 row(s)
+   Row 262: Carpenter | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 263: Woodwork | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 264: Furniture | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 265: cabinets | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 266: doors. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 267: Painting / interior and exterior painting. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 268: Tiler / tile cutting and installation. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 269: Waterproofing | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 270: Metalwork / welder - metal cutting | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 271: welding. | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 272: Waterproofing | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 273: Out door advertisement | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 274: Interiour advertuisement | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 275: Cad draft technicion | Construction > Interioudconstruction & Renovation > N/A | Class: C
+   Row 276: Concrete | Construction > Heavy Construction > N/A | Class: C
+   Row 277: Blocks / masonry | Construction > Heavy Construction > N/A | Class: C
+   Row 278: Electrical | Construction > Heavy Construction > N/A | Class: C
+   Row 279: Mechanical | Construction > Heavy Construction > N/A | Class: C
+   Row 280: Waterproofing | Construction > Heavy Construction > N/A | Class: C
+   Row 281: Scalfolding | Construction > Heavy Construction > N/A | Class: C
+   Row 282: Track driver | Construction > Heavy Construction > N/A | Class: C
+   Row 283: Safety | Construction > Heavy Construction > N/A | Class: C
+   Row 284: Quantity survey | Construction > Heavy Construction > N/A | Class: C
+   Row 285: Itc | Construction > Heavy Construction > N/A | Class: C
+   Row 301: Camping | Entertainment & Leisure > Outdoor Activities > N/A | Class: D
+   Row 302: Hourse Riding | Entertainment & Leisure > Outdoor Activities > N/A | Class: D
+   Row 303: Auto sports | Entertainment & Leisure > Outdoor Activities > N/A | Class: D
+   Row 304: Scuba assistant / helping divers prepare equipment. | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+   Row 305: Snorkeling Guide / Guiding Customers In Snorkeling Areas. | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+   Row 306: Beach/resort activity guide / managing beach games | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+   Row 307: rentals and safety. | Entertainment & Leisure > Marine/Water Activities > N/A | Class: D
+   Row 308: Marketing | Buisness > Buisness Support > Nan | Class: C
+   Row 309: Accounting finance | Buisness > Buisness Support > Nan | Class: C
+   Row 310: It and softoware | Buisness > Buisness Support > Nan | Class: C
+   Row 311: Wherehouse and logistic management | Buisness > Buisness Support > Nan | Class: C
+   Row 312: Hr | Buisness > Buisness Support > Nan | Class: C
+   Row 313: Staff relationship manager | Buisness > Buisness Support > Nan | Class: C
+   Row 314: Retail manager | Buisness > Buisness Support > Nan | Class: C
+   Row 315: Supply chain | Buisness > Buisness Support > Nan | Class: C
+   Row 316: Customer relation ship | Buisness > Buisness Support > Nan | Class: C
+   Row 317: Call center | Buisness > Buisness Support > Nan | Class: C
+
+Missing required fields: Skill: 4 row(s)
+   Row 327: N/A | Cafee And Resturnant > Coffees > Coffeee Maker | Class: D
+   Row 384: N/A | IT > IT support > IT and Softoware | Class: D
+   Row 385: N/A | IT > IT support > Information Technology | Class: D
+   Row 386: N/A | IT > IT support > Mechatronics / Electro-Mechanical Engineering | Class: D
+
+Missing required fields: Category: 7 row(s)
+   Row 366: Auto repair & vehicle services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 367: Satellite & tv technician | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 368: Truck repair & services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 369: Bikes repair & services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 370: Computer repair services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 371: Coffee and resturant appliance repair | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 372: Atm technicion | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+
+============================================================

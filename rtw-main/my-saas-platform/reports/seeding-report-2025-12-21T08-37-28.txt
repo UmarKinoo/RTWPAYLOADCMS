@@ -1,0 +1,19 @@
+============================================================
+SEEDING COMPLETE - SUMMARY REPORT
+============================================================
+
+STATISTICS:
+   Total rows processed: 390
+   Skills created: 390
+   Rows skipped: 0
+   Success rate: 100.0%
+
+ENTITIES CREATED:
+   Disciplines: 18 (Total unique: 18)
+   Categories: 69 (Total unique: 69)
+   SubCategories: 73 (Total unique: 73)
+   Skills: 390
+
+✅ No rows were skipped!
+
+============================================================

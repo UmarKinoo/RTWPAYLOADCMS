@@ -1,0 +1,352 @@
+[
+  {
+    "row": 262,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Carpenter",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 263,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Woodwork",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 264,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Furniture",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 265,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "cabinets",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 266,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "doors.",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 267,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Painting / interior and exterior painting.",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 268,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Tiler / tile cutting and installation.",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 269,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Waterproofing",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 270,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Metalwork / welder - metal cutting",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 271,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "welding.",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 272,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Waterproofing",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 273,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Out door advertisement",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 274,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Interiour advertuisement",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 275,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Interioudconstruction & Renovation",
+      "Skill": "Cad draft technicion",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 276,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Concrete",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 277,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Blocks / masonry",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 278,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Electrical",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 279,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Mechanical",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 280,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Waterproofing",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 281,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Scalfolding",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 282,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Track driver",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 283,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Safety",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 284,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Quantity survey",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 285,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Construction",
+      "Category": "Heavy Construction",
+      "Skill": "Itc",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 301,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Entertainment & Leisure",
+      "Category": "Outdoor Activities",
+      "Skill": "Camping",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 302,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Entertainment & Leisure",
+      "Category": "Outdoor Activities",
+      "Skill": "Hourse Riding",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 303,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Entertainment & Leisure",
+      "Category": "Outdoor Activities",
+      "Skill": "Auto sports",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 304,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Entertainment & Leisure",
+      "Category": "Marine/Water Activities",
+      "Skill": "Scuba assistant / helping divers prepare equipment.",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 305,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Entertainment & Leisure",
+      "Category": "Marine/Water Activities",
+      "Skill": "Snorkeling Guide / Guiding Customers In Snorkeling Areas.",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 306,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Entertainment & Leisure",
+      "Category": "Marine/Water Activities",
+      "Skill": "Beach/resort activity guide / managing beach games",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 307,
+    "reason": "Missing required fields: SubCategory",
+    "data": {
+      "Discipline": "Entertainment & Leisure",
+      "Category": "Marine/Water Activities",
+      "Skill": "rentals and safety.",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 327,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Cafee And Resturnant",
+      "Category": "Coffees",
+      "Sub Category": "Coffeee Maker",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 384,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "IT",
+      "Category": "IT support",
+      "Sub Category": "IT and Softoware",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 385,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "IT",
+      "Category": "IT support",
+      "Sub Category": "Information Technology",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 386,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "IT",
+      "Category": "IT support",
+      "Sub Category": "Mechatronics / Electro-Mechanical Engineering",
+      "Class": "D"
+    }
+  }
+]

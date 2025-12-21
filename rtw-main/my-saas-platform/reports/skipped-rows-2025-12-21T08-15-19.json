@@ -1,0 +1,229 @@
+[
+  {
+    "row": 203,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Retail",
+      "Category": "Laundry/Dry Cleaning Assistant / Clothing Washing And Pressing.",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 222,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Retail",
+      "Category": "Petrolian Buisness",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "C"
+    }
+  },
+  {
+    "row": 327,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Cafee And Resturnant",
+      "Category": "Coffees",
+      "Sub Category": "Coffeee Maker",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 352,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Trasport & Speciality Vehicle",
+      "Category": "Passenger Transport",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 353,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Trasport & Speciality Vehicle",
+      "Category": "Commercial Goods Transport",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 354,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Trasport & Speciality Vehicle",
+      "Category": "Specialty Vehicles (Operational & Industrial)",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 355,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Trasport & Speciality Vehicle",
+      "Category": "Municipal & Service Vehicles",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 356,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Trasport & Speciality Vehicle",
+      "Category": "Construction Site Transport",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 357,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Trasport & Speciality Vehicle",
+      "Category": "Marine Transport",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 358,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Trasport & Speciality Vehicle",
+      "Category": "Delivary & Carrier",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 359,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "Sustinability And Wastemanagement",
+      "Category": "Sustinability And Wastemanagement",
+      "Sub Category": "Nan",
+      "Skill": "Nan",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 366,
+    "reason": "Missing required fields: Category",
+    "data": {
+      "Discipline": "Mechanical, Auto & Appliance / Repair  Services",
+      "Category": "Nan",
+      "Sub Category": "Home Appliance Repair Services",
+      "Skill": "Auto repair & vehicle services",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 367,
+    "reason": "Missing required fields: Category",
+    "data": {
+      "Discipline": "Mechanical, Auto & Appliance / Repair  Services",
+      "Category": "Nan",
+      "Sub Category": "Home Appliance Repair Services",
+      "Skill": "Satellite & tv technician",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 368,
+    "reason": "Missing required fields: Category",
+    "data": {
+      "Discipline": "Mechanical, Auto & Appliance / Repair  Services",
+      "Category": "Nan",
+      "Sub Category": "Home Appliance Repair Services",
+      "Skill": "Truck repair & services",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 369,
+    "reason": "Missing required fields: Category",
+    "data": {
+      "Discipline": "Mechanical, Auto & Appliance / Repair  Services",
+      "Category": "Nan",
+      "Sub Category": "Home Appliance Repair Services",
+      "Skill": "Bikes repair & services",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 370,
+    "reason": "Missing required fields: Category",
+    "data": {
+      "Discipline": "Mechanical, Auto & Appliance / Repair  Services",
+      "Category": "Nan",
+      "Sub Category": "Home Appliance Repair Services",
+      "Skill": "Computer repair services",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 371,
+    "reason": "Missing required fields: Category",
+    "data": {
+      "Discipline": "Mechanical, Auto & Appliance / Repair  Services",
+      "Category": "Nan",
+      "Sub Category": "Home Appliance Repair Services",
+      "Skill": "Coffee and resturant appliance repair",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 372,
+    "reason": "Missing required fields: Category",
+    "data": {
+      "Discipline": "Mechanical, Auto & Appliance / Repair  Services",
+      "Category": "Nan",
+      "Sub Category": "Home Appliance Repair Services",
+      "Skill": "Atm technicion",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 384,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "IT",
+      "Category": "IT support",
+      "Sub Category": "IT and Softoware",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 385,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "IT",
+      "Category": "IT support",
+      "Sub Category": "Information Technology",
+      "Class": "D"
+    }
+  },
+  {
+    "row": 386,
+    "reason": "Missing required fields: Skill",
+    "data": {
+      "Discipline": "IT",
+      "Category": "IT support",
+      "Sub Category": "Mechatronics / Electro-Mechanical Engineering",
+      "Class": "D"
+    }
+  }
+]

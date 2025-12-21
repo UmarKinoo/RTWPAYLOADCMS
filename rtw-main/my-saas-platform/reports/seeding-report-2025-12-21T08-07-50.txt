@@ -1,0 +1,46 @@
+============================================================
+SEEDING COMPLETE - SUMMARY REPORT
+============================================================
+
+STATISTICS:
+   Total rows processed: 390
+   Skills created: 369
+   Rows skipped: 21
+   Success rate: 94.6%
+
+ENTITIES CREATED:
+   Disciplines: 15 (Total unique: 15)
+   Categories: 58 (Total unique: 58)
+   SubCategories: 59 (Total unique: 59)
+   Skills: 369
+
+SKIPPED ROWS (21):
+------------------------------------------------------------
+
+
+Missing required fields: Skill: 14 row(s)
+   Row 203: Nan | Retail > Laundry/Dry Cleaning Assistant / Clothing Washing And Pressing. > Nan | Class: C
+   Row 222: Nan | Retail > Petrolian Buisness > Nan | Class: C
+   Row 327: N/A | Cafee And Resturnant > Coffees > Coffeee Maker | Class: D
+   Row 352: Nan | Trasport & Speciality Vehicle > Passenger Transport > Nan | Class: D
+   Row 353: Nan | Trasport & Speciality Vehicle > Commercial Goods Transport > Nan | Class: D
+   Row 354: Nan | Trasport & Speciality Vehicle > Specialty Vehicles (Operational & Industrial) > Nan | Class: D
+   Row 355: Nan | Trasport & Speciality Vehicle > Municipal & Service Vehicles > Nan | Class: D
+   Row 356: Nan | Trasport & Speciality Vehicle > Construction Site Transport > Nan | Class: D
+   Row 357: Nan | Trasport & Speciality Vehicle > Marine Transport > Nan | Class: D
+   Row 358: Nan | Trasport & Speciality Vehicle > Delivary & Carrier > Nan | Class: D
+   Row 359: Nan | Sustinability And Wastemanagement > Sustinability And Wastemanagement > Nan | Class: D
+   Row 384: N/A | IT > IT support > IT and Softoware | Class: D
+   Row 385: N/A | IT > IT support > Information Technology | Class: D
+   Row 386: N/A | IT > IT support > Mechatronics / Electro-Mechanical Engineering | Class: D
+
+Missing required fields: Category: 7 row(s)
+   Row 366: Auto repair & vehicle services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 367: Satellite & tv technician | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 368: Truck repair & services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 369: Bikes repair & services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 370: Computer repair services | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 371: Coffee and resturant appliance repair | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+   Row 372: Atm technicion | Mechanical, Auto & Appliance / Repair  Services > Nan > Home Appliance Repair Services | Class: D
+
+============================================================

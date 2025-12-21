@@ -1,0 +1,371 @@
+Major Discipline,Category,Subcategory,Skill,Class
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Babysitting,B
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Pet Friendly,B
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Elderly Care,B
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Cooking,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Private Driver / Out Door Hous Maintenance,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Pool Service / Water Treatment,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Filter Checks,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Gardening / Plant Care,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Trimming,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Watering,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Pest Control,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Senior Helper / Support,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Companionship,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Light Tasks,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting,Home Security (hares),B
+Education,Tutoring,General Academics Support,General Academics Support -camputing,C
+Education,Tutoring,General Academics Support,General Academics Support -math,C
+Education,Tutoring,General Academics Support,General Academics Support,C
+Education,Tutoring,General Academics Support,Langouges,C
+Education,Tutoring,General Academics Support,General Academics Support - Science Support,C
+Education,Tutoring,General Academics Support,Art - Crafts Instructor,C
+Education,Tutoring,General Academics Support,Sports,C
+Education,Tutoring,General Academics Support,Music,C
+Education,Tutoring,General Academics Support,Writing,C
+Education,Early Child Hood Education,Infant & Toddler Care,Preschool Support,C
+Education,Early Child Hood Education,Infant & Toddler Care,Home-based Child Development,C
+Life Style & Personal Care,Personal Support Services,Personal Presentation & Preparation Support,Family & Household Activity Support,D
+Life Style & Personal Care,Women Beauty,Makeup,Grooming Services,D
+Life Style & Personal Care,Women Beauty,Makeup,Spa & Wellness,D
+Life Style & Personal Care,Women Beauty,Makeup,Skin & Body Care Support,D
+Life Style & Personal Care,Men Beauty,"Shave, Beard Shaping, Hair Trim",Skin & Body Care Support,D
+Life Style & Personal Care,Men Beauty,"Shave, Beard Shaping, Hair Trim",Spa & Wellness,D
+Life Style & Personal Care,Handmade & Craft Production,Handmade & Craft Production,Boutique Fshion & Design,D
+Life Style & Personal Care,Handmade & Craft Production,Handmade & Craft Production,Content Writer,D
+Life Style & Personal Care,Handmade & Craft Production,Handmade & Craft Production,Hobby & Passiob,D
+Life Style & Personal Care,Health & Welness,Relaxations Massage,Sport & Fitness Massage,D
+Life Style & Personal Care,Health & Welness,Relaxations Massage,Nutrition Coaching,D
+Life Style & Personal Care,Health & Welness,Relaxations Massage,Life Coaching,D
+Life Style & Personal Care,Health & Welness,Relaxations Massage,Hamam,D
+Life Style & Personal Care,Events And Experience,Event Planning,Wedding Planning,D
+Life Style & Personal Care,Events And Experience,Event Planning,Travel & Hosting,D
+Life Style & Personal Care,Events And Experience,Event Planning,Floral Event Stylish,D
+Life Style & Personal Care,Events And Experience,Event Planning,Event Decoration,D
+Life Style & Personal Care,Events And Experience,Event Planning,Audio - Visual Technician,D
+Life Style & Personal Care,Events And Experience,Event Planning,Event Logistics Support & Set Up,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Gym Floor Fitness Trainer / Personal Exercise Training,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Basketball Trainer,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Volleyball Trianer,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Tenis & Padel Trainer,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Swimming Trainer,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Outdoor Sports Trainer,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Water Outdoor Sports,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Sport Gymeniest Therapy,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Sport Gymeniest Yoga,D
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training,Nutrition & Supliment,D
+Retail,Tailer,"Clothing Tailor / Stitching, Alterations",Thob Tailer,C
+Retail,Tailer,"Clothing Tailor / Stitching, Alterations",Cloths Trailer,C
+Retail,Tailer,"Clothing Tailor / Stitching, Alterations",Cloths Designer,C
+Retail,Fashion Retail,Visual Merchandiser,Clothing Merchandiser,C
+Retail,Fashion Retail,Visual Merchandiser,Stock & Floor Merchandiser,C
+Retail,Animal & Pet Shops,Pet Store Helper,Feeding,C
+Retail,Animal & Pet Shops,Pet Store Helper,Cleaning,C
+Retail,Animal & Pet Shops,Pet Store Helper,Customer Support,C
+Retail,Animal & Pet Shops,Pet Store Helper,Veterinarian / Medical Animal Care,C
+Retail,Animal & Pet Shops,Pet Store Helper,Pet Groomer / Bathing,C
+Retail,Animal & Pet Shops,Pet Store Helper,Haircut,C
+Retail,Animal & Pet Shops,Pet Store Helper,Nail Trim,C
+Retail,Car Care,Car Cleaning,Interior And Exterior Cleaning,C
+Retail,Car Care,Car Cleaning,Glass Tinting,C
+Retail,Car Care,Car Cleaning,Car Polishing,C
+Retail,Car Care,Car Cleaning,Waxing,C
+Retail,Car Care,Car Cleaning,Buffing,C
+Retail,Car Care,Car Cleaning,Window Film Installation,C
+Retail,Super Market & Mini Market,,,C
+Retail,Grocery & Food Retail,Retail Operations,Store Helper,C
+Retail,Grocery & Food Retail,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Grocery & Food Retail,Retail Operations,Customer Service,C
+Retail,Grocery & Food Retail,Retail Operations,Retail Assistant / Stocking,C
+Retail,Grocery & Food Retail,Retail Operations,Shelf Arrangement,C
+Retail,Grocery & Food Retail,Retail Operations,Customer Services Representitve,C
+Retail,Grocery & Food Retail,Retail Operations,Store Operations,C
+Retail,Grocery & Food Retail,Retail Operations,Discount Value Creator,C
+Retail,Fashion & Apparel,Retail Operations,Store Helper,C
+Retail,Fashion & Apparel,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Fashion & Apparel,Retail Operations,Customer Service,C
+Retail,Fashion & Apparel,Retail Operations,Retail Assistant / Stocking,C
+Retail,Fashion & Apparel,Retail Operations,Shelf Arrangement,C
+Retail,Fashion & Apparel,Retail Operations,Customer Services Representitve,C
+Retail,Fashion & Apparel,Retail Operations,Store Operations,C
+Retail,Fashion & Apparel,Retail Operations,Discount Value Creator,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Store Helper,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Cashier Helper / Payment Support,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Customer Service,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Retail Assistant / Stocking,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Shelf Arrangement,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Customer Services Representitve,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Store Operations,C
+Retail,"Beauty, Health & Personal Care",Retail Operations,Discount Value Creator,C
+Retail,Electronic Technology,Retail Operations,Store Helper,C
+Retail,Electronic Technology,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Electronic Technology,Retail Operations,Customer Service,C
+Retail,Electronic Technology,Retail Operations,Retail Assistant / Stocking,C
+Retail,Electronic Technology,Retail Operations,Shelf Arrangement,C
+Retail,Electronic Technology,Retail Operations,Customer Services Representitve,C
+Retail,Electronic Technology,Retail Operations,Store Operations,C
+Retail,Electronic Technology,Retail Operations,Discount Value Creator,C
+Retail,Home & Living,Retail Operations,Store Helper,C
+Retail,Home & Living,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Home & Living,Retail Operations,Customer Service,C
+Retail,Home & Living,Retail Operations,Retail Assistant / Stocking,C
+Retail,Home & Living,Retail Operations,Shelf Arrangement,C
+Retail,Home & Living,Retail Operations,Customer Services Representitve,C
+Retail,Home & Living,Retail Operations,Store Operations,C
+Retail,Home & Living,Retail Operations,Discount Value Creator,C
+Retail,Automotive Retail Store,Retail Operations,Store Helper,C
+Retail,Automotive Retail Store,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Automotive Retail Store,Retail Operations,Customer Service,C
+Retail,Automotive Retail Store,Retail Operations,Retail Assistant / Stocking,C
+Retail,Automotive Retail Store,Retail Operations,Shelf Arrangement,C
+Retail,Automotive Retail Store,Retail Operations,Customer Services Representitve,C
+Retail,Automotive Retail Store,Retail Operations,Store Operations,C
+Retail,Automotive Retail Store,Retail Operations,Discount Value Creator,C
+Retail,Sport Cloth And Equipment,Retail Operations,Store Helper,C
+Retail,Sport Cloth And Equipment,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Sport Cloth And Equipment,Retail Operations,Customer Service,C
+Retail,Sport Cloth And Equipment,Retail Operations,Retail Assistant / Stocking,C
+Retail,Sport Cloth And Equipment,Retail Operations,Shelf Arrangement,C
+Retail,Sport Cloth And Equipment,Retail Operations,Customer Services Representitve,C
+Retail,Sport Cloth And Equipment,Retail Operations,Store Operations,C
+Retail,Sport Cloth And Equipment,Retail Operations,Discount Value Creator,C
+Retail,Construction Material,Retail Operations,Store Helper,C
+Retail,Construction Material,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Construction Material,Retail Operations,Customer Service,C
+Retail,Construction Material,Retail Operations,Retail Assistant / Stocking,C
+Retail,Construction Material,Retail Operations,Shelf Arrangement,C
+Retail,Construction Material,Retail Operations,Customer Services Representitve,C
+Retail,Construction Material,Retail Operations,Store Operations,C
+Retail,Construction Material,Retail Operations,Discount Value Creator,C
+Retail,Kids Staff Store,Retail Operations,Store Helper,C
+Retail,Kids Staff Store,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Kids Staff Store,Retail Operations,Customer Service,C
+Retail,Kids Staff Store,Retail Operations,Retail Assistant / Stocking,C
+Retail,Kids Staff Store,Retail Operations,Shelf Arrangement,C
+Retail,Kids Staff Store,Retail Operations,Customer Services Representitve,C
+Retail,Kids Staff Store,Retail Operations,Store Operations,C
+Retail,Kids Staff Store,Retail Operations,Discount Value Creator,C
+Retail,Itc And Computer Store,Retail Operations,Store Helper,C
+Retail,Itc And Computer Store,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Itc And Computer Store,Retail Operations,Customer Service,C
+Retail,Itc And Computer Store,Retail Operations,Retail Assistant / Stocking,C
+Retail,Itc And Computer Store,Retail Operations,Shelf Arrangement,C
+Retail,Itc And Computer Store,Retail Operations,Customer Services Representitve,C
+Retail,Itc And Computer Store,Retail Operations,Store Operations,C
+Retail,Itc And Computer Store,Retail Operations,Discount Value Creator,C
+Retail,Plastic Store,Retail Operations,Store Helper,C
+Retail,Plastic Store,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Plastic Store,Retail Operations,Customer Service,C
+Retail,Plastic Store,Retail Operations,Retail Assistant / Stocking,C
+Retail,Plastic Store,Retail Operations,Shelf Arrangement,C
+Retail,Plastic Store,Retail Operations,Customer Services Representitve,C
+Retail,Plastic Store,Retail Operations,Store Operations,C
+Retail,Plastic Store,Retail Operations,Discount Value Creator,C
+Retail,Kitchen Appliance Store,Retail Operations,Store Helper,C
+Retail,Kitchen Appliance Store,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Kitchen Appliance Store,Retail Operations,Customer Service,C
+Retail,Kitchen Appliance Store,Retail Operations,Retail Assistant / Stocking,C
+Retail,Kitchen Appliance Store,Retail Operations,Shelf Arrangement,C
+Retail,Kitchen Appliance Store,Retail Operations,Customer Services Representitve,C
+Retail,Kitchen Appliance Store,Retail Operations,Store Operations,C
+Retail,Kitchen Appliance Store,Retail Operations,Discount Value Creator,C
+Retail,Care Rental & Car Sales,Retail Operations,Store Helper,C
+Retail,Care Rental & Car Sales,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Care Rental & Car Sales,Retail Operations,Customer Service,C
+Retail,Care Rental & Car Sales,Retail Operations,Retail Assistant / Stocking,C
+Retail,Care Rental & Car Sales,Retail Operations,Shelf Arrangement,C
+Retail,Care Rental & Car Sales,Retail Operations,Customer Services Representitve,C
+Retail,Care Rental & Car Sales,Retail Operations,Store Operations,C
+Retail,Care Rental & Car Sales,Retail Operations,Discount Value Creator,C
+Retail,Mobile & M Appliance,Retail Operations,Store Helper,C
+Retail,Mobile & M Appliance,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Mobile & M Appliance,Retail Operations,Customer Service,C
+Retail,Mobile & M Appliance,Retail Operations,Retail Assistant / Stocking,C
+Retail,Mobile & M Appliance,Retail Operations,Shelf Arrangement,C
+Retail,Mobile & M Appliance,Retail Operations,Customer Services Representitve,C
+Retail,Mobile & M Appliance,Retail Operations,Store Operations,C
+Retail,Mobile & M Appliance,Retail Operations,Discount Value Creator,C
+Retail,Laundry / Dry Cleaning Assistant / Clothing Washing And Pressing,Laundry & Dry Cleaning,,C
+Retail,Flowers & Gifts,Retail Operations,Store Helper,C
+Retail,Flowers & Gifts,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Flowers & Gifts,Retail Operations,Customer Service,C
+Retail,Flowers & Gifts,Retail Operations,Retail Assistant / Stocking,C
+Retail,Flowers & Gifts,Retail Operations,Shelf Arrangement,C
+Retail,Flowers & Gifts,Retail Operations,Customer Services Representitve,C
+Retail,Flowers & Gifts,Retail Operations,Store Operations,C
+Retail,Flowers & Gifts,Retail Operations,Discount Value Creator,C
+Retail,Fabric,Retail Operations,Store Helper,C
+Retail,Fabric,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Fabric,Retail Operations,Customer Service,C
+Retail,Fabric,Retail Operations,Retail Assistant / Stocking,C
+Retail,Fabric,Retail Operations,Shelf Arrangement,C
+Retail,Fabric,Retail Operations,Customer Services Representitve,C
+Retail,Fabric,Retail Operations,Store Operations,C
+Retail,Fabric,Retail Operations,Discount Value Creator,C
+Retail,Petroleum Business,,,C
+Retail,E-games,,,C
+Retail,Glasses & Foot Wear,Retail Operations,Store Helper,C
+Retail,Glasses & Foot Wear,Retail Operations,Cashier Helper / Payment Support,C
+Retail,Glasses & Foot Wear,Retail Operations,Customer Service,C
+Retail,Glasses & Foot Wear,Retail Operations,Retail Assistant / Stocking,C
+Retail,Glasses & Foot Wear,Retail Operations,Shelf Arrangement,C
+Retail,Glasses & Foot Wear,Retail Operations,Customer Services Representitve,C
+Retail,Glasses & Foot Wear,Retail Operations,Store Operations,C
+Retail,Glasses & Foot Wear,Retail Operations,Discount Value Creator,C
+Retail,Stationery,,,C
+Facility Management,Technical & Installation,Light Mep,Light Electrician / Lighting,C
+Facility Management,Technical & Installation,Light Mep,Wiring,C
+Facility Management,Technical & Installation,Light Mep,Switch Repair,C
+Facility Management,Technical & Installation,Light Mep,Plumbing,C
+Facility Management,Technical & Installation,Light Mep,AC Technician / Cooling,C
+Facility Management,Technical & Installation,Light Mep,Generator Technician,C
+Facility Management,Technical & Installation,Light Mep,Elevator Technician,C
+Facility Management,Technical & Installation,Light Mep,Fire System Technician,C
+Facility Management,Technical & Installation,Light Mep,Ict,C
+Facility Management,Technical & Installation,Light Mep,Irrigation System,C
+Facility Management,Technical & Installation,Light Mep,Water Treatment,C
+Facility Management,Technical & Installation,Light Mep,Painter,C
+Facility Management,Smart System,Tech Setup,Smart Control Installer,C
+Facility Management,Smart System,Tech Setup,Cctv Technician,C
+Facility Management,Smart System,Tech Setup,Internet Technician,C
+Facility Management,Smart System,Tech Setup,Access Control & Security System,C
+Facility Management,Smart System,Tech Setup,Bms ( Building Management System),C
+Facility Management,Non-technical,General,"Landscape, Lawn & Trimming",C
+Facility Management,Non-technical,General,General Cleaning,C
+Facility Management,Non-technical,General,Office Cleaning,C
+Facility Management,Non-technical,General,Security,C
+Facility Management,Non-technical,General,Glass & Window Cleaning,C
+Facility Management,Non-technical,General,Carpet Cleaning,C
+Facility Management,Non-technical,General,Furniture & Fixtures Repair,C
+Facility Management,Non-technical,General,Parking & Traffic Control,C
+Facility Management,Non-technical,General,Waste Management,C
+Facility Management,Non-technical,General,Inventory & Store Support,C
+Construction,Interior Construction & Renovation,Carpentry Works,Carpenter,C
+Construction,Interior Construction & Renovation,Carpentry Works,Woodwork,C
+Construction,Interior Construction & Renovation,Carpentry Works,Furniture,C
+Construction,Interior Construction & Renovation,,Cabinets,C
+Construction,Interior Construction & Renovation,Carpentry Works,Doors,C
+Construction,Interior Construction & Renovation,Painting Works,Painting / Interior And Exterior Painting,C
+Construction,Interior Construction & Renovation,Tiling Works,Tiler / Tile Cutting And Installation,C
+Construction,Interior Construction & Renovation,,Waterproofing,C
+Construction,Interior Construction & Renovation,Metal Works,Metalwork / Welder - Metal Cutting,C
+Construction,Interior Construction & Renovation,Metal Works,Welding,C
+Construction,Interior Construction & Renovation,Carpentry Works,Out Door Advertisement,C
+Construction,Interior Construction & Renovation,,Interiour Advertuisement,C
+Construction,Interior Construction & Renovation,,Cad Draft Technician,C
+Construction,Heavy Construction,,Concrete,C
+Construction,Heavy Construction,,Blocks / Masonry,C
+Construction,Heavy Construction,,Electrical,C
+Construction,Heavy Construction,,Mechanical,C
+Construction,Heavy Construction,,Waterproofing,C
+Construction,Heavy Construction,,Scalfolding,C
+Construction,Heavy Construction,Driver Services,Track Driver,C
+Construction,Heavy Construction,,Safety,C
+Construction,Heavy Construction,,Quantity Survey,C
+Construction,Heavy Construction,,Itc,C
+Events & Hospitality,Catering,Catering Helper,Serving And Preparation,D
+Events & Hospitality,Hospitality,Receiption,Room Cleaning And Support,D
+Events & Hospitality,Hospitality,Receiption,Guest Service Support,D
+Events & Hospitality,Hospitality,Receiption,Reception Assistance,D
+Events & Hospitality,Hospitality,Receiption,Call Center,D
+Events & Hospitality,Hospitality,Receiption,Hotel Housekeeping,D
+Events & Hospitality,Events,Set Up & Logistic,Audio-visual & Technical Support,D
+Events & Hospitality,Events,Set Up & Logistic,Decorations & Venue Preparations,D
+Events & Hospitality,Events,Set Up & Logistic,Crowd & Guest Operations (tickets-information Helper),D
+Events & Hospitality,Events,Set Up & Logistic,Catering Support,D
+Events & Hospitality,Events,Set Up & Logistic,Security & Safety,D
+Entertainment & Leisure,Recreation,"Entertainment Assistant / Games, Children's Activities, Recreation Support",Dj,D
+Entertainment & Leisure,Recreation,"Entertainment Assistant / Games, Children's Activities, Recreation Support",Entertainment Assistant,D
+Entertainment & Leisure,Recreation,"Entertainment Assistant / Games, Children's Activities, Recreation Support","Games, Children's Activities",D
+Entertainment & Leisure,Recreation,"Entertainment Assistant / Games, Children's Activities, Recreation Support",Recreation Support,D
+Entertainment & Leisure,Outdoor Activities,,Camping,D
+Entertainment & Leisure,Outdoor Activities,,Hourse Riding,D
+Entertainment & Leisure,Outdoor Activities,,Auto Sports,D
+Entertainment & Leisure,Marine / Water Activities,,Scuba Assistant / Helping Divers Prepare Equipment,D
+Entertainment & Leisure,Marine / Water Activities,,Snorkeling Guide / Guiding Customer In Snorkeling Areas,D
+Entertainment & Leisure,Marine / Water Activities,,Beach / Resort Activity Guide / Managing Beach Games,D
+Entertainment & Leisure,Marine / Water Activities,,Rentals And Safety,D
+Business,Business Support,,Marketing,C
+Business,Business Support,,Accounting Finance,C
+Business,Business Support,,IT And Software,C
+Business,Business Support,,Wherehouse And Logistic Management,C
+Business,Business Support,,HR,C
+Business,Business Support,,Staff Relationship Manager,C
+Business,Business Support,,Retail Manager,C
+Business,Business Support,,Supply Chain,C
+Business,Business Support,,Customer Relation Ship,C
+Business,Business Support,,Call Center,C
+Cafe And Restaurant,Coffees,Coffee Maker,Tea Maker,D
+Cafe And Restaurant,Coffees,Coffee Maker,Breakfast Preparation,D
+Cafe And Restaurant,Coffees,Coffee Maker,Waiter / Beverage Server,D
+Cafe And Restaurant,Coffees,Coffee Maker,Counter Service,D
+Cafe And Restaurant,Coffees,Coffee Maker,Juice Maker,D
+Cafe And Restaurant,Coffees,Coffee Maker,Barista,D
+Cafe And Restaurant,Coffees,Coffee Maker,Customer Care & Service,D
+Cafe And Restaurant,Coffees,Coffee Maker,Takeaway Counter,D
+Cafe And Restaurant,Coffees,Coffee Maker,Dishwasher / Dining Cleaner,D
+Cafe And Restaurant,Coffees,Coffee Maker,,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Fast Food Preparation,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Eastern Cuisine,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Western Cuisine,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Indian Cuisine,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Asian Cuisine,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Japanese Cuisine,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Saudi Cuisine,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,Chief Cusin Or Chief Assistance Cusin,Dessert And Bakery,D
+Cafe And Restaurant,Resturnat & Brefage & Buffet,General,Dishwasher / Dining Cleaner,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Shepherd / Herd Management,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Cats,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Dogs,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Birds,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Hourse,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Camels,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Cheaps,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Wild Animals,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Crop Production & Field Operations,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Aquaclture & Marine Farming,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Agricultural Processing & Packaging,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Farm Equipment & Infrastructure Support,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Agricultural Logistics & Distribution,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Specialized Agricultural Services,D
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,Fishing,D
+Transport & Speciality Vehicle,Passenger Transport,,,D
+Transport & Speciality Vehicle,Commercial Goods Transport,,,D
+Transport & Speciality Vehicle,Specialty Vehicles (operational & Industrial),,,D
+Transport & Speciality Vehicle,Municipal & Service Vehicles,,,D
+Transport & Speciality Vehicle,Construction Site Transport,,,D
+Transport & Speciality Vehicle,Marine Transport,,,D
+Transport & Speciality Vehicle,Delivery & Carrier,Driver Services,,D
+Sustainability And Waste Management,Sustainability And Waste Management,,,D
+Industrial & Logistic,Industrial & Logistic,Material Handling & Equipment Operators,Distribution,D
+Industrial & Logistic,Industrial & Logistic,Material Handling & Equipment Operators,Dispatch & Coordination,D
+Industrial & Logistic,Industrial & Logistic,Material Handling & Equipment Operators,Industrial Production & Manufacturing Support,D
+Industrial & Logistic,Industrial & Logistic,Material Handling & Equipment Operators,Industrial Maintenance Support,D
+Industrial & Logistic,Industrial & Logistic,Material Handling & Equipment Operators,Freight & Cargo Handling,D
+Industrial & Logistic,Industrial & Logistic,Material Handling & Equipment Operators,Warehouse Operations,D
+"Mechanical, Auto & Appliance / Repair Services",Other,Home Appliance Repair Services,Auto Repair & Vehicle Services,D
+"Mechanical, Auto & Appliance / Repair Services",Other,Home Appliance Repair Services,Satellite & TV Technician,D
+"Mechanical, Auto & Appliance / Repair Services",Other,Home Appliance Repair Services,Truck Repair & Services,D
+"Mechanical, Auto & Appliance / Repair Services",Other,Home Appliance Repair Services,Bikes Repair & Services,D
+"Mechanical, Auto & Appliance / Repair Services",Other,Home Appliance Repair Services,Computer Repair Services,D
+"Mechanical, Auto & Appliance / Repair Services",Other,Home Appliance Repair Services,Coffee And Restaurant Appliance Repair,D
+"Mechanical, Auto & Appliance / Repair Services",Other,Home Appliance Repair Services,ATM Technician,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Home Healthcare Assistant,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Physiotherapy Support,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Medical Equipment Technician,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Hospital Porter,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Clinic Reception & Patient Support,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Pharmacy Assistant,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Elderly Care,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Special Needs Support,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Health & Hygiene Technician,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Veterinarian / Medical Animal Care,D
+IT,IT Support,Ai,Data Analyst,D
+IT,IT Support,IT And Software,,D
+IT,IT Support,Information Technology,,D
+IT,IT Support,Mechatronics / Electro-mechanical Engineering,,D
+Media & Visuialisation,Digital Media Production,,,D
+Media & Visuialisation,Visualisation & Creative Rendering,,,D
+Media & Visuialisation,Media Operations & Productions Support,,,D
+Media & Visuialisation,Marketing Visualization & Communication Media,,,D
+Media & Visuialisation,Technical Media Support & Maintenance,,,D
