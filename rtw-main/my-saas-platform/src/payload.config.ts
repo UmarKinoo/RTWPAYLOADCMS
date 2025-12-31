@@ -17,6 +17,13 @@ import { Disciplines } from '@/collections/Disciplines'
 import { SubCategories } from '@/collections/SubCategories'
 import { Skills } from '@/collections/Skills'
 import { Candidates } from '@/collections/Candidates'
+import { Employers } from '@/collections/Employers'
+import { Plans } from '@/collections/Plans'
+import { Purchases } from '@/collections/Purchases'
+import { Interviews } from '@/collections/Interviews'
+import { Notifications } from '@/collections/Notifications'
+import { CandidateInteractions } from '@/collections/CandidateInteractions'
+import { JobPostings } from '@/collections/JobPostings'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
 import { plugins } from '@/plugins'
@@ -70,6 +77,13 @@ export default buildConfig({
     SubCategories,
     Skills,
     Candidates,
+    Employers,
+    Plans,
+    Purchases,
+    Interviews,
+    Notifications,
+    CandidateInteractions,
+    JobPostings,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],

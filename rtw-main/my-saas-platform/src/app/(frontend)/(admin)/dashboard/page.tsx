@@ -1,44 +1,89 @@
-import { Section, Container } from '@/components/ds'
-
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
+import { getCurrentCandidate } from '@/lib/candidate'
+import { getCurrentEmployer } from '@/lib/employer'
+import { CandidateDashboard } from '@/components/candidate/CandidateDashboard'
 import { getUser } from '@/lib/auth'
-
-import type { User } from '@/payload-types'
+import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Dashboard() {
-  const user: User | null = await getUser()
-
+  // Check if user is authenticated first
+  const user = await getUser()
+  
   if (!user) {
     redirect('/login')
   }
 
-  return <ToDelete user={user} />
-}
+  // Determine user type based on collection
+  const userCollection = user.collection
 
-const ToDelete = ({ user }: { user: User }) => {
-  const createdAt = user.createdAt ? new Date(user.createdAt) : new Date()
-  const now = new Date()
-  const accountAgeDays = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
-  return (
-    <Section>
-      <Container className="font-mono space-y-2">
-        <h1 className="mb-4">Payload Starter Dashboard</h1>
-        <p>
-          &gt; You&apos;re email is <span className="text-primary">{user.email}</span>
-        </p>
-        <p>
-          &gt; Your created your account at{' '}
-          <span className="text-primary">{createdAt.toLocaleString()}</span>
-        </p>
-        <p>
-          &gt; Your account is <span className="text-primary">{accountAgeDays}</span> days old
-        </p>
-        <p>
-          &gt; You have the role of <span className="text-primary">{user.role}</span>
-        </p>
-      </Container>
-    </Section>
-  )
+  // Route based on user type
+  if (userCollection === 'candidates') {
+    const candidate = await getCurrentCandidate()
+
+    // SECURITY: If candidate exists, verify it belongs to the authenticated user
+    if (candidate) {
+      // Double-check email matches (additional security layer)
+      if (candidate.email !== user.email) {
+        console.error('SECURITY ALERT: Dashboard access denied - email mismatch', {
+          candidateEmail: candidate.email,
+          userEmail: user.email,
+          candidateId: candidate.id,
+          userId: user.id,
+        })
+        redirect('/login')
+      }
+    }
+
+    // If user exists but no candidate profile, redirect to registration
+    if (!candidate) {
+      redirect('/register')
+    }
+
+    // Fetch notifications data
+    const [unreadNotificationsCount, notifications] = await Promise.all([
+      getUnreadNotificationCount(candidate.id),
+      getCandidateNotifications(candidate.id),
+    ])
+
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <CandidateDashboard
+          candidate={candidate}
+          unreadNotificationsCount={unreadNotificationsCount}
+          notifications={notifications}
+        />
+      </Suspense>
+    )
+  } else if (userCollection === 'employers') {
+    const employer = await getCurrentEmployer()
+
+    // SECURITY: If employer exists, verify it belongs to the authenticated user
+    if (employer) {
+      // Double-check email matches (additional security layer)
+      if (employer.email !== user.email) {
+        console.error('SECURITY ALERT: Dashboard access denied - email mismatch', {
+          employerEmail: employer.email,
+          userEmail: user.email,
+          employerId: employer.id,
+          userId: user.id,
+        })
+        redirect('/login')
+      }
+    }
+
+    // If user exists but no employer profile, redirect to employer registration
+    if (!employer) {
+      redirect('/employer/register')
+    }
+
+    // Redirect to employer dashboard
+    redirect('/employer/dashboard')
+  } else {
+    // Unknown user type, redirect to login
+    console.warn('Unknown user collection:', userCollection)
+    redirect('/login')
+  }
 }

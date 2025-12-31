@@ -2,10 +2,42 @@ import type { CollectionConfig } from 'payload'
 import type { CollectionBeforeChangeHook } from 'payload'
 
 import { authenticated } from '../access/authenticated'
+import {
+  revalidateCandidate,
+  revalidateCandidateDelete,
+} from './Candidates/hooks/revalidateCandidate'
 
-// Hook to generate candidate bio embedding for vector search
-const generateBioEmbedding: CollectionBeforeChangeHook = async ({ data, req }) => {
-  // Only generate if we have the required fields
+// Hook to set billing class from primary skill and generate bio embedding
+const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({ data, req }) => {
+  // Set billing class from primary skill
+  if (data.primarySkill) {
+    try {
+      let skillDoc
+      if (typeof data.primarySkill === 'object' && data.primarySkill?.billingClass) {
+        // Already populated
+        skillDoc = data.primarySkill
+      } else {
+        // Need to fetch
+        const skillId = typeof data.primarySkill === 'object' && data.primarySkill.id
+          ? data.primarySkill.id
+          : (typeof data.primarySkill === 'string' ? data.primarySkill : String(data.primarySkill))
+        
+        skillDoc = await req.payload.findByID({
+          collection: 'skills',
+          id: skillId,
+        })
+      }
+
+      if (skillDoc && skillDoc.billingClass) {
+        // Automatically set billing class from skill
+        data.billingClass = skillDoc.billingClass
+      }
+    } catch (error) {
+      console.error('Error fetching skill for billing class:', error)
+    }
+  }
+
+  // Generate bio embedding if we have the required fields
   if (!data.jobTitle || !data.primarySkill || !data.experienceYears) {
     return data
   }
@@ -72,7 +104,7 @@ export const Candidates: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'email',
-    defaultColumns: ['firstName', 'lastName', 'email', 'primarySkill', 'updatedAt'],
+    defaultColumns: ['firstName', 'lastName', 'email', 'primarySkill', 'billingClass', 'updatedAt'],
   },
   fields: [
     // Identity
@@ -106,6 +138,21 @@ export const Candidates: CollectionConfig = {
       required: true,
       admin: {
         description: 'Primary skill determines discipline, category, and subcategory',
+      },
+    },
+    // Billing Class - Automatically set from primarySkill
+    {
+      name: 'billingClass',
+      type: 'select',
+      options: [
+        { label: 'A - Skilled Workers', value: 'A' },
+        { label: 'B - Specialty / Certified Technical', value: 'B' },
+        { label: 'C - Elite Specialty / Expert Licensed', value: 'C' },
+        { label: 'D - Saudi Nationals', value: 'D' },
+      ],
+      admin: {
+        description: 'Billing class automatically inherited from primary skill (A=Skilled, B=Specialty, C=Elite Specialty, D=Saudi Nationals)',
+        readOnly: true, // Auto-populated, not manually editable
       },
     },
     // Demographics
@@ -204,6 +251,26 @@ export const Candidates: CollectionConfig = {
         description: 'Vector embedding for candidate matching',
       },
     },
+    // Profile Picture Upload
+    {
+      name: 'profilePicture',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Profile Picture',
+      admin: {
+        description: 'Upload your profile picture (JPG, PNG, etc.)',
+      },
+    },
+    // Resume/CV Upload
+    {
+      name: 'resume',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Resume/CV Document',
+      admin: {
+        description: 'Upload your resume or CV document (PDF, DOC, DOCX)',
+      },
+    },
     // Terms acceptance
     {
       name: 'termsAccepted',
@@ -214,7 +281,9 @@ export const Candidates: CollectionConfig = {
     },
   ],
   hooks: {
-    beforeChange: [generateBioEmbedding],
+    beforeChange: [setBillingClassAndGenerateEmbedding],
+    afterChange: [revalidateCandidate],
+    afterDelete: [revalidateCandidateDelete],
   },
 }
 

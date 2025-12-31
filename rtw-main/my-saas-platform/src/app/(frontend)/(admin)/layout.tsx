@@ -1,5 +1,3 @@
-import { AppNav } from '@/components/app/nav'
-
 import { redirect } from 'next/navigation'
 import { getUser } from '@/lib/auth'
 
@@ -20,7 +18,6 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
 
   return (
     <main className="flex flex-col min-h-screen">
-      <AppNav />
       <section className="flex-1">{children}</section>
     </main>
   )

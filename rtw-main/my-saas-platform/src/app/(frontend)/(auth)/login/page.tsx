@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string; error?: string }>
+  searchParams: Promise<{ success?: string; error?: string; collection?: string }>
 }) {
   const user: User | null = await getUser()
 
@@ -33,7 +33,7 @@ export default async function LoginPage({
           {(params.success || params.error) && (
             <LoginPageToast success={params.success} error={params.error} />
           )}
-          <LoginForm />
+          <LoginForm collection={params.collection} />
           <p className="text-muted-foreground text-xs">
             Don&apos;t have an account?{' '}
             <Link className="text-foreground" href="/register">

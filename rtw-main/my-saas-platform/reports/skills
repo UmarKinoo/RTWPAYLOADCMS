@@ -1,0 +1,125 @@
+Major Discipline,Category,Subcategory / Job,Skill,Class
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Babysitting,B
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Pet Care,B
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Elderly Care,B
+Housekeeping & Home Services,Housekeeping,General Inside Home Cleaning,Cooking,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,Private driver / outdoor house maintenance,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,Pool service / water treatment,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,filter checks.,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,Gardening / plant care,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,trimming,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,watering.,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,Pest control,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,Senior helper / support,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,companionship,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,light tasks.,B
+Housekeeping & Home Services,Private Driver,Handyman / Basic Home Repairs And Mounting.,Home security (hares),B
+Education,Tutoring,General Academic Support,General academics support -computing,C
+Education,Tutoring,General Academic Support,General academics support -math,C
+Education,Tutoring,General Academic Support,General academics support,C
+Education,Tutoring,General Academic Support,Languages,C
+Education,Tutoring,General Academic Support,General academics support - science support.,C
+Education,Tutoring,General Academic Support,Art - crafts instructor,C
+Education,Tutoring,General Academic Support,Sports,C
+Education,Tutoring,General Academic Support,Music,C
+Education,Tutoring,General Academic Support,Writing,C
+Education,Early Childhood Education,Infant & Toddler Care,Preschool support,C
+Education,Early Childhood Education,Infant & Toddler Care,Home-based child development,C
+Education,Special Assistance,Special Assistance,General Special Assistance Services,C
+Life Style & Personal Care,Personal Support Services,Personal Presentation & Preparation Support,Family & household activity support,C
+Life Style & Personal Care,Personal Support Services,Personal Presentation & Preparation Support,Social & lifestyle support,C
+Life Style & Personal Care,Women Beauty,Makeup,Grooming services,C
+Life Style & Personal Care,Women Beauty,Makeup,Spa & wellness,C
+Life Style & Personal Care,Women Beauty,Makeup,Skin & body care support,C
+Life Style & Personal Care,Men Beauty,Shave, Beard Shaping, Hair Trim.,Men Beauty & grooming services,C
+Life Style & Personal Care,Handmade & Craft Production,Handmade & Craft Production,General Handmade & Craft Production Services,C
+Life Style & Personal Care,Health & Wellness,Relaxations Massage,Message,C
+Life Style & Personal Care,Health & Wellness,Relaxations Massage,Yoga,C
+Life Style & Personal Care,Events And Experience,Event Planning,Home event organizing & support,C
+Life Style & Personal Care,Sport Training & Coaching,Sport Coach / Individual Or Team Sports Training.,Sports & fitness coaching,C
+Retail,Tailor,Clothing Tailor / Stitching, Alterations.,Basic clothing repairs & alterations,C
+Retail,Fashion Retail,Visual Merchandiser,In-store sales assistance,C
+Retail,Fashion Retail,Visual Merchandiser,Visual merchandising support,C
+Retail,Animal & Pet Shops,Pet Store Helper,General Pet Store Helper Services,C
+Retail,Car Care,Car Cleaning,General Car Cleaning Services,C
+Retail,Super market & Mini market,Store Operations,General Store Operations Services,C
+Retail,Grocery & Food Retail,Store Operations,General Store Operations Services,C
+Retail,Fashion & Apparel,Retail Operation,General Retail Operation Services,C
+Retail,Beauty, Health & Personal Care,Retail Operation,General Retail Operation Services,C
+Retail,Electronic Technology,Retail Operation,General Retail Operation Services,C
+Retail,Home & Living,Retail Operation,General Retail Operation Services,C
+Retail,Automotive Retail Store,Retail Operation,General Retail Operation Services,C
+Retail,Sport Cloth And Equipment,Retail Operation,General Retail Operation Services,C
+Retail,Construction Material,Retail Operation,General Retail Operation Services,C
+Retail,Kids Staff Store,Retail Operation,General Retail Operation Services,C
+Retail,ITC And Computer Store,Retail Operation,General Retail Operation Services,C
+Retail,Plastic Store,Retail Operation,General Retail Operation Services,C
+Retail,Kitchen Appliance Store,Retail Operation,General Retail Operation Services,C
+Retail,Car Rental & Car Sales,Retail Operation,General Retail Operation Services,C
+Retail,Mobile & M Appliance,Retail Operation,General Retail Operation Services,C
+Retail,Super market & Mini market,Retail Operation,General Retail Operation Services,C
+Retail,Laundry/Dry Cleaning Assistant / Clothing Washing And Pressing.,General,General General Services,C
+Retail,Flowers & Gifts,Retail Operation,General Retail Operation Services,C
+Retail,Fabric,Retail Operation,General Retail Operation Services,C
+Retail,Petroleum Business,Retail Operation,General Retail Operation Services,C
+Retail,E-Games,Retail Operation,General Retail Operation Services,C
+Retail,Glasses & Foot Wear,Retail Operation,General Retail Operation Services,C
+Retail,Stationery,Retail Operation,General Retail Operation Services,C
+Facility Management,Technical & Installation,Light Mep,General Light Mep Services,C
+Facility Management,Technical & Installation,Tech Setup,General Tech Setup Services,C
+Facility Management,Smart System,General,General General Services,C
+Facility Management,Non-Technical,General,General General Services,C
+Construction,Interior Construction,General,General General Services,C
+Construction,Heavy Construction,General,General General Services,C
+Events & Hospitality,Catering,Catering Helper,General Catering Helper Services,C
+Events & Hospitality,Hospitality,Reception,General Reception Services,C
+Events & Hospitality,Events,Set Up & Logistic,General Set Up & Logistic Services,C
+Entertainment & Leisure,Recreation,Entertainment Assistant / Games, Children'S Activities, Recreation Support.,General Entertainment Assistant / Games, Children'S Activities, Recreation Support. Services,C
+Entertainment & Leisure,Outdoor Activities,Entertainment Assistant / Games, Children'S Activities, Recreation Support.,General Entertainment Assistant / Games, Children'S Activities, Recreation Support. Services,C
+Entertainment & Leisure,Marine/Water Activities,Entertainment Assistant / Games, Children'S Activities, Recreation Support.,General Entertainment Assistant / Games, Children'S Activities, Recreation Support. Services,C
+Business,Business Support,General,General General Services,C
+Cafe and Restaurant,Coffees,Coffee Maker,Coffee maker,C
+Cafe and Restaurant,Coffees,Coffee Maker,Tea boy,C
+Cafe and Restaurant,Coffees,Coffee Maker,Barista,C
+Cafe and Restaurant,Restaurant & Beverage & Buffet,Chef or Assistant Chef,Chef (cusin),C
+Cafe and Restaurant,Restaurant & Beverage & Buffet,Chef or Assistant Chef,Assistant chef (cusin),C
+Agriculture & Animal & Farm Services,Veterinarian,Livestock Feeding & Care,General Livestock Feeding & Care Services,C
+Transport & Specialty Vehicle,Passenger Transport,Material Handling & Equipment Operators,General Material Handling & Equipment Operators Services,C
+Transport & Specialty Vehicle,Commercial Goods Transport,Material Handling & Equipment Operators,General Material Handling & Equipment Operators Services,C
+Transport & Specialty Vehicle,Specialty Vehicles (Operational & Industrial),Material Handling & Equipment Operators,General Material Handling & Equipment Operators Services,C
+Transport & Specialty Vehicle,Municipal & Service Vehicles,Material Handling & Equipment Operators,General Material Handling & Equipment Operators Services,C
+Transport & Specialty Vehicle,Construction Site Transport,Material Handling & Equipment Operators,General Material Handling & Equipment Operators Services,C
+Transport & Specialty Vehicle,Marine Transport,Material Handling & Equipment Operators,General Material Handling & Equipment Operators Services,C
+Transport & Specialty Vehicle,Delivary & Carrier,Material Handling & Equipment Operators,General Material Handling & Equipment Operators Services,C
+Sustainability And Waste Management,Sustainability And Waste Management,General,General General Services,C
+Industrial  & Logistic,Industrial  & Logistic,Material Handling & Equipment Operators,Distribution, dispatch & coordination,C
+Industrial  & Logistic,Industrial  & Logistic,Material Handling & Equipment Operators,Industrial production & manufacturing support,C
+Industrial  & Logistic,Industrial  & Logistic,Material Handling & Equipment Operators,Industrial maintenance support,C
+Industrial  & Logistic,Industrial  & Logistic,Material Handling & Equipment Operators,Freight & cargo handling,C
+Industrial  & Logistic,Industrial  & Logistic,Material Handling & Equipment Operators,Warehouse operation,C
+Mechanical, Auto & Appliance Repair,Appliance Services,Home Appliance Repair Services,Auto repair & vehicle services,D
+Mechanical, Auto & Appliance Repair,Appliance Services,Home Appliance Repair Services,Satellite & tv technician,D
+Mechanical, Auto & Appliance Repair,Appliance Services,Home Appliance Repair Services,Truck repair & services,D
+Mechanical, Auto & Appliance Repair,Appliance Services,Home Appliance Repair Services,Bikes repair & services,D
+Mechanical, Auto & Appliance Repair,Appliance Services,Home Appliance Repair Services,Computer repair services,D
+Mechanical, Auto & Appliance Repair,Appliance Services,Home Appliance Repair Services,Coffee and resturant appliance repair,D
+Mechanical, Auto & Appliance Repair,Appliance Services,Home Appliance Repair Services,ATM Technician,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Home healthcare assistant,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Physiotherapy support,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Medical equipment technician,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Hospital porter,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Clinic reception & patient support,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Pharmacy assistant,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Elderly Care,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Special needs support,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Health & hygiene technician,D
+Healthcare,Healthcare Services,Nurse / Caregiver,Veterinarian / medical animal care.,D
+IT,IT support,AI,Data Analyst,D
+IT,IT support,IT and Software,General IT and Software Services,D
+IT,IT support,Information Technology,General Information Technology Services,D
+IT,IT support,Mechatronics / Electro-Mechanical Engineering,General Mechatronics / Electro-Mechanical Engineering Services,D
+Media & Visualisation,Digital Media Production,Production Team,Production Assistant,D
+Media & Visualisation,Visualisation & Creative Rendering,Rendering Team,3D Visualizer,D
+Media & Visualisation,Media Operations & Productions support,Operations,Operations Support,D
+Media & Visualisation,Marketing Visualization & Communication Media,Marketing Media,Content Creator,D
+Media & Visualisation,Technical Media Support & Maintenance,Technical Support,Media Technician,D

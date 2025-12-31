@@ -20,17 +20,26 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
   }
 
   try {
-    const data = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: emailFrom,
       to,
       subject,
       html,
     })
 
+    if (error) {
+      console.error('Resend API error:', error)
+      return { 
+        success: false, 
+        error: typeof error === 'string' ? error : error.message || 'Failed to send email' 
+      }
+    }
+
     return { success: true, data }
   } catch (error) {
     console.error('Failed to send email:', error)
-    return { success: false, error }
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    return { success: false, error: errorMessage }
   }
 }
 

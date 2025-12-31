@@ -1,35 +1,27 @@
-import { Container, Section } from '@/components/ds'
+import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
+import { Hero } from '@/components/homepage/blocks/Hero'
+import { Candidates } from '@/components/homepage/blocks/Candidates'
+import { MajorDisciplines } from '@/components/homepage/blocks/MajorDisciplines'
+import { UploadResume } from '@/components/homepage/blocks/UploadResume'
+import { Blog } from '@/components/homepage/blocks/Blog'
+import { TrustedBy } from '@/components/homepage/blocks/TrustedBy'
+import { FAQ } from '@/components/homepage/blocks/FAQ'
+import { Newsletter } from '@/components/homepage/blocks/Newsletter'
+import { Footer } from '@/components/homepage/blocks/Footer'
 
 export default async function Home() {
-  return <ToDelete />
-}
-
-const ToDelete = () => {
   return (
-    <Section className="font-mono text-sm">
-      <Container className="space-y-4">
-        <h1>
-          Payload Starter (<a href="https://payloadstarter.dev">payloadstarter.dev</a>)
-        </h1>
-        <p className="grid gap-1 underline text-primary">
-          <a href="https://github.com/brijr/payload-starter">View on GitHub &rarr;</a>
-          <a href="https://payloadcms.com/docs">Read the Payload Docs &rarr;</a>
-          <a href="https://payloadcms.com/docs/plugins/overview#official-plugins">
-            Explore Official Plugins &rarr;
-          </a>
-        </p>
-        <p>This starter uses Payload, Postgres, Resend, and Vercel Blob.</p>
-        <p className="mb-8">
-          Created by{' '}
-          <a className="underline text-primary" href="https://brijr.dev">
-            @brijr
-          </a>
-        </p>
-
-        <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbrijr%2Fpayload-starter&env=DATABASE_URI,PAYLOAD_SECRET,BLOB_READ_WRITE_TOKEN,RESEND_API_KEY,EMAIL_FROM&redirect-url=https%3A%2F%2Fgithub.com%2Fbrijr%2Fpayload-starter&demo-url=https%3A%2F%2Fpayloadstarter.dev">
-          <img src="https://vercel.com/button" alt="Deploy with Vercel" />
-        </a>
-      </Container>
-    </Section>
+    <div className="min-h-screen bg-[#ffffff] overflow-x-hidden">
+      <HomepageNavbarWrapper />
+      <Hero />
+      <Candidates />
+      <MajorDisciplines />
+      <UploadResume />
+      <Blog />
+      <TrustedBy />
+      <FAQ />
+      <Newsletter />
+      <Footer />
+    </div>
   )
 }

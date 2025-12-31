@@ -22,6 +22,7 @@ type LoginParams = {
   email: string
   password: string
   rememberMe?: boolean
+  collection?: string // Collection slug to authenticate against (defaults to 'users')
 }
 
 type RegisterParams = {
@@ -80,13 +81,14 @@ export async function getUser(): Promise<User | null> {
 
 /**
  * Authenticate a user with email and password
- * @param params Login parameters including email, password and optional rememberMe flag
+ * @param params Login parameters including email, password, optional rememberMe flag, and collection slug
  * @returns Login response with success status and error message if applicable
  */
 export async function loginUser({
   email,
   password,
   rememberMe = false,
+  collection = 'users', // Default to 'users' collection for backward compatibility
 }: LoginParams): Promise<LoginResponse> {
   // Validate inputs first
   const emailValidation = validateEmail(email)
@@ -104,7 +106,7 @@ export async function loginUser({
     // Track login attempts (could be extended with rate limiting)
     try {
       const result: Result = await payload.login({
-        collection: 'users',
+        collection: collection, // Use the provided collection or default to 'users'
         data: { email, password },
       })
 
@@ -343,11 +345,19 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
     })
 
     // Send reset email
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: email,
       subject: 'Reset your password',
       html: passwordResetEmailTemplate(email, resetToken),
     })
+
+    // Check if email was sent successfully
+    if (!emailResult.success) {
+      console.error('Failed to send password reset email:', emailResult.error)
+      // Still return success to prevent email enumeration, but log the error
+      // In production, you might want to handle this differently
+      return { success: true }
+    }
 
     return { success: true }
   } catch (error) {
@@ -424,11 +434,16 @@ export async function resetPassword(
     })
 
     // Send confirmation email
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: email,
       subject: 'Your password was changed',
       html: passwordChangedEmailTemplate(),
     })
+
+    // Log if email failed to send (but don't fail the password reset)
+    if (!emailResult.success) {
+      console.error('Failed to send password changed confirmation email:', emailResult.error)
+    }
 
     return { success: true }
   } catch (error) {
@@ -487,11 +502,18 @@ export async function resendVerification(
     })
 
     // Send verification email
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: email,
       subject: 'Verify your email address',
       html: verificationEmailTemplate(email, verificationToken),
     })
+
+    // Check if email was sent successfully
+    if (!emailResult.success) {
+      console.error('Failed to send verification email:', emailResult.error)
+      // Still return success to prevent email enumeration
+      return { success: true }
+    }
 
     return { success: true }
   } catch (error) {

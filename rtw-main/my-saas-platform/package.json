@@ -12,6 +12,8 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "seed:skills": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-skills.ts",
+    "seed:plans": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-plans.ts",
+    "optimize:images": "tsx scripts/optimize-images.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
@@ -102,11 +104,13 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
+    "@types/glob": "^9.0.0",
     "@types/node": "^22.19.1",
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
     "eslint": "^9.39.1",
     "eslint-config-next": "16.0.0",
+    "glob": "^13.0.0",
     "prettier": "^3.7.4",
     "rimraf": "^6.1.2",
     "supabase": "^2.67.3",

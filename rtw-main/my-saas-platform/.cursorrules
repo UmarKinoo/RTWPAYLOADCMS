@@ -1,0 +1,42 @@
+# RTW Brand Colors and Design System
+
+## Brand Colors
+- Primary Purple: #4644b8
+- Primary Blue: #005DDC
+- Error/Red: #DC0000
+- Dark Text: #16252d
+- Black: #222222
+- Neutral 800: #282828
+- Neutral 700: #353535
+- Neutral 500: #757575
+- Neutral 400: #A5A5A5
+- Neutral 300: #CBCBCB
+- Neutral 200: #EDEDED
+- Neutral 100: #E5EAE8
+- White: #FFFFFF
+- Neutral Shade 90: #CFD4D1
+- Neutral Shade 40: #606261
+- Neutral Shade 20: #333434
+
+## Typography
+- Font Family: Inter (primary), Poppins (secondary)
+- Heading 28: Inter Semi Bold, 28px, line-height: 100%
+- Subtitle 18: Inter Semi Bold, 18px, line-height: 100%
+- Body 16: Inter Medium/Semi Bold, 16px, line-height: 100%
+- Body 14: Inter Medium/Regular, 14px, line-height: 100%
+- Caption 12: Inter/Poppins Medium/Regular, 12px, line-height: 100%
+
+## Design Patterns
+- Border radius: 8px (default), 16px (cards), 24px (chips/badges)
+- Border colors: #EDEDED (light), #CBCBCB (medium)
+- Card backgrounds: #FFFFFF
+- Use consistent spacing: 4px, 8px, 16px, 24px, 32px
+
+
+
+
+
+
+
+
+
