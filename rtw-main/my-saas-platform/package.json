@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--no-deprecation next build --webpack",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation pnpm generate:types && cross-env NODE_OPTIONS=--no-deprecation next build --webpack",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
     "devsafe": "node scripts/cleanup.js && cross-env NODE_OPTIONS=--no-deprecation next dev --webpack",
     "cleanup": "powershell -ExecutionPolicy Bypass -File scripts/cleanup-windows.ps1",

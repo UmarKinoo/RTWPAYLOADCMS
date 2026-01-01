@@ -74,7 +74,9 @@ export async function getUser(): Promise<User | null> {
     const { user } = await payload.auth({ headers })
     return user || null
   } catch (error) {
-    console.error('Error getting user:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Error getting user:', errorMessage)
     return null
   }
 }
@@ -134,7 +136,10 @@ export async function loginUser({
         errorCode: 'INVALID_CREDENTIALS',
       }
     } catch (error) {
-      console.error('Login attempt failed:', error)
+      // SECURITY: Never log passwords or sensitive data
+      // Only log error message, not the full error object which might contain request data
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      console.error('Login attempt failed:', errorMessage)
 
       // Provide more specific error messages based on error type
       if (error instanceof Error) {
@@ -154,7 +159,9 @@ export async function loginUser({
       }
     }
   } catch (error) {
-    console.error('Login system error:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Login system error:', errorMessage)
     return {
       success: false,
       error: 'We encountered a system error. Please try again later.',
@@ -169,7 +176,7 @@ export async function loginUser({
 export async function logoutUser() {
   try {
     const cookieStore = await cookies()
-    // Delete the auth cookie with proper options
+    // Delete the auth cookie
     cookieStore.delete('payload-token')
 
     // Clear any other auth-related cookies if they exist
@@ -177,7 +184,9 @@ export async function logoutUser() {
 
     redirect('/')
   } catch (error) {
-    console.error('Logout error:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Logout error:', errorMessage)
     redirect('/')
   }
 }
@@ -188,7 +197,7 @@ export async function logoutUser() {
 export async function clearAuthCookies(): Promise<{ success: boolean }> {
   try {
     const cookieStore = await cookies()
-    // Delete the auth cookie with proper options
+    // Delete the auth cookie
     cookieStore.delete('payload-token')
 
     // Clear any other auth-related cookies if they exist
@@ -196,7 +205,9 @@ export async function clearAuthCookies(): Promise<{ success: boolean }> {
 
     return { success: true }
   } catch (error) {
-    console.error('Clear cookies error:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Clear cookies error:', errorMessage)
     return { success: false }
   }
 }
@@ -261,7 +272,9 @@ export async function registerUser({ email, password }: RegisterParams): Promise
         errorCode: 'LOGIN_AFTER_REGISTER_FAILED',
       }
     } catch (error) {
-      console.error('Registration attempt failed:', error)
+      // SECURITY: Never log passwords or sensitive data
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      console.error('Registration attempt failed:', errorMessage)
 
       // Provide specific error messages based on error type
       if (error instanceof Error) {
@@ -290,7 +303,9 @@ export async function registerUser({ email, password }: RegisterParams): Promise
       }
     }
   } catch (error) {
-    console.error('Registration system error:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Registration system error:', errorMessage)
     return {
       success: false,
       error: 'We encountered a system error. Please try again later.',
@@ -361,7 +376,9 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
 
     return { success: true }
   } catch (error) {
-    console.error('Forgot password error:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Forgot password error:', errorMessage)
     return {
       success: false,
       error: 'We encountered an error. Please try again later.',
@@ -447,7 +464,9 @@ export async function resetPassword(
 
     return { success: true }
   } catch (error) {
-    console.error('Reset password error:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Reset password error:', errorMessage)
     return {
       success: false,
       error: 'We encountered an error. Please try again later.',
@@ -517,7 +536,9 @@ export async function resendVerification(
 
     return { success: true }
   } catch (error) {
-    console.error('Resend verification error:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Resend verification error:', errorMessage)
     return { success: false, error: 'Failed to send verification email' }
   }
 }

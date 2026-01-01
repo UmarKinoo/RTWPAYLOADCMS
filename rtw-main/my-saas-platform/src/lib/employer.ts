@@ -91,7 +91,8 @@ export async function registerEmployer(
     })
 
     if (!loginResult.success) {
-      console.error('Failed to log in employer after registration:', loginResult.error)
+      // SECURITY: Never log passwords or sensitive data
+      console.error('Failed to log in employer after registration:', loginResult.error || 'Unknown error')
       return {
         success: false,
         error: loginResult.error || 'Registration successful, but failed to log in.',
@@ -105,7 +106,9 @@ export async function registerEmployer(
       employerId: String(employer.id),
     }
   } catch (error: any) {
-    console.error('Error registering employer:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error?.message || 'Unknown error'
+    console.error('Error registering employer:', errorMessage)
     return {
       success: false,
       error: error.message || 'Failed to register employer. Please try again.',

@@ -173,7 +173,9 @@ export async function registerCandidate(
       candidateId: String(candidate.id),
     }
   } catch (error: any) {
-    console.error('Error registering candidate:', error)
+    // SECURITY: Never log passwords or sensitive data
+    const errorMessage = error?.message || 'Unknown error'
+    console.error('Error registering candidate:', errorMessage)
 
     // Handle specific Payload errors
     if (error?.message?.includes('email')) {
