@@ -10,7 +10,7 @@ import { Container } from '@/components/ds'
 
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
-    id?: string
+    id?: string | null
   }
 > = async (props) => {
   const { id, categories, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
@@ -54,7 +54,7 @@ export const ArchiveBlock: React.FC<
   }
 
   return (
-    <section className="w-full" id={`block-${id}`}>
+    <section className="w-full" id={id ? `block-${id}` : undefined}>
       <Container>
         {introContent && (
           <div className="mb-16">

@@ -39,7 +39,6 @@ export const RenderBlocks: React.FC<{
           case 'hero': {
             return (
               <div key={index} className="my-12">
-                {/* @ts-expect-error there may be some mismatch between the expected types here */}
                 <HeroBlock {...block} />
               </div>
             )
@@ -48,7 +47,6 @@ export const RenderBlocks: React.FC<{
           case 'cta': {
             return (
               <div key={index} className="my-12">
-                {/* @ts-expect-error there may be some mismatch between the expected types here */}
                 <CallToActionBlock {...block} />
               </div>
             )
@@ -57,7 +55,6 @@ export const RenderBlocks: React.FC<{
           case 'content': {
             return (
               <div key={index} className="my-12">
-                {/* @ts-expect-error there may be some mismatch between the expected types here */}
                 <ContentBlock {...block} />
               </div>
             )
@@ -66,7 +63,6 @@ export const RenderBlocks: React.FC<{
           case 'mediaBlock': {
             return (
               <div key={index} className="my-12">
-                {/* @ts-expect-error there may be some mismatch between the expected types here */}
                 <MediaBlock {...block} />
               </div>
             )
@@ -75,7 +71,6 @@ export const RenderBlocks: React.FC<{
           case 'archive': {
             return (
               <div key={index} className="my-12">
-                {/* @ts-expect-error there may be some mismatch between the expected types here */}
                 <ArchiveBlock {...block} />
               </div>
             )
@@ -84,7 +79,6 @@ export const RenderBlocks: React.FC<{
           case 'formBlock': {
             return (
               <div key={index} className="my-12">
-                {/* @ts-expect-error there may be some mismatch between the expected types here */}
                 <FormBlock {...block} />
               </div>
             )

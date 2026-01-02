@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import type { Employer } from '@/payload-types'
 import type { StatisticsDataPoint } from '@/lib/payload/employer-dashboard'
+import type { NotificationListItem } from '@/lib/payload/notifications'
 
 interface EmployerDashboardClientProps {
   employer: Employer
@@ -17,9 +18,11 @@ interface EmployerDashboardClientProps {
   initialStatistics: StatisticsDataPoint[]
   initialPeriod: 'week' | 'month' | 'year'
   unreadNotificationsCount: number
+  notifications: NotificationListItem[]
   statsCards: React.ReactNode
   scheduleSidebar: React.ReactNode
   recentCandidatesTable: React.ReactNode
+  recentlySearchedCandidates: React.ReactNode
 }
 
 export function EmployerDashboardClient({
@@ -28,9 +31,11 @@ export function EmployerDashboardClient({
   initialStatistics,
   initialPeriod,
   unreadNotificationsCount,
+  notifications,
   statsCards,
   scheduleSidebar,
   recentCandidatesTable,
+  recentlySearchedCandidates,
 }: EmployerDashboardClientProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -63,7 +68,11 @@ export function EmployerDashboardClient({
       {/* Main Content */}
       <div className="px-4 pt-16 pb-8 sm:px-6 lg:ml-[220px] lg:pt-6 lg:pr-6">
         {/* Header Section */}
-        <DashboardHeader employer={employer} unreadNotificationsCount={unreadNotificationsCount} />
+        <DashboardHeader
+          employer={employer}
+          unreadNotificationsCount={unreadNotificationsCount}
+          notifications={notifications}
+        />
 
         {/* Main Grid */}
         <div className="mt-6 flex flex-col gap-4 xl:flex-row">
@@ -87,6 +96,11 @@ export function EmployerDashboardClient({
         {/* Recent Candidates Table */}
         <div className="mt-4">
           {recentCandidatesTable}
+        </div>
+
+        {/* Recently Searched Candidates */}
+        <div className="mt-4">
+          {recentlySearchedCandidates}
         </div>
       </div>
     </div>

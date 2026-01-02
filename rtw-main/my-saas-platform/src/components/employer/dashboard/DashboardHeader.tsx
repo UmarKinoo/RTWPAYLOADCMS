@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Search, Bell } from 'lucide-react'
-import { AvatarCircle } from '@/components/navbar/AvatarCircle'
+import { Search } from 'lucide-react'
+import { EmployerNotificationDropdown } from '@/components/employer/notifications/EmployerNotificationDropdown'
+import { AccountDropdown } from '@/components/shared/AccountDropdown'
 import type { Employer } from '@/payload-types'
+import type { NotificationListItem } from '@/lib/payload/notifications'
 // Simple debounce implementation
 function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
@@ -30,6 +31,7 @@ function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: num
 interface DashboardHeaderProps {
   employer: Employer
   unreadNotificationsCount: number
+  notifications: NotificationListItem[]
 }
 
 function getDisplayName(employer: Employer): string {
@@ -39,10 +41,13 @@ function getDisplayName(employer: Employer): string {
   return 'Employer'
 }
 
-export function DashboardHeader({ employer, unreadNotificationsCount }: DashboardHeaderProps) {
+export function DashboardHeader({ employer, unreadNotificationsCount, notifications }: DashboardHeaderProps) {
   const displayName = getDisplayName(employer)
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
+  
+  const interviewCredits = employer.wallet?.interviewCredits ?? 0
+  const contactUnlockCredits = employer.wallet?.contactUnlockCredits ?? 0
 
   const handleSearch = useDebounce((query: string) => {
     if (query.trim()) {
@@ -104,28 +109,22 @@ export function DashboardHeader({ employer, unreadNotificationsCount }: Dashboar
           </Button>
         </Link>
 
-        {/* Notification Button with Badge */}
-        <Link href="/employer/dashboard/notifications">
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-10 rounded-xl bg-[#ededed] sm:size-12"
-            >
-              <Bell className="size-5 text-[#282828] sm:size-6" />
-            </Button>
-            {unreadNotificationsCount > 0 && (
-              <Badge className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-[#dc0000] p-0 text-xs text-white">
-                {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
-              </Badge>
-            )}
-          </div>
-        </Link>
+        {/* Notification Dropdown */}
+        <EmployerNotificationDropdown
+          notifications={notifications}
+          unreadCount={unreadNotificationsCount}
+        />
 
-        {/* Profile Avatar */}
-        <div className="rounded-lg">
-          <AvatarCircle name={displayName} size="md" />
-        </div>
+        {/* Account Dropdown */}
+        <AccountDropdown
+          displayName={displayName}
+          email={employer.email}
+          role="employer"
+          avatarSize="md"
+          interviewCredits={interviewCredits}
+          contactUnlockCredits={contactUnlockCredits}
+          dashboardUrl="/employer/dashboard"
+        />
       </div>
     </div>
   )

@@ -1,32 +1,28 @@
 import { redirect } from 'next/navigation'
-import { getCurrentCandidate } from '@/lib/candidate'
-import { getUser } from '@/lib/auth'
+import { getCurrentUserType } from '@/lib/currentUserType'
 import { getCandidateNotifications } from '@/lib/payload/candidate-notifications'
 import { CandidateNotificationsPage } from '@/components/candidate/notifications/CandidateNotificationsPage'
 
 export const dynamic = 'force-dynamic'
 
 export default async function NotificationsPage() {
-  const user = await getUser()
+  const userType = await getCurrentUserType()
 
-  if (!user) {
+  if (!userType) {
     redirect('/login')
   }
 
-  if (user.collection !== 'candidates') {
+  // Allow candidates and admins (admin can view candidate pages)
+  if (userType.kind !== 'candidate' && userType.kind !== 'admin') {
     redirect('/dashboard')
   }
 
-  const candidate = await getCurrentCandidate()
-
-  if (!candidate) {
-    redirect('/register')
+  // If admin, redirect to dashboard (admin doesn't have candidate notifications)
+  if (userType.kind === 'admin') {
+    redirect('/dashboard')
   }
 
-  // Verify email matches
-  if (candidate.email !== user.email) {
-    redirect('/login')
-  }
+  const candidate = userType.candidate
 
   const notifications = await getCandidateNotifications(candidate.id)
 

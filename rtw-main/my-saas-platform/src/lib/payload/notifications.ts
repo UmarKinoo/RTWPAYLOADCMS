@@ -53,7 +53,7 @@ async function fetchNotifications(
     type: notification.type,
     title: notification.title,
     message: notification.message,
-    read: notification.read,
+    read: notification.read ?? false,
     actionUrl: notification.actionUrl || undefined,
     createdAt: notification.createdAt,
   }))

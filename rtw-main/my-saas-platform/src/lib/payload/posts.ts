@@ -105,7 +105,7 @@ async function fetchPosts(options?: {
     page,
     sort: '-publishedAt',
     depth: 2, // Populate categories, authors, media
-    where,
+    where: where as any,
   })
 
   return {

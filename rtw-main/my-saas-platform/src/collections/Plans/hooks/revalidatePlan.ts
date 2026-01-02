@@ -15,7 +15,7 @@ export const revalidatePlan: CollectionAfterChangeHook<Plan> = ({
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating plans after change: ${doc.slug}`)
             revalidatePath('/pricing')
-            revalidateTag('plans')
+            revalidateTag('plans', 'max')
           })
           .catch((error) => {
             if (error instanceof Error) {
@@ -25,14 +25,14 @@ export const revalidatePlan: CollectionAfterChangeHook<Plan> = ({
               ) {
                 payload.logger.warn('Revalidation skipped (not in Next.js server context)')
               } else {
-                payload.logger.error('Revalidation error:', error)
+                payload.logger.error(`Revalidation error: ${error.message}`)
               }
             }
           })
       }
     } catch (error) {
       if (error instanceof Error) {
-        payload.logger.warn('Revalidation skipped:', error.message)
+        payload.logger.warn(`Revalidation skipped: ${error.message}`)
       }
     }
   }
@@ -53,7 +53,7 @@ export const revalidatePlanDelete: CollectionAfterDeleteHook<Plan> = ({
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating plans after delete: ${doc.slug}`)
             revalidatePath('/pricing')
-            revalidateTag('plans')
+            revalidateTag('plans', 'max')
           })
           .catch((error) => {
             if (error instanceof Error) {
@@ -63,14 +63,14 @@ export const revalidatePlanDelete: CollectionAfterDeleteHook<Plan> = ({
               ) {
                 payload.logger.warn('Revalidation skipped (not in Next.js server context)')
               } else {
-                payload.logger.error('Revalidation error:', error)
+                payload.logger.error(`Revalidation error: ${error.message}`)
               }
             }
           })
       }
     } catch (error) {
       if (error instanceof Error) {
-        payload.logger.warn('Revalidation skipped:', error.message)
+        payload.logger.warn(`Revalidation skipped: ${error.message}`)
       }
     }
   }

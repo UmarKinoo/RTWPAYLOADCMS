@@ -93,13 +93,13 @@ export async function acceptInterview(
     })
 
     // Revalidate cache
-    revalidatePath('/candidate/dashboard/interviews')
-    revalidatePath('/employer/dashboard')
-    revalidateTag(`candidate:${user.id}`)
-    revalidateTag(`employer:${employerId}`)
-    revalidateTag(`interview:${interviewId}`)
-    revalidateTag('interviews')
-    revalidateTag('notifications')
+    revalidatePath('/candidate/dashboard/interviews', 'page')
+    revalidatePath('/employer/dashboard', 'page')
+    revalidateTag(`candidate:${user.id}`, 'max')
+    revalidateTag(`employer:${employerId}`, 'max')
+    revalidateTag(`interview:${interviewId}`, 'max')
+    revalidateTag('interviews', 'max')
+    revalidateTag('notifications', 'max')
 
     return { success: true, interview: updatedInterview }
   } catch (error: any) {
@@ -192,13 +192,13 @@ export async function rejectInterview(
     })
 
     // Revalidate cache
-    revalidatePath('/candidate/dashboard/interviews')
-    revalidatePath('/employer/dashboard')
-    revalidateTag(`candidate:${user.id}`)
-    revalidateTag(`employer:${employerId}`)
-    revalidateTag(`interview:${interviewId}`)
-    revalidateTag('interviews')
-    revalidateTag('notifications')
+    revalidatePath('/candidate/dashboard/interviews', 'page')
+    revalidatePath('/employer/dashboard', 'page')
+    revalidateTag(`candidate:${user.id}`, 'max')
+    revalidateTag(`employer:${employerId}`, 'max')
+    revalidateTag(`interview:${interviewId}`, 'max')
+    revalidateTag('interviews', 'max')
+    revalidateTag('notifications', 'max')
 
     return { success: true }
   } catch (error: any) {

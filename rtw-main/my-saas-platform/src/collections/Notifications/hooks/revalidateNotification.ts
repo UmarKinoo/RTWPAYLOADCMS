@@ -14,25 +14,26 @@ export const revalidateNotification: CollectionAfterChangeHook<Notification> = (
               const employerId = typeof doc.employer === 'object' ? doc.employer.id : doc.employer
               payload.logger.info(`Revalidating employer notifications after change: ${doc.id}`)
               revalidatePath('/employer/dashboard')
-              revalidateTag(`employer:${employerId}`)
-              revalidateTag('notifications')
+              revalidateTag(`employer:${employerId}`, 'max')
+              revalidateTag('notifications', 'max')
             }
             if (doc.candidate) {
               const candidateId = typeof doc.candidate === 'object' ? doc.candidate.id : doc.candidate
               payload.logger.info(`Revalidating candidate notifications after change: ${doc.id}`)
               revalidatePath('/candidate/dashboard')
-              revalidateTag(`candidate:${candidateId}`)
-              revalidateTag('notifications')
+              revalidateTag(`candidate:${candidateId}`, 'max')
+              revalidateTag('notifications', 'max')
             }
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating notification ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating notification ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating notification ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating notification ${doc.id}: ${errorMessage}`)
     }
   }
   return doc
@@ -51,25 +52,26 @@ export const revalidateNotificationDelete: CollectionAfterDeleteHook<Notificatio
               const employerId = typeof doc.employer === 'object' ? doc.employer.id : doc.employer
               payload.logger.info(`Revalidating employer notifications after delete: ${doc.id}`)
               revalidatePath('/employer/dashboard')
-              revalidateTag(`employer:${employerId}`)
-              revalidateTag('notifications')
+              revalidateTag(`employer:${employerId}`, 'max')
+              revalidateTag('notifications', 'max')
             }
             if (doc.candidate) {
               const candidateId = typeof doc.candidate === 'object' ? doc.candidate.id : doc.candidate
               payload.logger.info(`Revalidating candidate notifications after delete: ${doc.id}`)
               revalidatePath('/candidate/dashboard')
-              revalidateTag(`candidate:${candidateId}`)
-              revalidateTag('notifications')
+              revalidateTag(`candidate:${candidateId}`, 'max')
+              revalidateTag('notifications', 'max')
             }
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating deleted notification ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating deleted notification ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating deleted notification ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating deleted notification ${doc.id}: ${errorMessage}`)
     }
   }
   return doc

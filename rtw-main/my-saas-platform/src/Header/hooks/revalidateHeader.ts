@@ -11,7 +11,7 @@ export const revalidateHeader: GlobalAfterChangeHook = ({ doc, req: { payload, c
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating header`)
             revalidatePath('/', 'layout')
-            revalidateTag('global_header')
+            revalidateTag('global_header', 'max')
           })
           .catch((error) => {
             if (error instanceof Error) {
@@ -21,7 +21,7 @@ export const revalidateHeader: GlobalAfterChangeHook = ({ doc, req: { payload, c
               ) {
                 payload.logger.warn('Revalidation skipped (not in Next.js server context)')
               } else {
-                payload.logger.error('Revalidation error:', error)
+                payload.logger.error({ err: error }, 'Revalidation error')
               }
             }
           })
@@ -29,7 +29,7 @@ export const revalidateHeader: GlobalAfterChangeHook = ({ doc, req: { payload, c
     } catch (error) {
       // Silently fail if revalidation is not available
       if (error instanceof Error) {
-        payload.logger.warn('Revalidation skipped:', error.message)
+        payload.logger.warn(`Revalidation skipped: ${error.message}`)
       }
     }
   }

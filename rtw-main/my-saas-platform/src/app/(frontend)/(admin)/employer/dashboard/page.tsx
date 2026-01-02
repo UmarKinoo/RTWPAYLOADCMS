@@ -1,48 +1,44 @@
 import { redirect } from 'next/navigation'
-import { getCurrentEmployer } from '@/lib/employer'
-import { getUser } from '@/lib/auth'
+import { getCurrentUserType } from '@/lib/currentUserType'
 import { EmployerDashboard } from '@/components/employer/dashboard/EmployerDashboard'
 
 export const dynamic = 'force-dynamic'
 
 export default async function EmployerDashboardPage() {
-  // Check if user is authenticated first
-  const user = await getUser()
+  const timestamp = new Date().toISOString()
+  console.log(`[EMPLOYER_DASHBOARD ${timestamp}] Page render started`)
+  try {
+    const userType = await getCurrentUserType()
+    console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User type:`, userType ? userType.kind : 'null', userType ? { id: userType.user?.id, email: userType.user?.email } : 'no user')
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Ensure user is an employer
-  if (user.collection !== 'employers') {
-    redirect('/dashboard')
-  }
-
-  const employer = await getCurrentEmployer()
-
-  // SECURITY: If employer exists, verify it belongs to the authenticated user
-  if (employer) {
-    // Double-check email matches (additional security layer)
-    if (employer.email !== user.email) {
-      console.error('SECURITY ALERT: Dashboard access denied - email mismatch', {
-        employerEmail: employer.email,
-        userEmail: user.email,
-        employerId: employer.id,
-        userId: user.id,
-      })
+    if (!userType) {
+      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] No user type, redirecting to /login`)
       redirect('/login')
     }
-  }
 
-  // If user exists but no employer profile, redirect to employer registration
-  if (!employer) {
-    redirect('/employer/register')
-  }
+    // Only allow employers to access this page
+    if (userType.kind !== 'employer') {
+      // Redirect admins to admin dashboard, others to main dashboard
+      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User is not employer (kind:`, userType.kind, '), redirecting to /dashboard')
+      if (userType.kind === 'admin') {
+        redirect('/dashboard')
+      }
+      redirect('/dashboard')
+    }
 
-  return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      <EmployerDashboard employer={employer} />
-    </div>
-  )
+    // TypeScript type narrowing: at this point, userType.kind is 'employer'
+    const employer = userType.employer
+    console.log(`[EMPLOYER_DASHBOARD ${timestamp}] Rendering employer dashboard for employer:`, employer?.id, employer?.companyName)
+
+    return (
+      <div className="min-h-screen bg-[#f5f5f5]">
+        <EmployerDashboard employer={employer} />
+      </div>
+    )
+  } catch (error) {
+    const timestamp = new Date().toISOString()
+    console.error(`[EMPLOYER_DASHBOARD ${timestamp}] Error:`, error)
+    redirect('/login')
+  }
 }
 

@@ -166,7 +166,7 @@ export async function registerCandidate(
       // User can still log in manually
     }
 
-    revalidatePath('/register')
+    revalidatePath('/register', 'page')
 
     return {
       success: true,
@@ -332,14 +332,19 @@ export async function updateCandidate(
     if (data.visaStatus !== undefined) updateData.visaStatus = data.visaStatus
     if (data.visaExpiry !== undefined) {
       // Format visa expiry date to YYYY-MM-DD or undefined if empty
+      const cleanDate = (dateString: string | undefined): string | undefined => {
+        if (!dateString || dateString.trim() === '') {
+          return undefined
+        }
+        const date = new Date(dateString)
+        if (isNaN(date.getTime())) {
+          return undefined
+        }
+        return date.toISOString().split('T')[0]
+      }
       const visaExpiry = cleanDate(data.visaExpiry)
       if (visaExpiry) {
-        const visaDate = new Date(visaExpiry)
-        if (!isNaN(visaDate.getTime())) {
-          updateData.visaExpiry = visaDate.toISOString().split('T')[0]
-        } else {
-          updateData.visaExpiry = visaExpiry
-        }
+        updateData.visaExpiry = visaExpiry
       } else {
         updateData.visaExpiry = undefined
       }
@@ -354,7 +359,7 @@ export async function updateCandidate(
       data: updateData,
     })
 
-    revalidatePath('/dashboard')
+    revalidatePath('/dashboard', 'page')
 
     return {
       success: true,

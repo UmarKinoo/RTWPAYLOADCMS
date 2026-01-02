@@ -36,8 +36,8 @@ export async function markNotificationRead(
     })
 
     const employerId =
-      typeof notification.employer === 'object' ? notification.employer.id : notification.employer
-    if (employerId !== user.id) {
+      notification.employer && typeof notification.employer === 'object' ? notification.employer.id : notification.employer
+    if (!employerId || employerId !== user.id) {
       return { success: false, error: 'Unauthorized.' }
     }
 
@@ -51,10 +51,10 @@ export async function markNotificationRead(
     })
 
     // Revalidate cache
-    revalidatePath('/employer/dashboard')
-    revalidateTag(`employer:${user.id}`)
-    revalidateTag(`notification:${notificationId}`)
-    revalidateTag('notifications')
+    revalidatePath('/employer/dashboard', 'page')
+    revalidateTag(`employer:${user.id}`, 'max')
+    revalidateTag(`notification:${notificationId}`, 'max')
+    revalidateTag('notifications', 'max')
 
     return { success: true }
   } catch (error: any) {
@@ -111,9 +111,9 @@ export async function markAllNotificationsRead(): Promise<MarkNotificationReadRe
     }
 
     // Revalidate cache
-    revalidatePath('/employer/dashboard')
-    revalidateTag(`employer:${user.id}`)
-    revalidateTag('notifications')
+    revalidatePath('/employer/dashboard', 'page')
+    revalidateTag(`employer:${user.id}`, 'max')
+    revalidateTag('notifications', 'max')
 
     return { success: true }
   } catch (error: any) {
@@ -150,8 +150,8 @@ export async function deleteNotification(
     })
 
     const employerId =
-      typeof notification.employer === 'object' ? notification.employer.id : notification.employer
-    if (employerId !== user.id) {
+      notification.employer && typeof notification.employer === 'object' ? notification.employer.id : notification.employer
+    if (!employerId || employerId !== user.id) {
       return { success: false, error: 'Unauthorized.' }
     }
 
@@ -162,9 +162,9 @@ export async function deleteNotification(
     })
 
     // Revalidate cache
-    revalidatePath('/employer/dashboard')
-    revalidateTag(`employer:${user.id}`)
-    revalidateTag('notifications')
+    revalidatePath('/employer/dashboard', 'page')
+    revalidateTag(`employer:${user.id}`, 'max')
+    revalidateTag('notifications', 'max')
 
     return { success: true }
   } catch (error: any) {

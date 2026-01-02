@@ -42,7 +42,7 @@ export const HeroBlock: React.FC<HeroBlockProps> = ({
       <div
         className="absolute inset-0 mix-blend-multiply"
         style={{
-          backgroundColor: `rgba(0, 0, 0, ${overlayOpacity / 100})`,
+          backgroundColor: `rgba(0, 0, 0, ${(overlayOpacity ?? 36) / 100})`,
         }}
       />
 

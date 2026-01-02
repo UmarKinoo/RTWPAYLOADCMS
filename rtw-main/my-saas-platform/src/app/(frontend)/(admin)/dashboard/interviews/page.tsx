@@ -1,35 +1,33 @@
 import { redirect } from 'next/navigation'
-import { getCurrentCandidate } from '@/lib/candidate'
-import { getUser } from '@/lib/auth'
+import { getCurrentUserType } from '@/lib/currentUserType'
 import { getCandidateInterviews } from '@/lib/payload/interviews'
 import { CandidateInterviewsPage } from '@/components/candidate/interviews/CandidateInterviewsPage'
 
 export const dynamic = 'force-dynamic'
 
 export default async function InterviewsPage() {
-  const user = await getUser()
+  const userType = await getCurrentUserType()
 
-  if (!user) {
+  if (!userType) {
     redirect('/login')
   }
 
-  if (user.collection !== 'candidates') {
+  // Allow candidates and admins (admin can view candidate pages)
+  if (userType.kind !== 'candidate' && userType.kind !== 'admin') {
     redirect('/dashboard')
   }
 
-  const candidate = await getCurrentCandidate()
-
-  if (!candidate) {
-    redirect('/register')
+  // If admin, we need to handle differently - for now, redirect to dashboard
+  // In the future, you might want to allow admin to view specific candidate interviews
+  if (userType.kind === 'admin') {
+    redirect('/dashboard')
   }
 
-  // Verify email matches
-  if (candidate.email !== user.email) {
-    redirect('/login')
-  }
+  const candidate = userType.candidate
 
   // Only fetch non-pending interviews (candidates only see approved interviews)
-  const interviews = await getCandidateInterviews(candidate.id, { excludePending: true })
+  // excludePending is the default behavior, so no need to pass it
+  const interviews = await getCandidateInterviews(candidate.id)
 
   return <CandidateInterviewsPage candidate={candidate} interviews={interviews} />
 }

@@ -1,7 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getUser } from '@/lib/auth'
-
-import type { User } from '@/payload-types'
+import { getCurrentUserType } from '@/lib/currentUserType'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,11 +8,14 @@ type AuthLayoutProps = {
 }
 
 export default async function AuthLayout({ children }: AuthLayoutProps) {
-  const user: User | null = await getUser()
+  const userType = await getCurrentUserType()
 
-  if (!user) {
+  if (!userType) {
+    console.log('[AUTH_LAYOUT] No user type, redirecting to /login')
     redirect('/login')
   }
+
+  console.log('[AUTH_LAYOUT] User authenticated:', userType.kind, userType.user?.email)
 
   return (
     <main className="flex flex-col min-h-screen">

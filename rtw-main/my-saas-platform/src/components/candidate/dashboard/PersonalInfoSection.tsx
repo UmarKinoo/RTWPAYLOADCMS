@@ -218,7 +218,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
           {isEditing ? (
             <Select
               value={formData.gender}
-              onValueChange={(value) => setFormData({ ...formData, gender: value })}
+              onValueChange={(value) => setFormData({ ...formData, gender: value as 'male' | 'female' })}
             >
               <SelectTrigger className="h-10 rounded-lg border-[#ededed]">
                 <SelectValue placeholder="Select gender" />

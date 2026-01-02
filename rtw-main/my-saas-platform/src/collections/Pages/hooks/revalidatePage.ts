@@ -29,12 +29,13 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating page ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating page ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating page ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating page ${doc.id}: ${errorMessage}`)
     }
   }
   return doc
@@ -52,12 +53,13 @@ export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { 
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating deleted page ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating deleted page ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating deleted page ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating deleted page ${doc.id}: ${errorMessage}`)
     }
   }
 

@@ -127,7 +127,7 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
           {isEditing ? (
             <Select
               value={formData.visaStatus}
-              onValueChange={(value) => setFormData({ ...formData, visaStatus: value })}
+              onValueChange={(value) => setFormData({ ...formData, visaStatus: value as 'none' | 'active' | 'expired' | 'nearly_expired' })}
             >
               <SelectTrigger className="h-10 rounded-lg border-[#ededed]">
                 <SelectValue placeholder="Select visa status" />

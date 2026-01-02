@@ -259,3 +259,6 @@ export const isAdmin = ({ req: { user } }: AccessArgs<User>): boolean => {
 
 **Recommendation**: Fix access control first, then build candidate notification/interview pages, then moderation interface.
 
+
+
+

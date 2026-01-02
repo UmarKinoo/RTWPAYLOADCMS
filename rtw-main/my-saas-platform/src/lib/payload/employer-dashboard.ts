@@ -237,6 +237,94 @@ async function fetchEmployerStatistics(
   return dataPoints
 }
 
+export interface RecentCandidateSearch {
+  id: number
+  candidate: {
+    id: number
+    firstName: string
+    lastName: string
+    jobTitle?: string
+    location?: string
+    profilePicture?: any
+  }
+  interactionType: string
+  createdAt: string
+}
+
+async function fetchRecentCandidateSearches(
+  employerId: number,
+  limit: number = 5,
+): Promise<RecentCandidateSearch[]> {
+  const payload = await getPayload({ config: configPromise })
+
+  // Get recent 'view' interactions (searches/views)
+  const interactions = await payload.find({
+    collection: 'candidate-interactions',
+    where: {
+      and: [
+        {
+          employer: {
+            equals: employerId,
+          },
+        },
+        {
+          interactionType: {
+            equals: 'view',
+          },
+        },
+      ],
+    },
+    sort: '-createdAt',
+    limit,
+    depth: 1, // Populate candidate
+    overrideAccess: true,
+  })
+
+  // Get unique candidates (most recent view per candidate)
+  const candidateMap = new Map<number, RecentCandidateSearch>()
+
+  interactions.docs.forEach((interaction) => {
+    const candidate =
+      typeof interaction.candidate === 'object' ? interaction.candidate : null
+
+    if (!candidate) return
+
+    const candidateId = candidate.id
+
+    // Only keep the most recent interaction per candidate
+    if (!candidateMap.has(candidateId)) {
+      candidateMap.set(candidateId, {
+        id: interaction.id,
+        candidate: {
+          id: candidate.id,
+          firstName: candidate.firstName || '',
+          lastName: candidate.lastName || '',
+          jobTitle: candidate.jobTitle || undefined,
+          location: candidate.location || undefined,
+          profilePicture: candidate.profilePicture || undefined,
+        },
+        interactionType: interaction.interactionType,
+        createdAt: interaction.createdAt,
+      })
+    }
+  })
+
+  // Return sorted by most recent
+  return Array.from(candidateMap.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  )
+}
+
+export const getRecentCandidateSearches = (employerId: number, limit: number = 5) =>
+  unstable_cache(
+    async () => fetchRecentCandidateSearches(employerId, limit),
+    ['recent-candidate-searches', String(employerId), String(limit)],
+    {
+      tags: [`employer:${employerId}`, 'candidate-interactions'],
+      revalidate: 60,
+    },
+  )()
+
 async function fetchUpcomingInterviews(
   employerId: number,
   limit: number = 10,

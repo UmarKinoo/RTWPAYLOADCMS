@@ -11,6 +11,7 @@ import {
   getCandidates,
 } from '@/lib/payload/candidates'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
+import { cn } from '@/lib/utils'
 
 // ============================================================================
 // Types

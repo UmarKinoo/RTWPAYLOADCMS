@@ -35,7 +35,7 @@ async function fetchCandidateNotifications(
       type: notification.type,
       title: notification.title,
       message: notification.message,
-      read: notification.read,
+      read: notification.read ?? false,
       actionUrl: notification.actionUrl || undefined,
       createdAt: notification.createdAt,
     }))
@@ -60,38 +60,47 @@ export async function getCandidateNotifications(candidateId: number): Promise<Ca
 }
 
 /**
- * Get unread notification count for a candidate
+ * Get unread notification count for a candidate (cached)
  */
 export async function getUnreadNotificationCount(
   candidateId: number,
 ): Promise<number> {
-  const payload = await getPayload({ config: configPromise })
+  return unstable_cache(
+    async () => {
+      const payload = await getPayload({ config: configPromise })
 
-  try {
-    const result = await payload.find({
-      collection: 'notifications',
-      where: {
-        and: [
-          {
-            candidate: {
-              equals: candidateId,
-            },
+      try {
+        const result = await payload.find({
+          collection: 'notifications',
+          where: {
+            and: [
+              {
+                candidate: {
+                  equals: candidateId,
+                },
+              },
+              {
+                read: {
+                  equals: false,
+                },
+              },
+            ],
           },
-          {
-            read: {
-              equals: false,
-            },
-          },
-        ],
-      },
-      limit: 1000,
-      overrideAccess: true,
-    })
+          limit: 1, // We only need the count, not the docs
+          overrideAccess: true,
+        })
 
-    return result.totalDocs
-  } catch (error) {
-    console.error('Error fetching unread notification count:', error)
-    return 0
-  }
+        return result.totalDocs
+      } catch (error) {
+        console.error('Error fetching unread notification count:', error)
+        return 0
+      }
+    },
+    ['unread-notification-count', String(candidateId)],
+    {
+      tags: [`candidate:${candidateId}`, 'notifications'],
+      revalidate: 30, // Revalidate every 30 seconds
+    },
+  )()
 }
 

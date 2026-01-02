@@ -29,12 +29,13 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating post ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating post ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating post ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating post ${doc.id}: ${errorMessage}`)
     }
   }
   return doc
@@ -52,12 +53,13 @@ export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({ doc, req: { 
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating deleted post ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating deleted post ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating deleted post ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating deleted post ${doc.id}: ${errorMessage}`)
     }
   }
 

@@ -33,7 +33,7 @@ export async function markNotificationAsRead(
     })
 
     const candidateId =
-      typeof notification.candidate === 'object'
+      notification.candidate && typeof notification.candidate === 'object'
         ? notification.candidate.id
         : notification.candidate
 
@@ -51,9 +51,9 @@ export async function markNotificationAsRead(
     })
 
     // Revalidate cache
-    revalidatePath('/candidate/dashboard')
-    revalidateTag(`candidate:${user.id}`)
-    revalidateTag('notifications')
+    revalidatePath('/candidate/dashboard', 'page')
+    revalidateTag(`candidate:${user.id}`, 'max')
+    revalidateTag('notifications', 'max')
 
     return { success: true }
   } catch (error: any) {

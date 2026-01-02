@@ -19,17 +19,18 @@ export const revalidateCandidate: CollectionAfterChangeHook<Candidate> = ({
             .then(({ revalidatePath, revalidateTag }) => {
               payload.logger.info(`Revalidating candidate at path: ${path}`)
               revalidatePath(path)
-              revalidateTag(`candidate:${doc.id}`)
-              revalidateTag('candidates')
+              revalidateTag(`candidate:${doc.id}`, 'max')
+              revalidateTag('candidates', 'max')
             })
             .catch((error) => {
               if (error instanceof Error && !error.message.includes('Cannot find module')) {
-                payload.logger.error(`Error revalidating candidate ${doc.id}:`, error)
+                payload.logger.error(`Error revalidating candidate ${doc.id}: ${error.message}`)
               }
             })
         }
       } catch (error) {
-        payload.logger.error(`Error revalidating candidate ${doc.id}:`, error)
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        payload.logger.error(`Error revalidating candidate ${doc.id}: ${errorMessage}`)
       }
     }
   }
@@ -51,17 +52,18 @@ export const revalidateCandidateDelete: CollectionAfterDeleteHook<Candidate> = (
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating deleted candidate at path: ${path}`)
             revalidatePath(path)
-            revalidateTag(`candidate:${doc.id}`)
-            revalidateTag('candidates')
+            revalidateTag(`candidate:${doc.id}`, 'max')
+            revalidateTag('candidates', 'max')
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating deleted candidate ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating deleted candidate ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating deleted candidate ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating deleted candidate ${doc.id}: ${errorMessage}`)
     }
   }
 

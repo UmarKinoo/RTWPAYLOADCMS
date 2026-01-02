@@ -1,18 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getCurrentUserType } from '@/lib/currentUserType'
 
 export async function POST(request: NextRequest) {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
 
-    // Authenticate employer
-    const { user } = await payload.auth({ headers: headersList })
+    // Get current user type
+    const userType = await getCurrentUserType()
 
-    if (!user || user.collection !== 'employers') {
+    if (!userType) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Allow admin or employer
+    let employerId: number
+    if (userType.kind === 'admin') {
+      // Admin can search, but we need an employer ID for tracking interactions
+      // For now, return error - you may want to handle admin search differently
+      return NextResponse.json({ error: 'Admin search not yet supported' }, { status: 403 })
+    } else if (userType.kind === 'employer') {
+      employerId = userType.employer.id
+    } else {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
     const body = await request.json()
@@ -64,7 +75,7 @@ export async function POST(request: NextRequest) {
         await payload.create({
           collection: 'candidate-interactions',
           data: {
-            employer: user.id,
+            employer: employerId,
             candidate: candidate.id,
             interactionType: 'view',
             metadata: {

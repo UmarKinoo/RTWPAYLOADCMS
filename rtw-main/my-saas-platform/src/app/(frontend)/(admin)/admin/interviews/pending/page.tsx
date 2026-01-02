@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getUser } from '@/lib/auth'
+import { getCurrentUserType } from '@/lib/currentUserType'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { PendingInterviewsPage } from '@/components/admin/PendingInterviewsPage'
@@ -7,14 +7,14 @@ import { PendingInterviewsPage } from '@/components/admin/PendingInterviewsPage'
 export const dynamic = 'force-dynamic'
 
 export default async function PendingInterviewsAdminPage() {
-  const user = await getUser()
+  const userType = await getCurrentUserType()
 
-  if (!user) {
+  if (!userType) {
     redirect('/login')
   }
 
-  // Check if user is admin
-  if (user.collection !== 'users' || (user as any).role !== 'admin') {
+  // Only allow admin users
+  if (userType.kind !== 'admin') {
     redirect('/dashboard')
   }
 

@@ -29,17 +29,17 @@ import { useRouter } from 'next/navigation'
 
 const interviewRequestSchema = z.object({
   date: z.date({
-    required_error: 'Date is required',
+    message: 'Date is required',
   }),
   time: z.string().min(1, 'Time is required'),
   jobPosition: z.string().min(1, 'Job position is required'),
   jobLocation: z.string().min(1, 'Job location is required'),
   salary: z.string().min(1, 'Salary is required'),
   accommodationIncluded: z.enum(['yes', 'no'], {
-    required_error: 'Please select an option',
+    message: 'Please select an option',
   }),
   transportation: z.enum(['yes', 'no'], {
-    required_error: 'Please select an option',
+    message: 'Please select an option',
   }),
 })
 

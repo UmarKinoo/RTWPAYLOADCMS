@@ -14,17 +14,18 @@ export const revalidateCandidateInteraction: CollectionAfterChangeHook<Candidate
             .then(({ revalidatePath, revalidateTag }) => {
               payload.logger.info(`Revalidating candidate interactions after change: ${doc.id}`)
               revalidatePath('/employer/dashboard')
-              revalidateTag(`employer:${employerId}`)
-              revalidateTag('candidate-interactions')
+              revalidateTag(`employer:${employerId}`, 'max')
+              revalidateTag('candidate-interactions', 'max')
             })
             .catch((error) => {
               if (error instanceof Error && !error.message.includes('Cannot find module')) {
-                payload.logger.error(`Error revalidating candidate interaction ${doc.id}:`, error)
+                payload.logger.error(`Error revalidating candidate interaction ${doc.id}: ${error.message}`)
               }
             })
         }
       } catch (error) {
-        payload.logger.error(`Error revalidating candidate interaction ${doc.id}:`, error)
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        payload.logger.error(`Error revalidating candidate interaction ${doc.id}: ${errorMessage}`)
       }
     }
     return doc
@@ -40,17 +41,18 @@ export const revalidateCandidateInteractionDelete: CollectionAfterDeleteHook<Can
             .then(({ revalidatePath, revalidateTag }) => {
               payload.logger.info(`Revalidating candidate interactions after delete: ${doc.id}`)
               revalidatePath('/employer/dashboard')
-              revalidateTag(`employer:${employerId}`)
-              revalidateTag('candidate-interactions')
+              revalidateTag(`employer:${employerId}`, 'max')
+              revalidateTag('candidate-interactions', 'max')
             })
             .catch((error) => {
               if (error instanceof Error && !error.message.includes('Cannot find module')) {
-                payload.logger.error(`Error revalidating deleted candidate interaction ${doc.id}:`, error)
+                payload.logger.error(`Error revalidating deleted candidate interaction ${doc.id}: ${error.message}`)
               }
             })
         }
       } catch (error) {
-        payload.logger.error(`Error revalidating deleted candidate interaction ${doc.id}:`, error)
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        payload.logger.error(`Error revalidating deleted candidate interaction ${doc.id}: ${errorMessage}`)
       }
     }
     return doc

@@ -13,17 +13,18 @@ export const revalidateJobPosting: CollectionAfterChangeHook<JobPosting> = ({
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating job postings after change: ${doc.id}`)
             revalidatePath('/employer/dashboard')
-            revalidateTag(`employer:${employerId}`)
-            revalidateTag('job-postings')
+            revalidateTag(`employer:${employerId}`, 'max')
+            revalidateTag('job-postings', 'max')
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating job posting ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating job posting ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating job posting ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating job posting ${doc.id}: ${errorMessage}`)
     }
   }
   return doc
@@ -41,17 +42,18 @@ export const revalidateJobPostingDelete: CollectionAfterDeleteHook<JobPosting> =
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating job postings after delete: ${doc.id}`)
             revalidatePath('/employer/dashboard')
-            revalidateTag(`employer:${employerId}`)
-            revalidateTag('job-postings')
+            revalidateTag(`employer:${employerId}`, 'max')
+            revalidateTag('job-postings', 'max')
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating deleted job posting ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating deleted job posting ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating deleted job posting ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating deleted job posting ${doc.id}: ${errorMessage}`)
     }
   }
   return doc

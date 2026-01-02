@@ -21,7 +21,7 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
   // Get resume from candidate (could be a Media object or ID)
   const resume = candidate.resume
   const resumeMedia = typeof resume === 'object' ? resume : null
-  const resumeId = typeof resume === 'string' ? resume : resume?.id
+  const resumeId = typeof resume === 'object' && resume ? resume.id : typeof resume === 'number' ? resume : null
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'

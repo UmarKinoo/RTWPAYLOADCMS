@@ -143,3 +143,6 @@ DATABASE_URI=postgresql://postgres.gyvstzmebvmcrhxoxldc:WPcjhV*XW5_!kJ&@aws-0-us
 
 The pooler is **definitely recommended** for your Next.js + Payload 3.0 app in production!
 
+
+
+

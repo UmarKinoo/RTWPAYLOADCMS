@@ -96,10 +96,12 @@ export const Notifications: CollectionConfig = {
     beforeValidate: [
       ({ data }) => {
         // Ensure either employer or candidate is set
-        if (!data.employer && !data.candidate) {
+        const hasEmployer = data && 'employer' in data && data.employer
+        const hasCandidate = data && 'candidate' in data && data.candidate
+        if (!hasEmployer && !hasCandidate) {
           throw new Error('Either employer or candidate must be set for a notification')
         }
-        if (data.employer && data.candidate) {
+        if (hasEmployer && hasCandidate) {
           throw new Error('Notification cannot have both employer and candidate')
         }
         return data

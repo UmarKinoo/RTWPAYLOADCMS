@@ -4,12 +4,10 @@ import React from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Search } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ThemeToggle } from '@/components/theme/theme-toggle'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { getMediaUrl } from '@/utilities/getMediaUrl'
-import { NotificationDropdown } from '@/components/candidate/notifications/NotificationDropdown'
+import { CandidateNotificationDropdown } from '@/components/candidate/notifications/CandidateNotificationDropdown'
+import { AccountDropdown } from '@/components/shared/AccountDropdown'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
 
 interface DashboardHeaderProps {
@@ -21,19 +19,6 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notifications = [] }: DashboardHeaderProps) {
   const searchParams = useSearchParams()
   const currentView = searchParams.get('view') || 'dashboard'
-  
-  const initials = `${candidate.firstName?.[0] || ''}${candidate.lastName?.[0] || ''}`.toUpperCase()
-
-  // Get profile picture URL
-  const getProfilePictureUrl = () => {
-    if (candidate.profilePicture && typeof candidate.profilePicture === 'object') {
-      const media = candidate.profilePicture as any
-      return getMediaUrl(media.url, media.updatedAt)
-    }
-    return ''
-  }
-
-  const profilePictureUrl = getProfilePictureUrl()
 
   const getHeaderTitle = () => {
     if (currentView === 'notifications') {
@@ -79,25 +64,16 @@ export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notif
         </div>
 
         {/* Notification Dropdown */}
-        <NotificationDropdown notifications={notifications} unreadCount={unreadNotificationsCount} />
+        <CandidateNotificationDropdown notifications={notifications} unreadCount={unreadNotificationsCount} />
 
-        {/* Profile Avatar */}
-        <div className="flex items-center gap-3">
-          <Avatar className="size-10 shrink-0 overflow-hidden rounded-lg border border-[#ededed]">
-            <AvatarImage src={profilePictureUrl} alt={`${candidate.firstName} ${candidate.lastName}`} />
-            <AvatarFallback className="bg-[#ededed] text-[#282828]">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="hidden flex-col sm:flex">
-            <p className="text-sm font-medium leading-normal text-[#282828]">
-              {candidate.firstName} {candidate.lastName}
-            </p>
-            <p className="text-xs font-normal leading-normal text-[#757575]">
-              {candidate.email || 'No email'}
-            </p>
-          </div>
-        </div>
+        {/* Account Dropdown */}
+        <AccountDropdown
+          displayName={`${candidate.firstName} ${candidate.lastName}`}
+          email={candidate.email}
+          role="candidate"
+          avatarSize="md"
+          dashboardUrl="/dashboard"
+        />
       </div>
     </div>
   )

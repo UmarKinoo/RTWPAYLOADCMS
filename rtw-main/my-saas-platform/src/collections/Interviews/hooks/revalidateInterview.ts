@@ -13,17 +13,18 @@ export const revalidateInterview: CollectionAfterChangeHook<Interview> = ({
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating interviews after change: ${doc.id}`)
             revalidatePath('/employer/dashboard')
-            revalidateTag(`employer:${employerId}`)
-            revalidateTag('interviews')
+            revalidateTag(`employer:${employerId}`, 'max')
+            revalidateTag('interviews', 'max')
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating interview ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating interview ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating interview ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating interview ${doc.id}: ${errorMessage}`)
     }
   }
   return doc
@@ -41,17 +42,18 @@ export const revalidateInterviewDelete: CollectionAfterDeleteHook<Interview> = (
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating interviews after delete: ${doc.id}`)
             revalidatePath('/employer/dashboard')
-            revalidateTag(`employer:${employerId}`)
-            revalidateTag('interviews')
+            revalidateTag(`employer:${employerId}`, 'max')
+            revalidateTag('interviews', 'max')
           })
           .catch((error) => {
             if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating deleted interview ${doc.id}:`, error)
+              payload.logger.error(`Error revalidating deleted interview ${doc.id}: ${error.message}`)
             }
           })
       }
     } catch (error) {
-      payload.logger.error(`Error revalidating deleted interview ${doc.id}:`, error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      payload.logger.error(`Error revalidating deleted interview ${doc.id}: ${errorMessage}`)
     }
   }
   return doc

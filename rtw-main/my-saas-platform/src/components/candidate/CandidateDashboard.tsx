@@ -68,13 +68,11 @@ export function CandidateDashboard({ candidate: initialCandidate, unreadNotifica
       {/* Main Content */}
       <div className="px-4 pb-8 pt-16 sm:px-6 lg:ml-[220px] lg:pr-6 lg:pt-6">
         {/* Header Section */}
-        <React.Suspense fallback={<div className="h-20" />}>
-          <DashboardHeader 
-            candidate={candidate} 
-            unreadNotificationsCount={unreadNotificationsCount}
-            notifications={notifications}
-          />
-        </React.Suspense>
+        <DashboardHeader 
+          candidate={candidate} 
+          unreadNotificationsCount={unreadNotificationsCount}
+          notifications={notifications}
+        />
 
         {/* Content Area - Show different views based on currentView */}
         {currentView === 'notifications' ? (

@@ -72,9 +72,9 @@ export async function trackInteraction(
     }) as CandidateInteraction
 
     // Revalidate cache
-    revalidatePath('/employer/dashboard')
-    revalidateTag(`employer:${user.id}`)
-    revalidateTag('candidate-interactions')
+    revalidatePath('/employer/dashboard', 'page')
+    revalidateTag(`employer:${user.id}`, 'max')
+    revalidateTag('candidate-interactions', 'max')
 
     return { success: true, interaction }
   } catch (error: any) {

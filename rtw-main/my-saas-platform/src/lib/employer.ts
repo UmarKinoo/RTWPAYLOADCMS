@@ -80,7 +80,12 @@ export async function registerEmployer(
         email: data.email.toLowerCase().trim(),
         password: data.password,
         termsAccepted: data.termsAccepted,
+        wallet: {
+          interviewCredits: 0,
+          contactUnlockCredits: 0,
+        },
       },
+      draft: false,
     })
 
     // Log the employer in immediately after successful registration
@@ -99,7 +104,7 @@ export async function registerEmployer(
       }
     }
 
-    revalidatePath('/employer/register')
+    revalidatePath('/employer/register', 'page')
 
     return {
       success: true,
@@ -133,10 +138,8 @@ export async function getCurrentEmployer(): Promise<Employer | null> {
       return null
     }
 
-    // SECURITY: Only return employer if user is from employers collection
-    if (user.collection !== 'employers') {
-      return null
-    }
+    // SECURITY: Try to find employer by ID first (if user is from employers collection)
+    // Then fallback to email search (if user is from users collection)
 
     try {
       const employer = await payload.findByID({
@@ -158,9 +161,44 @@ export async function getCurrentEmployer(): Promise<Employer | null> {
 
       return employer as Employer
     } catch (error) {
-      console.warn('Employer not found by ID:', user.id)
-      return null
+      // Not found by ID, continue to email search
+      console.warn('Employer not found by ID, trying email search:', user.id)
     }
+
+    // Fallback: Search by email (works for both Users and Employers collections)
+    // SECURITY: This should only be used if the user is from Users collection
+    // and we need to find their employer profile
+    try {
+      const employers = await payload.find({
+        collection: 'employers',
+        where: {
+          email: {
+            equals: user.email,
+          },
+        },
+        limit: 1,
+        depth: 1,
+      })
+
+      if (employers.docs.length > 0) {
+        const employer = employers.docs[0] as Employer
+        
+        // SECURITY CHECK: Double-check email matches
+        if (employer.email !== user.email) {
+          console.error('SECURITY WARNING: Employer email mismatch in fallback!', {
+            employerEmail: employer.email,
+            userEmail: user.email,
+          })
+          return null
+        }
+
+        return employer
+      }
+    } catch (searchError) {
+      console.error('Error searching for employer by email:', searchError)
+    }
+
+    return null
   } catch (error) {
     console.error('Error getting employer:', error)
     return null

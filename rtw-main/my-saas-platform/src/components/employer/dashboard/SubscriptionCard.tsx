@@ -33,8 +33,15 @@ export function SubscriptionCard({ employer }: SubscriptionCardProps) {
   const interviewCredits = employer.wallet?.interviewCredits || 0
   const contactUnlockCredits = employer.wallet?.contactUnlockCredits || 0
   const totalCredits = interviewCredits + contactUnlockCredits
-  const maxCredits = 10 // Placeholder - could be from plan
+  
+  // Calculate max credits based on plan (default to 10 if no plan)
+  const maxCredits = plan?.interviewCredits || 10
   const creditsProgress = Math.min((totalCredits / maxCredits) * 100, 100)
+  
+  // Calculate circumference for circular progress
+  const radius = 40
+  const circumference = 2 * Math.PI * radius
+  const strokeDashoffset = circumference - (creditsProgress / 100) * circumference
 
   return (
     <Card className="flex min-h-[200px] flex-col overflow-hidden rounded-2xl bg-white">
@@ -88,16 +95,18 @@ export function SubscriptionCard({ employer }: SubscriptionCardProps) {
                 stroke="#4644b8"
                 strokeWidth="8"
                 strokeLinecap="round"
-                strokeDasharray={`${(creditsProgress / 100) * 251.2} 251.2`}
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+                className="transition-all duration-300 ease-in-out"
               />
             </svg>
             {/* Center content */}
-            <div className="flex flex-col items-center text-center">
-              <div className="flex items-start gap-0.5 text-[#222]">
-                <span className="text-xs font-semibold">{totalCredits}</span>
-                <span className="text-xs font-semibold">credits</span>
+            <div className="flex flex-col items-center text-center z-10">
+              <div className="flex items-baseline gap-0.5 text-[#222]">
+                <span className="text-base font-semibold">{totalCredits}</span>
+                <span className="text-xs font-normal text-[#515151]">/{maxCredits}</span>
               </div>
-              <span className="text-[10px] font-normal text-[#515151]">Left</span>
+              <span className="text-[10px] font-normal text-[#515151] mt-0.5">Credits</span>
             </div>
           </div>
         </div>

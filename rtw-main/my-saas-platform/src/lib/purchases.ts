@@ -123,9 +123,9 @@ export async function mockPurchase(planSlug: string): Promise<MockPurchaseRespon
       },
     })
 
-    revalidatePath('/pricing')
-    revalidatePath('/candidates')
-    revalidatePath('/dashboard')
+    revalidatePath('/pricing', 'page')
+    revalidatePath('/candidates', 'page')
+    revalidatePath('/dashboard', 'page')
 
     return {
       success: true,

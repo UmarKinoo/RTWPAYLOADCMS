@@ -72,7 +72,17 @@ export async function getUser(): Promise<User | null> {
     const payload: Payload = await getPayload({ config: await configPromise })
 
     const { user } = await payload.auth({ headers })
-    return user || null
+    // Return the authenticated user (could be from users, candidates, or employers collection)
+    // The caller (getCurrentUserType) will determine the actual type
+    if (user) {
+      // Check if it's a User type by checking for 'role' property (only Users have this)
+      if ('role' in user) {
+        return user as User
+      }
+      // If it's not a User type, return null - getCurrentCandidate/getCurrentEmployer will handle it
+      return null
+    }
+    return null
   } catch (error) {
     // SECURITY: Never log passwords or sensitive data
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -107,8 +117,8 @@ export async function loginUser({
 
     // Track login attempts (could be extended with rate limiting)
     try {
-      const result: Result = await payload.login({
-        collection: collection, // Use the provided collection or default to 'users'
+      const result = await payload.login({
+        collection: collection as any, // Use the provided collection or default to 'users'
         data: { email, password },
       })
 

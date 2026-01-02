@@ -11,7 +11,7 @@ export const revalidateFooter: GlobalAfterChangeHook = ({ doc, req: { payload, c
           .then(({ revalidatePath, revalidateTag }) => {
             payload.logger.info(`Revalidating footer`)
             revalidatePath('/', 'layout')
-            revalidateTag('global_footer')
+            revalidateTag('global_footer', 'max')
           })
           .catch((error) => {
             if (error instanceof Error) {
@@ -21,7 +21,7 @@ export const revalidateFooter: GlobalAfterChangeHook = ({ doc, req: { payload, c
               ) {
                 payload.logger.warn('Revalidation skipped (not in Next.js server context)')
               } else {
-                payload.logger.error('Revalidation error:', error)
+                payload.logger.error(`Revalidation error: ${error.message}`)
               }
             }
           })
@@ -29,7 +29,7 @@ export const revalidateFooter: GlobalAfterChangeHook = ({ doc, req: { payload, c
     } catch (error) {
       // Silently fail if revalidation is not available
       if (error instanceof Error) {
-        payload.logger.warn('Revalidation skipped:', error.message)
+        payload.logger.warn(`Revalidation skipped: ${error.message}`)
       }
     }
   }

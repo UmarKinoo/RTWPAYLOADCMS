@@ -10,12 +10,13 @@ export const revalidateRedirects: CollectionAfterChangeHook = ({ doc, req: { pay
         })
         .catch((error) => {
           if (error instanceof Error && !error.message.includes('Cannot find module')) {
-            payload.logger.error('Error revalidating redirects:', error)
+            payload.logger.error({ err: error }, 'Error revalidating redirects')
           }
         })
     }
   } catch (error) {
-    payload.logger.error('Error revalidating redirects:', error)
+    const errorMessage = error instanceof Error ? error : String(error)
+    payload.logger.error({ err: errorMessage }, 'Error revalidating redirects')
   }
 
   return doc
