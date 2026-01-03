@@ -7,6 +7,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 
 import { cn } from '@/lib/utils'
+import { getServerSideURL } from '@/utilities/getURL'
 
 import type { Metadata } from 'next'
 
@@ -21,11 +22,11 @@ const fontMono = FontMono({
 export const metadata: Metadata = {
   title: 'Payload App Starter by Bridger Tower',
   description: 'A modern SaaS starter built with Payload CMS, Next.js, and TypeScript',
-  metadataBase: new URL('https://payload-saas-starter.vercel.app/'),
+  metadataBase: new URL(getServerSideURL()),
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://payload-saas-starter.vercel.app/',
+    url: getServerSideURL(),
     siteName: 'Payload SaaS Starter by Bridger Tower',
     title: 'Payload SaaS Starter by Bridger Tower',
     description: 'A modern SaaS starter built with Payload CMS, Next.js, and TypeScript',

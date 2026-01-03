@@ -13,6 +13,7 @@ import { ImageWithSkeleton } from '@/components/homepage/ImageWithSkeleton'
 import RichText from '@/components/RichText'
 import { generateMeta } from '@/utilities/generateMeta'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { getServerSideURL } from '@/utilities/getURL'
 
 import type { Post, Media } from '@/payload-types'
 
@@ -81,6 +82,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
   if (!post) {
     return {
+      metadataBase: new URL(getServerSideURL()),
       title: 'Post Not Found | Ready to Work',
       description: 'The requested blog post could not be found.',
     }

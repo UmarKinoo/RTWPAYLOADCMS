@@ -31,6 +31,7 @@ export const generateMeta = async (args: {
     : 'Payload Website Template'
 
   return {
+    metadataBase: new URL(getServerSideURL()),
     description: doc?.meta?.description,
     openGraph: mergeOpenGraph({
       description: doc?.meta?.description || '',

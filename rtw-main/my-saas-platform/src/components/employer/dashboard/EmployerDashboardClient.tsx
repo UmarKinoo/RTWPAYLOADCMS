@@ -8,7 +8,7 @@ import { SubscriptionCard } from './SubscriptionCard'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
-import type { Employer } from '@/payload-types'
+import type { Employer, Purchase } from '@/payload-types'
 import type { StatisticsDataPoint } from '@/lib/payload/employer-dashboard'
 import type { NotificationListItem } from '@/lib/payload/notifications'
 
@@ -23,6 +23,7 @@ interface EmployerDashboardClientProps {
   scheduleSidebar: React.ReactNode
   recentCandidatesTable: React.ReactNode
   recentlySearchedCandidates: React.ReactNode
+  recentPurchase: Purchase | null
 }
 
 export function EmployerDashboardClient({
@@ -36,6 +37,7 @@ export function EmployerDashboardClient({
   scheduleSidebar,
   recentCandidatesTable,
   recentlySearchedCandidates,
+  recentPurchase,
 }: EmployerDashboardClientProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -89,7 +91,7 @@ export function EmployerDashboardClient({
           {/* Right Column - Schedule and Subscription */}
           <div className="flex w-full flex-col gap-4 xl:w-[340px]">
             {scheduleSidebar}
-            <SubscriptionCard employer={employer} />
+            <SubscriptionCard employer={employer} recentPurchase={recentPurchase} />
           </div>
         </div>
 

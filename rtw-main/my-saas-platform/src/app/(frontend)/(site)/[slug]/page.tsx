@@ -10,6 +10,7 @@ import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { getServerSideURL } from '@/utilities/getURL'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -80,7 +81,9 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug } = await paramsPromise
 
   if (!slug) {
-    return {}
+    return {
+      metadataBase: new URL(getServerSideURL()),
+    }
   }
 
   // Decode to support slugs with special characters

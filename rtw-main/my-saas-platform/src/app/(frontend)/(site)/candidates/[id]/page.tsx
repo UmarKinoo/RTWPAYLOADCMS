@@ -12,6 +12,7 @@ import {
 } from '@/lib/payload/candidates'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
 import { cn } from '@/lib/utils'
+import { getServerSideURL } from '@/utilities/getURL'
 
 // ============================================================================
 // Types
@@ -50,6 +51,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const fullName = `${candidate.firstName} ${candidate.lastName}`
 
   return {
+    metadataBase: new URL(getServerSideURL()),
     title: `${fullName} – ${candidate.jobTitle} | Ready to Work`,
     description: `View ${fullName}'s profile. ${candidate.jobTitle} with ${formatExperience(candidate.experienceYears)} experience in ${candidate.location}.`,
   }
