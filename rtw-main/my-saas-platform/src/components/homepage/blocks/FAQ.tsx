@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { HomepageSection } from '../HomepageSection'
 import {
   Accordion,
@@ -12,28 +12,31 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ChevronDown, ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export const FAQ: React.FC = () => {
+  const t = useTranslations('homepage.faq')
+  
   const faqItems = [
     {
-      question: 'How does the free trial work?',
-      answer: 'You get full access to all features for 14 days, no credit card required.',
+      question: t('items.freeTrial.question'),
+      answer: t('items.freeTrial.answer'),
     },
     {
-      question: 'Can I cancel my subscription anytime?',
-      answer: 'Yes, you can cancel or upgrade at any time.',
+      question: t('items.cancelSubscription.question'),
+      answer: t('items.cancelSubscription.answer'),
     },
     {
-      question: 'Does Ready to Work integrate with LinkedIn?',
-      answer: 'Yes, we offer seamless LinkedIn integration for profile imports.',
+      question: t('items.linkedinIntegration.question'),
+      answer: t('items.linkedinIntegration.answer'),
     },
     {
-      question: 'Is my data secure?',
-      answer: 'We use industry-standard encryption and security practices.',
+      question: t('items.dataSecurity.question'),
+      answer: t('items.dataSecurity.answer'),
     },
     {
-      question: 'Can I customize workflows?',
-      answer: 'Absolutely! Our platform offers flexible workflow customization.',
+      question: t('items.customizeWorkflows.question'),
+      answer: t('items.customizeWorkflows.answer'),
     },
   ]
 
@@ -48,31 +51,31 @@ export const FAQ: React.FC = () => {
               <div className="mb-6 sm:mb-8">
                 {/* FAQ Label */}
                 <div className="bg-[#afb7ff] inline-flex px-3 py-1.5 rounded-lg mb-3">
-                  <p className="text-xs sm:text-sm font-medium text-white">FAQ</p>
+                  <p className="text-xs sm:text-sm font-medium text-white">{t('label')}</p>
                 </div>
 
                 {/* Heading */}
                 <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold font-inter text-[#16252d] leading-tight mb-3">
-                  Have a Question?
+                  {t('title')}
                 </h2>
 
                 {/* Description */}
                 <p className="text-sm sm:text-base text-[#16252d]/80 max-w-md">
-                  Save time with straightforward answers to common questions recruiters and HR teams often ask.
+                  {t('description')}
                 </p>
               </div>
 
               {/* CTA Card */}
               <Card className="bg-[rgba(175,183,255,0.5)] border-0 p-5 sm:p-6 rounded-xl mt-auto">
                 <h3 className="text-lg sm:text-xl font-semibold font-inter text-[#16252d] mb-2">
-                  Got more questions?
+                  {t('gotMoreQuestions')}
                 </h3>
                 <p className="text-sm text-[#16252d]/80 mb-4">
-                  Get in touch and we'll take care of the rest.
+                  {t('contactUsDescription')}
                 </p>
                 <Link href="#contact">
                   <Button className="bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-xl px-5 py-2.5 text-sm font-medium w-full sm:w-auto flex items-center justify-center gap-2">
-                    Contact Us
+                    {t('contactUs')}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
@@ -85,7 +88,7 @@ export const FAQ: React.FC = () => {
                 {faqItems.map((item, index) => (
                   <AccordionItem key={index} value={`item-${index}`} className="border-0">
                     <AccordionTrigger className="bg-white hover:no-underline px-4 sm:px-6 py-4 sm:py-5 rounded-xl data-[state=open]:rounded-b-none data-[state=open]:bg-[rgba(175,183,255,0.5)] [&>svg]:hidden">
-                      <p className="text-sm sm:text-base font-medium font-inter text-[#16252d] text-left flex-1 pr-4">
+                      <p className="text-sm sm:text-base font-medium font-inter text-[#16252d] text-start flex-1 pe-4">
                         {item.question}
                       </p>
                       <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#16252d] transition-transform duration-200 flex-shrink-0" />

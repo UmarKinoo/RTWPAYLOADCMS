@@ -7,12 +7,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { HomepageNavbar } from '@/components/homepage/Navbar'
-import { Footer } from '@/components/homepage/blocks/Footer'
 import { registerCandidate } from '@/lib/candidate'
 import { validatePassword, validateEmail } from '@/lib/validation'
 import { AccountStep } from './wizard-steps/AccountStep'
@@ -79,20 +79,21 @@ const candidateSchema = z
 
 export type CandidateFormData = z.infer<typeof candidateSchema>
 
-const STEPS = [
-  { id: 1, title: 'Account', description: 'Create your account', shortTitle: 'Account', stepperTitle: 'Account' },
-  { id: 2, title: 'Personal Info', description: 'Your personal details', shortTitle: 'Personal', stepperTitle: 'Personal' },
-  { id: 3, title: 'Job Role', description: 'Select your role', shortTitle: 'Job Role', stepperTitle: 'Job Role' },
-  { id: 4, title: 'Experience', description: 'Work experience', shortTitle: 'Experience', stepperTitle: 'Experience' },
-  { id: 5, title: 'Location & Visa', description: 'Location and visa info', shortTitle: 'Location', stepperTitle: 'Location' },
-  { id: 6, title: 'Review', description: 'Review and submit', shortTitle: 'Review', stepperTitle: 'Review' },
-]
-
 export function RegistrationWizard() {
+  const t = useTranslations('registration')
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [isPending, setIsPending] = useState(false)
   const [sameAsPhone, setSameAsPhone] = useState(false)
+
+  const STEPS = [
+    { id: 1, title: t('steps.account.title'), description: t('steps.account.description'), shortTitle: t('steps.account.shortTitle'), stepperTitle: t('steps.account.stepperTitle') },
+    { id: 2, title: t('steps.personalInfo.title'), description: t('steps.personalInfo.description'), shortTitle: t('steps.personalInfo.shortTitle'), stepperTitle: t('steps.personalInfo.stepperTitle') },
+    { id: 3, title: t('steps.jobRole.title'), description: t('steps.jobRole.description'), shortTitle: t('steps.jobRole.shortTitle'), stepperTitle: t('steps.jobRole.stepperTitle') },
+    { id: 4, title: t('steps.experience.title'), description: t('steps.experience.description'), shortTitle: t('steps.experience.shortTitle'), stepperTitle: t('steps.experience.stepperTitle') },
+    { id: 5, title: t('steps.locationVisa.title'), description: t('steps.locationVisa.description'), shortTitle: t('steps.locationVisa.shortTitle'), stepperTitle: t('steps.locationVisa.stepperTitle') },
+    { id: 6, title: t('steps.review.title'), description: t('steps.review.description'), shortTitle: t('steps.review.shortTitle'), stepperTitle: t('steps.review.stepperTitle') },
+  ]
 
   const {
     register,
@@ -192,20 +193,20 @@ export function RegistrationWizard() {
       console.log('Registration result:', result)
 
       if (result.success) {
-        toast.success('Registration Successful!', {
-          description: 'Your candidate profile has been created.',
+        toast.success(t('registrationSuccessful'), {
+          description: t('registrationSuccessfulDescription'),
         })
         router.push('/dashboard')
       } else {
-        toast.error('Registration Failed', {
-          description: result.error || 'Please try again.',
+        toast.error(t('registrationFailed'), {
+          description: result.error || t('pleaseTryAgainLater'),
         })
         setIsPending(false)
       }
     } catch (error) {
       console.error('Registration error:', error)
-      toast.error('Registration Failed', {
-        description: error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.',
+      toast.error(t('registrationFailed'), {
+        description: error instanceof Error ? error.message : t('somethingWentWrong'),
       })
       setIsPending(false)
     }
@@ -293,10 +294,10 @@ export function RegistrationWizard() {
           {/* Header */}
           <div className="mb-6 sm:mb-8 text-center">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#16252d] mb-2">
-              Candidate Registration
+              {t('title')}
             </h1>
             <p className="text-sm sm:text-base text-[#757575]">
-              Step {currentStep} of {STEPS.length}: {STEPS[currentStep - 1].description}
+              {t('stepOf', { current: currentStep, total: STEPS.length })}: {STEPS[currentStep - 1].description}
             </p>
           </div>
 
@@ -310,10 +311,10 @@ export function RegistrationWizard() {
             </div>
             <div className="flex justify-between mt-2">
               <span className="text-xs sm:text-sm text-[#757575]">
-                {Math.round(progressPercentage)}% Complete
+                {Math.round(progressPercentage)}% {t('complete')}
               </span>
               <span className="text-xs sm:text-sm text-[#757575]">
-                Step {currentStep}/{STEPS.length}
+                {t('stepOf', { current: currentStep, total: STEPS.length })}
               </span>
             </div>
           </div>
@@ -446,7 +447,7 @@ export function RegistrationWizard() {
                     </CardDescription>
                   </div>
                   <Badge variant="outline" className="hidden sm:flex">
-                    Step {currentStep}/{STEPS.length}
+                    {t('stepOf', { current: currentStep, total: STEPS.length })}
                   </Badge>
                 </div>
               </CardHeader>
@@ -465,7 +466,7 @@ export function RegistrationWizard() {
                 className="w-full sm:w-auto order-2 sm:order-1"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
-                Previous
+                {t('previous')}
               </Button>
 
               {currentStep < STEPS.length ? (
@@ -474,7 +475,7 @@ export function RegistrationWizard() {
                   onClick={handleNext}
                   className="w-full sm:w-auto bg-[#4644b8] hover:bg-[#3a3aa0] order-1 sm:order-2"
                 >
-                  Next
+                  {t('next')}
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               ) : (
@@ -505,15 +506,13 @@ export function RegistrationWizard() {
                     }
                   }}
                 >
-                  {isPending ? 'Registering...' : 'Complete Registration'}
+                  {isPending ? t('registering') : t('completeRegistration')}
                 </Button>
               )}
             </div>
           </form>
         </div>
       </main>
-
-      <Footer />
     </div>
   )
 }

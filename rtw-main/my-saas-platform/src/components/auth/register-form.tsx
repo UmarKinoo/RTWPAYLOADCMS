@@ -5,7 +5,8 @@ import { SubmitButton } from './submit-button'
 import { Input } from '@/components/ui/input'
 
 import { registerUser } from '@/lib/auth'
-import { validatePassword, validateEmail } from '@/lib/validation'
+import { validatePassword, validateEmail, getValidationMessage } from '@/lib/validation'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
@@ -13,6 +14,9 @@ import { toast } from 'sonner'
 import type { RegisterResponse } from '@/lib/auth'
 
 export const RegisterForm = () => {
+  const t = useTranslations('validation')
+  const tAuth = useTranslations('auth')
+  const tErrors = useTranslations('errors')
   const [isPending, setIsPending] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -33,7 +37,8 @@ export const RegisterForm = () => {
     const validation = validatePassword(password)
 
     if (!validation.valid) {
-      setPasswordFeedback(validation.error || null)
+      const errorMessage = getValidationMessage(validation.errorKey, validation.errorParams, t)
+      setPasswordFeedback(errorMessage || null)
       // Determine password strength
       if (password.length < 8) {
         setPasswordStrength('weak')
@@ -57,8 +62,9 @@ export const RegisterForm = () => {
     // Client-side validation first
     const emailValidation = validateEmail(email)
     if (!emailValidation.valid) {
-      toast.error('Invalid Email', {
-        description: emailValidation.error || 'Please enter a valid email',
+      const errorMessage = getValidationMessage(emailValidation.errorKey, undefined, t)
+      toast.error(tAuth('invalidEmail'), {
+        description: errorMessage || t('invalidEmail'),
       })
       setIsPending(false)
       return
@@ -66,8 +72,13 @@ export const RegisterForm = () => {
 
     const passwordValidation = validatePassword(password)
     if (!passwordValidation.valid) {
-      toast.error('Invalid Password', {
-        description: passwordValidation.error || 'Please enter a valid password',
+      const errorMessage = getValidationMessage(
+        passwordValidation.errorKey,
+        passwordValidation.errorParams,
+        t
+      )
+      toast.error(tErrors('validationError'), {
+        description: errorMessage || t('passwordRequirements'),
       })
       setIsPending(false)
       return

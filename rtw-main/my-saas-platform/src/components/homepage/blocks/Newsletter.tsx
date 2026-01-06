@@ -5,8 +5,10 @@ import { HomepageSection } from '../HomepageSection'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export const Newsletter: React.FC = () => {
+  const t = useTranslations('homepage.newsletter')
   const [email, setEmail] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,7 +26,7 @@ export const Newsletter: React.FC = () => {
             {/* Left Side - Heading */}
             <div className="flex-1">
               <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold font-inter text-[#16252d] leading-tight">
-                Subscribe to our Newsletter
+                {t('title')}
               </h2>
             </div>
 
@@ -33,11 +35,11 @@ export const Newsletter: React.FC = () => {
               {/* Email Input Container */}
               <div className="relative bg-[#4644b8] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 flex items-center gap-3">
                 <label className="text-xs sm:text-sm font-bold font-inter text-white uppercase flex-shrink-0">
-                  Email*
+                  {t('emailLabel')}
                 </label>
                 <Input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -55,10 +57,11 @@ export const Newsletter: React.FC = () => {
 
               {/* Privacy Text */}
               <p className="text-[10px] sm:text-xs font-normal font-inter text-black/70 uppercase">
-                We care about your data. Read our{' '}
+                {t('privacyText')}{' '}
                 <a href="#privacy" className="underline hover:text-black">
-                  privacy policy
-                </a>.
+                  {t('privacyPolicy')}
+                </a>
+                {t('privacyTextEnd')}
               </p>
             </div>
           </form>

@@ -1,0 +1,321 @@
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "login": "Login",
+    "candidates": "Candidates",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact us"
+  },
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "createAccount": "Create Account",
+    "rememberMe": "Remember me for 30 days",
+    "loginAs": "Login as",
+    "candidate": "Candidate",
+    "employer": "Employer",
+    "signUp": "Sign Up",
+    "signUpNow": "Sign Up Now",
+    "dontHaveAccount": "Don't have an account?",
+    "invalidEmail": "Invalid Email",
+    "invalidCredentials": "Invalid Credentials",
+    "authenticationFailed": "Authentication Failed",
+    "loginFailed": "Login Failed",
+    "welcomeBack": "Welcome back!",
+    "redirectingToDashboard": "Redirecting to dashboard...",
+    "emailOrPasswordIncorrect": "The email or password you entered is incorrect",
+    "pleaseTryAgainLater": "Please try again later",
+    "somethingWentWrong": "Something went wrong"
+  },
+  "registration": {
+    "title": "Candidate Registration",
+    "stepOf": "Step {current} of {total}",
+    "complete": "Complete",
+    "previous": "Previous",
+    "next": "Next",
+    "registering": "Registering...",
+    "completeRegistration": "Complete Registration",
+    "registrationSuccessful": "Registration Successful!",
+    "registrationSuccessfulDescription": "Your candidate profile has been created.",
+    "registrationFailed": "Registration Failed",
+    "steps": {
+      "account": {
+        "title": "Account",
+        "description": "Create your account",
+        "shortTitle": "Account",
+        "stepperTitle": "Account"
+      },
+      "personalInfo": {
+        "title": "Personal Info",
+        "description": "Your personal details",
+        "shortTitle": "Personal",
+        "stepperTitle": "Personal"
+      },
+      "jobRole": {
+        "title": "Job Role",
+        "description": "Select your role",
+        "shortTitle": "Job Role",
+        "stepperTitle": "Job Role"
+      },
+      "experience": {
+        "title": "Experience",
+        "description": "Work experience",
+        "shortTitle": "Experience",
+        "stepperTitle": "Experience"
+      },
+      "locationVisa": {
+        "title": "Location & Visa",
+        "description": "Location and visa info",
+        "shortTitle": "Location",
+        "stepperTitle": "Location"
+      },
+      "review": {
+        "title": "Review",
+        "description": "Review and submit",
+        "shortTitle": "Review",
+        "stepperTitle": "Review"
+      }
+    },
+    "fields": {
+      "emailAddress": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "enterEmail": "Enter your email address",
+      "enterPassword": "Enter your password (min. 8 characters)",
+      "confirmPasswordPlaceholder": "Confirm your password"
+    },
+    "pleaseTryAgainLater": "Please try again later",
+    "somethingWentWrong": "Something went wrong"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "login": "Login",
+    "signUp": "Sign Up"
+  },
+  "emptyStates": {
+    "noResults": "No results found",
+    "tryAgain": "Try again",
+    "noCandidates": "No candidates found"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "invalidCredentials": "Invalid credentials",
+    "invalidEmail": "Invalid email",
+    "validationError": "Validation error"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "tooShort": "This field is too short",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least {minLength} characters long",
+    "passwordUppercase": "Password must contain at least one uppercase letter",
+    "passwordLowercase": "Password must contain at least one lowercase letter",
+    "passwordNumber": "Password must contain at least one number",
+    "passwordSpecialChar": "Password must contain at least one special character",
+    "passwordRequirements": "Password must be at least 8 characters and contain uppercase, lowercase, number, and special character"
+  },
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "search": "Search"
+  },
+  "homepage": {
+    "hero": {
+      "title": "Explore thousands of openings and",
+      "titleHighlight": "talented",
+      "titleEnd": "profiles all in one place.",
+      "subtitle": "Access a wide pool of qualified candidates across all roles and industries. Easily find profiles that match the skills and qualities your company is looking for.",
+      "forEmployer": "For Employer",
+      "forCandidates": "For Candidates",
+      "searchPlaceholder": "Smart Search",
+      "verifiedLogo": "Verified or Authorized Logo Government"
+    },
+    "candidates": {
+      "title": "Candidates",
+      "subtitle": "Search over 30,475 skilled candidates ready to work.",
+      "findMore": "Find More Candidates",
+      "experience": "Experience",
+      "nationality": "Nationality",
+      "location": "Location"
+    },
+    "majorDisciplines": {
+      "title": "Explore Jobs by Major Discipline",
+      "subtitle": "Our platform connects you with top employers across various industries"
+    },
+    "uploadResume": {
+      "title": "Put Your CV In Front Of Great Employers",
+      "description": "Take the next step in your career with confidence. Share your CV and let top employers find you based on your skills, experience, and potential.",
+      "button": "Upload Your Resume"
+    },
+    "blog": {
+      "title": "Our Blog: Your Path to Career Success",
+      "subtitle": "Stay updated with the latest trends in hiring and career success",
+      "viewAll": "View All Blog Posts",
+      "by": "By"
+    },
+    "trustedBy": {
+      "title": "Trusted by"
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Have a Question?",
+      "description": "Save time with straightforward answers to common questions recruiters and HR teams often ask.",
+      "gotMoreQuestions": "Got more questions?",
+      "contactUsDescription": "Get in touch and we'll take care of the rest.",
+      "contactUs": "Contact Us",
+      "items": {
+        "freeTrial": {
+          "question": "How does the free trial work?",
+          "answer": "You get full access to all features for 14 days, no credit card required."
+        },
+        "cancelSubscription": {
+          "question": "Can I cancel my subscription anytime?",
+          "answer": "Yes, you can cancel or upgrade at any time."
+        },
+        "linkedinIntegration": {
+          "question": "Does Ready to Work integrate with LinkedIn?",
+          "answer": "Yes, we offer seamless LinkedIn integration for profile imports."
+        },
+        "dataSecurity": {
+          "question": "Is my data secure?",
+          "answer": "We use industry-standard encryption and security practices."
+        },
+        "customizeWorkflows": {
+          "question": "Can I customize workflows?",
+          "answer": "Absolutely! Our platform offers flexible workflow customization."
+        }
+      }
+    },
+    "newsletter": {
+      "title": "Subscribe to our Newsletter",
+      "emailLabel": "Email*",
+      "emailPlaceholder": "Enter your email",
+      "privacyText": "We care about your data. Read our",
+      "privacyPolicy": "privacy policy",
+      "privacyTextEnd": "."
+    },
+    "footer": {
+      "stayConnected": "Stay connected",
+      "quicklinks": "Quicklinks",
+      "policies": "Policies",
+      "contactDetails": "Contact Details",
+      "address": "Address",
+      "email": "Email",
+      "phone": "Phone",
+      "open": "Open",
+      "addressValue": "Jeddah, Saudi Arabia",
+      "emailValue": "hello@readytowork.sa",
+      "phoneValue": "5 - 918 - 6338",
+      "hoursValue": "Sun - Thur / 9:00 AM - 6:00 PM",
+      "copyright": "Copyright 2025 ©Readytowork. All rights reserved.",
+      "designedBy": "Designed and Developed by",
+      "links": {
+        "aboutUs": "About Us",
+        "companyInformation": "Company information",
+        "codeOfConduct": "Code of conduct",
+        "investorRelations": "Investor relations",
+        "siteMap": "Site map",
+        "policies": "Policies",
+        "termsAndCondition": "Terms and condition",
+        "legal": "Legal",
+        "disclaimer": "Disclaimer",
+        "privacyAndPolicy": "Privacy and policy"
+      }
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "Pricing"
+    },
+    "intro": {
+      "title": "Flexible Pricing for Every Team Size",
+      "description": "Find the right talent without complexity. Our pricing plans are designed to support different hiring requirements, giving you flexibility, clarity, and access to qualified candidates when you need it."
+    },
+    "cards": {
+      "topPicks": "Top Picks",
+      "skilled": "Skilled Workers",
+      "specialty": "Certified Technical",
+      "eliteSpecialty": "Expert Licensed staff",
+      "custom": "Survey Package",
+      "processing": "Processing...",
+      "getStarted": "Get Started",
+      "features": {
+        "interviewCandidates": "Interview up to {count} candidates",
+        "basicFilters": "Use basic filters (age, experience, location, language)",
+        "contactUnlock": "Access contact details of {count} selected candidate{plural} after interviews",
+        "saudiOnly": "Saudi candidates only",
+        "customMoreThan5": "Receive more than 5 matched candidates",
+        "customTargetProfiles": "Target specific candidate profiles",
+        "customRespondQuestions": "Respond to up to 5 employer questions",
+        "customAccessContact": "Access contact details of one candidate"
+      },
+      "toasts": {
+        "creditsAdded": "Credits Added!",
+        "creditsAddedDescription": "You now have {interviewCredits} interview credits and {contactCredits} contact unlock credits.",
+        "purchaseFailed": "Purchase Failed",
+        "purchaseFailedDescription": "Please try again.",
+        "purchaseFailedError": "An unexpected error occurred. Please try again."
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "About Us"
+    },
+    "ourWork": {
+      "title": "Our Work",
+      "description": "We know that recruiting is a complex and time-consuming task. Our solution integrates video technology, smart tools, efficient workflows, analytics, and collaborative feedback to streamline and optimize the hiring process.",
+      "learnMore": "Learn more"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "steps": {
+        "step1": {
+          "title": "Create account",
+          "description": "Sign up in minutes and set up your personal profile to get started."
+        },
+        "step2": {
+          "title": "Upload CV / Resume",
+          "description": "Add your CV and key details so employers can understand your experience and skills."
+        },
+        "step3": {
+          "title": "Get matched & shortlisted",
+          "description": "We match you with relevant employers for interviews."
+        },
+        "step4": {
+          "title": "Interview & get hired",
+          "description": "Attend interviews and move forward with the employer that's right for you."
+        }
+      }
+    },
+    "contact": {
+      "label": "Contact us",
+      "title": "Need help? Contact us, and we'll respond soon.",
+      "description": "Reach out to us for any questions, support, or collaboration opportunities — we're always happy to assist!",
+      "phone": "+84 982 900 108",
+      "email": "info@readytowork.sa",
+      "form": {
+        "name": "Your Name*",
+        "email": "Email*",
+        "phone": "Phone*",
+        "title": "Your Title*",
+        "message": "Message*",
+        "send": "SEND"
+      }
+    }
+  }
+}
+

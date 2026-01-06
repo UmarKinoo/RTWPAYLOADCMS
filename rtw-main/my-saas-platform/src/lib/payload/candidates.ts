@@ -97,6 +97,7 @@ function toDetail(doc: Candidate): CandidateDetail {
 async function fetchCandidates(options?: {
   limit?: number
   page?: number
+  disciplineSlug?: string
 }): Promise<{
   candidates: CandidateListItem[]
   totalDocs: number
@@ -107,7 +108,108 @@ async function fetchCandidates(options?: {
 }> {
   const payload = await getPayload({ config: configPromise })
 
-  const { limit = 20, page = 1 } = options || {}
+  const { limit = 20, page = 1, disciplineSlug } = options || {}
+
+  // Build where clause
+  const where: any = {
+    // Only show candidates who accepted terms (valid registrations)
+    termsAccepted: {
+      equals: true,
+    },
+  }
+
+  // If discipline filter is provided, filter by discipline through relationship chain
+  if (disciplineSlug) {
+    try {
+      // 1. Find discipline by slug
+      const disciplineResult = await payload.find({
+        collection: 'disciplines',
+        where: {
+          slug: {
+            equals: disciplineSlug,
+          },
+        },
+        limit: 1,
+      })
+
+      if (disciplineResult.docs.length > 0) {
+        const disciplineId = disciplineResult.docs[0].id
+
+        // 2. Find all categories for this discipline
+        const categoriesResult = await payload.find({
+          collection: 'categories',
+          where: {
+            discipline: {
+              equals: disciplineId,
+            },
+          },
+          limit: 1000,
+        })
+
+        const categoryIds = categoriesResult.docs.map((cat) => cat.id)
+
+        if (categoryIds.length > 0) {
+          // 3. Find all subcategories for these categories
+          const subCategoriesResult = await payload.find({
+            collection: 'subcategories',
+            where: {
+              category: {
+                in: categoryIds,
+              },
+            },
+            limit: 1000,
+          })
+
+          const subCategoryIds = subCategoriesResult.docs.map((sub) => sub.id)
+
+          if (subCategoryIds.length > 0) {
+            // 4. Find all skills for these subcategories
+            const skillsResult = await payload.find({
+              collection: 'skills',
+              where: {
+                subCategory: {
+                  in: subCategoryIds,
+                },
+              },
+              limit: 1000,
+            })
+
+            const skillIds = skillsResult.docs.map((skill) => skill.id)
+
+            if (skillIds.length > 0) {
+              // 5. Filter candidates by primarySkill
+              where.primarySkill = {
+                in: skillIds,
+              }
+            } else {
+              // No skills found, return empty result
+              where.primarySkill = {
+                equals: -1, // Non-existent ID to return no results
+              }
+            }
+          } else {
+            // No subcategories found, return empty result
+            where.primarySkill = {
+              equals: -1,
+            }
+          }
+        } else {
+          // No categories found, return empty result
+          where.primarySkill = {
+            equals: -1,
+          }
+        }
+      } else {
+        // Discipline not found, return empty result
+        where.primarySkill = {
+          equals: -1,
+        }
+      }
+    } catch (error) {
+      console.error('Error filtering by discipline:', error)
+      // On error, don't filter (show all candidates)
+    }
+  }
 
   const result = await payload.find({
     collection: 'candidates',
@@ -116,12 +218,7 @@ async function fetchCandidates(options?: {
     sort: '-createdAt', // Newest first
     depth: 1, // Populate profilePicture
     overrideAccess: true, // Public listing
-    where: {
-      // Only show candidates who accepted terms (valid registrations)
-      termsAccepted: {
-        equals: true,
-      },
-    },
+    where,
   })
 
   return {
@@ -162,10 +259,15 @@ async function fetchCandidateById(id: number): Promise<CandidateDetail | null> {
 /**
  * Get paginated list of candidates (cached with 'candidates' tag)
  */
-export const getCandidates = (options?: { limit?: number; page?: number }) =>
+export const getCandidates = (options?: { limit?: number; page?: number; disciplineSlug?: string }) =>
   unstable_cache(
     async () => fetchCandidates(options),
-    ['candidates', `page-${options?.page || 1}`, `limit-${options?.limit || 20}`],
+    [
+      'candidates',
+      `page-${options?.page || 1}`,
+      `limit-${options?.limit || 20}`,
+      `discipline-${options?.disciplineSlug || 'all'}`,
+    ],
     {
       tags: ['candidates'],
       revalidate: 60, // Revalidate every 60 seconds as fallback

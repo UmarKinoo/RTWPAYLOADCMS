@@ -11,7 +11,7 @@ const INPUT_FILE = 'public/assets/72a7dc683281a0bfe193c81609cc3ea29e31fd5b.png'
 const OUTPUT_FILE = 'public/assets/72a7dc683281a0bfe193c81609cc3ea29e31fd5b.webp'
 const MAX_WIDTH = 1920
 const MAX_FILE_SIZE = 100 * 1024 // 100KB
-const INITIAL_QUALITY = 80
+const INITIAL_QUALITY = 75
 const MIN_QUALITY = 20
 
 async function optimizeContactHero() {
@@ -100,6 +100,7 @@ async function optimizeContactHero() {
 }
 
 optimizeContactHero()
+
 
 
 

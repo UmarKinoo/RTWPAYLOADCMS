@@ -18,9 +18,30 @@ export interface Plan {
 }
 
 /**
- * Get all plans (cached with 'plans' tag)
+ * Get localized plan title
  */
-export const getPlans = () =>
+// Type for plan with localized title field
+type PlanWithLocalizedTitle = {
+  title?: string | { [key: string]: string } | null
+  [key: string]: unknown
+}
+
+function getLocalizedPlanTitle(plan: PlanWithLocalizedTitle, locale: string): string {
+  if (locale === 'ar' && plan.title_ar) {
+    return plan.title_ar
+  }
+  if (locale === 'en' && plan.title_en) {
+    return plan.title_en
+  }
+  // Fallback to title_en if available, otherwise use title
+  return plan.title_en || plan.title || ''
+}
+
+/**
+ * Get all plans (cached with 'plans' tag)
+ * @param locale - Current locale ('en' or 'ar') for localized titles
+ */
+export const getPlans = (locale: string = 'en') =>
   unstable_cache(
     async () => {
       const payload = await getPayload({ config: configPromise })
@@ -34,7 +55,7 @@ export const getPlans = () =>
       return result.docs.map((doc) => ({
         id: doc.id,
         slug: doc.slug,
-        title: doc.title,
+        title: getLocalizedPlanTitle(doc, locale),
         price: doc.price,
         currency: doc.currency || 'SAR',
         entitlements: {
@@ -46,7 +67,7 @@ export const getPlans = () =>
         },
       })) as Plan[]
     },
-    ['plans'],
+    ['plans', locale],
     {
       tags: ['plans'],
       revalidate: 60, // Revalidate every 60 seconds

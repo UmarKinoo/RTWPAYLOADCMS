@@ -4,7 +4,8 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { loginUser } from './auth'
+import { randomBytes } from 'crypto'
+import { sendEmail, verificationEmailTemplate } from './email'
 import type { Employer } from '@/payload-types'
 
 export interface RegisterEmployerData {
@@ -71,6 +72,10 @@ export async function registerEmployer(
       return { success: false, error: 'An employer with this email already exists' }
     }
 
+    // Generate email verification token
+    const verificationToken = randomBytes(32).toString('hex')
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
     // Create the employer
     const employer = await payload.create({
       collection: 'employers',
@@ -80,6 +85,9 @@ export async function registerEmployer(
         email: data.email.toLowerCase().trim(),
         password: data.password,
         termsAccepted: data.termsAccepted,
+        emailVerified: false,
+        emailVerificationToken: verificationToken,
+        emailVerificationExpires: verificationExpires.toISOString(),
         wallet: {
           interviewCredits: 0,
           contactUnlockCredits: 0,
@@ -88,20 +96,17 @@ export async function registerEmployer(
       draft: false,
     })
 
-    // Log the employer in immediately after successful registration
-    const loginResult = await loginUser({
-      email: data.email,
-      password: data.password,
-      collection: 'employers',
+    // Send verification email
+    const emailResult = await sendEmail({
+      to: data.email.toLowerCase().trim(),
+      subject: 'Verify your email address - Ready to Work',
+      html: verificationEmailTemplate(data.email.toLowerCase().trim(), verificationToken, 'employer'),
     })
 
-    if (!loginResult.success) {
-      // SECURITY: Never log passwords or sensitive data
-      console.error('Failed to log in employer after registration:', loginResult.error || 'Unknown error')
-      return {
-        success: false,
-        error: loginResult.error || 'Registration successful, but failed to log in.',
-      }
+    if (!emailResult.success) {
+      console.error('Failed to send verification email:', emailResult.error)
+      // Don't fail registration if email fails, but log it
+      // User can request resend later
     }
 
     revalidatePath('/employer/register', 'page')
@@ -110,13 +115,13 @@ export async function registerEmployer(
       success: true,
       employerId: String(employer.id),
     }
-  } catch (error: any) {
+  } catch (error) {
     // SECURITY: Never log passwords or sensitive data
-    const errorMessage = error?.message || 'Unknown error'
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Error registering employer:', errorMessage)
     return {
       success: false,
-      error: error.message || 'Failed to register employer. Please try again.',
+      error: error instanceof Error ? error.message : 'Failed to register employer. Please try again.',
     }
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/routing'
 import { HomepageSection } from '../homepage/HomepageSection'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { mockPurchase } from '@/lib/purchases'
+import { useTranslations } from 'next-intl'
 import type { Plan } from '@/lib/payload/plans'
 
 interface PricingCardsProps {
@@ -21,6 +22,7 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
   onPurchase,
 }) => {
   const [isLoading, setIsLoading] = useState(false)
+  const t = useTranslations('pricing.cards')
   const isCustom = plan.entitlements.isCustom
   const isPopular = plan.slug === 'top-picks'
 
@@ -45,37 +47,38 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
   }
 
   const getSubtitle = () => {
-    if (plan.slug === 'skilled') return 'Skilled Workers'
-    if (plan.slug === 'specialty') return 'Certified Technical'
-    if (plan.slug === 'elite-specialty') return 'Expert Licensed staff'
+    if (plan.slug === 'skilled') return t('skilled')
+    if (plan.slug === 'specialty') return t('specialty')
+    if (plan.slug === 'elite-specialty') return t('eliteSpecialty')
     if (plan.slug === 'top-picks') return 'N/A'
-    if (plan.slug === 'custom') return 'Survey Package'
+    if (plan.slug === 'custom') return t('custom')
     return ''
   }
 
   const getFeatures = () => {
     const features = []
     if (plan.entitlements.interviewCreditsGranted > 0) {
-      features.push(`Interview up to ${plan.entitlements.interviewCreditsGranted} candidates`)
+      features.push(t('features.interviewCandidates', { count: plan.entitlements.interviewCreditsGranted }))
     }
     if (plan.entitlements.basicFilters) {
-      features.push('Use basic filters (age, experience, location, language)')
+      features.push(t('features.basicFilters'))
     }
     if (plan.entitlements.contactUnlockCreditsGranted > 0) {
       features.push(
-        `Access contact details of ${plan.entitlements.contactUnlockCreditsGranted} selected candidate${
-          plan.entitlements.contactUnlockCreditsGranted > 1 ? 's' : ''
-        } after interviews`,
+        t('features.contactUnlock', {
+          count: plan.entitlements.contactUnlockCreditsGranted,
+          plural: plan.entitlements.contactUnlockCreditsGranted > 1 ? 's' : '',
+        }),
       )
     }
     if (plan.entitlements.nationalityRestriction === 'SAUDI') {
-      features.push('Saudi candidates only')
+      features.push(t('features.saudiOnly'))
     }
     if (isCustom) {
-      features.push('Receive more than 5 matched candidates')
-      features.push('Target specific candidate profiles')
-      features.push('Respond to up to 5 employer questions')
-      features.push('Access contact details of one candidate')
+      features.push(t('features.customMoreThan5'))
+      features.push(t('features.customTargetProfiles'))
+      features.push(t('features.customRespondQuestions'))
+      features.push(t('features.customAccessContact'))
     }
     return features
   }
@@ -90,8 +93,8 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
     >
       {/* Popular Badge */}
       {isPopular && (
-        <Badge className="absolute -top-3 right-4 bg-[#d8e530] hover:bg-[#c8d520] text-[#222] px-3 py-1 rounded-full text-xs font-medium">
-          Top Picks
+        <Badge className="absolute -top-3 end-4 bg-[#d8e530] hover:bg-[#c8d520] text-[#222] px-3 py-1 rounded-full text-xs font-medium">
+          {t('topPicks')}
         </Badge>
       )}
 
@@ -128,7 +131,7 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
           disabled={isLoading}
           className="w-full bg-[#4644b8] hover:bg-[#3a3aa0] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl h-11 sm:h-12 text-sm sm:text-base font-semibold transition-all"
         >
-          {isLoading ? 'Processing...' : 'Get Started'}
+          {isLoading ? t('processing') : t('getStarted')}
         </Button>
       </CardFooter>
     </Card>
@@ -137,26 +140,30 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
 
 export const PricingCards: React.FC<PricingCardsProps> = ({ plans }) => {
   const router = useRouter()
+  const t = useTranslations('pricing.cards')
 
   const handlePurchase = async (planSlug: string) => {
     try {
       const result = await mockPurchase(planSlug)
 
       if (result.success) {
-        toast.success('Credits Added!', {
-          description: `You now have ${result.wallet?.interviewCredits || 0} interview credits and ${result.wallet?.contactUnlockCredits || 0} contact unlock credits.`,
+        toast.success(t('toasts.creditsAdded'), {
+          description: t('toasts.creditsAddedDescription', {
+            interviewCredits: result.wallet?.interviewCredits || 0,
+            contactCredits: result.wallet?.contactUnlockCredits || 0,
+          }),
         })
         // Redirect to candidates page
         router.push('/candidates')
       } else {
-        toast.error('Purchase Failed', {
-          description: result.error || 'Please try again.',
+        toast.error(t('toasts.purchaseFailed'), {
+          description: result.error || t('toasts.purchaseFailedDescription'),
         })
       }
     } catch (error) {
       console.error('Purchase error:', error)
-      toast.error('Purchase Failed', {
-        description: 'An unexpected error occurred. Please try again.',
+      toast.error(t('toasts.purchaseFailed'), {
+        description: t('toasts.purchaseFailedError'),
       })
     }
   }

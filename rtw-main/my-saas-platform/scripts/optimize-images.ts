@@ -2,7 +2,7 @@
  * Batch Image Optimization Script
  *
  * Resizes images to max width 1920px (maintains aspect ratio)
- * Converts to WebP format with quality 80
+ * Converts to WebP format with quality 75
  * Processes JPG, JPEG, PNG files
  * Outputs to /optimized folder preserving folder structure
  *
@@ -18,7 +18,7 @@ import * as path from 'path'
 const INPUT_DIR = 'public/assets'
 const OUTPUT_DIR = 'public/assets-optimized'
 const MAX_WIDTH = 1920
-const INITIAL_QUALITY = 80
+const INITIAL_QUALITY = 75
 const MIN_QUALITY = 20
 const MAX_FILE_SIZE = 100 * 1024 // 100KB in bytes
 const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png']

@@ -33,7 +33,23 @@ export const Plans: CollectionConfig = {
       type: 'text',
       required: true,
       admin: {
-        description: 'Display name for the plan',
+        description: 'English name (fallback if title_en is not set)',
+      },
+    },
+    {
+      name: 'title_en',
+      type: 'text',
+      required: false,
+      admin: {
+        description: 'English name (used when locale is "en")',
+      },
+    },
+    {
+      name: 'title_ar',
+      type: 'text',
+      required: false,
+      admin: {
+        description: 'Arabic name (used when locale is "ar")',
       },
     },
     {

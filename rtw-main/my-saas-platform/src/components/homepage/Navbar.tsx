@@ -1,13 +1,16 @@
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
+import { useRouter, usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { UserMenu } from '@/components/navbar/UserMenu'
 import { CandidateUserMenu } from '@/components/navbar/CandidateUserMenu'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import type { Employer, Candidate } from '@/payload-types'
 
 // Logo image - the full combined logo
@@ -19,14 +22,18 @@ interface HomepageNavbarProps {
 }
 
 export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candidate }) => {
+  const t = useTranslations('nav')
+  const router = useRouter()
+  const pathname = usePathname()
+  const locale = pathname.split('/')[1] || 'en'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navLinks = [
-    { label: 'Candidates', href: '/candidates' },
-    { label: 'Pricing', href: '/pricing' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'About', href: '/about' },
-    { label: 'Contact us', href: '/contact' },
+    { label: t('candidates'), href: '/candidates' },
+    { label: t('pricing'), href: '/pricing' },
+    { label: t('blog'), href: '/blog' },
+    { label: t('about'), href: '/about' },
+    { label: t('contact'), href: '/contact' },
   ]
 
   return (
@@ -62,6 +69,7 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-3 sm:gap-4">
+              <LanguageSwitcher />
               {employer ? (
                 // Employer is logged in - show Employer UserMenu
                 <>
@@ -100,21 +108,20 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
                     href="/login"
                     className="hidden sm:block text-sm lg:text-base font-semibold font-inter text-[#16252d] hover:text-[#4545b8] transition-colors"
                   >
-                    Login
+                    {t('login')}
                   </Link>
 
                   {/* Get Started Button */}
-                  <Link href="/register">
-                    <Button
-                      className={cn(
-                        'bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-lg sm:rounded-xl',
-                        'px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5',
-                        'text-sm sm:text-base lg:text-lg font-bold whitespace-nowrap'
-                      )}
-                    >
-                      Get Started
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={() => router.push(`/${locale}/register-type`)}
+                    className={cn(
+                      'bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-lg sm:rounded-xl',
+                      'px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5',
+                      'text-sm sm:text-base lg:text-lg font-bold whitespace-nowrap'
+                    )}
+                  >
+                    Get Started
+                  </Button>
 
                   {/* Mobile Menu Button */}
                   <Button
@@ -151,7 +158,7 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
                     className="sm:hidden text-base font-semibold font-inter text-[#16252d] hover:text-[#4545b8] transition-colors py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Login
+                    {t('login')}
                   </Link>
                 )}
               </div>

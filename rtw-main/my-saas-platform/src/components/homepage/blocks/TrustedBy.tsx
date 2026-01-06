@@ -1,6 +1,7 @@
 import React from 'react'
 import { HomepageSection } from '../HomepageSection'
 import Image from 'next/image'
+import { getTranslations } from 'next-intl/server'
 
 // Complete logo images
 const imgAirbnb = '/assets/c590fb13c93f778ca78535868125737d83f0af01.svg'
@@ -17,13 +18,15 @@ const companies = [
   { name: 'Framer', logo: imgFramer },
 ]
 
-export const TrustedBy: React.FC = () => {
+export const TrustedBy: React.FC = async () => {
+  const t = await getTranslations('homepage.trustedBy')
+
   return (
     <HomepageSection className="pb-12 sm:pb-16 md:pb-20">
       {/* Header */}
       <div className="text-center mb-6 sm:mb-8">
         <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold font-inter text-[#16252d]">
-          Trusted by
+          {t('title')}
         </h2>
       </div>
 

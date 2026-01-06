@@ -1,9 +1,9 @@
 /**
  * Billing Class Utilities
- * Maps billing classes (A, B, C, D) to pricing tiers and provides helper functions
+ * Maps billing classes (A, B, C, D, S) to pricing tiers and provides helper functions
  */
 
-export type BillingClass = 'A' | 'B' | 'C' | 'D'
+export type BillingClass = 'A' | 'B' | 'C' | 'D' | 'S'
 
 export interface BillingClassInfo {
   class: BillingClass
@@ -19,27 +19,34 @@ export interface BillingClassInfo {
 export const BILLING_CLASSES: Record<BillingClass, BillingClassInfo> = {
   A: {
     class: 'A',
-    name: 'Skilled',
-    subtitle: 'Skilled Workers',
-    price: 'SAR 350',
-    description: 'Skilled workers',
+    name: 'Essential',
+    subtitle: 'General Staff',
+    price: 'SAR 150',
+    description: 'Essential (Aamel) - General Staff',
   },
   B: {
     class: 'B',
-    name: 'Specialty',
-    subtitle: 'Certified Technical',
-    price: 'SAR 450',
-    description: 'Specialty / Certified Technical workers',
+    name: 'Skilled',
+    subtitle: 'Skilled Workers',
+    price: 'SAR 350',
+    description: 'Skilled (Maher) - Skilled Workers',
   },
   C: {
     class: 'C',
-    name: 'Elite Specialty',
-    subtitle: 'Expert Licensed staff',
-    price: 'SAR 600',
-    description: 'Elite Specialty / Expert Licensed staff',
+    name: 'Specialty',
+    subtitle: 'Certified Technical',
+    price: 'SAR 450',
+    description: 'Specialty (Teqani) - Certified Technical',
   },
   D: {
     class: 'D',
+    name: 'Elite Specialty',
+    subtitle: 'Expert Licensed staff',
+    price: 'SAR 600',
+    description: 'Elite Specialty (Khibra) - Expert Licensed staff',
+  },
+  S: {
+    class: 'S',
     name: 'Saudi Nationals',
     subtitle: 'N/A',
     price: 'SAR 700',
@@ -54,7 +61,10 @@ export function getBillingClassInfo(billingClass: BillingClass | string | null |
   if (!billingClass) return null
   
   const normalized = String(billingClass).toUpperCase().trim() as BillingClass
-  return BILLING_CLASSES[normalized] || null
+  if (normalized in BILLING_CLASSES) {
+    return BILLING_CLASSES[normalized]
+  }
+  return null
 }
 
 /**
@@ -78,7 +88,7 @@ export function getBillingClassPrice(billingClass: BillingClass | string | null 
  */
 export function isValidBillingClass(billingClass: string | null | undefined): billingClass is BillingClass {
   if (!billingClass) return false
-  return ['A', 'B', 'C', 'D'].includes(billingClass.toUpperCase().trim())
+  return ['A', 'B', 'C', 'D', 'S'].includes(billingClass.toUpperCase().trim())
 }
 
 

@@ -59,7 +59,26 @@ export const Pages: CollectionConfig<'pages'> = {
     {
       name: 'title',
       type: 'text',
-      required: true,
+      required: false,
+      admin: {
+        description: 'Fallback title (used if title_en or title_ar is not available)',
+      },
+    },
+    {
+      name: 'title_en',
+      type: 'text',
+      required: false,
+      admin: {
+        description: 'English title',
+      },
+    },
+    {
+      name: 'title_ar',
+      type: 'text',
+      required: false,
+      admin: {
+        description: 'Arabic title',
+      },
     },
     {
       type: 'tabs',

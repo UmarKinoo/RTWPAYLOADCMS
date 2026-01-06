@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import { HomepageSection } from '../homepage/HomepageSection'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -52,26 +53,28 @@ const StepCard: React.FC<StepCardProps> = ({ step, title, description }) => {
 }
 
 export const HowItWorks: React.FC = () => {
+  const t = useTranslations('about.howItWorks')
+
   const steps = [
     {
       step: 1,
-      title: 'Create account',
-      description: 'Sign up in minutes and set up your personal profile to get started.',
+      title: t('steps.step1.title'),
+      description: t('steps.step1.description'),
     },
     {
       step: 2,
-      title: 'Upload CV / Resume',
-      description: 'Add your CV and key details so employers can understand your experience and skills.',
+      title: t('steps.step2.title'),
+      description: t('steps.step2.description'),
     },
     {
       step: 3,
-      title: 'Get matched & shortlisted',
-      description: 'We match you with relevant employers for interviews.',
+      title: t('steps.step3.title'),
+      description: t('steps.step3.description'),
     },
     {
       step: 4,
-      title: 'Interview & get hired',
-      description: "Attend interviews and move forward with the employer that's right for you.",
+      title: t('steps.step4.title'),
+      description: t('steps.step4.description'),
     },
   ]
 
@@ -80,7 +83,7 @@ export const HowItWorks: React.FC = () => {
       {/* Title */}
       <div className="text-center mb-8 sm:mb-10 md:mb-12">
         <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-inter text-[#16252d] leading-tight">
-          How it works
+          {t('title')}
         </h2>
       </div>
 

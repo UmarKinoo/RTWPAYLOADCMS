@@ -1,0 +1,320 @@
+{
+  "nav": {
+    "home": "الصفحة الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "logout": "تسجيل الخروج",
+    "login": "تسجيل الدخول",
+    "candidates": "المرشحون",
+    "pricing": "التسعير",
+    "blog": "مدونة",
+    "about": "حول",
+    "contact": "اتصل بنا"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "createAccount": "إنشاء حساب",
+    "rememberMe": "تذكرني لمدة 30 يومًا",
+    "loginAs": "تسجيل الدخول كـ",
+    "candidate": "مرشح",
+    "employer": "صاحب العمل",
+    "signUp": "اشترك",
+    "signUpNow": "سجل الآن",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "invalidEmail": "بريد إلكتروني غير صالح",
+    "invalidCredentials": "بيانات الاعتماد غير صالحة",
+    "authenticationFailed": "فشل التحقق من الهوية",
+    "loginFailed": "فشل تسجيل الدخول",
+    "welcomeBack": "مرحبًا بعودتك!",
+    "redirectingToDashboard": "إعادة التوجيه إلى لوحة التحكم...",
+    "emailOrPasswordIncorrect": "البريد الإلكتروني أو كلمة المرور التي أدخلتها غير صحيحة",
+    "pleaseTryAgainLater": "يرجى المحاولة مرة أخرى لاحقًا",
+    "somethingWentWrong": "حدث خطأ ما"
+  },
+  "registration": {
+    "title": "تسجيل المرشح",
+    "stepOf": "الخطوة {current} من {total}",
+    "complete": "مكتمل",
+    "previous": "السابق",
+    "next": "التالي",
+    "registering": "جاري التسجيل...",
+    "completeRegistration": "إكمال التسجيل",
+    "registrationSuccessful": "تم التسجيل بنجاح!",
+    "registrationSuccessfulDescription": "تم إنشاء ملف المرشح الخاص بك.",
+    "registrationFailed": "فشل التسجيل",
+    "steps": {
+      "account": {
+        "title": "الحساب",
+        "description": "إنشاء حسابك",
+        "shortTitle": "الحساب",
+        "stepperTitle": "الحساب"
+      },
+      "personalInfo": {
+        "title": "المعلومات الشخصية",
+        "description": "تفاصيلك الشخصية",
+        "shortTitle": "شخصي",
+        "stepperTitle": "شخصي"
+      },
+      "jobRole": {
+        "title": "الدور الوظيفي",
+        "description": "اختر دورك",
+        "shortTitle": "الدور",
+        "stepperTitle": "الدور الوظيفي"
+      },
+      "experience": {
+        "title": "الخبرة",
+        "description": "الخبرة العملية",
+        "shortTitle": "الخبرة",
+        "stepperTitle": "الخبرة"
+      },
+      "locationVisa": {
+        "title": "الموقع والتأشيرة",
+        "description": "معلومات الموقع والتأشيرة",
+        "shortTitle": "الموقع",
+        "stepperTitle": "الموقع"
+      },
+      "review": {
+        "title": "المراجعة",
+        "description": "المراجعة والإرسال",
+        "shortTitle": "المراجعة",
+        "stepperTitle": "المراجعة"
+      }
+    },
+    "fields": {
+      "emailAddress": "عنوان البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "enterEmail": "أدخل عنوان بريدك الإلكتروني",
+      "enterPassword": "أدخل كلمة المرور (8 أحرف على الأقل)",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور"
+    },
+    "pleaseTryAgainLater": "يرجى المحاولة مرة أخرى لاحقًا",
+    "somethingWentWrong": "حدث خطأ ما"
+  },
+  "buttons": {
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "back": "عودة",
+    "next": "التالي",
+    "login": "تسجيل الدخول",
+    "signUp": "اشترك"
+  },
+  "emptyStates": {
+    "noResults": "لم يتم العثور على نتائج",
+    "tryAgain": "حاول مرة أخرى",
+    "noCandidates": "لم يتم العثور على مرشحين"
+  },
+  "errors": {
+    "somethingWentWrong": "حدث خطأ ما",
+    "invalidCredentials": "بيانات اعتماد غير صالحة",
+    "invalidEmail": "البريد الإلكتروني غير صالح",
+    "validationError": "خطأ في التحقق"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+    "tooShort": "هذا الحقل قصير جدًا",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "passwordMinLength": "يجب أن تكون كلمة المرور مكونة من {minLength} حرفًا على الأقل.",
+    "passwordUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+    "passwordLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل.",
+    "passwordNumber": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل.",
+    "passwordSpecialChar": "يجب أن تحتوي كلمة المرور على حرف خاص واحد على الأقل.",
+    "passwordRequirements": "يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل وتحتوي على حرف كبير وحرف صغير ورقم وحرف خاص."
+  },
+  "common": {
+    "welcome": "مرحبًا",
+    "loading": "جارٍ التحميل...",
+    "search": "بحث"
+  },
+  "homepage": {
+    "hero": {
+      "title": "استكشف آلاف الفرص و",
+      "titleHighlight": "موهوب",
+      "titleEnd": "الملفات الشخصية في مكان واحد.",
+      "subtitle": "الوصول إلى مجموعة واسعة من المرشحين المؤهلين عبر جميع الأدوار والصناعات. ابحث بسهولة عن الملفات الشخصية التي تتوافق مع المهارات والصفات التي تبحث عنها شركتك.",
+      "forEmployer": "لصاحب العمل",
+      "forCandidates": "للمرشحين",
+      "searchPlaceholder": "البحث الذكي",
+      "verifiedLogo": "شعار الحكومة المعتمد أو المصرح به"
+    },
+    "candidates": {
+      "title": "المرشحون",
+      "subtitle": "ابحث بين أكثر من 30,475 مرشح ماهر جاهز للعمل.",
+      "findMore": "اعثر على المزيد من المرشحين",
+      "experience": "تجربة",
+      "nationality": "الجنسية",
+      "location": "الموقع"
+    },
+    "majorDisciplines": {
+      "title": "استكشاف الوظائف حسب التخصص الرئيسي",
+      "subtitle": "منصتنا تربطك بأفضل أصحاب العمل في مختلف الصناعات"
+    },
+    "uploadResume": {
+      "title": "ضع سيرتك الذاتية أمام أصحاب العمل الرائعين",
+      "description": "اتخذ الخطوة التالية في مسيرتك المهنية بثقة. شارك سيرتك الذاتية ودع أفضل أصحاب العمل يجدونك بناءً على مهاراتك وخبراتك وإمكاناتك.",
+      "button": "قم بتحميل سيرتك الذاتية"
+    },
+    "blog": {
+      "title": "مدونتنا: طريقك إلى النجاح المهني",
+      "subtitle": "ابقَ على اطلاع بأحدث الاتجاهات في التوظيف ونجاح الحياة المهنية",
+      "viewAll": "عرض جميع منشورات المدونة",
+      "by": "بواسطة"
+    },
+    "trustedBy": {
+      "title": "موثوق به من قبل"
+    },
+    "faq": {
+      "label": "الأسئلة الشائعة",
+      "title": "هل لديك سؤال؟",
+      "description": "وفر الوقت من خلال الحصول على إجابات مباشرة للأسئلة الشائعة التي يطرحها عادةً مسؤولو التوظيف وفرق الموارد البشرية.",
+      "gotMoreQuestions": "هل لديك المزيد من الأسئلة؟",
+      "contactUsDescription": "تواصل معنا وسنتولى الباقي.",
+      "contactUs": "اتصل بنا",
+      "items": {
+        "freeTrial": {
+          "question": "كيف تعمل الفترة التجريبية المجانية؟",
+          "answer": "تحصل على وصول كامل لجميع الميزات لمدة 14 يومًا، دون الحاجة إلى بطاقة ائتمان."
+        },
+        "cancelSubscription": {
+          "question": "هل يمكنني إلغاء اشتراكي في أي وقت؟",
+          "answer": "نعم، يمكنك الإلغاء أو الترقية في أي وقت."
+        },
+        "linkedinIntegration": {
+          "question": "هل يتكامل ReadyToWork مع LinkedIn؟",
+          "answer": "نعم، نحن نقدم تكاملًا سلسًا مع LinkedIn لاستيراد الملفات الشخصية."
+        },
+        "dataSecurity": {
+          "question": "هل بياناتي آمنة؟",
+          "answer": "نستخدم تشفير وممارسات أمان وفقًا للمعايير الصناعية."
+        },
+        "customizeWorkflows": {
+          "question": "هل يمكنني تخصيص سير العمل؟",
+          "answer": "بالتأكيد! منصتنا تقدم تخصيص سير العمل بمرونة."
+        }
+      }
+    },
+    "newsletter": {
+      "title": "اشترك في نشرتنا الإخبارية",
+      "emailLabel": "البريد الإلكتروني*",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "privacyText": "نحن نهتم ببياناتك. اقرأ الـ",
+      "privacyPolicy": "سياسة الخصوصية",
+      "privacyTextEnd": "."
+    },
+    "footer": {
+      "stayConnected": "ابقَ على اتصال",
+      "quicklinks": "روابط سريعة",
+      "policies": "السياسات",
+      "contactDetails": "تفاصيل الاتصال",
+      "address": "عنوان",
+      "email": "البريد الإلكتروني",
+      "phone": "هاتف",
+      "open": "افتح",
+      "addressValue": "جدة، المملكة العربية السعودية",
+      "emailValue": "hello@readytowork.sa",
+      "phoneValue": "5 - 918 - 6338",
+      "hoursValue": "الأحد - الخميس / 9:00 صباحاً - 6:00 مساءً",
+      "copyright": "حقوق الطبع والنشر 2025 ©ReadyToWork. جميع الحقوق محفوظة.",
+      "designedBy": "مصمم ومطور بواسطة",
+      "links": {
+        "aboutUs": "معلومات عنا",
+        "companyInformation": "معلومات الشركة",
+        "codeOfConduct": "مدونة السلوك",
+        "investorRelations": "علاقات المستثمرين",
+        "siteMap": "خريطة الموقع",
+        "policies": "السياسات",
+        "termsAndCondition": "الشروط والأحكام",
+        "legal": "قانوني",
+        "disclaimer": "إخلاء المسؤولية",
+        "privacyAndPolicy": "الخصوصية والسياسة"
+      }
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "التسعير"
+    },
+    "intro": {
+      "title": "أسعار مرنة لكل حجم فريق",
+      "description": "ابحث عن المواهب المناسبة دون تعقيد. تم تصميم خطط التسعير لدينا لدعم متطلبات التوظيف المختلفة، مما يمنحك المرونة والوضوح والوصول إلى المرشحين المؤهلين عندما تحتاجهم."
+    },
+    "cards": {
+      "topPicks": "أفضل الخيارات",
+      "skilled": "عمال مهرة",
+      "specialty": "تقني معتمد",
+      "eliteSpecialty": "موظفون مرخصون خبراء",
+      "custom": "حزمة استطلاع",
+      "processing": "جاري المعالجة...",
+      "getStarted": "ابدأ الآن",
+      "features": {
+        "interviewCandidates": "إجراء مقابلات مع ما يصل إلى {count} مرشح",
+        "basicFilters": "استخدام المرشحات الأساسية (العمر، الخبرة، الموقع، اللغة)",
+        "contactUnlock": "الوصول إلى تفاصيل الاتصال لـ {count} مرشح{plural} محدد بعد المقابلات",
+        "saudiOnly": "مرشحون سعوديون فقط",
+        "customMoreThan5": "استقبل أكثر من 5 مرشحين متطابقين",
+        "customTargetProfiles": "استهداف ملفات مرشحين محددة",
+        "customRespondQuestions": "الرد على ما يصل إلى 5 أسئلة من صاحب العمل",
+        "customAccessContact": "الوصول إلى تفاصيل الاتصال لمرشح واحد"
+      },
+      "toasts": {
+        "creditsAdded": "تمت إضافة الرصيد!",
+        "creditsAddedDescription": "لديك الآن {interviewCredits} رصيد مقابلة و {contactCredits} رصيد فتح جهة الاتصال.",
+        "purchaseFailed": "فشل الشراء",
+        "purchaseFailedDescription": "يرجى المحاولة مرة أخرى.",
+        "purchaseFailedError": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "معلومات عنا"
+    },
+    "ourWork": {
+      "title": "عملنا",
+      "description": "نعلم أن التوظيف مهمة معقدة وتستغرق وقتًا طويلاً. يجمع حلنا بين تقنية الفيديو والأدوات الذكية وسير العمل الفعال والتحليلات والملاحظات التعاونية لتبسيط وتحسين عملية التوظيف.",
+      "learnMore": "اعرف المزيد"
+    },
+    "howItWorks": {
+      "title": "كيف يعمل",
+      "steps": {
+        "step1": {
+          "title": "إنشاء حساب",
+          "description": "سجل في دقائق وقم بإعداد ملفك الشخصي للبدء."
+        },
+        "step2": {
+          "title": "تحميل السيرة الذاتية",
+          "description": "أضف سيرتك الذاتية والتفاصيل الرئيسية حتى يتمكن أصحاب العمل من فهم خبرتك ومهاراتك."
+        },
+        "step3": {
+          "title": "الحصول على المطابقة والاختيار",
+          "description": "نقوم بمطابقتك مع أصحاب العمل ذوي الصلة لإجراء المقابلات."
+        },
+        "step4": {
+          "title": "المقابلة والحصول على الوظيفة",
+          "description": "احضر المقابلات وتقدم مع صاحب العمل المناسب لك."
+        }
+      }
+    },
+    "contact": {
+      "label": "اتصل بنا",
+      "title": "تحتاج مساعدة؟ اتصل بنا، وسنرد قريبًا.",
+      "description": "تواصل معنا لأي أسئلة أو دعم أو فرص تعاون — نحن سعداء دائمًا للمساعدة!",
+      "phone": "+84 982 900 108",
+      "email": "info@readytowork.sa",
+      "form": {
+        "name": "اسمك*",
+        "email": "البريد الإلكتروني*",
+        "phone": "الهاتف*",
+        "title": "منصبك*",
+        "message": "الرسالة*",
+        "send": "إرسال"
+      }
+    }
+  }
+}

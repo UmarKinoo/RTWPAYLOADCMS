@@ -2,7 +2,9 @@ import React from 'react'
 import { HomepageSection } from '../HomepageSection'
 import { ImageWithSkeleton } from '../ImageWithSkeleton'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
+import { getTranslations } from 'next-intl/server'
+import { CandidatesClient } from './CandidatesClient'
 
 // Image assets
 const ASSETS = {
@@ -31,87 +33,14 @@ export interface CandidateCardProps {
   nationalityFlag: string
   location: string
   profileImage: string
+  billingClass?: 'A' | 'B' | 'C' | 'D' | 'S' | null
 }
 
-export const CandidateCard: React.FC<CandidateCardProps> = ({
-  name,
-  jobTitle,
-  experience,
-  nationality,
-  nationalityFlag,
-  location,
-  profileImage,
-}) => {
-  return (
-    <div className="relative w-full aspect-[341/530] max-w-[180px] sm:max-w-[200px] md:max-w-[220px] lg:max-w-[240px] xl:max-w-[280px] 2xl:max-w-[320px] mx-auto">
-      {/* Outer Vector Border */}
-      <div className="absolute inset-0 z-0">
-        <ImageWithSkeleton src={ASSETS.vector} alt="" fill objectFit="contain" />
-      </div>
+// Re-export for convenience
+export { CandidateCard } from './CandidatesClient'
 
-      {/* Inner Card Content */}
-      <div className="absolute inset-[2%] z-10">
-        {/* Background Layers */}
-        <div className="absolute inset-0">
-          <ImageWithSkeleton src={ASSETS.layer1} alt="" fill objectFit="contain" />
-        </div>
-        <div className="absolute" style={{ inset: '1.39% 0.31% 23.89% 0.22%' }}>
-          <ImageWithSkeleton src={ASSETS.layer2} alt="" fill objectFit="contain" />
-        </div>
-        <div className="absolute" style={{ inset: '1.39% 0.31% 23.89% 0.22%' }}>
-          <ImageWithSkeleton src={ASSETS.layer3} alt="" fill objectFit="contain" />
-        </div>
-
-        {/* Profile Image */}
-        <div className="absolute top-[15%] left-1/2 -translate-x-1/2 z-20 w-[56.9%] aspect-square">
-          <div className="relative w-full h-full" style={MASK_STYLE}>
-            <ImageWithSkeleton
-              src={profileImage}
-              alt={name}
-              fill
-              objectFit="cover"
-              objectPosition="center"
-            />
-          </div>
-        </div>
-
-        {/* Text Content */}
-        <div className="absolute top-[60%] left-0 right-0 px-2 sm:px-3 text-center flex flex-col items-center gap-0.5">
-          <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-[#16252d] font-inter leading-tight truncate w-full">
-            {name}
-          </h3>
-          <p className="text-[10px] sm:text-xs md:text-sm font-semibold text-[#16252d] font-inter leading-tight truncate w-full">
-            {jobTitle}
-          </p>
-          <p className="text-[9px] sm:text-[10px] md:text-xs text-[#757575] font-inter leading-tight">
-            Experience: <span className="font-medium">{experience}</span>
-          </p>
-          <div className="flex items-center justify-center gap-1">
-            <p className="text-[9px] sm:text-[10px] md:text-xs text-[#757575] font-inter leading-tight">
-              Nationality: <span className="font-medium">{nationality}</span>
-            </p>
-            <div
-              className="relative rounded-[2px] overflow-hidden flex-shrink-0 w-3 sm:w-4 aspect-[3/2]"
-              style={{ boxShadow: '0px 2px 2px 0px rgba(0,0,0,0.25)' }}
-            >
-              <ImageWithSkeleton
-                src={nationalityFlag}
-                alt={`${nationality} flag`}
-                fill
-                objectFit="cover"
-              />
-            </div>
-          </div>
-          <p className="text-[9px] sm:text-[10px] md:text-xs text-[#757575] font-inter leading-tight">
-            Location: <span className="font-medium">{location}</span>
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export const Candidates: React.FC = () => {
+export const Candidates: React.FC = async () => {
+  const t = await getTranslations('homepage.candidates')
   const candidates = [
     {
       name: 'Ali Al-Hamdan',
@@ -159,25 +88,21 @@ export const Candidates: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8 md:mb-10">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-inter text-[#16252d] mb-2 sm:mb-3">
-              Candidates
+              {t('title')}
             </h2>
             <p className="text-sm sm:text-base md:text-lg lg:text-xl font-normal font-inter text-gray-600">
-              Search over 30,475 skilled candidates ready to work.
+              {t('subtitle')}
             </p>
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6">
-            {candidates.map((candidate, index) => (
-              <CandidateCard key={index} {...candidate} />
-            ))}
-          </div>
+          <CandidatesClient candidates={candidates} />
 
           {/* CTA Button */}
           <div className="flex justify-center mt-6 sm:mt-8 md:mt-10">
             <Link href="/candidates">
               <Button className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold uppercase tracking-wide">
-                Find More Candidates
+                {t('findMore')}
               </Button>
             </Link>
           </div>

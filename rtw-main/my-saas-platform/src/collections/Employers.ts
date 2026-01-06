@@ -1,6 +1,6 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
 
-const authenticated = ({ req }: { req: any }) => {
+const authenticated = ({ req }: { req: PayloadRequest }) => {
   return !!req.user
 }
 
@@ -69,6 +69,43 @@ export const Employers: CollectionConfig = {
       label: 'Terms Accepted',
       defaultValue: false,
       required: true,
+    },
+    {
+      name: 'emailVerified',
+      type: 'checkbox',
+      label: 'Email Verified',
+      defaultValue: false,
+      admin: {
+        description: 'Has the employer verified their email address',
+      },
+    },
+    {
+      name: 'emailVerificationToken',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+    },
+    {
+      name: 'emailVerificationExpires',
+      type: 'date',
+      admin: {
+        hidden: true,
+      },
+    },
+    {
+      name: 'passwordResetToken',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+    },
+    {
+      name: 'passwordResetExpires',
+      type: 'date',
+      admin: {
+        hidden: true,
+      },
     },
     {
       name: 'wallet',

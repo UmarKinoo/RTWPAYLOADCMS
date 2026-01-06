@@ -6,7 +6,7 @@ import type { Payload } from 'payload'
 import config from '@payload-config'
 import configPromise from '@payload-config'
 import { redirect } from 'next/navigation'
-import type { User } from '@/payload-types'
+import type { User, Employer, Candidate } from '@/payload-types'
 import { validateEmail, validatePassword } from './validation'
 import {
   sendEmail,
@@ -117,8 +117,9 @@ export async function loginUser({
 
     // Track login attempts (could be extended with rate limiting)
     try {
+      // Type-safe collection login
       const result = await payload.login({
-        collection: collection as any, // Use the provided collection or default to 'users'
+        collection: collection as 'users' | 'candidates' | 'employers',
         data: { email, password },
       })
 
@@ -203,15 +204,20 @@ export async function logoutUser() {
 
 /**
  * Clear authentication cookies without redirect (for client components)
+ * Also clears NextAuth session cookies
  */
 export async function clearAuthCookies(): Promise<{ success: boolean }> {
   try {
     const cookieStore = await cookies()
-    // Delete the auth cookie
+    // Delete the Payload auth cookie
     cookieStore.delete('payload-token')
 
     // Clear any other auth-related cookies if they exist
     cookieStore.delete('user-session')
+
+    // Clear NextAuth session cookies
+    cookieStore.delete('next-auth.session-token')
+    cookieStore.delete('__Secure-next-auth.session-token') // Production secure cookie
 
     return { success: true }
   } catch (error) {
@@ -264,8 +270,8 @@ export async function registerUser({ email, password }: RegisterParams): Promise
       // Send verification email
       await sendEmail({
         to: email,
-        subject: 'Verify your email address',
-        html: verificationEmailTemplate(email, verificationToken),
+        subject: 'Verify your email address - Ready to Work',
+        html: verificationEmailTemplate(email, verificationToken, 'candidate'),
       })
 
       // Log the user in (they can use the app but with limited access until verified)
@@ -339,21 +345,74 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
   try {
     const payload = await getPayload({ config: await configPromise })
 
-    // Find user by email
-    const users = await payload.find({
-      collection: 'users',
-      where: {
-        email: { equals: email },
-      },
-    })
+    // Try to find user in all collections (users, candidates, employers)
+    let user: User | Candidate | Employer | null = null
+    let collection: 'users' | 'candidates' | 'employers' = 'users'
+    let userType: 'candidate' | 'employer' = 'candidate'
+
+    // Try employers first
+    try {
+      const employers = await payload.find({
+        collection: 'employers',
+        where: {
+          email: { equals: email },
+        },
+        limit: 1,
+      })
+      if (employers.docs.length > 0) {
+        user = employers.docs[0]
+        collection = 'employers'
+        userType = 'employer'
+      }
+    } catch {
+      // Not found in employers
+    }
+
+    // Try candidates
+    if (!user) {
+      try {
+        const candidates = await payload.find({
+          collection: 'candidates',
+          where: {
+            email: { equals: email },
+          },
+          limit: 1,
+        })
+        if (candidates.docs.length > 0) {
+          user = candidates.docs[0]
+          collection = 'candidates'
+          userType = 'candidate'
+        }
+      } catch {
+        // Not found in candidates
+      }
+    }
+
+    // Try users
+    if (!user) {
+      try {
+        const users = await payload.find({
+          collection: 'users',
+          where: {
+            email: { equals: email },
+          },
+          limit: 1,
+        })
+        if (users.docs.length > 0) {
+          user = users.docs[0]
+          collection = 'users'
+          userType = 'candidate'
+        }
+      } catch {
+        // Not found in users
+      }
+    }
 
     // Always return success to prevent email enumeration attacks
     // Even if user doesn't exist, we say we sent an email
-    if (users.docs.length === 0) {
+    if (!user) {
       return { success: true }
     }
-
-    const user = users.docs[0]
 
     // Generate reset token
     const resetToken = randomBytes(32).toString('hex')
@@ -361,7 +420,7 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
 
     // Update user with reset token
     await payload.update({
-      collection: 'users',
+      collection,
       id: user.id,
       data: {
         passwordResetToken: resetToken,
@@ -369,11 +428,11 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
       },
     })
 
-    // Send reset email
+    // Send reset email with appropriate user type
     const emailResult = await sendEmail({
       to: email,
-      subject: 'Reset your password',
-      html: passwordResetEmailTemplate(email, resetToken),
+      subject: 'Reset your password - Ready to Work',
+      html: passwordResetEmailTemplate(email, resetToken, userType),
     })
 
     // Check if email was sent successfully
@@ -408,6 +467,7 @@ export async function resetPassword(
   token: string,
   email: string,
   newPassword: string,
+  userType?: 'candidate' | 'employer',
 ): Promise<ResetPasswordResponse> {
   // Validate inputs
   const emailValidation = validateEmail(email)
@@ -427,19 +487,41 @@ export async function resetPassword(
   try {
     const payload = await getPayload({ config: await configPromise })
 
-    // Find user with matching email and valid reset token
-    const users = await payload.find({
-      collection: 'users',
-      where: {
-        and: [
-          { email: { equals: email } },
-          { passwordResetToken: { equals: token } },
-          { passwordResetExpires: { greater_than: new Date().toISOString() } },
-        ],
-      },
-    })
+    // Try to find user in collections based on userType hint, or search all
+    let user: User | Candidate | Employer | null = null
+    let collection: 'users' | 'candidates' | 'employers' = 'users'
 
-    if (users.docs.length === 0) {
+    const collectionsToTry = userType === 'employer' 
+      ? ['employers', 'candidates', 'users']
+      : userType === 'candidate'
+      ? ['candidates', 'users', 'employers']
+      : ['employers', 'candidates', 'users'] // Default: try all
+
+    for (const coll of collectionsToTry) {
+      try {
+        const results = await payload.find({
+          collection: coll as 'users' | 'candidates' | 'employers',
+          where: {
+            and: [
+              { email: { equals: email } },
+              { passwordResetToken: { equals: token } },
+              { passwordResetExpires: { greater_than: new Date().toISOString() } },
+            ],
+          },
+          limit: 1,
+        })
+
+        if (results.docs.length > 0) {
+          user = results.docs[0]
+          collection = coll as 'users' | 'candidates' | 'employers'
+          break
+        }
+      } catch {
+        // Not found in this collection, continue
+      }
+    }
+
+    if (!user) {
       return {
         success: false,
         error: 'Invalid or expired reset token',
@@ -447,11 +529,9 @@ export async function resetPassword(
       }
     }
 
-    const user = users.docs[0]
-
     // Update password and clear reset token
     await payload.update({
-      collection: 'users',
+      collection,
       id: user.id,
       data: {
         password: newPassword,

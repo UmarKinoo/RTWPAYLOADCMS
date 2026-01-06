@@ -4,6 +4,7 @@ import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
+import { customType } from 'drizzle-orm/pg-core'
 
 import sharp from 'sharp'
 import path from 'node:path'
@@ -95,6 +96,41 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    afterSchemaInit: [
+      ({ schema, extendTable }) => {
+        // Define vector type for pgvector columns (1536 dimensions)
+        // These columns are managed outside Payload via SQL migrations
+        const vector = customType<{ data: string; driverData: string }>({
+          dataType: () => 'vector(1536)',
+          toDriver: (value: string) => value,
+          fromDriver: (value: string) => value,
+        })
+
+        // Extend skills table with name_embedding_vec column
+        // Column is nullable because it may be NULL before backfill completes
+        if (schema.tables.skills) {
+          extendTable({
+            table: schema.tables.skills,
+            columns: {
+              name_embedding_vec: vector('name_embedding_vec'),
+            },
+          })
+        }
+
+        // Extend candidates table with bio_embedding_vec column
+        // Column is nullable because it may be NULL before backfill completes
+        if (schema.tables.candidates) {
+          extendTable({
+            table: schema.tables.candidates,
+            columns: {
+              bio_embedding_vec: vector('bio_embedding_vec'),
+            },
+          })
+        }
+
+        return schema
+      },
+    ],
   }),
   sharp,
   plugins: [

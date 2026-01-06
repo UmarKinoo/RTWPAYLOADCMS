@@ -3,7 +3,8 @@ import { HomepageSection } from '../HomepageSection'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ImageWithSkeleton } from '../ImageWithSkeleton'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
+import { getTranslations } from 'next-intl/server'
 
 // Image assets
 const imgBlog1 = '/assets/ac0fd8c628d0f50b3bdcbedaff88d237be9a96fe.webp'
@@ -17,9 +18,10 @@ interface BlogCardProps {
   date: string
   title: string
   description: string
+  byLabel: string
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ image, tags, author, date, title, description }) => {
+const BlogCard: React.FC<BlogCardProps> = ({ image, tags, author, date, title, description, byLabel }) => {
   return (
     <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow border-0 bg-white">
       {/* Image */}
@@ -49,7 +51,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ image, tags, author, date, title, d
 
         {/* Author and Date */}
         <div className="flex items-center gap-2 text-[10px] sm:text-xs text-[#757575]">
-          <span>By {author}</span>
+          <span>{byLabel} {author}</span>
           <span>•</span>
           <span>{date}</span>
         </div>
@@ -68,7 +70,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ image, tags, author, date, title, d
   )
 }
 
-export const Blog: React.FC = () => {
+export const Blog: React.FC = async () => {
+  const t = await getTranslations('homepage.blog')
   const blogPosts = [
     {
       image: imgBlog1,
@@ -104,17 +107,17 @@ export const Blog: React.FC = () => {
       {/* Header */}
       <div className="text-center mb-6 sm:mb-8 md:mb-10">
         <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold font-inter text-[#16252d] mb-2 sm:mb-3 leading-tight">
-          Our Blog: Your Path to Career Success
+          {t('title')}
         </h2>
         <p className="text-sm sm:text-base md:text-lg font-normal font-inter text-[#757575] max-w-2xl mx-auto">
-          Stay updated with the latest trends in hiring and career success
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Blog Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
         {blogPosts.map((post, index) => (
-          <BlogCard key={index} {...post} />
+          <BlogCard key={index} {...post} byLabel={t('by')} />
         ))}
       </div>
 
@@ -124,7 +127,7 @@ export const Blog: React.FC = () => {
           href="/blog" 
           className="text-sm sm:text-base font-semibold text-[#4644b8] hover:text-[#3a3aa0] underline underline-offset-4"
         >
-          View All Blog Posts →
+          {t('viewAll')} <span className="inline-block rtl:rotate-180">→</span>
         </Link>
       </div>
     </HomepageSection>

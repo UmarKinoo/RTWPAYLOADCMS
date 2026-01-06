@@ -32,14 +32,158 @@
 - Card backgrounds: #FFFFFF
 - Use consistent spacing: 4px, 8px, 16px, 24px, 32px
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MASTER PROJECT RULES — Next.js App Router + Payload + Supabase
+# Goal: server-first, secure, scalable, Cursor-safe codebase
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A) SERVER vs CLIENT (CRITICAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1) Server Components are the default.
+   DO NOT add "use client" unless REQUIRED for:
+   - React hooks (useState/useEffect/useRef/useContext/useReducer)
+   - browser events (onClick/onSubmit/onChange)
+   - browser-only APIs (window/document/localStorage)
 
+2) Pages and layouts MUST remain server components unless impossible.
+3) If interactivity is needed:
+   - Split into Server wrapper + small Client component
+   - Client components must contain UI logic only
 
+4) If "use client" is added:
+   - Add a short comment explaining why
+   - Before final output, list all files using "use client" + justification
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+B) SECURITY (NON-NEGOTIABLE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5) NEVER expose secrets to the browser:
+   - Payload secret
+   - Supabase service role key
+   - API tokens / private keys
 
+6) Supabase browser usage:
+   - ANON key only
+   - All privileged operations go through server actions or route handlers
 
+7) Authorization MUST happen on the server:
+   - UI checks ≠ security
+   - Every mutation verifies session + permissions server-side
 
+8) All mutations must validate input server-side (Zod or equivalent)
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+C) DATA OWNERSHIP & ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9) Single source of truth:
+   - Payload → CMS + app data
+   - Supabase → auth/storage/realtime (if used)
+   Do not duplicate data unless explicitly required.
 
+10) If crossing Payload/Supabase boundaries, add a short comment explaining why.
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+D) NEXT.JS DATA FETCHING & CACHING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11) Prefer server-side fetch.
+12) Do NOT disable caching globally (no-store) unless justified.
+13) Revalidation:
+    - Use ONE strategy per feature (revalidatePath OR revalidateTag)
+    - Document which one and why
+14) Avoid random or scattered revalidation calls.
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+E) FORMS, UX & ERRORS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+15) Every async UI must handle:
+    - loading
+    - empty
+    - error states (user-friendly)
+
+16) Forms:
+    - shared Zod schema
+    - field-level errors + top-level error
+    - disable submit while pending
+
+17) Never swallow errors with empty catch blocks.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+F) TYPESCRIPT & QUALITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+18) Avoid "any". If unavoidable, comment why.
+19) @ts-ignore / @ts-expect-error must include justification.
+20) Prefer generated Payload/Supabase types; do not duplicate interfaces.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+G) CODE STRUCTURE & STYLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+21) Small, single-purpose components.
+22) No business logic in UI components.
+    - Use server actions / route handlers / services
+23) Follow existing folder patterns.
+24) No copy-paste duplication; extract shared logic.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+H) AUTH & ROUTE PROTECTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+25) Route protection happens on the server:
+    - redirect unauth users server-side
+    - avoid client-only guards that cause content flashes
+26) Do not store auth tokens in localStorage unless explicitly required.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+I) SUPABASE-SPECIFIC RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+27) Assume RLS is required for client-accessed tables.
+    - Document required policies.
+28) Supabase Storage:
+    - Use signed URLs or server-controlled access for protected files.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+J) ENV VARS & DEPLOY SAFETY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+29) Never hardcode URLs or keys.
+30) Only non-sensitive values may use NEXT_PUBLIC_*.
+31) Do not assume Edge runtime.
+    - Do not set runtime="edge" unless explicitly required.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+K) PAYLOAD RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+32) Every collection must define access rules.
+33) Sensitive fields must have field-level access protection.
+34) Hooks must be idempotent and not trust client data.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+L) MIGRATIONS, SEEDS & UPLOADS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+35) Schema changes must include migration notes.
+36) Seed scripts must be safe to re-run.
+37) Choose ONE upload strategy:
+    - Payload uploads OR Supabase Storage (not both).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+M) LOGGING, RATE LIMITING, EMAIL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+38) Add server-side logs for auth + mutations (no secrets/PII).
+39) Rate limit sensitive endpoints (auth, search, OTP, profile views).
+40) Email links must use a single APP_URL per environment.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+N) UI CONSISTENCY & ACCESSIBILITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+41) Use shadcn/ui components consistently.
+42) No divs as buttons; ensure keyboard accessibility.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+O) DELIVERY & SELF-AUDIT (MANDATORY)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+43) Before final output, perform this audit:
+    - List all "use client" files + reasons
+    - Confirm no secrets in client code
+    - Confirm all mutations validate input server-side
+    - Confirm caching/revalidation choice is documented
+    - Confirm loading/error states exist
+
+If any rule conflicts with existing codebase conventions,
+FOLLOW THE CODEBASE and extend existing patterns.

@@ -1,4 +1,7 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import createNextIntlPlugin from 'next-intl/plugin'
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
 // Build remotePatterns from env (for R2 public hostname, etc.)
 const remotePatterns = []
@@ -27,6 +30,8 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
+    // Note: quality is set per Image component (default is 75 in Next.js 13+)
+    // We've set quality={75} in ImageMedia component
   },
 
   webpack: (config, { isServer }) => {
@@ -89,4 +94,4 @@ const nextConfig = {
   },
 }
 
-export default withPayload(nextConfig)
+export default withPayload(withNextIntl(nextConfig))

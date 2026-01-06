@@ -145,13 +145,14 @@ export const Candidates: CollectionConfig = {
       name: 'billingClass',
       type: 'select',
       options: [
-        { label: 'A - Skilled Workers', value: 'A' },
-        { label: 'B - Specialty / Certified Technical', value: 'B' },
-        { label: 'C - Elite Specialty / Expert Licensed', value: 'C' },
-        { label: 'D - Saudi Nationals', value: 'D' },
+        { label: 'A - Essential (Aamel) - General Staff', value: 'A' },
+        { label: 'B - Skilled (Maher) - Skilled Workers', value: 'B' },
+        { label: 'C - Specialty (Teqani) - Certified Technical', value: 'C' },
+        { label: 'D - Elite Specialty (Khibra) - Expert Licensed staff', value: 'D' },
+        { label: 'S - Saudi Nationals', value: 'S' },
       ],
       admin: {
-        description: 'Billing class automatically inherited from primary skill (A=Skilled, B=Specialty, C=Elite Specialty, D=Saudi Nationals)',
+        description: 'Billing class automatically inherited from primary skill (A=Essential, B=Skilled, C=Specialty, D=Elite Specialty, S=Saudi Nationals)',
         readOnly: true, // Auto-populated, not manually editable
       },
     },

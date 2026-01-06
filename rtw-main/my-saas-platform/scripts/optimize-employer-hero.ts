@@ -11,7 +11,7 @@ const INPUT_FILE = 'public/assets/1c9081eb8a1bf7184d09a0304d1ffbda9a8d0678.png'
 const OUTPUT_FILE = 'public/assets/1c9081eb8a1bf7184d09a0304d1ffbda9a8d0678.webp'
 const MAX_WIDTH = 1920
 const MAX_FILE_SIZE = 100 * 1024 // 100KB
-const INITIAL_QUALITY = 80
+const INITIAL_QUALITY = 75
 const MIN_QUALITY = 20
 
 async function optimizeEmployerHero() {
@@ -100,6 +100,7 @@ async function optimizeEmployerHero() {
 }
 
 optimizeEmployerHero()
+
 
 
 

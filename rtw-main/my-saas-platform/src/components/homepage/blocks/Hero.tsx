@@ -6,12 +6,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ImageWithSkeleton } from '../ImageWithSkeleton'
 import { Search, Building2, User } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 // Image assets from public/assets/
 const imgBusinessmanMakingCoffee20252 = '/assets/5902659f7a1d069cd46ab37be664dbed528febb1.webp'
 const imgBusinessmanMakingCoffee20251 = '/assets/9067d496e1f10f37d480e3dc99e0dd3a6af0fb6c.svg'
 
 export const Hero: React.FC = () => {
+  const t = useTranslations('homepage.hero')
+
   return (
     <HomepageSection className="pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-8 sm:pb-12 md:pb-16">
       {/* Content container */}
@@ -48,17 +51,16 @@ export const Hero: React.FC = () => {
           <div className="max-w-2xl">
             {/* Main Heading */}
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold font-inter leading-tight text-white mb-4 sm:mb-6">
-              Explore thousands of openings and{' '}
+              {t('title')}{' '}
               <span className="bg-[#d8e530] text-[#16252d] px-1.5 sm:px-2 rounded-md inline-block">
-                talented
+                {t('titleHighlight')}
               </span>{' '}
-              profiles all in one place.
+              {t('titleEnd')}
             </h1>
 
             {/* Subtitle */}
             <p className="text-sm sm:text-base lg:text-lg font-normal font-inter leading-relaxed text-white/90 mb-6 sm:mb-8">
-              Access a wide pool of qualified candidates across all roles and industries. Easily
-              find profiles that match the skills and qualities your company is looking for.
+              {t('subtitle')}
             </p>
 
             {/* Buttons */}
@@ -69,7 +71,7 @@ export const Hero: React.FC = () => {
                 className="h-auto rounded-xl px-4 py-3 flex items-center justify-center gap-2.5 text-sm font-bold uppercase tracking-wide bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 w-full sm:w-auto"
               >
                 <Building2 className="w-5 h-5" />
-                <span>For Employer</span>
+                <span>{t('forEmployer')}</span>
               </Button>
 
               <Button
@@ -78,7 +80,7 @@ export const Hero: React.FC = () => {
                 className="h-auto rounded-xl px-4 py-3 flex items-center justify-center gap-2.5 text-sm font-bold uppercase tracking-wide bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 w-full sm:w-auto"
               >
                 <User className="w-5 h-5" />
-                <span>For Candidates</span>
+                <span>{t('forCandidates')}</span>
               </Button>
             </div>
 
@@ -87,13 +89,13 @@ export const Hero: React.FC = () => {
               <div className="relative backdrop-blur-md bg-white/20 rounded-xl flex items-center">
                 <Input
                   type="text"
-                  placeholder="Smart Search"
-                  className="w-full bg-transparent border-none text-white placeholder-white/70 text-sm sm:text-base font-normal px-4 py-3 h-12 pr-14 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  placeholder={t('searchPlaceholder')}
+                  className="w-full bg-transparent border-none text-white placeholder-white/70 text-sm sm:text-base font-normal px-4 py-3 h-12 pe-14 focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
                 <Button
                   variant="default"
                   size="icon"
-                  className="absolute right-1.5 bg-white rounded-lg w-10 h-10 hover:bg-gray-100 shadow-sm"
+                  className="absolute end-1.5 bg-white rounded-lg w-10 h-10 hover:bg-gray-100 shadow-sm"
                 >
                   <Search className="w-4 h-4 text-[#16252d]" />
                 </Button>
@@ -102,8 +104,8 @@ export const Hero: React.FC = () => {
           </div>
 
           {/* Bottom Right Text - Hidden on very small screens */}
-          <p className="hidden sm:block absolute bottom-4 sm:bottom-6 right-4 sm:right-6 md:right-8 text-xs sm:text-sm font-medium text-white/80 text-right max-w-[200px] leading-tight">
-            Verified or Authorized Logo Government
+          <p className="hidden sm:block absolute bottom-4 sm:bottom-6 end-4 sm:end-6 md:end-8 text-xs sm:text-sm font-medium text-white/80 text-end max-w-[200px] leading-tight">
+            {t('verifiedLogo')}
           </p>
         </div>
       </div>

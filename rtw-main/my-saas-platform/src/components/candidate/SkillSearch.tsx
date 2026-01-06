@@ -1,19 +1,19 @@
 'use client'
 
 import * as React from 'react'
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { Check, Loader2, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
+import { Badge } from '@/components/ui/badge'
 import { useDebounce } from '@/utilities/useDebounce'
 
 interface Skill {
@@ -21,6 +21,9 @@ interface Skill {
   name: string
   billingClass: string
   fullPath: string
+  subCategory?: string
+  category?: string
+  discipline?: string
 }
 
 interface SkillSearchProps {
@@ -35,6 +38,8 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
   const [skills, setSkills] = React.useState<Skill[]>([])
   const [loading, setLoading] = React.useState(false)
   const [selectedSkill, setSelectedSkill] = React.useState<Skill | null>(null)
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
 
   const debouncedQuery = useDebounce(searchQuery, 300)
 
@@ -42,16 +47,16 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
   React.useEffect(() => {
     // Only fetch if query is long enough
     if (!debouncedQuery || debouncedQuery.trim().length < 2) {
-      // Don't clear results immediately - keep them visible
-      // Only clear if search query is also empty/short (user cleared the field)
       if (!searchQuery || searchQuery.trim().length === 0) {
         setSkills([])
+        setOpen(false)
       }
       setLoading(false)
       return
     }
 
     setLoading(true)
+    setOpen(true)
     const controller = new AbortController()
     
     fetch(`/api/skills/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`, {
@@ -59,7 +64,6 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
     })
       .then((res) => res.json())
       .then((data) => {
-        // Always update with new results
         setSkills(data.skills || [])
         setLoading(false)
       })
@@ -89,116 +93,190 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
           }
         })
         .catch(console.error)
+    } else if (!value) {
+      setSelectedSkill(null)
+      setSearchQuery('')
     }
   }, [value, selectedSkill])
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const handleSelect = (skill: Skill) => {
     setSelectedSkill(skill)
     onValueChange(String(skill.id))
     setOpen(false)
     setSearchQuery('')
-    setSkills([]) // Clear search results after selection
+    setSkills([])
+    inputRef.current?.blur()
   }
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedSkill(null)
+    setSearchQuery('')
+    setSkills([])
+    setOpen(false)
+    onValueChange('')
+    inputRef.current?.focus()
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
+    setSearchQuery(newValue)
+    if (selectedSkill && newValue !== selectedSkill.fullPath) {
+      // User is typing something different, clear selection
+      setSelectedSkill(null)
+      onValueChange('')
+    }
+  }
+
+  const handleInputFocus = () => {
+    if (searchQuery.trim().length >= 2 && skills.length > 0) {
+      setOpen(true)
+    }
+  }
+
+  const displayValue = selectedSkill ? selectedSkill.fullPath : searchQuery
+
   return (
-    <Field data-invalid={!!error}>
+    <Field data-invalid={!!error} className="relative">
       <FieldLabel htmlFor="skill-search">Search your Job Role or Skill *</FieldLabel>
-      <Popover 
-        open={open} 
-        onOpenChange={(newOpen) => {
-          setOpen(newOpen)
-          // Clear search when popover closes (but keep results visible briefly)
-          if (!newOpen && searchQuery.trim().length === 0) {
-            setSearchQuery('')
-          }
-        }}
-      >
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-            data-invalid={!!error}
+      <Popover open={open && (loading || skills.length > 0 || (searchQuery.trim().length >= 2 && !loading))}>
+        <div ref={containerRef} className="relative w-full">
+          <PopoverAnchor asChild>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Input
+                ref={inputRef}
+                id="skill-search"
+                type="text"
+                placeholder="Type to search (e.g., Mason, Engineer, Electrician...)"
+                value={displayValue}
+                onChange={handleInputChange}
+                onFocus={handleInputFocus}
+                className={cn(
+                  "w-full pl-9 pr-9",
+                  error && "border-destructive focus-visible:ring-destructive",
+                  selectedSkill && "pr-9"
+                )}
+                aria-expanded={open}
+                aria-autocomplete="list"
+                aria-haspopup="listbox"
+                role="combobox"
+              />
+              {selectedSkill && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Clear selection"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </PopoverAnchor>
+
+          <PopoverContent 
+            className="w-full p-0" 
+            align="start"
+            side="bottom"
+            sideOffset={4}
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            style={{ width: containerRef.current?.offsetWidth }}
           >
-            {selectedSkill ? selectedSkill.fullPath : 'Search for your job role...'}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent 
-          className="w-full p-0" 
-          align="start" 
-          onOpenAutoFocus={(e) => e.preventDefault()}
-          onInteractOutside={(e) => {
-            // Prevent closing when clicking inside the command input
-            const target = e.target as HTMLElement
-            if (target.closest('[cmdk-input]')) {
-              e.preventDefault()
-            }
-          }}
-        >
-          <Command shouldFilter={false}>
-            <CommandInput
-              placeholder="Type to search (e.g., Mason, Engineer...)"
-              value={searchQuery}
-              onValueChange={(value) => {
-                setSearchQuery(value)
-                // Keep popover open when typing
-                if (!open) {
-                  setOpen(true)
-                }
-              }}
-              onKeyDown={(e) => {
-                // Prevent popover from closing on Escape if there are results
-                if (e.key === 'Escape' && skills.length > 0) {
-                  e.stopPropagation()
-                }
-              }}
-            />
-            <CommandList>
-              {loading && (
-                <div className="flex items-center justify-center p-4">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                </div>
-              )}
-              {!loading && (
-                <>
+            <Command shouldFilter={false} className="max-h-[300px]">
+              <CommandList>
+                {loading && (
+                  <div className="flex items-center justify-center p-6">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    <span className="ml-2 text-sm text-muted-foreground">Searching...</span>
+                  </div>
+                )}
+                {!loading && searchQuery.trim().length < 2 && (
                   <CommandEmpty>
-                    {searchQuery.trim().length < 2
-                      ? 'Type at least 2 characters to search'
-                      : 'No skills found. Try a different search term.'}
+                    <div className="py-6 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Type at least 2 characters to search
+                      </p>
+                    </div>
                   </CommandEmpty>
-                  {skills.length > 0 && (
-                    <CommandGroup>
-                      {skills.map((skill) => (
-                        <CommandItem
-                          key={String(skill.id)}
-                          value={skill.fullPath}
-                          onSelect={() => handleSelect(skill)}
-                          className="cursor-pointer"
-                        >
-                          <Check
-                            className={cn(
-                              'mr-2 h-4 w-4 shrink-0',
-                              selectedSkill?.id === String(skill.id) ? 'opacity-100' : 'opacity-0',
-                            )}
-                          />
-                          <div className="flex flex-col flex-1">
-                            <span className="font-medium">{skill.fullPath}</span>
-                            <span className="text-xs text-muted-foreground">
-                              Billing Class: {skill.billingClass}
-                            </span>
+                )}
+                {!loading && searchQuery.trim().length >= 2 && skills.length === 0 && (
+                  <CommandEmpty>
+                    <div className="py-6 text-center">
+                      <p className="text-sm text-muted-foreground mb-1">
+                        No skills found
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Try a different search term
+                      </p>
+                    </div>
+                  </CommandEmpty>
+                )}
+                {!loading && skills.length > 0 && (
+                  <CommandGroup>
+                    {skills.map((skill) => (
+                      <CommandItem
+                        key={String(skill.id)}
+                        value={skill.fullPath}
+                        onSelect={() => handleSelect(skill)}
+                        className="cursor-pointer py-3"
+                      >
+                        <Check
+                          className={cn(
+                            'mr-3 h-4 w-4 shrink-0',
+                            selectedSkill?.id === String(skill.id) ? 'opacity-100 text-primary' : 'opacity-0',
+                          )}
+                        />
+                        <div className="flex flex-col flex-1 gap-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm truncate">{skill.name}</span>
+                            <Badge variant="outline" className="text-xs shrink-0">
+                              {skill.billingClass}
+                            </Badge>
                           </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
-                </>
-              )}
-            </CommandList>
-          </Command>
-        </PopoverContent>
+                          {skill.fullPath !== skill.name && (
+                            <span className="text-xs text-muted-foreground truncate">
+                              {skill.fullPath}
+                            </span>
+                          )}
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </div>
       </Popover>
+      {selectedSkill && (
+        <div className="mt-2 p-3 bg-muted/50 rounded-md border">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">
+                {selectedSkill.fullPath}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Billing Class: <span className="font-medium">{selectedSkill.billingClass}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       {error && <FieldError>{error}</FieldError>}
     </Field>
   )

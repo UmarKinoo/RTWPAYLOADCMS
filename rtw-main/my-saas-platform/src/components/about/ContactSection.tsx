@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { HomepageSection } from '../homepage/HomepageSection'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +11,7 @@ import { ArrowRight, Phone, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const ContactSection: React.FC = () => {
+  const t = useTranslations('about.contact')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -49,13 +51,13 @@ export const ContactSection: React.FC = () => {
             {/* Left Side - Contact Info */}
             <div className="flex flex-col">
               <p className="text-base sm:text-lg md:text-xl font-bold text-[#16252d] mb-2">
-                Contact us
+                {t('label')}
               </p>
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-inter text-[#16252d] leading-tight mb-4 sm:mb-5">
-                Need help? Contact us, and we'll respond soon.
+                {t('title')}
               </h2>
               <p className="text-sm sm:text-base text-[#16252d]/80 leading-relaxed mb-6 sm:mb-8">
-                Reach out to us for any questions, support, or collaboration opportunities — we're always happy to assist!
+                {t('description')}
               </p>
 
               {/* Contact Details */}
@@ -66,7 +68,7 @@ export const ContactSection: React.FC = () => {
                     <Phone className="w-4 h-4 text-[#4644b8]" />
                   </div>
                   <span className="text-sm sm:text-base font-semibold text-[#16252d]">
-                    +84 982 900 108
+                    {t('phone')}
                   </span>
                 </div>
 
@@ -79,10 +81,10 @@ export const ContactSection: React.FC = () => {
                     <Mail className="w-4 h-4 text-[#4644b8]" />
                   </div>
                   <a
-                    href="mailto:info@readytowork.sa"
+                    href={`mailto:${t('email')}`}
                     className="text-sm sm:text-base font-semibold text-[#16252d] hover:text-[#4644b8] transition-colors"
                   >
-                    info@readytowork.sa
+                    {t('email')}
                   </a>
                 </div>
               </div>
@@ -95,7 +97,7 @@ export const ContactSection: React.FC = () => {
                 <Input
                   type="text"
                   name="name"
-                  placeholder="Your Name*"
+                  placeholder={t('form.name')}
                   value={formData.name}
                   onChange={handleInputChange}
                   required
@@ -107,7 +109,7 @@ export const ContactSection: React.FC = () => {
                   <Input
                     type="email"
                     name="email"
-                    placeholder="Email*"
+                    placeholder={t('form.email')}
                     value={formData.email}
                     onChange={handleInputChange}
                     required
@@ -116,7 +118,7 @@ export const ContactSection: React.FC = () => {
                   <Input
                     type="tel"
                     name="phone"
-                    placeholder="Phone*"
+                    placeholder={t('form.phone')}
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
@@ -128,7 +130,7 @@ export const ContactSection: React.FC = () => {
                 <Input
                   type="text"
                   name="title"
-                  placeholder="Your Title*"
+                  placeholder={t('form.title')}
                   value={formData.title}
                   onChange={handleInputChange}
                   required
@@ -138,7 +140,7 @@ export const ContactSection: React.FC = () => {
                 {/* Message */}
                 <Textarea
                   name="message"
-                  placeholder="Message*"
+                  placeholder={t('form.message')}
                   value={formData.message}
                   onChange={handleInputChange}
                   required
@@ -164,7 +166,7 @@ export const ContactSection: React.FC = () => {
                     "mt-1 transition-all hover:shadow-lg"
                   )}
                 >
-                  <span>SEND</span>
+                  <span>{t('form.send')}</span>
                   <ArrowRight className="w-4 h-4 -rotate-45" />
                 </Button>
               </form>
