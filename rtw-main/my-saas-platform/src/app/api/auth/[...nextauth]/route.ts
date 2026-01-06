@@ -7,23 +7,24 @@
  */
 
 import NextAuth from 'next-auth'
-import Google from 'next-auth/providers/google'
+// import Google from 'next-auth/providers/google'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { randomBytes } from 'crypto'
 import type { User, Candidate, Employer } from '@/payload-types'
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+const { handlers } = NextAuth({
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          scope: 'openid email profile',
-        },
-      },
-    }),
+    // Google login temporarily commented out - will be re-enabled later
+    // Google({
+    //   clientId: process.env.GOOGLE_CLIENT_ID!,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    //   authorization: {
+    //     params: {
+    //       scope: 'openid email profile',
+    //     },
+    //   },
+    // }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -173,5 +174,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
 })
 
+// Only export handlers for Next.js route - other exports cause TypeScript errors in Next.js 16
 export const { GET, POST } = handlers
 

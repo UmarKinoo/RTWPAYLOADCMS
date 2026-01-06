@@ -62,7 +62,7 @@ async function verifySocialLoginToken(token: string): Promise<SocialLoginTokenPa
       throw new Error('Token has expired')
     }
 
-    return payload as SocialLoginTokenPayload
+    return payload as unknown as SocialLoginTokenPayload
   } catch (error) {
     if (error instanceof Error) {
       if (error.message.includes('expired')) {

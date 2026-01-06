@@ -302,15 +302,15 @@ export const EmployerRegistrationForm: React.FC = () => {
           {isPending ? 'Signing up...' : 'Sign up'}
         </Button>
 
-        {/* OR Divider */}
-        <div className="flex items-center gap-3 sm:gap-4 my-6 sm:my-8">
+        {/* OR Divider - Google sign up temporarily commented out */}
+        {/* <div className="flex items-center gap-3 sm:gap-4 my-6 sm:my-8">
           <Separator className="flex-1" />
           <span className="text-xs sm:text-sm text-[#a5a5a5] font-medium">OR</span>
           <Separator className="flex-1" />
-        </div>
+        </div> */}
 
-        {/* Google Sign Up Button */}
-        <Button
+        {/* Google Sign Up Button - Temporarily commented out */}
+        {/* <Button
           type="button"
           variant="outline"
           className="w-full h-12 sm:h-14 border border-[#16252d] rounded-lg text-sm sm:text-base font-medium flex items-center justify-center gap-2 hover:bg-gray-50"
@@ -324,7 +324,7 @@ export const EmployerRegistrationForm: React.FC = () => {
             />
           </div>
           <span className="whitespace-nowrap">Sign up with Google</span>
-        </Button>
+        </Button> */}
 
         {/* Login Link */}
         <div className="text-center text-xs sm:text-sm pt-2">

@@ -114,7 +114,14 @@ async function backfillSkills() {
           // Parse JSONB embedding (stored as text in query result)
           let embedding: number[]
           try {
-            embedding = JSON.parse(row.name_embedding || '[]')
+            // Handle both string and already-parsed array cases
+            if (typeof row.name_embedding === 'string') {
+              embedding = JSON.parse(row.name_embedding || '[]')
+            } else if (Array.isArray(row.name_embedding)) {
+              embedding = row.name_embedding
+            } else {
+              embedding = []
+            }
           } catch (parseError) {
             console.warn(`   ⚠️  Skipping skill ${row.id}: Invalid JSON in name_embedding`)
             continue

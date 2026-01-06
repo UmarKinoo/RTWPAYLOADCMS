@@ -21,7 +21,7 @@ export async function MajorDisciplines() {
       image,
       imageMask,
       isHighlighted: discipline.isHighlighted || false,
-      slug: discipline.slug || null,
+      slug: discipline.slug || undefined, // Use undefined instead of null to match DisciplineData type
     }
   })
 

@@ -105,7 +105,7 @@ export async function loginUser({
   // Validate inputs first
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
-    return { success: false, error: emailValidation.error, errorCode: 'INVALID_EMAIL' }
+    return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
 
   if (!password) {
@@ -237,13 +237,13 @@ export async function registerUser({ email, password }: RegisterParams): Promise
   // Validate email
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
-    return { success: false, error: emailValidation.error, errorCode: 'INVALID_EMAIL' }
+    return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
 
   // Validate password
   const passwordValidation = validatePassword(password)
   if (!passwordValidation.valid) {
-    return { success: false, error: passwordValidation.error, errorCode: 'INVALID_PASSWORD' }
+    return { success: false, error: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character', errorCode: 'INVALID_PASSWORD' }
   }
 
   try {
@@ -339,7 +339,7 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
   // Validate email
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
-    return { success: false, error: emailValidation.error, errorCode: 'INVALID_EMAIL' }
+    return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
 
   try {
@@ -472,12 +472,12 @@ export async function resetPassword(
   // Validate inputs
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
-    return { success: false, error: emailValidation.error, errorCode: 'INVALID_EMAIL' }
+    return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
 
   const passwordValidation = validatePassword(newPassword)
   if (!passwordValidation.valid) {
-    return { success: false, error: passwordValidation.error, errorCode: 'INVALID_PASSWORD' }
+    return { success: false, error: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character', errorCode: 'INVALID_PASSWORD' }
   }
 
   if (!token) {
@@ -575,7 +575,7 @@ export async function resendVerification(
 ): Promise<{ success: boolean; error?: string }> {
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
-    return { success: false, error: emailValidation.error }
+    return { success: false, error: 'Invalid email address' }
   }
 
   try {

@@ -5,7 +5,7 @@ import { SubmitButton } from '@/components/auth/submit-button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { signIn } from 'next-auth/react'
+// import { signIn } from 'next-auth/react' // Temporarily commented out - Google login disabled
 
 import { Link } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
@@ -177,8 +177,8 @@ export const LoginForm = ({ collection }: LoginFormProps = {}) => {
         </FieldGroup>
       </form>
 
-      {/* Social Login Section */}
-      <div className="mt-4">
+      {/* Social Login Section - Google login temporarily commented out */}
+      {/* <div className="mt-4">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-gray-200" />
@@ -223,7 +223,7 @@ export const LoginForm = ({ collection }: LoginFormProps = {}) => {
             Continue with Google
           </Button>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

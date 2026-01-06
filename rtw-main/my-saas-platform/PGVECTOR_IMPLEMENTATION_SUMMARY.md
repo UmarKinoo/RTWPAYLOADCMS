@@ -163,3 +163,6 @@ FROM skills;
 3. Migrate candidate `bio_embedding` to `bio_embedding_vec` (similar process)
 4. Add vector similarity search for candidate matching
 
+
+
+

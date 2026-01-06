@@ -322,3 +322,6 @@ Based on all existing scripts and migrations:
 - This documents the column in Payload even though Payload doesn't manage it
 - Maintains "Payload as source of truth" pattern while acknowledging SQL-only columns
 
+
+
+

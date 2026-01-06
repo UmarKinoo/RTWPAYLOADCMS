@@ -11,7 +11,7 @@ import { Resend } from 'resend'
 import { verificationEmailTemplate, passwordResetEmailTemplate, welcomeEmailTemplate } from '../src/lib/email-templates'
 
 const resendApiKey = process.env.RESEND_API_KEY
-const testEmail = process.env.TEST_EMAIL || 'test@example.com'
+const recipientEmail = process.env.TEST_EMAIL || 'test@example.com'
 
 if (!resendApiKey) {
   console.error('❌ RESEND_API_KEY is not set in environment variables')
@@ -24,15 +24,15 @@ const emailFrom = process.env.EMAIL_FROM || 'noreply@readytowork.sa'
 async function testEmail() {
   console.log('📧 Testing email sending...\n')
   console.log(`From: ${emailFrom}`)
-  console.log(`To: ${testEmail}\n`)
+  console.log(`To: ${recipientEmail}\n`)
 
   // Test 1: Verification Email
   console.log('1️⃣ Testing verification email...')
   try {
-    const verificationHtml = verificationEmailTemplate(testEmail, 'test-token-123', 'candidate')
+    const verificationHtml = verificationEmailTemplate(recipientEmail, 'test-token-123', 'candidate')
     const result1 = await resend.emails.send({
       from: emailFrom,
-      to: testEmail,
+      to: recipientEmail,
       subject: 'Test: Verify Your Email - Ready to Work',
       html: verificationHtml,
     })
@@ -46,10 +46,10 @@ async function testEmail() {
   // Test 2: Password Reset Email
   console.log('2️⃣ Testing password reset email...')
   try {
-    const resetHtml = passwordResetEmailTemplate(testEmail, 'test-reset-token-456', 'employer')
+    const resetHtml = passwordResetEmailTemplate(recipientEmail, 'test-reset-token-456', 'employer')
     const result2 = await resend.emails.send({
       from: emailFrom,
-      to: testEmail,
+      to: recipientEmail,
       subject: 'Test: Reset Your Password - Ready to Work',
       html: resetHtml,
     })
@@ -63,10 +63,10 @@ async function testEmail() {
   // Test 3: Welcome Email
   console.log('3️⃣ Testing welcome email...')
   try {
-    const welcomeHtml = welcomeEmailTemplate(testEmail, 'candidate')
+    const welcomeHtml = welcomeEmailTemplate(recipientEmail, 'candidate')
     const result3 = await resend.emails.send({
       from: emailFrom,
-      to: testEmail,
+      to: recipientEmail,
       subject: 'Test: Welcome to Ready to Work',
       html: welcomeHtml,
     })
@@ -76,7 +76,7 @@ async function testEmail() {
   }
 
   console.log('\n✅ Email testing complete!')
-  console.log(`Check your inbox at ${testEmail}`)
+  console.log(`Check your inbox at ${recipientEmail}`)
 }
 
 testEmail().catch(console.error)

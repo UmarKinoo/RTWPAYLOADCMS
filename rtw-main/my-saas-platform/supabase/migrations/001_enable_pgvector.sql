@@ -30,3 +30,6 @@ CREATE INDEX IF NOT EXISTS candidates_bio_embedding_vec_hnsw
 -- 3. For production: Consider running during low-traffic hours
 -- 4. Monitor index build progress: SELECT * FROM pg_stat_progress_create_index;
 
+
+
+

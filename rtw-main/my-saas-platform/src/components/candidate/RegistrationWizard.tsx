@@ -65,11 +65,11 @@ const candidateSchema = z
     }),
   })
   .refine((data) => validatePassword(data.password).valid, {
-    message: validatePassword('').error || 'Invalid password',
+    message: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
     path: ['password'],
   })
   .refine((data) => validateEmail(data.email).valid, {
-    message: validateEmail('').error || 'Invalid email',
+    message: 'Invalid email address',
     path: ['email'],
   })
   .refine((data) => data.password === data.confirmPassword, {

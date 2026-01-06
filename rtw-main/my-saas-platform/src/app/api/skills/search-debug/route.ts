@@ -10,11 +10,13 @@ export async function GET(request: NextRequest) {
     dbMs: 0,
   }
   const startTime = Date.now()
+  
+  // Declare searchQuery outside try block so it's accessible in catch block
+  const { searchParams } = new URL(request.url)
+  const searchQuery = searchParams.get('q') || ''
+  const limit = parseInt(searchParams.get('limit') || '10')
 
   try {
-    const { searchParams } = new URL(request.url)
-    const searchQuery = searchParams.get('q') || ''
-    const limit = parseInt(searchParams.get('limit') || '10')
 
     if (!searchQuery || searchQuery.length < 2) {
       timings.totalMs = Date.now() - startTime

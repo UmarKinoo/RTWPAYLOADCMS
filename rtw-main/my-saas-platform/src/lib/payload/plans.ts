@@ -23,18 +23,26 @@ export interface Plan {
 // Type for plan with localized title field
 type PlanWithLocalizedTitle = {
   title?: string | { [key: string]: string } | null
+  title_ar?: string | null
+  title_en?: string | null
   [key: string]: unknown
 }
 
 function getLocalizedPlanTitle(plan: PlanWithLocalizedTitle, locale: string): string {
-  if (locale === 'ar' && plan.title_ar) {
+  if (locale === 'ar' && plan.title_ar && typeof plan.title_ar === 'string') {
     return plan.title_ar
   }
-  if (locale === 'en' && plan.title_en) {
+  if (locale === 'en' && plan.title_en && typeof plan.title_en === 'string') {
     return plan.title_en
   }
   // Fallback to title_en if available, otherwise use title
-  return plan.title_en || plan.title || ''
+  if (plan.title_en && typeof plan.title_en === 'string') {
+    return plan.title_en
+  }
+  if (typeof plan.title === 'string') {
+    return plan.title
+  }
+  return ''
 }
 
 /**
@@ -55,7 +63,7 @@ export const getPlans = (locale: string = 'en') =>
       return result.docs.map((doc) => ({
         id: doc.id,
         slug: doc.slug,
-        title: getLocalizedPlanTitle(doc, locale),
+        title: getLocalizedPlanTitle(doc as unknown as PlanWithLocalizedTitle, locale),
         price: doc.price,
         currency: doc.currency || 'SAR',
         entitlements: {

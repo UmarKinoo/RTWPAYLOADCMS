@@ -4,10 +4,12 @@ import config from '@payload-config'
 import { query as dbQuery } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
+  // Declare searchQuery outside try block so it's accessible in catch block
+  const { searchParams } = new URL(request.url)
+  const searchQuery = searchParams.get('q') || ''
+  const limit = parseInt(searchParams.get('limit') || '10')
+
   try {
-    const { searchParams } = new URL(request.url)
-    const searchQuery = searchParams.get('q') || ''
-    const limit = parseInt(searchParams.get('limit') || '10')
 
     if (!searchQuery || searchQuery.length < 2) {
       return NextResponse.json({ skills: [] })
