@@ -55,6 +55,7 @@ async function main() {
     '004_add_pages_localized_titles.sql',
     '005_add_disciplines_missing_fields.sql',
     '006_add_employers_missing_fields.sql',
+    '007_add_candidates_password_reset_fields.sql',
   ]
   
   let successCount = 0
