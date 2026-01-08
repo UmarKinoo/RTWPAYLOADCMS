@@ -499,24 +499,49 @@ export async function resetPassword(
 
     for (const coll of collectionsToTry) {
       try {
-        const results = await payload.find({
+        // First, try to find user by email only to debug
+        const emailResults = await payload.find({
           collection: coll as 'users' | 'candidates' | 'employers',
           where: {
-            and: [
-              { email: { equals: email } },
-              { passwordResetToken: { equals: token } },
-              { passwordResetExpires: { greater_than: new Date().toISOString() } },
-            ],
+            email: { equals: email },
           },
           limit: 1,
         })
 
-        if (results.docs.length > 0) {
-          user = results.docs[0]
-          collection = coll as 'users' | 'candidates' | 'employers'
-          break
+        if (emailResults.docs.length > 0) {
+          const foundUser = emailResults.docs[0]
+          console.log(`[Reset Password] Found user in ${coll}:`, {
+            email: foundUser.email,
+            hasPasswordResetToken: !!(foundUser as any).passwordResetToken,
+            passwordResetToken: (foundUser as any).passwordResetToken ? 'SET' : 'NULL',
+            passwordResetExpires: (foundUser as any).passwordResetExpires,
+            tokenFromEmail: token.substring(0, 10) + '...',
+          })
+
+          // Now check if token matches
+          const results = await payload.find({
+            collection: coll as 'users' | 'candidates' | 'employers',
+            where: {
+              and: [
+                { email: { equals: email } },
+                { passwordResetToken: { equals: token } },
+                { passwordResetExpires: { greater_than: new Date().toISOString() } },
+              ],
+            },
+            limit: 1,
+          })
+
+          if (results.docs.length > 0) {
+            user = results.docs[0]
+            collection = coll as 'users' | 'candidates' | 'employers'
+            console.log(`[Reset Password] Token validated successfully for ${coll}`)
+            break
+          } else {
+            console.log(`[Reset Password] Token validation failed for ${coll} - token mismatch or expired`)
+          }
         }
-      } catch {
+      } catch (error: any) {
+        console.error(`[Reset Password] Error checking ${coll}:`, error.message)
         // Not found in this collection, continue
       }
     }
@@ -581,20 +606,83 @@ export async function resendVerification(
   try {
     const payload = await getPayload({ config: await configPromise })
 
-    // Find user by email
-    const users = await payload.find({
-      collection: 'users',
-      where: {
-        and: [{ email: { equals: email } }, { emailVerified: { equals: false } }],
-      },
-    })
+    // Try to find user in all collections (employers, candidates, users)
+    let user: User | Candidate | Employer | null = null
+    let collection: 'users' | 'candidates' | 'employers' = 'users'
+    let userType: 'candidate' | 'employer' = 'candidate'
 
-    if (users.docs.length === 0) {
-      // Don't reveal if email exists or is already verified
-      return { success: true }
+    // Try employers first
+    try {
+      const employers = await payload.find({
+        collection: 'employers',
+        where: {
+          and: [
+            { email: { equals: email } },
+            { emailVerified: { equals: false } },
+          ],
+        },
+        limit: 1,
+      })
+      if (employers.docs.length > 0) {
+        user = employers.docs[0]
+        collection = 'employers'
+        userType = 'employer'
+      }
+    } catch {
+      // Not found in employers
     }
 
-    const user = users.docs[0]
+    // Try candidates
+    if (!user) {
+      try {
+        const candidates = await payload.find({
+          collection: 'candidates',
+          where: {
+            and: [
+              { email: { equals: email } },
+              { emailVerified: { equals: false } },
+            ],
+          },
+          limit: 1,
+        })
+        if (candidates.docs.length > 0) {
+          user = candidates.docs[0]
+          collection = 'candidates'
+          userType = 'candidate'
+        }
+      } catch {
+        // Not found in candidates
+      }
+    }
+
+    // Try users
+    if (!user) {
+      try {
+        const users = await payload.find({
+          collection: 'users',
+          where: {
+            and: [
+              { email: { equals: email } },
+              { emailVerified: { equals: false } },
+            ],
+          },
+          limit: 1,
+        })
+        if (users.docs.length > 0) {
+          user = users.docs[0]
+          collection = 'users'
+          userType = 'candidate'
+        }
+      } catch {
+        // Not found in users
+      }
+    }
+
+    // Always return success to prevent email enumeration attacks
+    // Even if user doesn't exist or is already verified, we say we sent an email
+    if (!user) {
+      return { success: true }
+    }
 
     // Generate new verification token
     const verificationToken = randomBytes(32).toString('hex')
@@ -602,7 +690,7 @@ export async function resendVerification(
 
     // Update user with new token
     await payload.update({
-      collection: 'users',
+      collection,
       id: user.id,
       data: {
         emailVerificationToken: verificationToken,
@@ -610,11 +698,11 @@ export async function resendVerification(
       },
     })
 
-    // Send verification email
+    // Send verification email with appropriate user type
     const emailResult = await sendEmail({
       to: email,
       subject: 'Verify your email address',
-      html: verificationEmailTemplate(email, verificationToken),
+      html: verificationEmailTemplate(email, verificationToken, userType),
     })
 
     // Check if email was sent successfully

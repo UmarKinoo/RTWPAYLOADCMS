@@ -255,7 +255,8 @@ export function welcomeEmailTemplate(email: string, userType: 'candidate' | 'emp
  * Password reset email template
  */
 export function passwordResetEmailTemplate(email: string, token: string, userType: 'candidate' | 'employer' = 'candidate'): string {
-  const resetUrl = `${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}&type=${userType}`
+  // Include locale prefix (default to 'en') for proper routing
+  const resetUrl = `${appUrl}/en/reset-password?token=${token}&email=${encodeURIComponent(email)}&type=${userType}`
   
   const content = `
     <h1 class="email-title">Reset Your Password</h1>

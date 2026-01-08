@@ -243,6 +243,21 @@ export const Candidates: CollectionConfig = {
       type: 'text',
       label: 'Job Position in Visa',
     },
+    // Password Reset Fields
+    {
+      name: 'passwordResetToken',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+    },
+    {
+      name: 'passwordResetExpires',
+      type: 'date',
+      admin: {
+        hidden: true,
+      },
+    },
     // Vector Search Field
     {
       name: 'bio_embedding',
