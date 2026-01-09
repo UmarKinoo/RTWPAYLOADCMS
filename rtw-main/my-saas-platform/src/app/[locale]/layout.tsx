@@ -6,7 +6,7 @@ import { Geist as FontSans } from 'next/font/google'
 import { Geist_Mono as FontMono } from 'next/font/google'
 import { Cairo } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme/theme-provider'
-import { SessionProvider } from '@/components/providers/SessionProvider'
+// import { SessionProvider } from '@/components/providers/SessionProvider' // Disabled: NextAuth not in use (Google login disabled)
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -86,10 +86,8 @@ export default async function LocaleLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SessionProvider>
-            <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
-            <Toaster richColors expand={true} closeButton />
-          </SessionProvider>
+          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+          <Toaster richColors expand={true} closeButton />
         </ThemeProvider>
         <Analytics />
       </body>

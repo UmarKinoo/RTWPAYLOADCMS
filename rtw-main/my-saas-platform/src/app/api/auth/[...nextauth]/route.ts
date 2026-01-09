@@ -1,11 +1,16 @@
 /**
  * NextAuth (Auth.js) Route Handler
  * 
+ * DISABLED: Google login is currently disabled.
+ * This route handler is kept for future use when social login is re-enabled.
+ * 
  * Handles OAuth authentication with Google.
  * Bridges OAuth to Payload Auth by creating/linking users and generating
  * short-lived tokens for Pattern A endpoint.
  */
 
+// DISABLED: NextAuth not in use (Google login disabled)
+// Uncomment and configure providers when re-enabling social login
 import NextAuth from 'next-auth'
 // import Google from 'next-auth/providers/google'
 import { getPayload } from 'payload'

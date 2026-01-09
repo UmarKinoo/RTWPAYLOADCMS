@@ -215,9 +215,9 @@ export async function clearAuthCookies(): Promise<{ success: boolean }> {
     // Clear any other auth-related cookies if they exist
     cookieStore.delete('user-session')
 
-    // Clear NextAuth session cookies
-    cookieStore.delete('next-auth.session-token')
-    cookieStore.delete('__Secure-next-auth.session-token') // Production secure cookie
+    // NextAuth cookies (commented out - NextAuth not in use, Google login disabled)
+    // cookieStore.delete('next-auth.session-token')
+    // cookieStore.delete('__Secure-next-auth.session-token')
 
     return { success: true }
   } catch (error) {

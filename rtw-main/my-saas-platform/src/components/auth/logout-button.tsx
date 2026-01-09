@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
 
 import { clearAuthCookies } from '@/lib/auth'
-import { signOut as nextAuthSignOut } from 'next-auth/react'
+// import { signOut as nextAuthSignOut } from 'next-auth/react' // Disabled: NextAuth not in use (Google login disabled)
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -17,9 +17,6 @@ export const LogoutButton = () => {
     setIsLoading(true)
 
     try {
-      // Clear NextAuth session first
-      await nextAuthSignOut({ redirect: false })
-
       // Clear Payload auth cookies
       const result = await clearAuthCookies()
 
@@ -52,8 +49,6 @@ export const LogoutButton = () => {
 
 export const LogoutIconButton = () => {
   const handleLogout = async () => {
-    // Clear NextAuth session
-    await nextAuthSignOut({ redirect: false })
     // Clear Payload auth cookies
     await clearAuthCookies()
   }
