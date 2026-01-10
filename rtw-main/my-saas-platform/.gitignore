@@ -47,3 +47,25 @@ next-env.d.ts
 supabase/.temp
 supabase/.branches
 supabase/.temp
+
+# Database dumps and backups (may contain sensitive data)
+*.sql
+*.dump
+*.backup
+*_dump.sql
+*_local_dump.sql
+app_public.sql
+supabase_local_dump.sql
+
+# Environment and secrets
+.env*
+!.env.example
+*.secret
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Configuration files with potential secrets
+config.local.*
+*.local.*

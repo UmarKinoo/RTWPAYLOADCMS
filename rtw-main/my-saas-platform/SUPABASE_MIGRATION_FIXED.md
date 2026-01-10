@@ -62,13 +62,13 @@ psql "$env:SUPABASE_DB_URI" -f supabase_local_dump.sql
 
 **Connection String Format:**
 ```
-postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
+postgresql://postgres.[project-ref]:YOUR_PASSWORD_HERE@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
 **For your app's `.env`:**
 ```env
 # Get connection string from Supabase Dashboard → Settings → Database → Connection Pooling
-DATABASE_URI=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
+DATABASE_URI=postgresql://postgres.[project-ref]:YOUR_PASSWORD_HERE@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
 ### ⚠️ **For Migrations/Dumps: Use Direct Connection (Port 5432)**
@@ -81,7 +81,7 @@ DATABASE_URI=postgresql://postgres.[project-ref]:[password]@aws-0-[region].poole
 **Connection String:**
 ```
 # Get from Supabase Dashboard → Settings → Database → Connection String
-postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres?sslmode=require
+postgresql://postgres:YOUR_PASSWORD_HERE@db.[project-ref].supabase.co:5432/postgres?sslmode=require
 ```
 
 ## Quick Fix: Use Supabase SQL Editor
@@ -131,7 +131,7 @@ After migration, update your `.env`:
 ```env
 # Use POOLER connection for your app (port 6543)
 # Get this from: Supabase Dashboard → Settings → Database → Connection Pooling
-DATABASE_URI=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
+DATABASE_URI=postgresql://postgres.[project-ref]:YOUR_PASSWORD_HERE@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
 **Note:** Replace `us-east-1` with your actual region. Check Supabase Dashboard for the correct pooler URL.

@@ -1,0 +1,17 @@
+# Pre-commit hook to prevent committing secrets
+# Install with: pip install pre-commit && pre-commit install
+
+repos:
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package-lock.json|pnpm-lock.yaml|yarn.lock
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.0
+    hooks:
+      - id: gitleaks
+        args: ['--no-banner', '--verbose']
+
