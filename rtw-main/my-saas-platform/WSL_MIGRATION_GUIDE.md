@@ -58,10 +58,12 @@ cd /mnt/c/Users/UmarKinoo/rtw-payload/rtw-main/my-saas-platform
 ### Step 3: Test Connection
 
 ```bash
+# Set password from environment variable (NEVER hardcode)
+export PGPASSWORD="${SUPABASE_DB_PASSWORD}"
 docker run --rm \
-  -e PGPASSWORD='WPcjhV*XW5_!kJ&' \
+  -e PGPASSWORD="$PGPASSWORD" \
   postgres:17 \
-  psql -h db.gyvstzmebvmcrhxoxldc.supabase.co \
+  psql -h "${SUPABASE_DB_HOST:-db.[project-ref].supabase.co}" \
   -p 5432 \
   -U postgres \
   -d postgres \
@@ -74,9 +76,9 @@ docker run --rm \
 ```bash
 docker run --rm \
   -v $(pwd):/backup \
-  -e PGPASSWORD='WPcjhV*XW5_!kJ&' \
+  -e PGPASSWORD="${SUPABASE_DB_PASSWORD}" \
   postgres:17 \
-  psql -h db.gyvstzmebvmcrhxoxldc.supabase.co \
+  psql -h "${SUPABASE_DB_HOST:-db.[project-ref].supabase.co}" \
   -p 5432 \
   -U postgres \
   -d postgres \
@@ -88,9 +90,9 @@ docker run --rm \
 
 ```bash
 docker run --rm \
-  -e PGPASSWORD='WPcjhV*XW5_!kJ&' \
+  -e PGPASSWORD="${SUPABASE_DB_PASSWORD}" \
   postgres:17 \
-  psql -h db.gyvstzmebvmcrhxoxldc.supabase.co \
+  psql -h "${SUPABASE_DB_HOST:-db.[project-ref].supabase.co}" \
   -p 5432 \
   -U postgres \
   -d postgres \
@@ -136,21 +138,27 @@ chmod 644 /mnt/c/Users/UmarKinoo/rtw-payload/rtw-main/my-saas-platform/supabase_
 ## Quick Commands Reference
 
 ```bash
+# Set credentials from environment variables (NEVER hardcode)
+export PGPASSWORD="${SUPABASE_DB_PASSWORD}"
+export DB_HOST="${SUPABASE_DB_HOST:-db.[project-ref].supabase.co}"
+
 # Test connection
-docker run --rm -e PGPASSWORD='WPcjhV*XW5_!kJ&' postgres:17 \
-  psql -h db.gyvstzmebvmcrhxoxldc.supabase.co -p 5432 -U postgres -d postgres \
+docker run --rm -e PGPASSWORD="$PGPASSWORD" postgres:17 \
+  psql -h "$DB_HOST" -p 5432 -U postgres -d postgres \
   -c "SELECT 1;" "sslmode=require"
 
 # Restore dump
-docker run --rm -v $(pwd):/backup -e PGPASSWORD='WPcjhV*XW5_!kJ&' postgres:17 \
-  psql -h db.gyvstzmebvmcrhxoxldc.supabase.co -p 5432 -U postgres -d postgres \
+docker run --rm -v $(pwd):/backup -e PGPASSWORD="$PGPASSWORD" postgres:17 \
+  psql -h "$DB_HOST" -p 5432 -U postgres -d postgres \
   -f /backup/supabase_local_dump.sql "sslmode=require"
 
 # Enable pgvector
-docker run --rm -e PGPASSWORD='WPcjhV*XW5_!kJ&' postgres:17 \
-  psql -h db.gyvstzmebvmcrhxoxldc.supabase.co -p 5432 -U postgres -d postgres \
+docker run --rm -e PGPASSWORD="$PGPASSWORD" postgres:17 \
+  psql -h "$DB_HOST" -p 5432 -U postgres -d postgres \
   -c "CREATE EXTENSION IF NOT EXISTS vector;" "sslmode=require"
 ```
+<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
+grep
 
 
 

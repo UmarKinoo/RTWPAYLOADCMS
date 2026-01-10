@@ -124,6 +124,14 @@ export const Candidates: CollectionConfig = {
       required: true,
     },
     {
+      name: 'phoneVerified',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Has the candidate verified their phone number via OTP',
+      },
+    },
+    {
       name: 'whatsapp',
       type: 'text',
       admin: {

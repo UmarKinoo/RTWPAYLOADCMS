@@ -11,12 +11,20 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}Supabase Cloud Restore via WSL${NC}"
 echo "================================"
 
-# Set connection details
-DB_HOST="db.gyvstzmebvmcrhxoxldc.supabase.co"
-DB_PORT="5432"
-DB_USER="postgres"
-DB_NAME="postgres"
-DB_PASSWORD="WPcjhV*XW5_!kJ&"
+# Set connection details from environment variables
+# NEVER hardcode credentials in source files
+# Set these via: export SUPABASE_DB_HOST=... etc.
+DB_HOST="${SUPABASE_DB_HOST:-db.[project-ref].supabase.co}"
+DB_PORT="${SUPABASE_DB_PORT:-5432}"
+DB_USER="${SUPABASE_DB_USER:-postgres}"
+DB_NAME="${SUPABASE_DB_NAME:-postgres}"
+DB_PASSWORD="${SUPABASE_DB_PASSWORD}"
+
+if [ -z "$DB_PASSWORD" ]; then
+    echo -e "${RED}Error: SUPABASE_DB_PASSWORD environment variable is not set${NC}"
+    echo "Set it with: export SUPABASE_DB_PASSWORD='your-password'"
+    exit 1
+fi
 DUMP_FILE="/mnt/c/Users/UmarKinoo/rtw-payload/rtw-main/my-saas-platform/supabase_local_dump.sql"
 
 # Check if dump file exists

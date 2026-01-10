@@ -23,12 +23,16 @@ export default async function EmployerDashboardPage({ params }: EmployerDashboar
 
     // Only allow employers to access this page
     if (userType.kind !== 'employer') {
-      // Redirect admins to admin dashboard, others to main dashboard
-      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User is not employer (kind:`, userType.kind, '), redirecting to /dashboard')
+      // Redirect based on user type
+      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User is not employer (kind:`, userType.kind, '), redirecting appropriately')
       if (userType.kind === 'admin') {
+        redirect(`/${locale}/admin/interviews/pending`)
+      } else if (userType.kind === 'candidate') {
+        redirect(`/${locale}/dashboard`)
+      } else {
+        // Unknown type, go to main dashboard which will handle routing
         redirect(`/${locale}/dashboard`)
       }
-      redirect(`/${locale}/dashboard`)
     }
 
     // TypeScript type narrowing: at this point, userType.kind is 'employer'
@@ -40,7 +44,12 @@ export default async function EmployerDashboardPage({ params }: EmployerDashboar
         <EmployerDashboard employer={employer} />
       </div>
     )
-  } catch (error) {
+  } catch (error: any) {
+    // Next.js redirects work by throwing a special error - re-throw it
+    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error
+    }
+    // Only log actual errors, not redirects
     const timestamp = new Date().toISOString()
     console.error(`[EMPLOYER_DASHBOARD ${timestamp}] Error:`, error)
     redirect(`/${locale}/login`)

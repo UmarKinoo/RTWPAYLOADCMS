@@ -35,6 +35,18 @@ export const Employers: CollectionConfig = {
       name: 'phone',
       type: 'text',
       label: 'Phone Number',
+      required: false, // Made optional to allow existing records, but required in form validation
+      admin: {
+        description: 'Phone number will be verified via OTP during registration. Required for new registrations.',
+      },
+    },
+    {
+      name: 'phoneVerified',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Has the employer verified their phone number via OTP',
+      },
     },
     {
       name: 'website',

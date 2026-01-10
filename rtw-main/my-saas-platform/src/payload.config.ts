@@ -25,6 +25,7 @@ import { Interviews } from '@/collections/Interviews'
 import { Notifications } from '@/collections/Notifications'
 import { CandidateInteractions } from '@/collections/CandidateInteractions'
 import { JobPostings } from '@/collections/JobPostings'
+import { PhoneVerifications } from '@/collections/PhoneVerifications'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
 import { plugins } from '@/plugins'
@@ -85,6 +86,7 @@ export default buildConfig({
     Notifications,
     CandidateInteractions,
     JobPostings,
+    PhoneVerifications,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],

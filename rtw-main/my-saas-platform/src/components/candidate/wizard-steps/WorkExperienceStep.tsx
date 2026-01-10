@@ -13,7 +13,7 @@ interface WorkExperienceStepProps {
 
 export function WorkExperienceStep({ register, errors }: WorkExperienceStepProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Field data-invalid={!!errors.jobTitle}>
         <FieldLabel htmlFor="jobTitle">Job Title *</FieldLabel>
         <Input
@@ -24,7 +24,7 @@ export function WorkExperienceStep({ register, errors }: WorkExperienceStepProps
         {errors.jobTitle && <FieldError>{errors.jobTitle.message}</FieldError>}
       </Field>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Field data-invalid={!!errors.experienceYears}>
           <FieldLabel htmlFor="experienceYears">Total Experience (Years) *</FieldLabel>
           <Input

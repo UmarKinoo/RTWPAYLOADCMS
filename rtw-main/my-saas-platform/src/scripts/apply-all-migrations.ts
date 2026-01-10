@@ -56,6 +56,7 @@ async function main() {
     '005_add_disciplines_missing_fields.sql',
     '006_add_employers_missing_fields.sql',
     '007_add_candidates_password_reset_fields.sql',
+    '008_make_employers_phone_optional.sql',
   ]
   
   let successCount = 0

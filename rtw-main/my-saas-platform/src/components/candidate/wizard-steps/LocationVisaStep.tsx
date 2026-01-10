@@ -1,54 +1,104 @@
 'use client'
 
-import { UseFormRegister, FieldErrors, Control } from 'react-hook-form'
+import { useState } from 'react'
+import { UseFormRegister, FieldErrors, Control, UseFormSetValue, Controller, useWatch } from 'react-hook-form'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { CalendarIcon, Shield, AlertTriangle, Clock, Ban } from 'lucide-react'
+import { format } from 'date-fns'
+import { cn } from '@/lib/utils'
 import type { CandidateFormData } from '../RegistrationWizard'
 
 interface LocationVisaStepProps {
   register: UseFormRegister<CandidateFormData>
   errors: FieldErrors<CandidateFormData>
   control: Control<CandidateFormData>
+  setValue: UseFormSetValue<CandidateFormData>
 }
 
-export function LocationVisaStep({ register, errors }: LocationVisaStepProps) {
-  return (
-    <div className="space-y-4">
-      <Field data-invalid={!!errors.location}>
-        <FieldLabel htmlFor="location">Current Location *</FieldLabel>
-        <Input
-          id="location"
-          {...register('location')}
-          placeholder="Enter your current location"
-        />
-        {errors.location && <FieldError>{errors.location.message}</FieldError>}
-      </Field>
+export function LocationVisaStep({ register, errors, control, setValue }: LocationVisaStepProps) {
+  const watchedVisaExpiry = useWatch({ control, name: 'visaExpiry' })
+  const [visaExpiryDate, setVisaExpiryDate] = useState<Date | undefined>(
+    watchedVisaExpiry ? new Date(watchedVisaExpiry) : undefined
+  )
 
+  const handleVisaExpiryChange = (date: Date | undefined) => {
+    setVisaExpiryDate(date)
+    if (date) {
+      setValue('visaExpiry', format(date, 'yyyy-MM-dd'), { shouldValidate: true })
+    } else {
+      setValue('visaExpiry', '', { shouldValidate: true })
+    }
+  }
+
+  const visaStatusOptions = [
+    { value: 'active', label: 'Active', icon: Shield, color: 'text-green-600' },
+    { value: 'nearly_expired', label: 'Nearly Expired', icon: Clock, color: 'text-amber-600' },
+    { value: 'expired', label: 'Expired', icon: AlertTriangle, color: 'text-red-600' },
+    { value: 'none', label: 'No Visa', icon: Ban, color: 'text-gray-600' },
+  ]
+
+  return (
+    <div className="space-y-6">
+      {/* Visa Status with Icons */}
       <Field data-invalid={!!errors.visaStatus}>
         <FieldLabel htmlFor="visaStatus">Visa Status *</FieldLabel>
-        <select
-          id="visaStatus"
-          {...register('visaStatus')}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <option value="">Select Visa Status</option>
-          <option value="active">Active</option>
-          <option value="expired">Expired</option>
-          <option value="nearly_expired">Nearly Expired</option>
-          <option value="none">None</option>
-        </select>
+        <Controller
+          name="visaStatus"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger className="w-full h-12">
+                <SelectValue placeholder="Select your visa status" />
+              </SelectTrigger>
+              <SelectContent>
+                {visaStatusOptions.map((option) => {
+                  const Icon = option.icon
+                  return (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex items-center gap-2">
+                        <Icon className={cn('h-4 w-4', option.color)} />
+                        <span>{option.label}</span>
+                      </div>
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
+          )}
+        />
         {errors.visaStatus && <FieldError>{errors.visaStatus.message}</FieldError>}
       </Field>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Field data-invalid={!!errors.visaExpiry}>
           <FieldLabel htmlFor="visaExpiry">Visa Expiry Date (Optional)</FieldLabel>
-          <Input
-            id="visaExpiry"
-            type="date"
-            {...register('visaExpiry')}
-            placeholder="Enter visa expiry date"
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  'w-full justify-start text-left font-normal h-12',
+                  !visaExpiryDate && 'text-muted-foreground'
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {visaExpiryDate ? format(visaExpiryDate, 'PPP') : 'Select expiry date'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={visaExpiryDate}
+                onSelect={handleVisaExpiryChange}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
           {errors.visaExpiry && <FieldError>{errors.visaExpiry.message}</FieldError>}
         </Field>
 
@@ -58,6 +108,7 @@ export function LocationVisaStep({ register, errors }: LocationVisaStepProps) {
             id="visaProfession"
             {...register('visaProfession')}
             placeholder="Enter job position in visa"
+            className="h-12"
           />
           {errors.visaProfession && <FieldError>{errors.visaProfession.message}</FieldError>}
         </Field>

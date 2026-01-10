@@ -4,6 +4,8 @@ import { Control, Controller, FieldErrors } from 'react-hook-form'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Edit, User, Mail, Briefcase, MapPin, FileCheck, ChevronRight } from 'lucide-react'
 import type { CandidateFormData } from '../RegistrationWizard'
 
 interface ReviewStepProps {
@@ -11,9 +13,10 @@ interface ReviewStepProps {
   sameAsPhone: boolean
   control: Control<CandidateFormData>
   errors: FieldErrors<CandidateFormData>
+  onEditStep?: (step: number) => void
 }
 
-export function ReviewStep({ formValues, sameAsPhone, control, errors }: ReviewStepProps) {
+export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditStep }: ReviewStepProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Not provided'
     try {
@@ -39,18 +42,43 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors }: ReviewS
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Please review your information</h3>
-        <p className="text-sm text-muted-foreground mb-6">
-          Review all the information below. If anything needs to be changed, use the Previous button to go back.
-        </p>
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <FileCheck className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Please review your information</h3>
+            <p className="text-sm text-muted-foreground">
+              Click Edit to modify any section
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Account Information */}
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-200">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-3">Account Information</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold">Account Information</h4>
+              </div>
+              {onEditStep && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditStep(1)}
+                  className="h-8"
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Email:</span>
@@ -61,10 +89,28 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors }: ReviewS
         </Card>
 
         {/* Personal Information */}
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-200">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-3">Personal Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold">Personal Information</h4>
+              </div>
+              {onEditStep && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditStep(2)}
+                  className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">First Name:</span>
                 <span className="font-medium">{formValues.firstName || 'Not provided'}</span>
@@ -104,9 +150,27 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors }: ReviewS
         </Card>
 
         {/* Job Role */}
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-200">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-3">Job Role</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold">Job Role</h4>
+              </div>
+              {onEditStep && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditStep(3)}
+                  className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
             <div className="text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Primary Skill:</span>
@@ -117,10 +181,28 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors }: ReviewS
         </Card>
 
         {/* Work Experience */}
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-200">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-3">Work Experience</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold">Work Experience</h4>
+              </div>
+              {onEditStep && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditStep(4)}
+                  className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Job Title:</span>
                 <span className="font-medium">{formValues.jobTitle || 'Not provided'}</span>
@@ -152,10 +234,28 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors }: ReviewS
         </Card>
 
         {/* Location & Visa */}
-        <Card>
+        <Card className="hover:shadow-md transition-shadow duration-200">
           <CardContent className="pt-6">
-            <h4 className="font-semibold mb-3">Location & Visa</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold">Location & Visa</h4>
+              </div>
+              {onEditStep && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditStep(5)}
+                  className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Location:</span>
                 <span className="font-medium">{formValues.location || 'Not provided'}</span>
@@ -183,17 +283,22 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors }: ReviewS
           name="termsAccepted"
           control={control}
           render={({ field }) => (
-            <div className="flex items-start space-x-2 p-4 border rounded-lg">
+            <div             className={`flex items-start space-x-3 p-4 border-2 rounded-lg transition-all duration-200 cursor-pointer ${
+              field.value 
+                ? 'border-primary bg-primary/5' 
+                : 'border-border hover:border-primary/50'
+            }`}
+            onClick={() => field.onChange(!field.value)}
+            >
               <Checkbox
                 id="termsAccepted"
                 checked={field.value}
                 onCheckedChange={(checked) => field.onChange(checked === true)}
-                className="mt-1"
+                className="mt-0.5"
               />
               <label
                 htmlFor="termsAccepted"
-                className="text-sm font-medium leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                onClick={() => field.onChange(!field.value)}
+                className="text-sm font-medium leading-relaxed cursor-pointer select-none"
               >
                 I accept the terms and conditions / Agreement Accepted *
               </label>

@@ -5,6 +5,7 @@ import config from '@payload-config'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import type { Candidate } from '@/payload-types'
+import { normalizePhone } from '@/server/sms/taqnyat'
 
 export interface RegisterCandidateData {
   // Identity
@@ -108,6 +109,30 @@ export async function registerCandidate(
     }
     const formattedAvailabilityDate = availabilityDateObj.toISOString().split('T')[0]
 
+    // Normalize phone number
+    let normalizedPhone: string
+    try {
+      normalizedPhone = normalizePhone(data.phone)
+    } catch (e: any) {
+      return {
+        success: false,
+        error: e.message || 'Invalid phone number format',
+      }
+    }
+
+    // Normalize WhatsApp if provided
+    let normalizedWhatsApp: string | undefined
+    if (data.whatsapp && data.whatsapp !== data.phone) {
+      try {
+        normalizedWhatsApp = normalizePhone(data.whatsapp)
+      } catch (e: any) {
+        return {
+          success: false,
+          error: e.message || 'Invalid WhatsApp number format',
+        }
+      }
+    }
+
     // Create candidate (this will also create auth user)
     const candidate = await payload.create({
       collection: 'candidates',
@@ -116,8 +141,9 @@ export async function registerCandidate(
         lastName: data.lastName,
         email: data.email,
         password: data.password,
-        phone: data.phone,
-        whatsapp: data.whatsapp || data.phone, // Use phone if whatsapp not provided
+        phone: normalizedPhone,
+        whatsapp: normalizedWhatsApp || normalizedPhone, // Use phone if whatsapp not provided
+        phoneVerified: false, // Will be set to true after OTP verification
         primarySkill: parseInt(data.primarySkill, 10),
         gender: data.gender,
         dob: formattedDob, // Required field, formatted as YYYY-MM-DD
@@ -136,35 +162,9 @@ export async function registerCandidate(
       },
     })
 
-    // IMPORTANT: Log the user in after registration
-    // This ensures they're authenticated and can access their own dashboard
-    try {
-      const loginResult = await payload.login({
-        collection: 'candidates',
-        data: {
-          email: data.email,
-          password: data.password,
-        },
-      })
-
-      if (loginResult.token) {
-        const { cookies } = await import('next/headers')
-        const cookieStore = await cookies()
-        
-        // Set auth cookie
-        cookieStore.set('payload-token', loginResult.token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          path: '/',
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-        })
-      }
-    } catch (loginError) {
-      console.error('Error logging in after registration:', loginError)
-      // Don't fail registration if login fails, but log it
-      // User can still log in manually
-    }
+    // Note: We don't log in automatically after registration
+    // User will be logged in after OTP verification in the frontend
+    // This ensures phone verification is completed before access
 
     revalidatePath('/register', 'page')
 
@@ -210,30 +210,39 @@ export async function getCurrentCandidate(): Promise<Candidate | null> {
       return null
     }
 
-    // SECURITY: First, try to find candidate by ID (if user is from Candidates collection)
-    // This ensures we only return the candidate that matches the authenticated user's ID
-    try {
-      const candidate = await payload.findByID({
-        collection: 'candidates',
-        id: user.id,
-        depth: 1,
-      })
-
-      // SECURITY CHECK: Verify the candidate's email matches the authenticated user's email
-      if (candidate.email !== user.email) {
-        console.error('SECURITY WARNING: Candidate email mismatch!', {
-          candidateEmail: candidate.email,
-          userEmail: user.email,
-          candidateId: candidate.id,
-          userId: user.id,
+    // SECURITY: Check user's collection first - only search by ID if user is from candidates collection
+    // IDs are not unique across collections (ID 3 in candidates ≠ ID 3 in employers)
+    const userCollection = (user as any).collection
+    
+    if (userCollection === 'candidates') {
+      // User is from candidates collection - safe to search by ID
+      try {
+        const candidate = await payload.findByID({
+          collection: 'candidates',
+          id: user.id,
+          depth: 1,
         })
-        return null
-      }
 
-      return candidate as Candidate
-    } catch (error) {
-      // Not found by ID, continue to email search
-      console.warn('Candidate not found by ID, trying email search:', user.id)
+        // SECURITY CHECK: Verify the candidate's email matches the authenticated user's email
+        if (candidate.email !== user.email) {
+          console.error('SECURITY WARNING: Candidate email mismatch!', {
+            candidateEmail: candidate.email,
+            userEmail: user.email,
+            candidateId: candidate.id,
+            userId: user.id,
+          })
+          return null
+        }
+
+        return candidate as Candidate
+      } catch (error) {
+        // Not found by ID, continue to email search
+        console.warn('Candidate not found by ID, trying email search:', user.id)
+      }
+    } else {
+      // User is from employers or users collection - skip ID search, go straight to email search
+      // This prevents false matches when IDs happen to be the same across collections
+      console.log(`User is from ${userCollection} collection, searching candidate by email only`)
     }
 
     // Fallback: Search by email (works for both Users and Candidates)

@@ -12,6 +12,7 @@ export interface RegisterEmployerData {
   responsiblePerson: string
   companyName: string
   email: string
+  phone?: string
   password: string
   confirmPassword: string
   termsAccepted: boolean
@@ -83,11 +84,13 @@ export async function registerEmployer(
         responsiblePerson: data.responsiblePerson.trim(),
         companyName: data.companyName.trim(),
         email: data.email.toLowerCase().trim(),
+        phone: data.phone?.trim() || null,
         password: data.password,
         termsAccepted: data.termsAccepted,
         emailVerified: false,
         emailVerificationToken: verificationToken,
         emailVerificationExpires: verificationExpires.toISOString(),
+        phoneVerified: false, // Will be set to true after OTP verification
         wallet: {
           interviewCredits: 0,
           contactUnlockCredits: 0,
@@ -143,31 +146,39 @@ export async function getCurrentEmployer(): Promise<Employer | null> {
       return null
     }
 
-    // SECURITY: Try to find employer by ID first (if user is from employers collection)
-    // Then fallback to email search (if user is from users collection)
-
-    try {
-      const employer = await payload.findByID({
-        collection: 'employers',
-        id: user.id,
-        depth: 1, // Populate relationships
-      })
-
-      // SECURITY CHECK: Verify the employer's email matches the authenticated user's email
-      if (employer.email !== user.email) {
-        console.error('SECURITY WARNING: Employer email mismatch!', {
-          employerEmail: employer.email,
-          userEmail: user.email,
-          employerId: employer.id,
-          userId: user.id,
+    // SECURITY: Check user's collection first - only search by ID if user is from employers collection
+    // IDs are not unique across collections (ID 3 in candidates ≠ ID 3 in employers)
+    const userCollection = (user as any).collection
+    
+    if (userCollection === 'employers') {
+      // User is from employers collection - safe to search by ID
+      try {
+        const employer = await payload.findByID({
+          collection: 'employers',
+          id: user.id,
+          depth: 1, // Populate relationships
         })
-        return null
-      }
 
-      return employer as Employer
-    } catch (error) {
-      // Not found by ID, continue to email search
-      console.warn('Employer not found by ID, trying email search:', user.id)
+        // SECURITY CHECK: Verify the employer's email matches the authenticated user's email
+        if (employer.email !== user.email) {
+          console.error('SECURITY WARNING: Employer email mismatch!', {
+            employerEmail: employer.email,
+            userEmail: user.email,
+            employerId: employer.id,
+            userId: user.id,
+          })
+          return null
+        }
+
+        return employer as Employer
+      } catch (error) {
+        // Not found by ID, continue to email search
+        console.warn('Employer not found by ID, trying email search:', user.id)
+      }
+    } else {
+      // User is from candidates or users collection - skip ID search, go straight to email search
+      // This prevents false matches when IDs happen to be the same across collections
+      console.log(`User is from ${userCollection} collection, searching employer by email only`)
     }
 
     // Fallback: Search by email (works for both Users and Employers collections)

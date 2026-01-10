@@ -6,11 +6,23 @@ import { Pool } from 'pg'
 import fs from 'fs'
 import path from 'path'
 
-// Production database connection string (pooler)
-const PROD_DB_URI = 'postgresql://postgres.svckgweagckklhdooxsp:aWtvtXf6%KN@J&+@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require'
+// Production database connection string - MUST be set via environment variable
+// NEVER hardcode production credentials in source code
+// Set PROD_DATABASE_URI in your .env file or pass it as an environment variable
+import dotenv from 'dotenv'
+dotenv.config({ path: path.resolve(process.cwd(), '.env') })
+
+const PROD_DB_URI = process.env.PROD_DATABASE_URI || process.env.PRODUCTION_DATABASE_URI
 
 async function applyMigrationToProd() {
   console.log('\n🚀 Applying migration 007 to production database...\n')
+  
+  if (!PROD_DB_URI) {
+    console.error('❌ PROD_DATABASE_URI or PRODUCTION_DATABASE_URI environment variable is not set.')
+    console.error('   Set it in your .env file or pass it as an environment variable.')
+    console.error('   NEVER commit production database credentials to version control!')
+    process.exit(1)
+  }
   
   // Use pooler connection (Supabase pooler supports DDL operations)
   const pool = new Pool({

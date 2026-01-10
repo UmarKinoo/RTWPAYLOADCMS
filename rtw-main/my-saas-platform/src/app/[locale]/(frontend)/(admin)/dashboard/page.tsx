@@ -73,7 +73,12 @@ export default async function Dashboard({ params }: DashboardProps) {
     // Unknown user type, redirect to login
     console.warn(`[DASHBOARD ${timestamp}] Unknown user type:`, userType.kind, 'redirecting to /login')
     redirect(`/${locale}/login`)
-  } catch (error) {
+  } catch (error: any) {
+    // Next.js redirects work by throwing a special error - re-throw it
+    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error
+    }
+    // Only log actual errors, not redirects
     console.error(`[DASHBOARD ${timestamp}] Error:`, error)
     redirect(`/${locale}/login`)
   }

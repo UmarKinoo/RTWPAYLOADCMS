@@ -44,8 +44,9 @@ choco install postgresql --params '/Password:postgres'
 Then restore directly:
 ```powershell
 cd C:\Users\UmarKinoo\rtw-payload\rtw-main\my-saas-platform
-$env:PGPASSWORD="WPcjhV*XW5_!kJ&"
-psql "postgresql://postgres:WPcjhV*XW5_!kJ&@db.gyvstzmebvmcrhxoxldc.supabase.co:5432/postgres?sslmode=require" -f supabase_local_dump.sql
+# Set password from environment variable (NEVER hardcode in scripts)
+$env:PGPASSWORD=$env:SUPABASE_DB_PASSWORD
+psql "$env:SUPABASE_DB_URI" -f supabase_local_dump.sql
 ```
 
 ## Direct Connection vs Pooler for Next.js + Payload 3.0
@@ -66,7 +67,8 @@ postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.co
 
 **For your app's `.env`:**
 ```env
-DATABASE_URI=postgresql://postgres.gyvstzmebvmcrhxoxldc:WPcjhV*XW5_!kJ&@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require
+# Get connection string from Supabase Dashboard → Settings → Database → Connection Pooling
+DATABASE_URI=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
 ### ⚠️ **For Migrations/Dumps: Use Direct Connection (Port 5432)**
@@ -78,7 +80,8 @@ DATABASE_URI=postgresql://postgres.gyvstzmebvmcrhxoxldc:WPcjhV*XW5_!kJ&@aws-0-us
 
 **Connection String:**
 ```
-postgresql://postgres:WPcjhV*XW5_!kJ&@db.gyvstzmebvmcrhxoxldc.supabase.co:5432/postgres?sslmode=require
+# Get from Supabase Dashboard → Settings → Database → Connection String
+postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres?sslmode=require
 ```
 
 ## Quick Fix: Use Supabase SQL Editor
@@ -128,7 +131,7 @@ After migration, update your `.env`:
 ```env
 # Use POOLER connection for your app (port 6543)
 # Get this from: Supabase Dashboard → Settings → Database → Connection Pooling
-DATABASE_URI=postgresql://postgres.gyvstzmebvmcrhxoxldc:WPcjhV*XW5_!kJ&@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require
+DATABASE_URI=postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
 **Note:** Replace `us-east-1` with your actual region. Check Supabase Dashboard for the correct pooler URL.

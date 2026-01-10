@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { registerEmployer } from '@/lib/employer'
+import { PhoneVerification } from '@/components/auth/phone-verification'
 
 // Google logo
 const googleLogo = '/assets/8f7935e769322ac3c425296f0ab80d00c06649f5.png'
@@ -92,10 +93,13 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 export const EmployerRegistrationForm: React.FC = () => {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
+  const [showPhoneVerification, setShowPhoneVerification] = useState(false)
+  const [employerId, setEmployerId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     responsiblePerson: '',
     companyName: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     termsAccepted: false,
@@ -139,6 +143,14 @@ export const EmployerRegistrationForm: React.FC = () => {
         return
       }
 
+      if (!formData.phone.trim()) {
+        toast.error('Validation Error', {
+          description: 'Please enter your phone number',
+        })
+        setIsPending(false)
+        return
+      }
+
       if (!formData.password || formData.password.length < 8) {
         toast.error('Validation Error', {
           description: 'Password must be at least 8 characters long',
@@ -168,30 +180,91 @@ export const EmployerRegistrationForm: React.FC = () => {
         responsiblePerson: formData.responsiblePerson,
         companyName: formData.companyName,
         email: formData.email,
+        phone: formData.phone,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
         termsAccepted: formData.termsAccepted,
       })
 
-      if (result.success) {
+      if (result.success && result.employerId) {
         toast.success('Registration Successful!', {
-          description: 'Your employer account has been created successfully.',
+          description: 'Please verify your phone number to continue.',
         })
-        // Redirect to candidates page
-        router.push('/candidates')
+        // Show phone verification step
+        setEmployerId(result.employerId)
+        setShowPhoneVerification(true)
+        setIsPending(false) // Registration complete, now showing verification
       } else {
         toast.error('Registration Failed', {
           description: result.error || 'Please try again.',
         })
+        setIsPending(false)
       }
     } catch (error) {
       console.error('Registration error:', error)
       toast.error('Registration Failed', {
         description: 'An unexpected error occurred. Please try again.',
       })
-    } finally {
       setIsPending(false)
     }
+  }
+
+  // Show phone verification step after successful registration
+  if (showPhoneVerification && employerId) {
+    return (
+      <div className="w-full">
+        {/* Progress Bar */}
+        <div className="flex gap-2 mb-6 sm:mb-8">
+          <div className="h-2.5 flex-1 bg-[#4644b8] rounded-lg transition-all" />
+          <div className="h-2.5 flex-1 bg-[#4644b8] rounded-lg transition-all" />
+        </div>
+
+        {/* Title and Description */}
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#16252d] mb-3 sm:mb-4 leading-tight">
+            Verify Your Phone Number
+          </h2>
+          <p className="text-sm sm:text-base text-[#a5a5a5] leading-relaxed px-2">
+            We've sent a verification code to your phone. Please enter it below to complete your registration.
+          </p>
+        </div>
+
+        {/* Phone Verification Component */}
+        <PhoneVerification
+          phone={formData.phone}
+          userId={employerId}
+          userCollection="employers"
+          onVerified={async () => {
+            toast.success('Phone Verified!', {
+              description: 'Your phone number has been verified successfully.',
+            })
+            // Log in the employer after successful phone verification
+            try {
+              // Use the loginUser server action
+              const { loginUser } = await import('@/lib/auth')
+              const loginResult = await loginUser({
+                email: formData.email,
+                password: formData.password,
+                collection: 'employers',
+              })
+
+              if (loginResult.success) {
+                // Redirect to dashboard (which will route to employer dashboard)
+                router.push('/dashboard')
+                router.refresh() // Refresh to update auth state
+              } else {
+                toast.error('Verification successful, but login failed. Please log in manually.')
+                router.push('/login')
+              }
+            } catch (error) {
+              console.error('Error logging in after verification:', error)
+              toast.error('Verification successful, but login failed. Please log in manually.')
+              router.push('/login')
+            }
+          }}
+        />
+      </div>
+    )
   }
 
   return (
@@ -243,6 +316,17 @@ export const EmployerRegistrationForm: React.FC = () => {
           value={formData.email}
           onChange={handleInputChange}
           name="email"
+        />
+
+        {/* Phone */}
+        <FloatingLabelInput
+          label="Phone Number"
+          required
+          type="tel"
+          placeholder="+9665xxxxxxx or 5xxxxxxx"
+          value={formData.phone}
+          onChange={handleInputChange}
+          name="phone"
         />
 
         {/* Password */}
