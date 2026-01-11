@@ -8,15 +8,38 @@
  * - Accent: #ecf2ff (light purple)
  */
 
+import { getServerSideURL } from '@/utilities/getURL'
+import { defaultLocale } from '@/i18n/config'
+
 // Logo URL - adjust path as needed
 const logoUrl = 'https://readytowork.sa/assets/03bdd9d6f0fa9e8b68944b910c59a8474fc37999.svg'
-const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 const supportEmail = process.env.SUPPORT_EMAIL || 'support@readytowork.sa'
+
+/**
+ * Get the base app URL for email links
+ * Uses getServerSideURL() to ensure correct production URLs
+ * Validates that we're not using localhost in production
+ */
+function getAppUrl(): string {
+  const url = getServerSideURL()
+  
+  // Warn if using localhost in production (but don't break in development)
+  if (process.env.NODE_ENV === 'production' && url.includes('localhost')) {
+    console.warn(
+      '⚠️ WARNING: Email templates are using localhost URL in production!',
+      'Please set APP_URL, NEXT_PUBLIC_SERVER_URL, or NEXT_PUBLIC_APP_URL environment variable.'
+    )
+  }
+  
+  return url
+}
 
 /**
  * Base email template wrapper with branding
  */
 function baseEmailTemplate(content: string, title: string): string {
+  const appUrl = getAppUrl()
+  
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -161,9 +184,9 @@ function baseEmailTemplate(content: string, title: string): string {
     <div class="footer">
       <p>© ${new Date().getFullYear()} Ready to Work. All rights reserved.</p>
       <div class="footer-links">
-        <a href="${appUrl}/about">About Us</a> |
-        <a href="${appUrl}/contact">Contact</a> |
-        <a href="${appUrl}/privacy-policy">Privacy Policy</a>
+        <a href="${appUrl}/${defaultLocale}/about">About Us</a> |
+        <a href="${appUrl}/${defaultLocale}/contact">Contact</a> |
+        <a href="${appUrl}/${defaultLocale}/privacy-policy">Privacy Policy</a>
       </div>
       <p style="margin-top: 12px; font-size: 12px;">
         If you have any questions, contact us at <a href="mailto:${supportEmail}" style="color: #4644b8;">${supportEmail}</a>
@@ -179,6 +202,7 @@ function baseEmailTemplate(content: string, title: string): string {
  * Email verification template for new registrations
  */
 export function verificationEmailTemplate(email: string, token: string, userType: 'candidate' | 'employer' = 'candidate'): string {
+  const appUrl = getAppUrl()
   const verificationUrl = `${appUrl}/api/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}&type=${userType}`
   const userTypeLabel = userType === 'employer' ? 'employer' : 'candidate'
   
@@ -213,9 +237,11 @@ export function verificationEmailTemplate(email: string, token: string, userType
  * Welcome email template (sent after email verification)
  */
 export function welcomeEmailTemplate(email: string, userType: 'candidate' | 'employer' = 'candidate'): string {
+  const appUrl = getAppUrl()
+  // Use default locale for dashboard URLs to ensure proper routing
   const dashboardUrl = userType === 'employer' 
-    ? `${appUrl}/employer/dashboard`
-    : `${appUrl}/dashboard`
+    ? `${appUrl}/${defaultLocale}/employer/dashboard`
+    : `${appUrl}/${defaultLocale}/dashboard`
   const userTypeLabel = userType === 'employer' ? 'employer' : 'candidate'
   
   const content = `
@@ -255,8 +281,9 @@ export function welcomeEmailTemplate(email: string, userType: 'candidate' | 'emp
  * Password reset email template
  */
 export function passwordResetEmailTemplate(email: string, token: string, userType: 'candidate' | 'employer' = 'candidate'): string {
-  // Include locale prefix (default to 'en') for proper routing
-  const resetUrl = `${appUrl}/en/reset-password?token=${token}&email=${encodeURIComponent(email)}&type=${userType}`
+  const appUrl = getAppUrl()
+  // Use default locale from config for proper routing (supports en/ar locales)
+  const resetUrl = `${appUrl}/${defaultLocale}/reset-password?token=${token}&email=${encodeURIComponent(email)}&type=${userType}`
   
   const content = `
     <h1 class="email-title">Reset Your Password</h1>
@@ -294,6 +321,8 @@ export function passwordResetEmailTemplate(email: string, token: string, userTyp
  * Password changed confirmation email
  */
 export function passwordChangedEmailTemplate(): string {
+  const appUrl = getAppUrl()
+  
   const content = `
     <h1 class="email-title">Password Successfully Changed</h1>
     <p class="email-content">
@@ -314,7 +343,7 @@ export function passwordChangedEmailTemplate(): string {
       For security reasons, you may need to sign in again on your devices.
     </p>
     <div style="text-align: center; margin-top: 32px;">
-      <a href="${appUrl}/login" class="button button-secondary">Sign In</a>
+      <a href="${appUrl}/${defaultLocale}/login" class="button button-secondary">Sign In</a>
     </div>
   `
   
@@ -325,6 +354,8 @@ export function passwordChangedEmailTemplate(): string {
  * Employer-specific welcome email
  */
 export function employerWelcomeEmailTemplate(companyName: string, responsiblePerson: string): string {
+  const appUrl = getAppUrl()
+  
   const content = `
     <h1 class="email-title">Welcome to Ready to Work, ${responsiblePerson}! 🎉</h1>
     <p class="email-content">
@@ -338,7 +369,7 @@ export function employerWelcomeEmailTemplate(companyName: string, responsiblePer
       <p style="margin-top: 8px; font-size: 14px;">Start exploring our pool of qualified candidates today.</p>
     </div>
     <div style="text-align: center;">
-      <a href="${appUrl}/employer/dashboard" class="button">Go to Employer Dashboard</a>
+      <a href="${appUrl}/${defaultLocale}/employer/dashboard" class="button">Go to Employer Dashboard</a>
     </div>
     <div class="divider"></div>
     <p class="email-content">
@@ -352,14 +383,9 @@ export function employerWelcomeEmailTemplate(companyName: string, responsiblePer
       <li>Manage your subscription and credits</li>
     </ul>
     <p class="email-content">
-      Need help getting started? Check out our <a href="${appUrl}/pricing" class="link">pricing plans</a> or contact our support team.
+      Need help getting started? Check out our <a href="${appUrl}/${defaultLocale}/pricing" class="link">pricing plans</a> or contact our support team.
     </p>
   `
   
   return baseEmailTemplate(content, 'Welcome to Ready to Work')
 }
-
-
-
-
-
