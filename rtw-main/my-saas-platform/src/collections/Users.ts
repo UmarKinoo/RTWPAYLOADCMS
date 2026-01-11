@@ -13,6 +13,7 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: true,
+  versions: false, // Disable versioning for users collection to avoid versioning errors
   access: {
     admin: isAdmin,
   },

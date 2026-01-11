@@ -17,3 +17,5 @@ WHERE name_en IS NULL AND name IS NOT NULL;
 -- Note: name_ar will remain NULL until translations are added
 -- Run the translate-disciplines script to populate name_ar values
 
+
+

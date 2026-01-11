@@ -31,3 +31,5 @@ WHERE email_verified IS NULL;
 -- Note: password column is not needed - Payload uses hash and salt for authentication
 -- The password field in the collection definition is handled by Payload's auth system
 
+
+

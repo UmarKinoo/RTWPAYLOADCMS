@@ -170,3 +170,5 @@ TEST_EMAIL=your@email.com pnpm tsx scripts/test-email.ts
 3. **Verify Environment Variables** - Ensure all are set in Vercel
 4. **Check Resend Dashboard** - Verify domain is approved
 
+
+

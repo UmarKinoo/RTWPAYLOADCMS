@@ -17,3 +17,5 @@ WHERE title_en IS NULL AND title IS NOT NULL;
 -- Note: title_ar will remain NULL until translations are added manually
 -- or via CMS admin interface
 
+
+

@@ -15,3 +15,5 @@ repos:
       - id: gitleaks
         args: ['--no-banner', '--verbose']
 
+
+

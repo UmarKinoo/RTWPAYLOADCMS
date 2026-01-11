@@ -12,7 +12,6 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 // Email configuration
 const emailFrom = process.env.EMAIL_FROM || 'noreply@readytowork.sa'
-const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
 export interface EmailOptions {
   to: string

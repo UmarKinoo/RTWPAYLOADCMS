@@ -83,3 +83,5 @@ export function RegisterTypeModal({ open, onOpenChange }: RegisterTypeModalProps
 
 
 
+
+

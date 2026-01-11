@@ -102,3 +102,5 @@ export async function RecentlySearchedCandidates({ employerId }: RecentlySearche
 
 
 
+
+

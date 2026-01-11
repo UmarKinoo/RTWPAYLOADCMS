@@ -44,3 +44,5 @@ if ($foundSecrets) {
 Write-Host "✅ No secrets detected" -ForegroundColor Green
 exit 0
 
+
+

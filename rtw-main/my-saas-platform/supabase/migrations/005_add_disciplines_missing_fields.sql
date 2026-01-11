@@ -26,3 +26,5 @@ WHERE is_highlighted IS NULL;
 -- Note: slug values should be populated via the seed-disciplines script
 -- or manually in the CMS admin
 
+
+

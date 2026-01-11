@@ -68,6 +68,11 @@ supabase_local_dump.sql
 *.p12
 *.pfx
 
+# Temporary scripts with credentials (DO NOT COMMIT)
+*credentials*.ts
+*prod-connection*.ts
+*with-password*.ts
+
 # Configuration files with potential secrets
 config.local.*
 *.local.*
