@@ -31,9 +31,22 @@ import { Footer } from '@/Footer/config'
 import { plugins } from '@/plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from '@/utilities/getURL'
+import { resendAdapter } from '@payloadcms/email-resend'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+// Email adapter configuration - only initialize if RESEND_API_KEY is set
+const resendApiKey = process.env.RESEND_API_KEY
+const emailFrom = process.env.EMAIL_FROM || 'noreply@readytowork.sa'
+
+// Log email adapter status
+if (resendApiKey && resendApiKey.trim()) {
+  console.log('[Payload Config] ✅ Resend email adapter will be initialized')
+} else {
+  console.warn('[Payload Config] ⚠️  RESEND_API_KEY not set or empty. Payload admin forgot password emails will not work.')
+  console.warn('[Payload Config] ⚠️  Custom forgot password (candidates/employers) uses separate email system and may still work if configured.')
+}
 
 export default buildConfig({
   admin: {
@@ -89,6 +102,14 @@ export default buildConfig({
     PhoneVerifications,
   ],
   cors: [getServerSideURL()].filter(Boolean),
+  // Only set email adapter if API key is present and not empty
+  email: resendApiKey && resendApiKey.trim()
+    ? resendAdapter({
+        defaultFromAddress: emailFrom,
+        defaultFromName: 'Ready to Work',
+        apiKey: resendApiKey,
+      })
+    : undefined,
   globals: [Header, Footer],
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
