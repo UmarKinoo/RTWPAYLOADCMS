@@ -223,11 +223,11 @@ export function PhoneVerification({
           </FieldDescription>
           {/* Dev mode: Show OTP for testing */}
           {devOtp && (
-            <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
-              <p className="text-xs font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+            <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <p className="text-xs font-semibold text-yellow-800 mb-1">
                 🧪 DEV MODE - OTP Code (for testing only):
               </p>
-              <p className="text-lg font-mono font-bold text-yellow-900 dark:text-yellow-100 text-center">
+              <p className="text-lg font-mono font-bold text-yellow-900 text-center">
                 {devOtp}
               </p>
             </div>

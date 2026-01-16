@@ -5,10 +5,12 @@ import {
   revalidateCandidateInteractionDelete,
 } from './CandidateInteractions/hooks/revalidateCandidateInteraction'
 
-// Access control: Employers can only access their own interactions
+// Access control: Employers can access their own interactions, candidates can access interactions where they are the candidate
+// Note: Server actions use overrideAccess: true with proper filtering
 const ownInteractions = ({ req: { user } }: { req: any }) => {
   if (!user) return false
   if (user.collection === 'employers') return true
+  if (user.collection === 'candidates') return true
   return false
 }
 

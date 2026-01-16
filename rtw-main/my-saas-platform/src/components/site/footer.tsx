@@ -1,5 +1,4 @@
 import { Section, Container } from '@/components/ds'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
 
 import Balancer from 'react-wrap-balancer'
 import Link from 'next/link'
@@ -25,7 +24,6 @@ export const Footer = () => {
               © <a href="https://github.com/brijr">brijr</a>. All rights reserved. 2025-present.
             </p>
           </div>
-          <ThemeToggle />
         </Container>
       </Section>
     </footer>

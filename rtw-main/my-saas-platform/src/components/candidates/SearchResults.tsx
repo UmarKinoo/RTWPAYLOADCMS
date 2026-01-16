@@ -1,0 +1,118 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { CandidateCard } from '@/components/homepage/blocks/Candidates'
+import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton'
+import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
+import { Link } from '@/i18n/routing'
+import type { CandidateListItem } from '@/lib/payload/candidates'
+import { searchCandidates } from '@/lib/employer/search'
+
+const DEFAULT_PROFILE = '/assets/aa541dc65d58ecc58590a815ca3bf2c27c889667.webp'
+
+interface SearchResultsProps {
+  searchQuery: string
+  locale: string
+}
+
+export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
+  const [candidates, setCandidates] = useState<CandidateListItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setIsLoading(false)
+      return
+    }
+
+    const performSearch = async () => {
+      setIsLoading(true)
+      setError(null)
+      
+      try {
+        const result = await searchCandidates(searchQuery.trim(), 20)
+        setCandidates(result.candidates || [])
+      } catch (err: any) {
+        console.error('Search error:', err)
+        const errorMessage = err.message || 'Failed to search candidates'
+        setError(
+          errorMessage.includes('Unauthorized')
+            ? 'Please log in to search candidates'
+            : errorMessage.includes('not yet supported')
+            ? 'You do not have permission to search'
+            : errorMessage
+        )
+        setCandidates([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    performSearch()
+  }, [searchQuery])
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-sm text-[#757575]">Searching candidates...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-lg font-semibold text-[#16252d] mb-2">
+          Search Error
+        </p>
+        <p className="text-sm text-[#757575]">
+          {error}. Please try again or browse all candidates.
+        </p>
+      </div>
+    )
+  }
+
+  if (candidates.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <p className="text-lg font-semibold text-[#16252d] mb-2">
+          No candidates found
+        </p>
+        <p className="text-sm text-[#757575]">
+          Try adjusting your search query or browse all candidates.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="mb-4 sm:mb-6">
+        <p className="text-sm sm:text-base font-medium text-[#16252d]">
+          {candidates.length} candidate{candidates.length === 1 ? '' : 's'} found for &quot;{searchQuery}&quot;
+        </p>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+        {candidates.map((candidate) => (
+          <div key={candidate.id} className="flex flex-col items-center">
+            <Link href={`/candidates/${candidate.id}`} className="w-full" locale={locale}>
+              <CandidateCard
+                name={`${candidate.firstName} ${candidate.lastName}`}
+                jobTitle={candidate.jobTitle}
+                experience={formatExperience(candidate.experienceYears)}
+                nationality={candidate.nationality}
+                nationalityFlag={getNationalityFlag(candidate.nationality)}
+                location={candidate.location}
+                profileImage={candidate.profilePictureUrl || DEFAULT_PROFILE}
+                billingClass={candidate.billingClass}
+              />
+            </Link>
+            <AddToInterviewButton candidate={candidate} variant="outline" />
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+

@@ -373,6 +373,7 @@ export const getCandidateInterviews = (candidateId: number, filters?: {
   status?: string
   fromDate?: string
   toDate?: string
+  excludePending?: boolean
 }) =>
   unstable_cache(
     async () => fetchCandidateInterviews(candidateId, filters),

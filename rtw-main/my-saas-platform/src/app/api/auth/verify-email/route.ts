@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const payload = await getPayload({ config: await configPromise })
 
     // Determine collection based on type
-    const collection = type === 'employer' ? 'employers' : 'users'
+    const collection = type === 'employer' ? 'employers' : type === 'candidate' ? 'candidates' : 'users'
 
     // Find user/employer with matching email and token
     const results = await payload.find({
@@ -61,10 +61,11 @@ export async function GET(request: NextRequest) {
         ),
       })
     } else {
+      const userType = type === 'employer' ? 'employer' : 'candidate'
       await sendEmail({
         to: email,
         subject: 'Welcome! Your email has been verified',
-        html: welcomeEmailTemplate(email, type as 'candidate' | 'employer'),
+        html: welcomeEmailTemplate(email, userType),
       })
     }
 

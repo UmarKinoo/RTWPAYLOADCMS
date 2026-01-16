@@ -5,7 +5,6 @@ import { routing } from '@/i18n/routing'
 import { Geist as FontSans } from 'next/font/google'
 import { Geist_Mono as FontMono } from 'next/font/google'
 import { Cairo } from 'next/font/google'
-import { ThemeProvider } from '@/components/theme/theme-provider'
 // import { SessionProvider } from '@/components/providers/SessionProvider' // Disabled: NextAuth not in use (Google login disabled)
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
@@ -80,15 +79,8 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className={cn('flex flex-col min-h-screen', isArabic ? cairo.className : fontSans.className)}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
-          <Toaster richColors expand={true} closeButton />
-        </ThemeProvider>
+        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <Toaster richColors expand={true} closeButton />
         <Analytics />
       </body>
     </html>

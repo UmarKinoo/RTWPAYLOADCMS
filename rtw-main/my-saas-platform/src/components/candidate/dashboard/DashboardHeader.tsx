@@ -4,7 +4,6 @@ import React from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Search } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
-import { ThemeToggle } from '@/components/theme/theme-toggle'
 import { Input } from '@/components/ui/input'
 import { CandidateNotificationDropdown } from '@/components/candidate/notifications/CandidateNotificationDropdown'
 import { AccountDropdown } from '@/components/shared/AccountDropdown'
@@ -56,11 +55,6 @@ export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notif
             placeholder="Search..."
             className="h-10 w-full rounded-lg border border-[#ededed] bg-white pl-9 text-sm focus-visible:ring-offset-0"
           />
-        </div>
-
-        {/* Theme Toggle - Hidden on mobile */}
-        <div className="hidden sm:block">
-          <ThemeToggle />
         </div>
 
         {/* Notification Dropdown */}

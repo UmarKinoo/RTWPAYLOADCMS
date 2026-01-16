@@ -1,16 +1,23 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { EmployerDashboardSidebar } from './EmployerDashboardSidebar'
 import { DashboardHeader } from './DashboardHeader'
 import { StatisticsChart } from './StatisticsChart'
 import { SubscriptionCard } from './SubscriptionCard'
+import { NotificationsView } from './NotificationsView'
+import { SettingsView } from './SettingsView'
+import { CandidatesToReviewView } from './CandidatesToReviewView'
+import { ScheduledInterviewsView } from './ScheduledInterviewsView'
+import { PendingRequestsView } from './PendingRequestsView'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import type { Employer, Purchase } from '@/payload-types'
 import type { StatisticsDataPoint } from '@/lib/payload/employer-dashboard'
 import type { NotificationListItem } from '@/lib/payload/notifications'
+import type { CandidateToReview, ScheduledInterview, PendingInterviewRequest } from '@/lib/payload/employer-views'
 
 interface EmployerDashboardClientProps {
   employer: Employer
@@ -19,9 +26,11 @@ interface EmployerDashboardClientProps {
   initialPeriod: 'week' | 'month' | 'year'
   unreadNotificationsCount: number
   notifications: NotificationListItem[]
+  candidatesToReview: CandidateToReview[]
+  scheduledInterviews: ScheduledInterview[]
+  pendingRequests: PendingInterviewRequest[]
   statsCards: React.ReactNode
   scheduleSidebar: React.ReactNode
-  recentCandidatesTable: React.ReactNode
   recentlySearchedCandidates: React.ReactNode
   recentPurchase: Purchase | null
 }
@@ -33,13 +42,17 @@ export function EmployerDashboardClient({
   initialPeriod,
   unreadNotificationsCount,
   notifications,
+  candidatesToReview,
+  scheduledInterviews,
+  pendingRequests,
   statsCards,
   scheduleSidebar,
-  recentCandidatesTable,
   recentlySearchedCandidates,
   recentPurchase,
 }: EmployerDashboardClientProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const searchParams = useSearchParams()
+  const currentView = searchParams.get('view') || 'dashboard'
 
   return (
     <div className="relative min-h-screen bg-[#f5f5f5]">
@@ -57,13 +70,13 @@ export function EmployerDashboardClient({
 
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
-        <EmployerDashboardSidebar />
+        <EmployerDashboardSidebar unreadNotificationsCount={unreadNotificationsCount} />
       </div>
 
       {/* Mobile Sidebar Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-[220px] p-0">
-          <EmployerDashboardSidebar mobile onClose={() => setMobileMenuOpen(false)} />
+          <EmployerDashboardSidebar mobile onClose={() => setMobileMenuOpen(false)} unreadNotificationsCount={unreadNotificationsCount} />
         </SheetContent>
       </Sheet>
 
@@ -76,34 +89,44 @@ export function EmployerDashboardClient({
           notifications={notifications}
         />
 
-        {/* Main Grid */}
-        <div className="mt-6 flex flex-col gap-4 xl:flex-row">
-          {/* Left Column - Stats Cards and Chart */}
-          <div className="flex flex-1 flex-col gap-4">
-            {statsCards}
-            <StatisticsChart
-              employerId={employerId}
-              initialData={initialStatistics}
-              initialPeriod={initialPeriod}
-            />
-          </div>
+        {/* Content Area - Show different views based on currentView */}
+        {currentView === 'notifications' ? (
+          <NotificationsView employer={employer} notifications={notifications} />
+        ) : currentView === 'settings' ? (
+          <SettingsView employer={employer} />
+        ) : currentView === 'candidates-to-review' ? (
+          <CandidatesToReviewView candidates={candidatesToReview} />
+        ) : currentView === 'interviews' ? (
+          <ScheduledInterviewsView interviews={scheduledInterviews} />
+        ) : currentView === 'pending-requests' ? (
+          <PendingRequestsView requests={pendingRequests} />
+        ) : (
+          <>
+            {/* Main Grid */}
+            <div className="mt-6 flex flex-col gap-4 xl:flex-row">
+              {/* Left Column - Stats Cards and Chart */}
+              <div className="flex flex-1 flex-col gap-4">
+                {statsCards}
+                <StatisticsChart
+                  employerId={employerId}
+                  initialData={initialStatistics}
+                  initialPeriod={initialPeriod}
+                />
+              </div>
 
-          {/* Right Column - Schedule and Subscription */}
-          <div className="flex w-full flex-col gap-4 xl:w-[340px]">
-            {scheduleSidebar}
-            <SubscriptionCard employer={employer} recentPurchase={recentPurchase} />
-          </div>
-        </div>
+              {/* Right Column - Schedule and Subscription */}
+              <div className="flex w-full flex-col gap-4 xl:w-[340px]">
+                {scheduleSidebar}
+                <SubscriptionCard employer={employer} recentPurchase={recentPurchase} />
+              </div>
+            </div>
 
-        {/* Recent Candidates Table */}
-        <div className="mt-4">
-          {recentCandidatesTable}
-        </div>
-
-        {/* Recently Searched Candidates */}
-        <div className="mt-4">
-          {recentlySearchedCandidates}
-        </div>
+            {/* Recently Searched Candidates */}
+            <div className="mt-4">
+              {recentlySearchedCandidates}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

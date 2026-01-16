@@ -18,7 +18,7 @@ export async function StatsCards({ employerId }: StatsCardsProps) {
       label: 'candidates to review',
       bgColor: 'bg-[#f9f9f9]',
       borderColor: 'border-[#cbcbcb]',
-      href: '/candidates',
+      href: '/employer/dashboard?view=candidates-to-review',
     },
     {
       icon: MessageSquare,
@@ -26,7 +26,7 @@ export async function StatsCards({ employerId }: StatsCardsProps) {
       label: 'Notifications',
       bgColor: 'bg-white',
       borderColor: 'border-[#ededed]',
-      href: '/employer/dashboard/notifications',
+      href: '/employer/dashboard?view=notifications',
     },
     {
       icon: UserCheck,
@@ -34,7 +34,7 @@ export async function StatsCards({ employerId }: StatsCardsProps) {
       label: 'Scheduled Interviews',
       bgColor: 'bg-white',
       borderColor: 'border-[#ededed]',
-      href: '/employer/dashboard/interviews',
+      href: '/employer/dashboard?view=interviews',
     },
     {
       icon: Clock,
@@ -42,7 +42,7 @@ export async function StatsCards({ employerId }: StatsCardsProps) {
       label: 'Pending Requests',
       bgColor: stats.pendingInterviewRequestsCount > 0 ? 'bg-yellow-50' : 'bg-white',
       borderColor: stats.pendingInterviewRequestsCount > 0 ? 'border-yellow-200' : 'border-[#ededed]',
-      href: '/employer/dashboard/interviews?status=pending',
+      href: '/employer/dashboard?view=pending-requests',
     },
   ]
 

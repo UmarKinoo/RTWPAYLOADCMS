@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton'
+import { SearchResults } from '@/components/candidates/SearchResults'
 import { cn } from '@/lib/utils'
 import { getCandidates } from '@/lib/payload/candidates'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
@@ -42,7 +43,23 @@ const DEFAULT_PROFILE = '/assets/aa541dc65d58ecc58590a815ca3bf2c27c889667.webp'
 
 interface CandidatesPageProps {
   params: Promise<{ locale: string }>
-  searchParams: Promise<{ discipline?: string; page?: string }>
+  searchParams: Promise<{
+    discipline?: string
+    page?: string
+    search?: string
+    location?: string
+    nationality?: string
+    billingClass?: string
+    experience?: string
+    country?: string
+    state?: string
+    jobType?: string
+    category?: string
+    subCategory?: string
+    skillLevel?: string
+    availability?: string
+    language?: string
+  }>
 }
 
 export default async function CandidatesPage({ params, searchParams }: CandidatesPageProps) {
@@ -50,7 +67,23 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
   const t = await getTranslations('emptyStates')
   const searchParamsResolved = await searchParams
   const disciplineSlug = searchParamsResolved.discipline
+  const searchQuery = searchParamsResolved.search
   const page = parseInt(searchParamsResolved.page || '1', 10)
+  
+  // Extract all filter params
+  const location = searchParamsResolved.location
+  const nationality = searchParamsResolved.nationality
+  const billingClass = searchParamsResolved.billingClass
+  const experience = searchParamsResolved.experience
+  const country = searchParamsResolved.country
+  const state = searchParamsResolved.state
+  const jobType = searchParamsResolved.jobType
+  const discipline = searchParamsResolved.discipline
+  const category = searchParamsResolved.category
+  const subCategory = searchParamsResolved.subCategory
+  const skillLevel = searchParamsResolved.skillLevel
+  const availability = searchParamsResolved.availability
+  const language = searchParamsResolved.language
 
   // Get discipline name if filtering by discipline (localized)
   let disciplineName: string | null = null
@@ -83,12 +116,38 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
     }
   }
 
-  // Fetch candidates from Payload CMS
-  const { candidates, totalDocs, totalPages } = await getCandidates({
-    limit: 20,
-    page,
-    disciplineSlug,
-  })
+  // If search query is provided, use client-side search component
+  // Otherwise, fetch candidates normally
+  const isSearchMode = searchQuery && searchQuery.trim()
+  
+  let candidates: any[] = []
+  let totalDocs = 0
+  let totalPages = 1
+
+  if (!isSearchMode) {
+    // Regular listing with filters
+    const result = await getCandidates({
+      limit: 20,
+      page,
+      disciplineSlug,
+      location,
+      nationality,
+      billingClass,
+      experience,
+      country,
+      state,
+      jobType,
+      discipline,
+      category,
+      subCategory,
+      skillLevel,
+      availability,
+      language,
+    })
+    candidates = result.candidates
+    totalDocs = result.totalDocs
+    totalPages = result.totalPages
+  }
 
   const startIndex = (page - 1) * 20 + 1
   const endIndex = Math.min(page * 20, totalDocs)
@@ -108,16 +167,27 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
 
           {/* Main Grid */}
           <div className="flex-1">
-            {/* Active Filter Badge */}
-            {disciplineName && (
-              <div className="mb-4 sm:mb-6">
-                <Link
-                  href="/candidates"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#e9d5ff] hover:bg-[#d9c5ef] rounded-lg text-sm font-medium text-[#16252d] transition-colors"
-                >
-                  <span>Filtered by: {disciplineName}</span>
-                  <X className="h-4 w-4" />
-                </Link>
+            {/* Active Filter/Search Badge */}
+            {(disciplineName || searchQuery || location || nationality || billingClass || experience) && (
+              <div className="mb-4 sm:mb-6 flex flex-wrap gap-2">
+                {searchQuery && (
+                  <Link
+                    href="/candidates"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#e9d5ff] hover:bg-[#d9c5ef] rounded-lg text-sm font-medium text-[#16252d] transition-colors"
+                  >
+                    <span>Search: "{searchQuery}"</span>
+                    <X className="h-4 w-4" />
+                  </Link>
+                )}
+                {disciplineName && (
+                  <Link
+                    href="/candidates"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#e9d5ff] hover:bg-[#d9c5ef] rounded-lg text-sm font-medium text-[#16252d] transition-colors"
+                  >
+                    <span>Discipline: {disciplineName}</span>
+                    <X className="h-4 w-4" />
+                  </Link>
+                )}
               </div>
             )}
 
@@ -126,7 +196,7 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
               {/* Results Count */}
               <p className="text-sm sm:text-base font-medium text-[#16252d]">
                 {totalDocs > 0
-                  ? `${totalDocs} candidate${totalDocs === 1 ? '' : 's'}${disciplineName ? ` in ${disciplineName}` : ''}`
+                  ? `${totalDocs} candidate${totalDocs === 1 ? '' : 's'}${searchQuery ? ` for "${searchQuery}"` : disciplineName ? ` in ${disciplineName}` : ''}`
                   : t('noCandidates')}
               </p>
 
@@ -153,8 +223,10 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
               </Select>
             </div>
 
-            {/* Candidates Grid */}
-            {candidates.length > 0 ? (
+            {/* Candidates Grid or Search Results */}
+            {isSearchMode ? (
+              <SearchResults searchQuery={searchQuery!} locale={locale} />
+            ) : candidates.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
                 {candidates.map((candidate) => (
                   <div key={candidate.id} className="flex flex-col items-center">

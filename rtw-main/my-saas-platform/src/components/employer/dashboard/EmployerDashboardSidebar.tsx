@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutGrid,
@@ -20,22 +21,27 @@ import { Separator } from '@/components/ui/separator'
 import { clearAuthCookies } from '@/lib/auth'
 import { toast } from 'sonner'
 
-const menuItems = [
-  { icon: LayoutGrid, label: 'Dashboard', href: '/employer/dashboard' },
-  { icon: Bell, label: 'Notification', href: '/employer/dashboard/notifications', badge: 6 },
-  { icon: Settings, label: 'Account Setting', href: '/employer/dashboard/settings' },
-  { icon: Users, label: 'Candidates', href: '/candidates' },
-]
+// Logo image - the full combined logo
+const logoSrc = '/assets/03bdd9d6f0fa9e8b68944b910c59a8474fc37999.svg'
 
 interface EmployerDashboardSidebarProps {
   mobile?: boolean
   onClose?: () => void
+  unreadNotificationsCount?: number
 }
 
-export function EmployerDashboardSidebar({ mobile = false, onClose }: EmployerDashboardSidebarProps) {
+export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotificationsCount = 0 }: EmployerDashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const menuItems = [
+    { icon: LayoutGrid, label: 'Dashboard', href: '/employer/dashboard' },
+    { icon: Bell, label: 'Notification', href: '/employer/dashboard?view=notifications', badge: unreadNotificationsCount },
+    { icon: Settings, label: 'Account Setting', href: '/employer/dashboard?view=settings' },
+    { icon: Users, label: 'Candidates', href: '/candidates' },
+  ]
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -76,20 +82,20 @@ export function EmployerDashboardSidebar({ mobile = false, onClose }: EmployerDa
       )}
     >
       <div className="flex flex-1 flex-col p-4">
-        {/* Header - Dashboard Icon and Title */}
+        {/* Header - ReadyToWork Logo */}
         <div className="mb-2 flex items-center gap-2">
-          {/* Colorful grid icon */}
-          <div className="flex size-10 items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="12" height="12" rx="2" fill="#4644b8"/>
-              <rect x="18" y="2" width="12" height="12" rx="2" fill="#d8e530"/>
-              <rect x="2" y="18" width="12" height="12" rx="2" fill="#6eabff"/>
-              <rect x="18" y="18" width="12" height="12" rx="2" fill="#dc0000"/>
-            </svg>
-          </div>
-          <span className="text-sm font-bold uppercase tracking-wide text-[#16252d]">
-            Dashboard
-          </span>
+          {/* ReadyToWork Logo */}
+          <Link href="/" className="flex-shrink-0">
+            <div className="relative h-5 w-[130px]" style={{ aspectRatio: '319/49' }}>
+              <Image
+                src={logoSrc}
+                alt="Ready to Work"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
+          </Link>
         </div>
 
         {/* Close button for mobile */}
@@ -123,7 +129,12 @@ export function EmployerDashboardSidebar({ mobile = false, onClose }: EmployerDa
         <div className="flex flex-col gap-2">
           {menuItems.map((item) => {
             const Icon = item.icon
-            const isActive = pathname === item.href
+            const currentView = searchParams?.get('view')
+            const isActive = 
+              pathname === item.href || 
+              (item.href.includes('view=notifications') && pathname === '/employer/dashboard' && currentView === 'notifications') ||
+              (item.href.includes('view=settings') && pathname === '/employer/dashboard' && currentView === 'settings') ||
+              (item.href === '/employer/dashboard' && pathname === '/employer/dashboard' && !currentView)
             return (
               <Link
                 key={item.href}
@@ -138,9 +149,9 @@ export function EmployerDashboardSidebar({ mobile = false, onClose }: EmployerDa
               >
                 <ChevronLeft className="size-4 text-[#757575]" />
                 <span className="text-sm font-medium">{item.label}</span>
-                {item.badge && (
+                {item.badge && item.badge > 0 && (
                   <Badge className="ml-auto flex size-5 items-center justify-center rounded-full bg-[#dc0000] p-0 text-[10px] text-white">
-                    {item.badge}
+                    {item.badge > 99 ? '99+' : item.badge}
                   </Badge>
                 )}
               </Link>

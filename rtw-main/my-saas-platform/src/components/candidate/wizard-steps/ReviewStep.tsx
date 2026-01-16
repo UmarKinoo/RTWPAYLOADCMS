@@ -283,22 +283,24 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
           name="termsAccepted"
           control={control}
           render={({ field }) => (
-            <div             className={`flex items-start space-x-3 p-4 border-2 rounded-lg transition-all duration-200 cursor-pointer ${
-              field.value 
-                ? 'border-primary bg-primary/5' 
-                : 'border-border hover:border-primary/50'
-            }`}
-            onClick={() => field.onChange(!field.value)}
+            <div
+              className={`flex items-start space-x-3 p-4 border-2 rounded-lg transition-all duration-200 ${
+                field.value 
+                  ? 'border-primary bg-primary/5' 
+                  : 'border-border hover:border-primary/50'
+              }`}
             >
               <Checkbox
                 id="termsAccepted"
-                checked={field.value}
-                onCheckedChange={(checked) => field.onChange(checked === true)}
+                checked={field.value || false}
+                onCheckedChange={(checked) => {
+                  field.onChange(checked === true)
+                }}
                 className="mt-0.5"
               />
               <label
                 htmlFor="termsAccepted"
-                className="text-sm font-medium leading-relaxed cursor-pointer select-none"
+                className="text-sm font-medium leading-relaxed cursor-pointer select-none flex-1"
               >
                 I accept the terms and conditions / Agreement Accepted *
               </label>

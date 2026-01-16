@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -10,23 +10,6 @@ import { EmployerNotificationDropdown } from '@/components/employer/notification
 import { AccountDropdown } from '@/components/shared/AccountDropdown'
 import type { Employer } from '@/payload-types'
 import type { NotificationListItem } from '@/lib/payload/notifications'
-// Simple debounce implementation
-function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null)
-
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-      const newTimeoutId = setTimeout(() => {
-        callback(...args)
-      }, delay)
-      setTimeoutId(newTimeoutId)
-    },
-    [callback, delay, timeoutId],
-  )
-}
 
 interface DashboardHeaderProps {
   employer: Employer
@@ -49,22 +32,16 @@ export function DashboardHeader({ employer, unreadNotificationsCount, notificati
   const interviewCredits = employer.wallet?.interviewCredits ?? 0
   const contactUnlockCredits = employer.wallet?.contactUnlockCredits ?? 0
 
-  const handleSearch = useDebounce((query: string) => {
-    if (query.trim()) {
-      router.push(`/candidates?search=${encodeURIComponent(query)}`)
-    }
-  }, 500)
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setSearchQuery(value)
-    handleSearch(value)
+    // Don't redirect automatically - only on form submit
   }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/candidates?search=${encodeURIComponent(searchQuery)}`)
+      router.push(`/candidates?search=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
 
@@ -99,13 +76,13 @@ export function DashboardHeader({ employer, unreadNotificationsCount, notificati
           </div>
         </form>
 
-        {/* Candidate Button */}
+        {/* Candidates Button */}
         <Link href="/candidates">
           <Button
             variant="outline"
             className="h-10 gap-2 border border-[#282828] px-4 py-2 sm:h-12"
           >
-            <span className="text-sm font-medium text-[#282828] sm:text-lg">Candidate</span>
+            <span className="text-sm font-medium text-[#282828] sm:text-lg">Candidates</span>
           </Button>
         </Link>
 

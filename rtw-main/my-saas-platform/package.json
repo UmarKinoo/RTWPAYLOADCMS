@@ -19,7 +19,8 @@
     "translate:ar": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/generate-arabic-translations.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "start:standalone": "cross-env NODE_OPTIONS=--no-deprecation node .next/standalone/server.js"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { getCurrentUserType } from '@/lib/currentUserType'
 import { CandidateDashboardContent } from '@/components/candidate/CandidateDashboardContent'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
+import { getCandidateActivity } from '@/lib/payload/candidate-activity'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,31 +13,41 @@ type DashboardProps = {
 
 export default async function Dashboard({ params }: DashboardProps) {
   const { locale } = await params
-  const timestamp = new Date().toISOString()
-  console.log(`[DASHBOARD ${timestamp}] Page render started`)
+  const timestamp = process.env.NODE_ENV === 'development' ? new Date().toISOString() : ''
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[DASHBOARD ${timestamp}] Page render started`)
+  }
   try {
     const userType = await getCurrentUserType()
-    console.log(`[DASHBOARD ${timestamp}] User type:`, userType ? userType.kind : 'null', userType ? { id: userType.user?.id, email: userType.user?.email } : 'no user')
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[DASHBOARD ${timestamp}] User type:`, userType ? userType.kind : 'null', userType ? { id: userType.user?.id, email: userType.user?.email } : 'no user')
+    }
 
     if (!userType) {
-      console.log(`[DASHBOARD ${timestamp}] No user type, redirecting to /login`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[DASHBOARD ${timestamp}] No user type, redirecting to /login`)
+      }
       redirect(`/${locale}/login`)
     }
 
     // Route based on user type
     if (userType.kind === 'candidate') {
-      console.log(`[DASHBOARD ${timestamp}] Rendering candidate dashboard`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[DASHBOARD ${timestamp}] Rendering candidate dashboard`)
+      }
       const candidate = userType.candidate
 
-      // Fetch notifications data with timeout protection
+      // Fetch notifications and activity data with timeout protection
       // Use Promise.allSettled to prevent one failure from blocking the other
-      const [unreadResult, notificationsResult] = await Promise.allSettled([
+      const [unreadResult, notificationsResult, activitiesResult] = await Promise.allSettled([
         getUnreadNotificationCount(candidate.id),
         getCandidateNotifications(candidate.id),
+        getCandidateActivity(candidate.id),
       ])
       
       const unreadNotificationsCount = unreadResult.status === 'fulfilled' ? unreadResult.value : 0
       const notifications = notificationsResult.status === 'fulfilled' ? notificationsResult.value : []
+      const activities = activitiesResult.status === 'fulfilled' ? activitiesResult.value : []
 
       // Suspense boundary must be at server component level for useSearchParams()
       return (
@@ -52,6 +63,7 @@ export default async function Dashboard({ params }: DashboardProps) {
             candidate={candidate}
             unreadNotificationsCount={unreadNotificationsCount}
             notifications={notifications}
+            activities={activities}
           />
         </Suspense>
       )
@@ -59,19 +71,25 @@ export default async function Dashboard({ params }: DashboardProps) {
 
   if (userType.kind === 'employer') {
     // Redirect to employer dashboard
-    console.log(`[DASHBOARD ${timestamp}] Employer detected, redirecting to /employer/dashboard`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[DASHBOARD ${timestamp}] Employer detected, redirecting to /employer/dashboard`)
+    }
     redirect(`/${locale}/employer/dashboard`)
   }
 
   if (userType.kind === 'admin') {
     // Admin users - redirect to admin dashboard or show admin view
     // For now, redirect to a placeholder - you may want to create an admin dashboard
-    console.log(`[DASHBOARD ${timestamp}] Admin detected, redirecting to /admin/interviews/pending`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[DASHBOARD ${timestamp}] Admin detected, redirecting to /admin/interviews/pending`)
+    }
     redirect(`/${locale}/admin/interviews/pending`)
   }
 
     // Unknown user type, redirect to login
-    console.warn(`[DASHBOARD ${timestamp}] Unknown user type:`, userType.kind, 'redirecting to /login')
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[DASHBOARD ${timestamp}] Unknown user type:`, userType.kind, 'redirecting to /login')
+    }
     redirect(`/${locale}/login`)
   } catch (error: any) {
     // Next.js redirects work by throwing a special error - re-throw it

@@ -19,7 +19,7 @@ export const Header = async () => {
       containerClassName="flex justify-between items-center gap-4"
     >
       <Link href="/" className="flex gap-3 items-center">
-        <Image src={Logo} width={14} alt="Payload SaaS Starter" className="invert dark:invert-0" />
+        <Image src={Logo} width={14} alt="Payload SaaS Starter" className="invert" />
         <h3 className="sm:text-lg">Payload Starter</h3>
       </Link>
 

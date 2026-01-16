@@ -17,16 +17,23 @@ export type CurrentUserType =
  */
 export async function getCurrentUserType(): Promise<CurrentUserType | null> {
   try {
-    console.log('[getCurrentUserType] Starting user type detection')
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[getCurrentUserType] Starting user type detection')
+    }
     const payload = await getPayload({ config: await configPromise })
     const headersList = await headers()
     
     // Get authenticated user (could be from users, candidates, or employers collection)
     const { user } = await payload.auth({ headers: headersList })
-    console.log('[getCurrentUserType] Auth result:', user ? { id: user.id, email: user.email, collection: (user as any).collection } : 'no user')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[getCurrentUserType] Auth result:', user ? { id: user.id, email: user.email, collection: (user as any).collection } : 'no user')
+    }
 
     if (!user) {
-      console.log('[getCurrentUserType] No authenticated user found')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[getCurrentUserType] No authenticated user found')
+      }
       return null
     }
 
@@ -34,7 +41,9 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
     // We check if the user has a 'role' property, which only exists on User type from 'users' collection
     const userWithRole = user as any
     if (userWithRole.role === 'admin') {
-      console.log('[getCurrentUserType] User is admin')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[getCurrentUserType] User is admin')
+      }
       return { kind: 'admin', user: user as User }
     }
 
@@ -84,7 +93,9 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
     }
     
     if (candidate) {
-      console.log('[getCurrentUserType] User is candidate:', candidate.id, candidate.email)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[getCurrentUserType] User is candidate:', candidate.id, candidate.email)
+      }
       const userObj: User = isFromUsersCollection
         ? (user as User)
         : ({
@@ -137,7 +148,9 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
     }
     
     if (employer) {
-      console.log('[getCurrentUserType] User is employer:', employer.id, employer.email, employer.companyName)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[getCurrentUserType] User is employer:', employer.id, employer.email, employer.companyName)
+      }
       const userObj: User = isFromUsersCollection
         ? (user as User)
         : ({
@@ -153,12 +166,16 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
     // User exists but no matching profile found
     // If user is from users collection, use it directly
     if ('role' in user) {
-      console.log('[getCurrentUserType] User from users collection but no candidate/employer profile found, returning unknown')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[getCurrentUserType] User from users collection but no candidate/employer profile found, returning unknown')
+      }
       return { kind: 'unknown', user: user as User }
     }
     
     // Otherwise create a minimal User object
-    console.log('[getCurrentUserType] User exists but no matching profile found, returning unknown')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[getCurrentUserType] User exists but no matching profile found, returning unknown')
+    }
     const userObj: User = {
       id: user.id,
       email: user.email,

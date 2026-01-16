@@ -75,11 +75,11 @@ function InfoCard({ title, children, className }: InfoCardProps) {
         className,
       )}
     >
-      <p className="font-inter font-semibold text-[#4644b8] text-[18px] leading-[100%] uppercase tracking-wide">
+      <p className="font-inter font-semibold text-[#4644b8] text-base sm:text-lg leading-[100%] uppercase tracking-wide">
         {title}
       </p>
       <div className="h-px bg-[#d9d9d9] w-full" />
-      <div className="font-inter font-medium text-[#16252d] text-[16px] leading-[100%]">
+      <div className="font-inter font-medium text-[#16252d] text-sm sm:text-base leading-[140%]">
         {children}
       </div>
     </div>
@@ -179,7 +179,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
 
             {/* Row 3: Tools & Skills (Full width) */}
             <InfoCard title="Tools & Skills" className="sm:col-span-2">
-              <ul className="list-disc list-inside space-y-1 text-[16px] leading-[100%]">
+              <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%]">
                 <li>Specialized in {candidate.jobTitle}</li>
                 <li>
                   {candidate.experienceYears} years of professional experience
@@ -201,18 +201,18 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
               {/* Work Entry */}
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                  <p className="font-semibold text-[#2c2c2c] text-[16px] leading-[100%]">
+                  <p className="font-semibold text-[#2c2c2c] text-sm sm:text-base leading-[140%]">
                     {candidate.jobTitle}
                     {candidate.currentEmployer && (
                       <span className="underline">, {candidate.currentEmployer}</span>
                     )}
                   </p>
-                  <p className="text-[12px] leading-[100%] text-[#9a9a9a] uppercase">
+                  <p className="text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
                     {candidate.experienceYears} years experience
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2 text-[12px] leading-[100%] text-[#9a9a9a] uppercase">
+                <div className="flex flex-wrap gap-2 text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
                   <span>{candidate.experienceYears} years</span>
                   <span>•</span>
                   <span>Full-time</span>
@@ -220,7 +220,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
                   <span>{candidate.location}</span>
                 </div>
 
-                <ul className="list-disc list-inside space-y-1 text-[14px] leading-[100%] font-medium text-[#2c2c2c]">
+                <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%] font-medium text-[#2c2c2c]">
                   <li>Professional {candidate.jobTitle} with proven track record</li>
                   <li>
                     {candidate.saudiExperience} years of experience working in Saudi Arabia
@@ -237,15 +237,15 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
         <div className="mt-6 sm:mt-8">
           <InfoCard title="Education" className="w-full">
             <div className="space-y-2">
-              <p className="font-semibold text-[#2c2c2c] text-[16px] leading-[100%]">
+              <p className="font-semibold text-[#2c2c2c] text-sm sm:text-base leading-[140%]">
                 Professional Training & Certification
               </p>
-              <div className="flex flex-wrap gap-2 text-[12px] leading-[100%] text-[#9a9a9a] uppercase">
+              <div className="flex flex-wrap gap-2 text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
                 <span>Professional Certification</span>
                 <span>•</span>
                 <span>{candidate.jobTitle}</span>
               </div>
-              <ul className="list-disc list-inside space-y-1 text-[14px] leading-[100%] font-medium text-[#2c2c2c]">
+              <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%] font-medium text-[#2c2c2c]">
                 <li>Completed professional training in {candidate.jobTitle}</li>
                 <li>Certified for work in Saudi Arabia</li>
               </ul>
@@ -257,7 +257,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
       {/* Similar Candidates Section */}
       {similarCandidates.length > 0 && (
         <HomepageSection className="py-12 sm:py-16 md:py-20 bg-[rgba(175,183,255,0.1)]">
-          <h2 className="font-inter font-semibold text-[#16252d] text-[28px] leading-[100%] mb-8 sm:mb-10 md:mb-12">
+          <h2 className="font-inter font-semibold text-[#16252d] text-xl sm:text-2xl md:text-3xl leading-[120%] mb-6 sm:mb-8 md:mb-10 lg:mb-12">
             Similar Candidates
           </h2>
 

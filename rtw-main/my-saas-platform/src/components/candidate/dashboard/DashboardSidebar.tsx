@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import {
@@ -20,6 +21,9 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { clearAuthCookies } from '@/lib/auth'
 import { toast } from 'sonner'
+
+// Logo image - the full combined logo
+const logoSrc = '/assets/03bdd9d6f0fa9e8b68944b910c59a8474fc37999.svg'
 
 // menuItems will be created inside component to access unreadNotificationsCount
 
@@ -74,20 +78,20 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
       )}
     >
       <div className="flex flex-1 flex-col p-4">
-        {/* Header - Dashboard Icon and Title */}
+        {/* Header - Logo and Title */}
         <div className="mb-2 flex items-center gap-2">
-          {/* Colorful grid icon */}
-          <div className="flex size-10 items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="12" height="12" rx="2" fill="#4644b8"/>
-              <rect x="18" y="2" width="12" height="12" rx="2" fill="#d8e530"/>
-              <rect x="2" y="18" width="12" height="12" rx="2" fill="#6eabff"/>
-              <rect x="18" y="18" width="12" height="12" rx="2" fill="#dc0000"/>
-            </svg>
-          </div>
-          <span className="text-sm font-bold uppercase tracking-wide text-[#16252d]">
-            Dashboard
-          </span>
+          {/* ReadyToWork Logo */}
+          <Link href="/" className="flex-shrink-0">
+            <div className="relative h-5 w-[130px]" style={{ aspectRatio: '319/49' }}>
+              <Image
+                src={logoSrc}
+                alt="Ready to Work"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
+          </Link>
         </div>
 
         {/* Close button for mobile */}
@@ -106,7 +110,7 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
         <div className="relative my-4">
           <Separator className="bg-[#ededed]" />
           <div className="absolute -right-2 top-1/2 -translate-y-1/2">
-            <div className="flex size-5 items-center justify-center rounded-full bg-[#f6b500]">
+            <div className="flex size-5 items-center justify-center rounded-full bg-[#4644b8]">
               <ChevronLeft className="size-3 rotate-180 text-white" />
             </div>
           </div>
@@ -124,12 +128,13 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
             { icon: User, label: 'My Resume', href: '/dashboard/resume' },
             { icon: Bell, label: 'Notification', href: '/dashboard?view=notifications', badge: unreadNotificationsCount },
             { icon: Settings, label: 'Account Setting', href: '/dashboard/settings' },
-            { icon: SlidersHorizontal, label: 'Activity', href: '/dashboard/activity' },
+            { icon: SlidersHorizontal, label: 'Activity', href: '/dashboard?view=activity' },
           ].map((item) => {
             const Icon = item.icon
             const isActive = 
               pathname === item.href || 
-              (item.href.includes('view=notifications') && pathname === '/dashboard' && searchParams?.get('view') === 'notifications')
+              (item.href.includes('view=notifications') && pathname === '/dashboard' && searchParams?.get('view') === 'notifications') ||
+              (item.href.includes('view=activity') && pathname === '/dashboard' && searchParams?.get('view') === 'activity')
             return (
               <Link
                 key={item.href}

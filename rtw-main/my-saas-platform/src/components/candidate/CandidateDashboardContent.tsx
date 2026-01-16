@@ -18,18 +18,21 @@ import { JobBenefitsSection } from './dashboard/JobBenefitsSection'
 import { ResumeQualityWidget } from './dashboard/ResumeQualityWidget'
 import { ResumeUploadSection } from './dashboard/ResumeUploadSection'
 import { NotificationsView } from './dashboard/NotificationsView'
+import { ActivityView } from './dashboard/ActivityView'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
+import type { ActivityItem } from '@/lib/payload/candidate-activity'
 
 interface CandidateDashboardContentProps {
   candidate: Candidate
   unreadNotificationsCount?: number
   notifications?: CandidateNotification[]
+  activities?: ActivityItem[]
 }
 
-export function CandidateDashboardContent({ candidate: initialCandidate, unreadNotificationsCount = 0, notifications = [] }: CandidateDashboardContentProps) {
+export function CandidateDashboardContent({ candidate: initialCandidate, unreadNotificationsCount = 0, notifications = [], activities = [] }: CandidateDashboardContentProps) {
   const [candidate, setCandidate] = useState(initialCandidate)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const searchParams = useSearchParams()
@@ -77,6 +80,8 @@ export function CandidateDashboardContent({ candidate: initialCandidate, unreadN
         {/* Content Area - Show different views based on currentView */}
         {currentView === 'notifications' ? (
           <NotificationsView candidate={candidate} notifications={notifications} />
+        ) : currentView === 'activity' ? (
+          <ActivityView candidate={candidate} activities={activities} />
         ) : (
           <div className="mt-6 flex flex-col gap-4 xl:flex-row">
             {/* Left Column - Main Content */}

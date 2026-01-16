@@ -48,6 +48,8 @@ async function handleAuth(request: NextRequest) {
     `/${locale}/blog`,
     `/${locale}/about`,
     `/${locale}/contact`,
+    `/${locale}/privacy-policy`,
+    `/${locale}/terms-and-conditions`,
   ]
   if (
     publicPaths.includes(pathname) ||

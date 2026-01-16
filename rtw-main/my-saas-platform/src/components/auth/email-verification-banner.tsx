@@ -38,18 +38,18 @@ export const EmailVerificationBanner = ({ userEmail }: EmailVerificationBannerPr
   }
 
   return (
-    <div className="border-b bg-yellow-50 dark:bg-yellow-950/20">
+    <div className="border-b bg-yellow-50">
       <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between">
           <div className="flex items-center">
-            <span className="flex rounded-lg bg-yellow-100 p-2 dark:bg-yellow-900/50">
-              <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" aria-hidden="true" />
+            <span className="flex rounded-lg bg-yellow-100 p-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" aria-hidden="true" />
             </span>
             <div className="ml-3">
-              <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+              <p className="text-sm font-medium text-yellow-800">
                 Please verify your email address
               </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              <p className="text-sm text-yellow-700">
                 We sent a verification link to <span className="font-medium">{userEmail}</span>
               </p>
             </div>
@@ -60,7 +60,7 @@ export const EmailVerificationBanner = ({ userEmail }: EmailVerificationBannerPr
               size="sm"
               onClick={handleResendVerification}
               disabled={isResending}
-              className="bg-white text-yellow-800 hover:bg-yellow-50 dark:bg-yellow-950 dark:text-yellow-200 dark:hover:bg-yellow-900"
+              className="bg-white text-yellow-800 hover:bg-yellow-50"
             >
               <Mail className="mr-2 h-4 w-4" />
               {isResending ? 'Sending...' : 'Resend Email'}

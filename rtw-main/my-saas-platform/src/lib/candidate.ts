@@ -4,8 +4,10 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
+import { randomBytes } from 'crypto'
 import type { Candidate } from '@/payload-types'
 import { normalizePhone } from '@/server/sms/taqnyat'
+import { sendEmail, verificationEmailTemplate } from './email'
 
 export interface RegisterCandidateData {
   // Identity
@@ -133,17 +135,24 @@ export async function registerCandidate(
       }
     }
 
+    // Generate email verification token
+    const verificationToken = randomBytes(32).toString('hex')
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
     // Create candidate (this will also create auth user)
     const candidate = await payload.create({
       collection: 'candidates',
       data: {
         firstName: data.firstName,
         lastName: data.lastName,
-        email: data.email,
+        email: data.email.toLowerCase().trim(),
         password: data.password,
         phone: normalizedPhone,
         whatsapp: normalizedWhatsApp || normalizedPhone, // Use phone if whatsapp not provided
         phoneVerified: false, // Will be set to true after OTP verification
+        emailVerified: false,
+        emailVerificationToken: verificationToken,
+        emailVerificationExpires: verificationExpires.toISOString(),
         primarySkill: parseInt(data.primarySkill, 10),
         gender: data.gender,
         dob: formattedDob, // Required field, formatted as YYYY-MM-DD
@@ -161,6 +170,19 @@ export async function registerCandidate(
         termsAccepted: data.termsAccepted,
       },
     })
+
+    // Send verification email
+    const emailResult = await sendEmail({
+      to: data.email.toLowerCase().trim(),
+      subject: 'Verify your email address - Ready to Work',
+      html: verificationEmailTemplate(data.email.toLowerCase().trim(), verificationToken, 'candidate'),
+    })
+
+    if (!emailResult.success) {
+      console.error('Failed to send verification email:', emailResult.error)
+      // Don't fail registration if email fails, but log it
+      // User can request resend later
+    }
 
     // Note: We don't log in automatically after registration
     // User will be logged in after OTP verification in the frontend
@@ -361,6 +383,10 @@ export async function updateCandidate(
     if (data.visaProfession !== undefined) updateData.visaProfession = data.visaProfession
     if ((data as any).profilePicture !== undefined) updateData.profilePicture = (data as any).profilePicture
     if ((data as any).resume !== undefined) updateData.resume = (data as any).resume
+    if ((data as any).aboutMe !== undefined) updateData.aboutMe = (data as any).aboutMe
+    if ((data as any).education !== undefined) updateData.education = (data as any).education
+    if ((data as any).jobPreferences !== undefined) updateData.jobPreferences = (data as any).jobPreferences
+    if ((data as any).preferredBenefits !== undefined) updateData.preferredBenefits = (data as any).preferredBenefits
 
     const candidate = await payload.update({
       collection: 'candidates',

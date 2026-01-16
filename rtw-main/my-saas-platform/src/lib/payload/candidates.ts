@@ -98,6 +98,19 @@ async function fetchCandidates(options?: {
   limit?: number
   page?: number
   disciplineSlug?: string
+  location?: string
+  nationality?: string
+  billingClass?: string
+  experience?: string
+  country?: string
+  state?: string
+  jobType?: string
+  discipline?: string
+  category?: string
+  subCategory?: string
+  skillLevel?: string
+  availability?: string
+  language?: string
 }): Promise<{
   candidates: CandidateListItem[]
   totalDocs: number
@@ -108,7 +121,24 @@ async function fetchCandidates(options?: {
 }> {
   const payload = await getPayload({ config: configPromise })
 
-  const { limit = 20, page = 1, disciplineSlug } = options || {}
+  const {
+    limit = 20,
+    page = 1,
+    disciplineSlug,
+    location,
+    nationality,
+    billingClass,
+    experience,
+    country,
+    state,
+    jobType,
+    discipline,
+    category,
+    subCategory,
+    skillLevel,
+    availability,
+    language,
+  } = options || {}
 
   // Build where clause
   const where: any = {
@@ -118,8 +148,221 @@ async function fetchCandidates(options?: {
     },
   }
 
-  // If discipline filter is provided, filter by discipline through relationship chain
-  if (disciplineSlug) {
+  // Apply location filter (country or state)
+  if (country || state || location) {
+    const locationFilter = country || state || location
+    if (locationFilter) {
+      where.location = {
+        contains: locationFilter,
+      }
+    }
+  }
+
+  // Apply nationality filter
+  if (nationality) {
+    where.nationality = {
+      contains: nationality,
+    }
+  }
+
+  // Apply language filter
+  if (language) {
+    where.languages = {
+      contains: language,
+    }
+  }
+
+  // Apply billing class filter (or skillLevel if it maps to billing class)
+  if (billingClass) {
+    where.billingClass = {
+      equals: billingClass,
+    }
+  } else if (skillLevel) {
+    // Map skill level to billing class if needed
+    // For now, we'll skip this as skillLevel might not directly map
+  }
+
+  // Apply experience filter (range) - handle both old format and new format
+  if (experience) {
+    const experienceRanges: Record<string, { min: number; max?: number }> = {
+      '0-1': { min: 0, max: 1 },
+      '1-3': { min: 1, max: 3 },
+      '3-5': { min: 3, max: 5 },
+      '5-10': { min: 5, max: 10 },
+      '10+': { min: 10 },
+      '0-1 years': { min: 0, max: 1 },
+      '1-3 years': { min: 1, max: 3 },
+      '3-5 years': { min: 3, max: 5 },
+      '5-10 years': { min: 5, max: 10 },
+      '10+ years': { min: 10 },
+    }
+
+    const range = experienceRanges[experience]
+    if (range) {
+      if (range.max !== undefined) {
+        where.experienceYears = {
+          greater_than_equal: range.min,
+          less_than_equal: range.max,
+        }
+      } else {
+        where.experienceYears = {
+          greater_than_equal: range.min,
+        }
+      }
+    }
+  }
+
+  // Apply availability filter
+  if (availability) {
+    const now = new Date()
+    now.setHours(0, 0, 0, 0) // Start of today
+    
+    const availabilityRanges: Record<string, { min?: Date; max: Date }> = {
+      'Immediate': { max: now }, // Available today or before
+      '1 Week': { max: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) },
+      '2 Weeks': { max: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000) },
+      '1 Month': { max: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) },
+      '2+ Months': { max: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000) },
+    }
+
+    const range = availabilityRanges[availability]
+    if (range) {
+      if (range.min) {
+        where.availabilityDate = {
+          greater_than_equal: range.min.toISOString(),
+          less_than_equal: range.max.toISOString(),
+        }
+      } else {
+        where.availabilityDate = {
+          less_than_equal: range.max.toISOString(),
+        }
+      }
+    }
+  }
+
+  // Apply taxonomy filters (discipline, category, subCategory)
+  // These filter through primarySkill relationship
+  let skillIdsToFilter: number[] | null = null
+
+  if (discipline || category || subCategory) {
+    try {
+      let disciplineIds: number[] = []
+      let categoryIds: number[] = []
+      let subCategoryIds: number[] = []
+
+      // 1. Filter by discipline if provided
+      if (discipline) {
+        const disciplineResult = await payload.find({
+          collection: 'disciplines',
+          where: {
+            name: {
+              equals: discipline,
+            },
+          },
+          limit: 1000,
+        })
+        disciplineIds = disciplineResult.docs.map((d) => d.id)
+      }
+
+      // 2. Filter by category if provided
+      if (category) {
+        const categoryWhere: any = {
+          name: {
+            equals: category,
+          },
+        }
+        if (disciplineIds.length > 0) {
+          categoryWhere.discipline = {
+            in: disciplineIds,
+          }
+        }
+        const categoryResult = await payload.find({
+          collection: 'categories',
+          where: categoryWhere,
+          limit: 1000,
+        })
+        categoryIds = categoryResult.docs.map((c) => c.id)
+      } else if (disciplineIds.length > 0) {
+        // If only discipline is provided, get all categories for that discipline
+        const categoryResult = await payload.find({
+          collection: 'categories',
+          where: {
+            discipline: {
+              in: disciplineIds,
+            },
+          },
+          limit: 1000,
+        })
+        categoryIds = categoryResult.docs.map((c) => c.id)
+      }
+
+      // 3. Filter by subCategory if provided
+      if (subCategory) {
+        const subCategoryWhere: any = {
+          name: {
+            equals: subCategory,
+          },
+        }
+        if (categoryIds.length > 0) {
+          subCategoryWhere.category = {
+            in: categoryIds,
+          }
+        }
+        const subCategoryResult = await payload.find({
+          collection: 'subcategories',
+          where: subCategoryWhere,
+          limit: 1000,
+        })
+        subCategoryIds = subCategoryResult.docs.map((sc) => sc.id)
+      } else if (categoryIds.length > 0) {
+        // If category is provided, get all subcategories for that category
+        const subCategoryResult = await payload.find({
+          collection: 'subcategories',
+          where: {
+            category: {
+              in: categoryIds,
+            },
+          },
+          limit: 1000,
+        })
+        subCategoryIds = subCategoryResult.docs.map((sc) => sc.id)
+      }
+
+      // 4. Get all skills for the filtered subcategories
+      if (subCategoryIds.length > 0) {
+        const skillsResult = await payload.find({
+          collection: 'skills',
+          where: {
+            subCategory: {
+              in: subCategoryIds,
+            },
+          },
+          limit: 1000,
+        })
+        skillIdsToFilter = skillsResult.docs.map((s) => s.id)
+      } else if (discipline || category || subCategory) {
+        // If filters were provided but no results, return empty
+        skillIdsToFilter = []
+      }
+    } catch (error) {
+      console.error('Error filtering by taxonomy:', error)
+    }
+  }
+
+  // Apply primarySkill filter (from taxonomy filters or disciplineSlug)
+  if (skillIdsToFilter !== null) {
+    if (skillIdsToFilter.length > 0) {
+      where.primarySkill = {
+        in: skillIdsToFilter,
+      }
+    } else {
+      // No skills found, return empty result
+      where.primarySkill = {
+        equals: -1, // Non-existent ID to return no results
+      }
+    }
+  } else if (disciplineSlug) {
+    // Legacy disciplineSlug filter
     try {
       // 1. Find discipline by slug
       const disciplineResult = await payload.find({
@@ -259,14 +502,39 @@ async function fetchCandidateById(id: number): Promise<CandidateDetail | null> {
 /**
  * Get paginated list of candidates (cached with 'candidates' tag)
  */
-export const getCandidates = (options?: { limit?: number; page?: number; disciplineSlug?: string }) =>
+export const getCandidates = (options?: {
+  limit?: number
+  page?: number
+  disciplineSlug?: string
+  location?: string
+  nationality?: string
+  billingClass?: string
+  experience?: string
+  country?: string
+  state?: string
+  jobType?: string
+  discipline?: string
+  category?: string
+  subCategory?: string
+  skillLevel?: string
+  availability?: string
+  language?: string
+}) =>
   unstable_cache(
     async () => fetchCandidates(options),
     [
       'candidates',
       `page-${options?.page || 1}`,
       `limit-${options?.limit || 20}`,
-      `discipline-${options?.disciplineSlug || 'all'}`,
+      `discipline-${options?.disciplineSlug || options?.discipline || 'all'}`,
+      `location-${options?.location || options?.country || options?.state || 'all'}`,
+      `nationality-${options?.nationality || 'all'}`,
+      `billingClass-${options?.billingClass || 'all'}`,
+      `experience-${options?.experience || 'all'}`,
+      `category-${options?.category || 'all'}`,
+      `subCategory-${options?.subCategory || 'all'}`,
+      `availability-${options?.availability || 'all'}`,
+      `language-${options?.language || 'all'}`,
     ],
     {
       tags: ['candidates'],

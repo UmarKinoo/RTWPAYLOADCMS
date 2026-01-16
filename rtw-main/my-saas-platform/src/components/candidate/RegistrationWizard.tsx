@@ -189,6 +189,13 @@ export function RegistrationWizard() {
 
   const onSubmit = async (data: CandidateFormData) => {
     console.log('Form submission started', { data })
+    
+    // Validate terms acceptance before proceeding
+    if (!data.termsAccepted) {
+      toast.error('Please accept the terms and conditions to continue')
+      return
+    }
+    
     setIsPending(true)
 
     try {
@@ -644,27 +651,6 @@ export function RegistrationWizard() {
                       disabled={isPending}
                       size="lg"
                       className="w-full sm:w-auto"
-                      onClick={async () => {
-                        console.log('Complete Registration button clicked')
-                        console.log('Form errors:', errors)
-                        console.log('Form values:', formValues)
-                        console.log('Is pending:', isPending)
-                        
-                        // Validate all fields before submission
-                        const isValid = await trigger()
-                        console.log('Form validation result:', isValid)
-                        
-                        if (!isValid) {
-                          console.log('Form validation failed, errors:', errors)
-                          // Show first error
-                          const firstError = Object.values(errors)[0] as any
-                          if (firstError?.message) {
-                            toast.error('Validation Error', {
-                              description: firstError.message,
-                            })
-                          }
-                        }
-                      }}
                     >
                       {isPending ? (
                         <span className="flex items-center gap-2">

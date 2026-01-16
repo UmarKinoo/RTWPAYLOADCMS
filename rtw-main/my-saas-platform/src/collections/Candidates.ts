@@ -6,6 +6,7 @@ import {
   revalidateCandidate,
   revalidateCandidateDelete,
 } from './Candidates/hooks/revalidateCandidate'
+import { updateBioEmbeddingVector } from './Candidates/hooks/updateBioEmbeddingVector'
 
 // Hook to set billing class from primary skill and generate bio embedding
 const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({ data, req }) => {
@@ -84,6 +85,8 @@ const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({
 
     const result = await response.json()
     if (result.data && result.data[0] && result.data[0].embedding) {
+      // Store in JSONB for backward compatibility
+      // The afterChange hook will update bio_embedding_vec column
       data.bio_embedding = result.data[0].embedding
     }
   } catch (error) {
@@ -251,6 +254,29 @@ export const Candidates: CollectionConfig = {
       type: 'text',
       label: 'Job Position in Visa',
     },
+    // Email Verification Fields
+    {
+      name: 'emailVerified',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Has the candidate verified their email address',
+      },
+    },
+    {
+      name: 'emailVerificationToken',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+    },
+    {
+      name: 'emailVerificationExpires',
+      type: 'date',
+      admin: {
+        hidden: true,
+      },
+    },
     // Password Reset Fields
     {
       name: 'passwordResetToken',
@@ -295,6 +321,130 @@ export const Candidates: CollectionConfig = {
         description: 'Upload your resume or CV document (PDF, DOC, DOCX)',
       },
     },
+    // About Me / Bio
+    {
+      name: 'aboutMe',
+      type: 'textarea',
+      label: 'About Me',
+      admin: {
+        description: 'Tell employers about yourself, your background, and what makes you unique',
+      },
+    },
+    // Education
+    {
+      name: 'education',
+      type: 'array',
+      label: 'Education',
+      fields: [
+        {
+          name: 'degree',
+          type: 'text',
+          label: 'Degree/Certification',
+          required: true,
+        },
+        {
+          name: 'institution',
+          type: 'text',
+          label: 'Institution Name',
+          required: true,
+        },
+        {
+          name: 'fieldOfStudy',
+          type: 'text',
+          label: 'Field of Study',
+        },
+        {
+          name: 'graduationYear',
+          type: 'number',
+          label: 'Graduation Year',
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          label: 'Description',
+        },
+      ],
+    },
+    // Job Preferences
+    {
+      name: 'jobPreferences',
+      type: 'group',
+      label: 'Job Preferences',
+      fields: [
+        {
+          name: 'preferredJobTitle',
+          type: 'text',
+          label: 'Preferred Job Title',
+        },
+        {
+          name: 'preferredLocation',
+          type: 'text',
+          label: 'Preferred Location',
+        },
+        {
+          name: 'preferredSalary',
+          type: 'text',
+          label: 'Preferred Salary Range',
+        },
+        {
+          name: 'workType',
+          type: 'select',
+          label: 'Work Type',
+          options: [
+            { label: 'Full-time', value: 'full-time' },
+            { label: 'Part-time', value: 'part-time' },
+            { label: 'Contract', value: 'contract' },
+            { label: 'Freelance', value: 'freelance' },
+            { label: 'Any', value: 'any' },
+          ],
+        },
+        {
+          name: 'shiftPreference',
+          type: 'select',
+          label: 'Shift Preference',
+          options: [
+            { label: 'Day Shift', value: 'day' },
+            { label: 'Night Shift', value: 'night' },
+            { label: 'Rotating', value: 'rotating' },
+            { label: 'Any', value: 'any' },
+          ],
+        },
+      ],
+    },
+    // Preferred Job Benefits
+    {
+      name: 'preferredBenefits',
+      type: 'array',
+      label: 'Preferred Job Benefits',
+      fields: [
+        {
+          name: 'benefit',
+          type: 'select',
+          label: 'Benefit',
+          required: true,
+          options: [
+            { label: 'Health Insurance', value: 'health_insurance' },
+            { label: 'Accommodation Provided', value: 'accommodation' },
+            { label: 'Transportation Provided', value: 'transportation' },
+            { label: 'Annual Leave', value: 'annual_leave' },
+            { label: 'End of Service Benefits', value: 'end_of_service' },
+            { label: 'Training & Development', value: 'training' },
+            { label: 'Performance Bonus', value: 'performance_bonus' },
+            { label: 'Overtime Pay', value: 'overtime_pay' },
+            { label: 'Meal Allowance', value: 'meal_allowance' },
+            { label: 'Other', value: 'other' },
+          ],
+        },
+        {
+          name: 'otherBenefit',
+          type: 'text',
+          label: 'Other Benefit (if Other selected)',
+          admin: {
+            condition: (data: any) => data.benefit === 'other',
+          },
+        },
+      ],
+    },
     // Terms acceptance
     {
       name: 'termsAccepted',
@@ -306,7 +456,7 @@ export const Candidates: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [setBillingClassAndGenerateEmbedding],
-    afterChange: [revalidateCandidate],
+    afterChange: [updateBioEmbeddingVector, revalidateCandidate],
     afterDelete: [revalidateCandidateDelete],
   },
 }
