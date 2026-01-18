@@ -137,8 +137,8 @@
       "title": "Explore thousands of openings and",
       "titleHighlight": "talented",
       "titleEnd": "profiles all in one place.",
-      "subtitle": "Access a wide pool of qualified candidates across all roles and industries. Easily find profiles that match the skills and qualities your company is looking for.",
-      "forEmployer": "For Employer",
+      "subtitle": "Access a wide pool of qualified candidates across all roles and industries.",
+      "forEmployer": "For Employers",
       "forCandidates": "For Candidates",
       "searchPlaceholder": "Smart Search",
       "verifiedLogo": "Verified or Authorized Logo Government"
@@ -146,13 +146,13 @@
     "candidates": {
       "title": "Candidates",
       "subtitle": "Search over 30,475 skilled candidates ready to work.",
-      "findMore": "Find More Candidates",
+      "findMore": "Find more candidates",
       "experience": "Experience",
       "nationality": "Nationality",
       "location": "Location"
     },
     "majorDisciplines": {
-      "title": "Explore Jobs by Major Discipline",
+      "title": "Explore job by Major Discipline",
       "subtitle": "Our platform connects you with top employers across various industries"
     },
     "uploadResume": {
@@ -203,12 +203,12 @@
       "title": "Subscribe to our Newsletter",
       "emailLabel": "Email*",
       "emailPlaceholder": "Enter your email",
-      "privacyText": "We care about your data. Read our",
+      "privacyText": "We care about your data, read our privacy policy.",
       "privacyPolicy": "privacy policy",
-      "privacyTextEnd": "."
+      "privacyTextEnd": ""
     },
     "footer": {
-      "stayConnected": "Stay connected",
+      "stayConnected": "Stay Connected",
       "quicklinks": "Quicklinks",
       "policies": "Policies",
       "contactDetails": "Contact Details",
@@ -218,18 +218,18 @@
       "open": "Open",
       "addressValue": "Jeddah, Saudi Arabia",
       "emailValue": "hello@readytowork.sa",
-      "phoneValue": "5 - 918 - 6338",
-      "hoursValue": "Sun - Thur / 9:00 AM - 6:00 PM",
+      "phoneValue": "5-918-6338",
+      "hoursValue": "Sun – Thur / 9:00 AM – 6:00 PM",
       "copyright": "Copyright 2025 ©Readytowork. All rights reserved.",
       "designedBy": "Designed and Developed by",
       "links": {
         "aboutUs": "About Us",
-        "companyInformation": "Company information",
-        "codeOfConduct": "Code of conduct",
-        "investorRelations": "Investor relations",
+        "companyInformation": "Company Information",
+        "codeOfConduct": "Code of Conduct",
+        "investorRelations": "Investor Relations",
         "siteMap": "Site map",
         "policies": "Policies",
-        "termsAndCondition": "Terms and condition",
+        "termsAndCondition": "Terms and Condition",
         "legal": "Legal",
         "disclaimer": "Disclaimer",
         "privacyAndPolicy": "Privacy and policy"
@@ -304,16 +304,16 @@
     "contact": {
       "label": "Contact us",
       "title": "Need help? Contact us, and we'll respond soon.",
-      "description": "Reach out to us for any questions, support, or collaboration opportunities — we're always happy to assist!",
+      "description": "Reach out to us for any questions, support, or collaboration opportunities, we're always happy to assist!",
       "phone": "+84 982 900 108",
       "email": "info@readytowork.sa",
       "form": {
-        "name": "Your Name*",
+        "name": "Your Name",
         "email": "Email*",
-        "phone": "Phone*",
-        "title": "Your Title*",
-        "message": "Message*",
-        "send": "SEND"
+        "phone": "Phone",
+        "title": "Your Title",
+        "message": "Message",
+        "send": "Send"
       }
     }
   }

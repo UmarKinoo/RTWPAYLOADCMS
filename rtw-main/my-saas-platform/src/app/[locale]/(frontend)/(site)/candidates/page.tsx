@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Link } from '@/i18n/routing'
 import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
-import { CandidatesHero, CandidatesFilter, FindCandidates } from '@/components/candidates'
+import { CandidatesHero, CandidatesFilter, FindCandidates, CandidateSearchBar } from '@/components/candidates'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
@@ -125,10 +125,10 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
   let totalPages = 1
 
   if (!isSearchMode) {
-    // Regular listing with filters
+    // Regular listing with filters - show all candidates
     const result = await getCandidates({
-      limit: 20,
-      page,
+      limit: 1000, // Show all candidates (increased from 20)
+      page: 1, // Always show page 1 when displaying all
       disciplineSlug,
       location,
       nationality,
@@ -146,16 +146,22 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
     })
     candidates = result.candidates
     totalDocs = result.totalDocs
-    totalPages = result.totalPages
+    totalPages = 1 // Single page showing all
   }
 
-  const startIndex = (page - 1) * 20 + 1
-  const endIndex = Math.min(page * 20, totalDocs)
+  // Show all candidates, so pagination info reflects total count
+  const startIndex = 1
+  const endIndex = totalDocs
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <HomepageNavbarWrapper />
       <CandidatesHero />
+
+      {/* Candidate Search Bar - Heart of candidate search */}
+      <HomepageSection className="py-8 sm:py-10 md:py-12 bg-gradient-to-b from-white to-gray-50/30">
+        <CandidateSearchBar initialValue={searchQuery || ''} />
+      </HomepageSection>
 
       {/* Main Content: Filter Sidebar + Grid */}
       <HomepageSection className="py-6 sm:py-8 md:py-10 lg:py-12">

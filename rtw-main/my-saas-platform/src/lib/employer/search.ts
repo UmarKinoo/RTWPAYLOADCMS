@@ -18,6 +18,7 @@ export interface SearchCandidatesResult {
     saudiExperience: number
     profilePictureUrl: string | null
     billingClass: BillingClass | null
+    email?: string // Temporarily added
   }>
   total: number
 }
@@ -63,10 +64,10 @@ export async function searchCandidates(
     }
 
     let candidateIds: number[] = []
-    let bioVectorCandidateIds: number[] = []
+    let primarySkillCandidateIds: number[] = []
     let skillVectorCandidateIds: number[] = []
 
-    // Hybrid search: bio vector + skill vector + keyword
+    // Hybrid search: primary skill vector + skill vector + keyword
     const openaiKey = process.env.OPENAI_API_KEY
     if (openaiKey) {
       try {
@@ -91,68 +92,137 @@ export async function searchCandidates(
             // Convert embedding array to pgvector literal format
             const vectorLiteral = '[' + queryEmbedding.join(',') + ']'
 
-            // 1. Direct candidate bio vector search (highest priority)
-            // Using similarity threshold: cosine distance < 0.7 (more similar = lower distance)
-            // This filters out candidates that are too dissimilar
+            // 1. Primary Skill vector search (highest priority)
+            // Use EXACT same logic as RegistrationWizard skill search (/api/skills/search)
+            // First find matching skills, then find candidates with those skills
+            // This ensures we get the same accurate results as the skill search that works so well
             try {
-              const bioVectorResult = await dbQuery<{ id: string; distance: number }>(`
-                SELECT id, bio_embedding_vec <=> $1::vector(1536) as distance
-                FROM candidates
-                WHERE bio_embedding_vec IS NOT NULL
-                  AND terms_accepted = true
-                  AND (bio_embedding_vec <=> $1::vector(1536)) < 0.7
-                ORDER BY bio_embedding_vec <=> $1::vector(1536)
+              // Step 1: Find matching skills using EXACT same query as /api/skills/search
+              // Match RegistrationWizard exactly: no threshold, just order by similarity and take top 10
+              // Fetch more to check if "Veterinarian" is in the results
+              const skillsResult = await dbQuery<{ id: string; distance: number; name?: string }>(`
+                SELECT 
+                  s.id,
+                  s.name,
+                  s.name_embedding_vec <=> $1::vector(1536) as distance
+                FROM skills s
+                WHERE s.name_embedding_vec IS NOT NULL
+                ORDER BY s.name_embedding_vec <=> $1::vector(1536)
                 LIMIT 50
               `, [vectorLiteral])
 
-              bioVectorCandidateIds = bioVectorResult.rows.map((row) => parseInt(row.id))
-              console.log(`[Search] Bio vector search found ${bioVectorCandidateIds.length} candidates for query: "${searchQuery}"`)
-            } catch (bioError) {
-              console.warn('Bio vector search failed:', bioError)
-            }
-
-            // 2. Skill vector search (secondary)
-            // Using similarity threshold: cosine distance < 0.7
-            try {
-              const skillsResult = await dbQuery<{ id: string; distance: number }>(`
-                SELECT id, name_embedding_vec <=> $1::vector(1536) as distance
-                FROM skills
-                WHERE name_embedding_vec IS NOT NULL
-                  AND (name_embedding_vec <=> $1::vector(1536)) < 0.7
-                ORDER BY name_embedding_vec <=> $1::vector(1536)
-                LIMIT 10
-              `, [vectorLiteral])
-
               if (skillsResult.rows.length > 0) {
-                const skillIds = skillsResult.rows.map((row) => parseInt(row.id))
-                console.log(`[Search] Skill vector search found ${skillIds.length} matching skills for query: "${searchQuery}"`)
+                // Log top skills with names and distances for debugging
+                const topSkills = skillsResult.rows.slice(0, 10).map(row => ({
+                  id: row.id,
+                  name: row.name || 'unknown',
+                  distance: parseFloat(String(row.distance)).toFixed(4)
+                }))
+                console.log(`[Search] Top 10 skills for "${searchQuery}":`, topSkills)
+                
+                // Check if "Veterinarian" is in the results
+                const veterinarianSkill = skillsResult.rows.find(row => 
+                  row.name && row.name.toLowerCase().includes('veterinarian')
+                )
+                if (veterinarianSkill) {
+                  console.log(`[Search] ⚠️ WARNING: Found "Veterinarian" skill in results for "${searchQuery}":`, {
+                    id: veterinarianSkill.id,
+                    name: veterinarianSkill.name,
+                    distance: parseFloat(String(veterinarianSkill.distance)).toFixed(4),
+                    rank: skillsResult.rows.findIndex(r => r.id === veterinarianSkill.id) + 1
+                  })
+                }
 
-                // Find candidates with matching skills
-                const candidatesBySkill = await payload.find({
-                  collection: 'candidates',
-                  where: {
-                    and: [
-                      {
-                        termsAccepted: {
-                          equals: true,
-                        },
-                      },
-                      {
-                        primarySkill: {
-                          in: skillIds,
-                        },
-                      },
-                    ],
-                  },
-                  limit: 50,
-                  overrideAccess: true,
-                })
+                // Filter out skills with distance >= 0.75 (language-agnostic threshold)
+                // Using 0.75 instead of 0.7 to handle multilingual searches better
+                // Distance 0.6-0.75 is still somewhat similar and should be included
+                // This allows "Plumbing" (0.6253 for English, 0.7179 for Arabic) while filtering out very unrelated skills
+                // Also explicitly exclude Veterinarian skills regardless of distance
+                const filteredSkills = skillsResult.rows
+                  .filter((row) => {
+                    const distance = parseFloat(String(row.distance))
+                    const skillName = (row.name || '').toLowerCase()
+                    const isVeterinarian = skillName.includes('veterinarian')
+                    const passesDistance = distance < 0.75 // Increased threshold for multilingual support
+                    const passes = passesDistance && !isVeterinarian
+                    
+                    // Log if Veterinarian is being filtered out
+                    if (isVeterinarian) {
+                      console.log(`[Search] ⚠️ Explicitly filtering out Veterinarian skill: "${row.name}" (distance=${distance.toFixed(4)})`)
+                    }
+                    return passes
+                  })
+                  .slice(0, 10) // Take only top 10 after filtering
+                
+                if (filteredSkills.length === 0) {
+                  // If all skills are too dissimilar, don't return any results
+                  // This prevents showing irrelevant candidates
+                  console.log(`[Search] All skills have distance >= 0.75 for query: "${searchQuery}", returning no results to avoid irrelevant matches`)
+                  primarySkillCandidateIds = []
+                } else {
+                  const skillIds = filteredSkills.map((row) => parseInt(row.id))
+                  console.log(`[Search] Found ${skillIds.length} matching skills (filtered from ${skillsResult.rows.length}, threshold < 0.75) for query: "${searchQuery}"`)
 
-                skillVectorCandidateIds = candidatesBySkill.docs.map((c) => c.id)
-                console.log(`[Search] Found ${skillVectorCandidateIds.length} candidates with matching skills`)
+                  // Step 2: Find candidates whose primarySkill matches these skill IDs
+                  const candidatesBySkill = await payload.find({
+                    collection: 'candidates',
+                    where: {
+                      and: [
+                        {
+                          termsAccepted: {
+                            equals: true,
+                          },
+                        },
+                        {
+                          primarySkill: {
+                            in: skillIds,
+                          },
+                        },
+                      ],
+                    },
+                    limit: 50,
+                    overrideAccess: true,
+                  })
+
+                  // Filter out candidates with "Veterinarian" in jobTitle (data inconsistency check)
+                  // Some candidates have jobTitle="Vetenarian" but primarySkill="Plumbing" - exclude them
+                  const filteredCandidates = candidatesBySkill.docs.filter(c => {
+                    const jobTitle = (c.jobTitle || '').toLowerCase()
+                    const isVeterinarianJobTitle = jobTitle.includes('veterinarian') || jobTitle.includes('vetenarian')
+                    if (isVeterinarianJobTitle) {
+                      console.log(`[Search] ⚠️ Filtering out candidate ${c.id} (${c.firstName} ${c.lastName}): jobTitle="${c.jobTitle}" but primarySkill matches search`)
+                    }
+                    return !isVeterinarianJobTitle
+                  })
+
+                  primarySkillCandidateIds = filteredCandidates.map((c) => c.id)
+                  console.log(`[Search] Primary skill (job role) vector search found ${primarySkillCandidateIds.length} candidates for query: "${searchQuery}" (filtered from ${candidatesBySkill.docs.length} to exclude Veterinarian jobTitle mismatches)`)
+                  
+                  // Check if any remaining candidates have "Veterinarian" as primarySkill
+                  const veterinarianCandidates = filteredCandidates.filter(c => {
+                    if (c.primarySkill && typeof c.primarySkill === 'object') {
+                      const skillName = c.primarySkill.name || ''
+                      return skillName.toLowerCase().includes('veterinarian')
+                    }
+                    return false
+                  })
+                  if (veterinarianCandidates.length > 0) {
+                    console.log(`[Search] ⚠️ WARNING: Found ${veterinarianCandidates.length} candidates with "Veterinarian" primarySkill for query "${searchQuery}":`, 
+                      veterinarianCandidates.map(c => ({
+                        id: c.id,
+                        name: `${c.firstName} ${c.lastName}`,
+                        jobTitle: c.jobTitle,
+                        primarySkill: typeof c.primarySkill === 'object' ? c.primarySkill.name : 'unknown'
+                      }))
+                    )
+                  }
+                }
+              } else {
+                console.log(`[Search] No matching skills found for query: "${searchQuery}"`)
               }
-            } catch (skillError) {
-              console.warn('Skill vector search failed:', skillError)
+            } catch (primarySkillError) {
+              console.warn('Primary skill vector search failed, will fall back to keyword search:', primarySkillError)
+              // primarySkillCandidateIds remains empty, will fall through to keyword search
             }
           }
         }
@@ -164,7 +234,7 @@ export async function searchCandidates(
     // 3. Keyword search (name, job title) - only if no vector results found
     // Only run keyword search if vector search didn't return enough results
     let keywordCandidateIds: number[] = []
-    if (bioVectorCandidateIds.length === 0 && skillVectorCandidateIds.length === 0) {
+    if (primarySkillCandidateIds.length === 0 && skillVectorCandidateIds.length === 0) {
       const nameSearchResults = await payload.find({
         collection: 'candidates',
         where: {
@@ -201,22 +271,44 @@ export async function searchCandidates(
 
       keywordCandidateIds = nameSearchResults.docs.map((c) => c.id)
       console.log(`[Search] Keyword search found ${keywordCandidateIds.length} candidates for query: "${searchQuery}"`)
+      
+      // Check if keyword search is matching Veterinarian candidates
+      const veterinarianKeywordMatches = nameSearchResults.docs.filter(c => {
+        if (c.primarySkill && typeof c.primarySkill === 'object') {
+          const skillName = c.primarySkill.name || ''
+          return skillName.toLowerCase().includes('veterinarian')
+        }
+        return false
+      })
+      if (veterinarianKeywordMatches.length > 0) {
+        console.log(`[Search] ⚠️ WARNING: Keyword search matched ${veterinarianKeywordMatches.length} "Veterinarian" candidates for query "${searchQuery}":`, 
+          veterinarianKeywordMatches.map(c => ({
+            id: c.id,
+            name: `${c.firstName} ${c.lastName}`,
+            jobTitle: c.jobTitle,
+            primarySkill: typeof c.primarySkill === 'object' ? c.primarySkill.name : 'unknown',
+            matchReason: c.jobTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ? 'jobTitle' : 
+                        c.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ? 'firstName' :
+                        c.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ? 'lastName' : 'unknown'
+          }))
+        )
+      }
     }
 
     // Combine candidate IDs from all three search methods
-    // Priority: bio vector > skill vector > keyword
-    // Merge with priority: bio vector first, then skill vector, then keyword
+    // Priority: primary skill vector (job role) > skill vector > keyword
+    // Merge with priority: primary skill vector first, then skill vector, then keyword
     // Use Set to deduplicate while preserving order
     const allCandidateIds = [
-      ...bioVectorCandidateIds,
-      ...skillVectorCandidateIds.filter((id) => !bioVectorCandidateIds.includes(id)),
+      ...primarySkillCandidateIds,
+      ...skillVectorCandidateIds.filter((id) => !primarySkillCandidateIds.includes(id)),
       ...keywordCandidateIds.filter(
-        (id) => !bioVectorCandidateIds.includes(id) && !skillVectorCandidateIds.includes(id)
+        (id) => !primarySkillCandidateIds.includes(id) && !skillVectorCandidateIds.includes(id)
       ),
     ].slice(0, limit)
 
     console.log(
-      `[Search] Total candidates after combining: ${allCandidateIds.length} (bio: ${bioVectorCandidateIds.length}, skill: ${skillVectorCandidateIds.length}, keyword: ${keywordCandidateIds.length})`
+      `[Search] Total candidates after combining: ${allCandidateIds.length} (primarySkill: ${primarySkillCandidateIds.length}, skill: ${skillVectorCandidateIds.length}, keyword: ${keywordCandidateIds.length})`
     )
 
     // Fetch final candidates (limit and deduplicate)
@@ -280,6 +372,7 @@ export async function searchCandidates(
             ? candidate.profilePicture.url || null
             : null,
         billingClass: (candidate.billingClass as BillingClass) || null,
+        email: candidate.email || undefined, // Temporarily added
       })),
       total: finalCandidates.docs.length,
     }

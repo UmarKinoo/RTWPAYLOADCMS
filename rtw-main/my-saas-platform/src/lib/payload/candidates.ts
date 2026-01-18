@@ -19,6 +19,7 @@ export interface CandidateListItem {
   saudiExperience: number
   profilePictureUrl: string | null
   billingClass: BillingClass | null
+  email?: string // Temporarily added
 }
 
 export interface CandidateDetail extends CandidateListItem {
@@ -65,6 +66,7 @@ function toListItem(doc: Candidate): CandidateListItem {
     saudiExperience: doc.saudiExperience,
     profilePictureUrl: getMediaUrl(doc.profilePicture),
     billingClass: (doc.billingClass as BillingClass) || null,
+    email: doc.email || undefined, // Temporarily added
   }
 }
 
@@ -148,9 +150,10 @@ async function fetchCandidates(options?: {
     },
   }
 
-  // Apply location filter (country or state)
-  if (country || state || location) {
-    const locationFilter = country || state || location
+  // Apply location filter (city/state)
+  // Note: location field stores city names like "Riyadh", "Jeddah", "PORT LOUIS"
+  if (state || location) {
+    const locationFilter = state || location
     if (locationFilter) {
       where.location = {
         contains: locationFilter,
@@ -158,8 +161,17 @@ async function fetchCandidates(options?: {
     }
   }
 
-  // Apply nationality filter
-  if (nationality) {
+  // Apply country filter - country should filter by nationality field
+  // Based on filter-options.ts, countries come from nationalities
+  if (country) {
+    where.nationality = {
+      contains: country,
+    }
+  }
+
+  // Apply nationality filter (if explicitly provided, separate from country)
+  if (nationality && !country) {
+    // Only apply if country wasn't already set (country and nationality are the same field)
     where.nationality = {
       contains: nationality,
     }

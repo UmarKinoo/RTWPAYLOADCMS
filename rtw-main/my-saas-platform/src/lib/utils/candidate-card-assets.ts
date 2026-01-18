@@ -38,7 +38,7 @@ const CLASS_ASSETS: Record<BillingClass, CandidateCardAssets> = {
     vector: '/assets/e401c4eec7023e8a29b21b2d8a54041988683440.svg', // Teal vector border
     layer1: '/assets/a7a6577a6e8f7ac7c9f5b2f297869418ec6c25a8.svg', // White background layer
     layer2: '/assets/49b478431404bfb040bba8822a1d4dbc70893a88.svg', // Teal decorative layer
-    layer3: '/assets/b56bcc91ec04d089e0e1b52e21e87c72d7d5b09d.svg', // Teal decorative layer (alternative)
+    layer3: '/assets/49b478431404bfb040bba8822a1d4dbc70893a88.svg', // Teal decorative layer (reuse layer2 pattern like Class C)
     profileMask: '/assets/e223af9be935490b430d9d6b758a27ceb15c14ec.svg', // Same for all classes
   },
   C: {

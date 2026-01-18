@@ -57,11 +57,17 @@ export const Newsletter: React.FC = () => {
 
               {/* Privacy Text */}
               <p className="text-[10px] sm:text-xs font-normal font-inter text-black/70 uppercase">
-                {t('privacyText')}{' '}
-                <a href="#privacy" className="underline hover:text-black">
-                  {t('privacyPolicy')}
-                </a>
-                {t('privacyTextEnd')}
+                {t('privacyTextEnd') ? (
+                  <>
+                    {t('privacyText')}{' '}
+                    <a href="#privacy" className="underline hover:text-black">
+                      {t('privacyPolicy')}
+                    </a>
+                    {t('privacyTextEnd')}
+                  </>
+                ) : (
+                  t('privacyText')
+                )}
               </p>
             </div>
           </form>

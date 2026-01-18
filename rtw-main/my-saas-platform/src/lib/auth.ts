@@ -419,6 +419,7 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
     const resetExpires = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
     // Update user with reset token
+    // The hooks will skip embedding generation for password/auth-only updates
     await payload.update({
       collection,
       id: user.id,
@@ -555,6 +556,7 @@ export async function resetPassword(
     }
 
     // Update password and clear reset token
+    // The hooks will skip embedding generation for password/auth-only updates
     await payload.update({
       collection,
       id: user.id,

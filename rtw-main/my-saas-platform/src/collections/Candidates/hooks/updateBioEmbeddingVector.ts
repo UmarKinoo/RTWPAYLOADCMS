@@ -11,7 +11,29 @@ export const updateBioEmbeddingVector: CollectionAfterChangeHook<Candidate> = as
   doc,
   req,
   operation,
+  previousDoc,
 }) => {
+  // Skip vector update for password/auth-only updates to prevent timeouts
+  // If this is an update and only password/auth fields changed, skip
+  if (operation === 'update') {
+    // Check what fields were actually updated
+    const updateData = req.data
+    if (updateData) {
+      const updatedFields = Object.keys(updateData).filter(key => updateData[key] !== undefined)
+      const isPasswordOnlyUpdate = 
+        updatedFields.length > 0 &&
+        updatedFields.every(field => 
+          ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
+           'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified'].includes(field)
+        )
+      
+      if (isPasswordOnlyUpdate) {
+        // Skip vector update for password/auth-only changes to prevent timeouts
+        return doc
+      }
+    }
+  }
+
   // Only update if we have bio_embedding (JSONB) and the vector column might be NULL
   if (!doc.bio_embedding || !Array.isArray(doc.bio_embedding)) {
     return doc
