@@ -9,20 +9,24 @@ import {
 import { updateBioEmbeddingVector } from './Candidates/hooks/updateBioEmbeddingVector'
 
 // Hook to set billing class from primary skill and generate bio embedding
-const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({ data, req, operation }) => {
+const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
   // Skip embedding generation for password/auth-only updates to prevent timeouts
   // Check if this is a password/auth-only update (password, reset token, or hash/salt)
-  const dataKeys = Object.keys(data).filter(key => data[key] !== undefined)
-  const isPasswordOnlyUpdate = 
-    operation === 'update' &&
-    dataKeys.length > 0 &&
-    dataKeys.every(key => 
-      ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified'].includes(key)
-    )
+  if (operation === 'update') {
+    const dataKeys = Object.keys(data).filter(key => data[key] !== undefined)
+    const isPasswordOnlyUpdate = 
+      dataKeys.length > 0 &&
+      !('bio_embedding' in data) && // Make sure bio_embedding is not being updated
+      dataKeys.every(key => 
+        ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
+         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified'].includes(key)
+      )
 
-  if (isPasswordOnlyUpdate) {
-    // Only update password/auth fields, skip embedding generation
-    return data
+    if (isPasswordOnlyUpdate) {
+      // Only update password/auth fields, skip embedding generation
+      req.payload.logger.info(`Skipping bio embedding generation for candidate ${originalDoc?.id || 'unknown'} (auth-only update)`)
+      return data
+    }
   }
 
   // Set billing class from primary skill

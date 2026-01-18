@@ -14,21 +14,34 @@ export const updateBioEmbeddingVector: CollectionAfterChangeHook<Candidate> = as
   previousDoc,
 }) => {
   // Skip vector update for password/auth-only updates to prevent timeouts
-  // If this is an update and only password/auth fields changed, skip
   if (operation === 'update') {
-    // Check what fields were actually updated
-    const updateData = req.data
+    // Early return: Check if this is an auth-only update
+    const updateData = req.data as Record<string, any> | undefined
     if (updateData) {
       const updatedFields = Object.keys(updateData).filter(key => updateData[key] !== undefined)
-      const isPasswordOnlyUpdate = 
-        updatedFields.length > 0 &&
-        updatedFields.every(field => 
-          ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
-           'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified'].includes(field)
-        )
       
-      if (isPasswordOnlyUpdate) {
+      // If bio_embedding was not in the update, and only auth fields were updated, skip immediately
+      const bioEmbeddingWasUpdated = 'bio_embedding' in updateData
+      const authFields = ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
+                          'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified']
+      
+      if (!bioEmbeddingWasUpdated && updatedFields.length > 0 && updatedFields.every(field => authFields.includes(field))) {
         // Skip vector update for password/auth-only changes to prevent timeouts
+        req.payload.logger.info(`Skipping bio_embedding_vec update for candidate ${doc.id} (auth-only update: ${updatedFields.join(', ')})`)
+        return doc
+      }
+    }
+    
+    // Also check if bio_embedding was unchanged (compare with previousDoc)
+    // This is a safety check in case req.data doesn't contain all the info we need
+    if (previousDoc && doc.bio_embedding && previousDoc.bio_embedding) {
+      const currentBio = Array.isArray(doc.bio_embedding) ? doc.bio_embedding : []
+      const previousBio = Array.isArray(previousDoc.bio_embedding) ? previousDoc.bio_embedding : []
+      
+      // If bio_embedding arrays are the same, skip update
+      if (currentBio.length === previousBio.length && 
+          currentBio.every((val, idx) => val === previousBio[idx])) {
+        req.payload.logger.info(`Skipping bio_embedding_vec update for candidate ${doc.id} (bio_embedding unchanged)`)
         return doc
       }
     }
