@@ -26,6 +26,8 @@ import { Notifications } from '@/collections/Notifications'
 import { CandidateInteractions } from '@/collections/CandidateInteractions'
 import { JobPostings } from '@/collections/JobPostings'
 import { PhoneVerifications } from '@/collections/PhoneVerifications'
+import { NewsletterSubscriptions } from '@/collections/NewsletterSubscriptions'
+import { ContactSubmissions } from '@/collections/ContactSubmissions'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
 import { plugins } from '@/plugins'
@@ -100,6 +102,8 @@ export default buildConfig({
     CandidateInteractions,
     JobPostings,
     PhoneVerifications,
+    NewsletterSubscriptions,
+    ContactSubmissions,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   // Only set email adapter if API key is present and not empty
