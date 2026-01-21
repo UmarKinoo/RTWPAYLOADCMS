@@ -254,9 +254,10 @@ async function fetchCandidates(options?: {
 
   // Apply taxonomy filters (discipline, category, subCategory)
   // These filter through primarySkill relationship
+  // NOTE: If disciplineSlug is provided, skip taxonomy filters (disciplineSlug takes precedence)
   let skillIdsToFilter: number[] | null = null
 
-  if (discipline || category || subCategory) {
+  if ((discipline || category || subCategory) && !disciplineSlug) {
     try {
       let disciplineIds: number[] = []
       let categoryIds: number[] = []
