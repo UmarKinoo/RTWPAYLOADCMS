@@ -15,18 +15,36 @@ export function ForgotPasswordForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('[FORGOT_PASSWORD_FORM] Form submitted with email:', email)
     setIsLoading(true)
 
+    const startTime = Date.now()
     try {
-      const result = await forgotPassword(email)
+      console.log('[FORGOT_PASSWORD_FORM] Starting forgot password request...')
+      
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timeout')), 30000)
+      )
+      
+      const result = await Promise.race([
+        forgotPassword(email),
+        timeoutPromise,
+      ]) as Awaited<ReturnType<typeof forgotPassword>>
+
+      const duration = Date.now() - startTime
+      console.log('[FORGOT_PASSWORD_FORM] Request completed in', duration, 'ms')
+      console.log('[FORGOT_PASSWORD_FORM] Result:', { success: result.success, errorCode: result.errorCode })
 
       if (result.success) {
+        console.log('[FORGOT_PASSWORD_FORM] ✅ Success - showing success message')
         setIsSuccess(true)
         toast.success('Email Sent!', {
           description:
             "If an account with that email exists, we've sent you a password reset link.",
         })
       } else {
+        console.log('[FORGOT_PASSWORD_FORM] ❌ Failed with error code:', result.errorCode)
         switch (result.errorCode) {
           case 'INVALID_EMAIL':
             toast.error('Invalid Email', {
@@ -39,11 +57,22 @@ export function ForgotPasswordForm() {
             })
         }
       }
-    } catch (_error) {
+    } catch (error) {
+      const duration = Date.now() - startTime
+      console.error('[FORGOT_PASSWORD_FORM] ❌ Error caught after', duration, 'ms:', error)
+      console.error('[FORGOT_PASSWORD_FORM] Error type:', error instanceof Error ? error.constructor.name : typeof error)
+      console.error('[FORGOT_PASSWORD_FORM] Error message:', error instanceof Error ? error.message : String(error))
+      if (error instanceof Error && error.stack) {
+        console.error('[FORGOT_PASSWORD_FORM] Error stack:', error.stack)
+      }
+      
       toast.error('Request Failed', {
-        description: 'Something went wrong. Please try again.',
+        description: error instanceof Error && error.message === 'Request timeout'
+          ? 'The request took too long. Please try again.'
+          : 'Something went wrong. Please try again.',
       })
     } finally {
+      console.log('[FORGOT_PASSWORD_FORM] Setting loading to false')
       setIsLoading(false)
     }
   }

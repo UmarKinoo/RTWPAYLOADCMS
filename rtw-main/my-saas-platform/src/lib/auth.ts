@@ -336,14 +336,20 @@ export async function registerUser({ email, password }: RegisterParams): Promise
  * @returns Response indicating success or failure
  */
 export async function forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+  console.log('[FORGOT_PASSWORD] Starting forgot password flow for email:', email)
+  
   // Validate email
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
+    console.log('[FORGOT_PASSWORD] Email validation failed:', emailValidation.error)
     return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
+  console.log('[FORGOT_PASSWORD] Email validation passed')
 
   try {
+    console.log('[FORGOT_PASSWORD] Initializing Payload...')
     const payload = await getPayload({ config: await configPromise })
+    console.log('[FORGOT_PASSWORD] Payload initialized successfully')
 
     // Try to find user in all collections (users, candidates, employers)
     let user: User | Candidate | Employer | null = null
@@ -351,6 +357,7 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
     let userType: 'candidate' | 'employer' = 'candidate'
 
     // Try employers first
+    console.log('[FORGOT_PASSWORD] Searching in employers collection...')
     try {
       const employers = await payload.find({
         collection: 'employers',
@@ -359,17 +366,21 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
         },
         limit: 1,
       })
+      console.log('[FORGOT_PASSWORD] Employers search result:', { found: employers.docs.length > 0, count: employers.docs.length })
       if (employers.docs.length > 0) {
         user = employers.docs[0]
         collection = 'employers'
         userType = 'employer'
+        console.log('[FORGOT_PASSWORD] User found in employers collection, ID:', user.id)
       }
-    } catch {
+    } catch (employerError) {
+      console.error('[FORGOT_PASSWORD] Error searching employers:', employerError instanceof Error ? employerError.message : String(employerError))
       // Not found in employers
     }
 
     // Try candidates
     if (!user) {
+      console.log('[FORGOT_PASSWORD] Searching in candidates collection...')
       try {
         const candidates = await payload.find({
           collection: 'candidates',
@@ -378,18 +389,22 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
           },
           limit: 1,
         })
+        console.log('[FORGOT_PASSWORD] Candidates search result:', { found: candidates.docs.length > 0, count: candidates.docs.length })
         if (candidates.docs.length > 0) {
           user = candidates.docs[0]
           collection = 'candidates'
           userType = 'candidate'
+          console.log('[FORGOT_PASSWORD] User found in candidates collection, ID:', user.id)
         }
-      } catch {
+      } catch (candidateError) {
+        console.error('[FORGOT_PASSWORD] Error searching candidates:', candidateError instanceof Error ? candidateError.message : String(candidateError))
         // Not found in candidates
       }
     }
 
     // Try users
     if (!user) {
+      console.log('[FORGOT_PASSWORD] Searching in users collection...')
       try {
         const users = await payload.find({
           collection: 'users',
@@ -398,12 +413,15 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
           },
           limit: 1,
         })
+        console.log('[FORGOT_PASSWORD] Users search result:', { found: users.docs.length > 0, count: users.docs.length })
         if (users.docs.length > 0) {
           user = users.docs[0]
           collection = 'users'
           userType = 'candidate'
+          console.log('[FORGOT_PASSWORD] User found in users collection, ID:', user.id)
         }
-      } catch {
+      } catch (userError) {
+        console.error('[FORGOT_PASSWORD] Error searching users:', userError instanceof Error ? userError.message : String(userError))
         // Not found in users
       }
     }
@@ -411,44 +429,91 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
     // Always return success to prevent email enumeration attacks
     // Even if user doesn't exist, we say we sent an email
     if (!user) {
+      console.log('[FORGOT_PASSWORD] User not found in any collection, returning success (security: prevent email enumeration)')
       return { success: true }
     }
+
+    console.log('[FORGOT_PASSWORD] User found:', { collection, id: user.id, userType })
 
     // Generate reset token
     const resetToken = randomBytes(32).toString('hex')
     const resetExpires = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+    console.log('[FORGOT_PASSWORD] Generated reset token, expires at:', resetExpires.toISOString())
 
     // Update user with reset token
     // The hooks will skip embedding generation for password/auth-only updates
-    await payload.update({
-      collection,
-      id: user.id,
-      data: {
-        passwordResetToken: resetToken,
-        passwordResetExpires: resetExpires.toISOString(),
-      },
-    })
+    // Use overrideAccess to bypass access checks and document locking
+    // Set context to skip vector updates
+    console.log('[FORGOT_PASSWORD] Attempting to update user with reset token...')
+    try {
+      const updateStartTime = Date.now()
+      await payload.update({
+        collection,
+        id: user.id,
+        data: {
+          passwordResetToken: resetToken,
+          passwordResetExpires: resetExpires.toISOString(),
+        },
+        overrideAccess: true, // Bypass access checks and document locking
+        context: {
+          skipVectorUpdate: true, // Flag to skip vector updates in hooks
+        },
+      })
+      const updateDuration = Date.now() - updateStartTime
+      console.log('[FORGOT_PASSWORD] ✅ User updated successfully in', updateDuration, 'ms')
+    } catch (updateError) {
+      // Log the specific error for debugging
+      const errorMessage = updateError instanceof Error ? updateError.message : String(updateError)
+      const errorStack = updateError instanceof Error ? updateError.stack : undefined
+      console.error('[FORGOT_PASSWORD] ❌ Failed to update password reset token:')
+      console.error('[FORGOT_PASSWORD] Error message:', errorMessage)
+      if (errorStack) {
+        console.error('[FORGOT_PASSWORD] Error stack:', errorStack)
+      }
+      if (updateError instanceof Error && 'code' in updateError) {
+        console.error('[FORGOT_PASSWORD] Error code:', (updateError as any).code)
+      }
+      
+      // If update fails, still return success to prevent email enumeration
+      // The user won't be able to reset, but we don't reveal that the email exists
+      console.log('[FORGOT_PASSWORD] Returning success despite update failure (security: prevent email enumeration)')
+      return { success: true }
+    }
 
     // Send reset email with appropriate user type
+    console.log('[FORGOT_PASSWORD] Sending password reset email...')
+    const emailStartTime = Date.now()
     const emailResult = await sendEmail({
       to: email,
       subject: 'Reset your password - Ready to Work',
       html: passwordResetEmailTemplate(email, resetToken, userType),
     })
+    const emailDuration = Date.now() - emailStartTime
+    console.log('[FORGOT_PASSWORD] Email send result:', { success: emailResult.success, duration: emailDuration + 'ms' })
 
     // Check if email was sent successfully
     if (!emailResult.success) {
-      console.error('Failed to send password reset email:', emailResult.error)
+      console.error('[FORGOT_PASSWORD] ❌ Failed to send password reset email:', emailResult.error)
       // Still return success to prevent email enumeration, but log the error
       // In production, you might want to handle this differently
+      console.log('[FORGOT_PASSWORD] Returning success despite email failure (security: prevent email enumeration)')
       return { success: true }
     }
 
+    console.log('[FORGOT_PASSWORD] ✅ Password reset flow completed successfully')
     return { success: true }
   } catch (error) {
     // SECURITY: Never log passwords or sensitive data
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Forgot password error:', errorMessage)
+    const errorStack = error instanceof Error ? error.stack : undefined
+    console.error('[FORGOT_PASSWORD] ❌ Fatal error in forgot password flow:')
+    console.error('[FORGOT_PASSWORD] Error message:', errorMessage)
+    if (errorStack) {
+      console.error('[FORGOT_PASSWORD] Error stack:', errorStack)
+    }
+    if (error instanceof Error && 'code' in error) {
+      console.error('[FORGOT_PASSWORD] Error code:', (error as any).code)
+    }
     return {
       success: false,
       error: 'We encountered an error. Please try again later.',
