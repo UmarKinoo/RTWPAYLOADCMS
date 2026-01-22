@@ -341,7 +341,7 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordRespo
   // Validate email
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
-    console.log('[FORGOT_PASSWORD] Email validation failed:', emailValidation.error)
+    console.log('[FORGOT_PASSWORD] Email validation failed:', emailValidation.errorKey || 'Invalid email')
     return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
   console.log('[FORGOT_PASSWORD] Email validation passed')
