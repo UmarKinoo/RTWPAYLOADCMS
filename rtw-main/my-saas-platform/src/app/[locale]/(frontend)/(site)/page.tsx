@@ -20,6 +20,7 @@ export default async function Home() {
     <div className="min-h-screen bg-[#ffffff] overflow-x-hidden">
       <HomepageNavbarWrapper />
       <Hero />
+      <TrustedBy />
       <Candidates />
       <MajorDisciplines />
       <UploadResume />

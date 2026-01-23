@@ -30,6 +30,20 @@ export const metadata: Metadata = {
   title: 'Ready to Work',
   description: 'Connect with talented candidates and find the right talent for your team. Ready to Work - Your trusted partner for hiring.',
   metadataBase: new URL(getServerSideURL()),
+  icons: {
+    icon: [
+      { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '16x16', type: 'image/png' },
+      { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '32x32', type: 'image/png' },
+      { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '48x48', type: 'image/png' },
+      { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '96x96', type: 'image/png' },
+      { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '192x192', type: 'image/png' },
+      { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: '/assets/RTW-Logo-VF-Icon-01.png',
+    apple: [
+      { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',

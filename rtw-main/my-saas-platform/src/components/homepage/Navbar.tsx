@@ -120,7 +120,7 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
                       'text-sm sm:text-base lg:text-lg font-bold whitespace-nowrap'
                     )}
                   >
-                    Get Started
+                    {t('getStarted')}
                   </Button>
 
                   {/* Mobile Menu Button */}

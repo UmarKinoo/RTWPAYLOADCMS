@@ -3,19 +3,34 @@ import { HomepageSection } from '../HomepageSection'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 
-// Complete logo images
-const imgAirbnb = '/assets/c590fb13c93f778ca78535868125737d83f0af01.svg'
-const imgFivetran = '/assets/d4b5bd24d268329bf2ed3f5b08d3c397eb248846.svg'
-const imgFramer = '/assets/c68f7d3dd27aa8351555d8cd14a736fbf710af10.svg'
+// Government logos from Hero component
+const logoMediaAuthority = '/assets/شعار الهيئة العامة لتنظيم الإعلام بدقة عالية png – svg.svg'
+const logoVision2030 = '/assets/شعار رؤية المملكة 2030 – Saudi vision 2030 Logo SVG.svg'
+const logoSaudiBusinessCenter = '/assets/شعار المركز السعودي للأعمال – Saudi Business Center Logo – PNG – SVG.svg'
+const logoCommerceMinistry = '/assets/شعار وزارة التجارة SVG.svg'
 
-// Company data with proper sizing
+// Government organizations data with balanced sizing
 const companies = [
-  { name: 'Airbnb', logo: imgAirbnb },
-  { name: 'Fivetran', logo: imgFivetran },
-  { name: 'Framer', logo: imgFramer },
-  { name: 'Airbnb', logo: imgAirbnb },
-  { name: 'Fivetran', logo: imgFivetran },
-  { name: 'Framer', logo: imgFramer },
+  { 
+    name: 'الهيئة العامة لتنظيم الإعلام', 
+    nameEn: 'General Authority for Media Regulation',
+    logo: logoMediaAuthority 
+  },
+  { 
+    name: 'رؤية المملكة 2030', 
+    nameEn: 'Saudi Vision 2030',
+    logo: logoVision2030 
+  },
+  { 
+    name: 'المركز السعودي للأعمال', 
+    nameEn: 'Saudi Business Center',
+    logo: logoSaudiBusinessCenter 
+  },
+  { 
+    name: 'وزارة التجارة', 
+    nameEn: 'Ministry of Commerce',
+    logo: logoCommerceMinistry 
+  },
 ]
 
 export const TrustedBy: React.FC = async () => {
@@ -36,14 +51,16 @@ export const TrustedBy: React.FC = async () => {
           {companies.map((company, index) => (
             <div
               key={index}
-              className="bg-gray-100 hover:bg-gray-200 transition-colors rounded-full px-5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-center"
+              className="bg-white hover:bg-gray-50 transition-colors rounded-lg px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-center shadow-sm border border-gray-100"
+              style={{ minWidth: '140px', maxWidth: '180px' }}
             >
               <Image
                 src={company.logo}
-                alt={`${company.name} logo`}
-                width={100}
-                height={32}
-                className="h-5 sm:h-6 md:h-8 w-auto grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100"
+                alt={company.nameEn || company.name}
+                width={140}
+                height={60}
+                className="h-12 sm:h-14 md:h-16 w-auto opacity-90 hover:opacity-100 transition-opacity object-contain"
+                unoptimized
               />
             </div>
           ))}

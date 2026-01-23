@@ -102,7 +102,7 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
         {/* Plan Name & Subtitle */}
         <div className="space-y-1">
           <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-inter text-[#16252d] leading-tight">
-            {plan.title}
+            {plan.slug === 'top-picks' ? t('saudiNationals') : plan.title}
           </h3>
           <p className="text-sm sm:text-base text-[#757575] font-medium">{getSubtitle()}</p>
         </div>

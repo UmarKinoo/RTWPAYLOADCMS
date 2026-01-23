@@ -8,6 +8,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const searchQuery = searchParams.get('q') || ''
   const limit = parseInt(searchParams.get('limit') || '10')
+  // Get locale from query param or default to 'en'
+  const locale = (searchParams.get('locale') || 'en') as 'en' | 'ar'
 
   try {
 
@@ -98,24 +100,40 @@ export async function GET(request: NextRequest) {
         const dbResult = await dbQuery<{
           id: string
           name: string
+          name_en: string | null
+          name_ar: string | null
           billing_class: string
           subcategory_id: string
           subcategory_name: string | null
+          subcategory_name_en: string | null
+          subcategory_name_ar: string | null
           category_id: string | null
           category_name: string | null
+          category_name_en: string | null
+          category_name_ar: string | null
           discipline_id: string | null
           discipline_name: string | null
+          discipline_name_en: string | null
+          discipline_name_ar: string | null
         }>(`
           SELECT 
             s.id,
             s.name,
+            s.name_en,
+            s.name_ar,
             s.billing_class,
             sc.id as subcategory_id,
             sc.name as subcategory_name,
+            sc.name_en as subcategory_name_en,
+            sc.name_ar as subcategory_name_ar,
             c.id as category_id,
             c.name as category_name,
+            c.name_en as category_name_en,
+            c.name_ar as category_name_ar,
             d.id as discipline_id,
-            d.name as discipline_name
+            d.name as discipline_name,
+            d.name_en as discipline_name_en,
+            d.name_ar as discipline_name_ar
           FROM skills s
           LEFT JOIN subcategories sc ON s.sub_category_id = sc.id
           LEFT JOIN categories c ON sc.category_id = c.id
@@ -132,20 +150,33 @@ export async function GET(request: NextRequest) {
           timeMs: dbTime,
         })
 
-        // 4. Format results for frontend (same shape as before)
+        // 4. Format results for frontend with localized names
+        const getLocalizedName = (name: string | null, name_en: string | null, name_ar: string | null): string => {
+          if (locale === 'ar' && name_ar) return name_ar
+          if (locale === 'en' && name_en) return name_en
+          if (name_ar) return name_ar // Fallback to Arabic if English not available
+          if (name_en) return name_en // Fallback to English if Arabic not available
+          return name || ''
+        }
+
         const skills = dbResult.rows.map((row) => {
+          const skillName = getLocalizedName(row.name, row.name_en, row.name_ar)
+          const subCategoryName = getLocalizedName(row.subcategory_name, row.subcategory_name_en, row.subcategory_name_ar)
+          const categoryName = getLocalizedName(row.category_name, row.category_name_en, row.category_name_ar)
+          const disciplineName = getLocalizedName(row.discipline_name, row.discipline_name_en, row.discipline_name_ar)
+
           return {
             id: String(row.id),
-            name: row.name,
+            name: skillName,
             billingClass: row.billing_class,
-            subCategory: row.subcategory_name || undefined,
-            category: row.category_name || undefined,
-            discipline: row.discipline_name || undefined,
+            subCategory: subCategoryName || undefined,
+            category: categoryName || undefined,
+            discipline: disciplineName || undefined,
             fullPath: [
-              row.discipline_name,
-              row.category_name,
-              row.subcategory_name,
-              row.name,
+              disciplineName,
+              categoryName,
+              subCategoryName,
+              skillName,
             ]
               .filter(Boolean)
               .join(' > '),
@@ -200,7 +231,16 @@ export async function GET(request: NextRequest) {
       sort: 'name',
     })
 
-    // Format results for frontend
+    // Helper function to get localized name
+    const getLocalizedName = (doc: any): string => {
+      if (locale === 'ar' && doc?.name_ar) return doc.name_ar
+      if (locale === 'en' && doc?.name_en) return doc.name_en
+      if (doc?.name_ar) return doc.name_ar // Fallback to Arabic if English not available
+      if (doc?.name_en) return doc.name_en // Fallback to English if Arabic not available
+      return doc?.name || ''
+    }
+
+    // Format results for frontend with localized names
     const skills = results.docs.map((skill) => {
       const subCategory = typeof skill.subCategory === 'object' ? skill.subCategory : null
       const category =
@@ -208,15 +248,20 @@ export async function GET(request: NextRequest) {
       const discipline =
         category && typeof category.discipline === 'object' ? category.discipline : null
 
+      const skillName = getLocalizedName(skill)
+      const subCategoryName = subCategory ? getLocalizedName(subCategory) : undefined
+      const categoryName = category ? getLocalizedName(category) : undefined
+      const disciplineName = discipline ? getLocalizedName(discipline) : undefined
+
       return {
         id: String(skill.id),
-        name: skill.name,
+        name: skillName,
         billingClass: skill.billingClass,
-        subCategory: subCategory?.name,
-        category: category?.name,
-        discipline: discipline?.name,
+        subCategory: subCategoryName,
+        category: categoryName,
+        discipline: disciplineName,
         // Full path for display
-        fullPath: [discipline?.name, category?.name, subCategory?.name, skill.name]
+        fullPath: [disciplineName, categoryName, subCategoryName, skillName]
           .filter(Boolean)
           .join(' > '),
       }

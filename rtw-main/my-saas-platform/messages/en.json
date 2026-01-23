@@ -8,7 +8,8 @@
     "pricing": "Pricing",
     "blog": "Blog",
     "about": "About",
-    "contact": "Contact us"
+    "contact": "Contact us",
+    "getStarted": "Get Started"
   },
   "auth": {
     "login": "Login",
@@ -91,7 +92,25 @@
       "confirmPasswordPlaceholder": "Confirm your password"
     },
     "pleaseTryAgainLater": "Please try again later",
-    "somethingWentWrong": "Something went wrong"
+    "somethingWentWrong": "Something went wrong",
+    "legalStatements": {
+      "termsAgreement": "By clicking on the Sign-up button you agree to ReadyToWork's Terms and Conditions and Privacy Policy. All your data doesn't appear to job seekers and protected with our Privacy Policy.",
+      "platformDisclaimer": "I acknowledge that ReadyToWork.sa provides access to published professional data only and does not act as a recruitment agency or intermediary. I accept full responsibility for verifying candidate information, complying with Saudi Labor Law, and any engagement, communication, or contractual arrangement entered into outside the platform.",
+      "dataUsageAgreement": "I agree not to misuse, copy, resell, or commercially exploit any data accessed through ReadyToWork.sa outside the scope of my active subscription and in violation of the platform's Terms & Conditions."
+    },
+    "skillSearch": {
+      "label": "Search your Job Role or Skill *",
+      "placeholder": "Type to search (e.g., Mason, Engineer, Electrician...)",
+      "searching": "Searching...",
+      "minChars": "Type at least 2 characters to search",
+      "noResults": "No skills found",
+      "tryDifferent": "Try a different search term",
+      "billingClass": "Billing Class:",
+      "clearSelection": "Clear selection"
+    },
+    "jobRole": {
+      "description": "Search and select your primary job role or skill. This will help us match you with relevant opportunities."
+    }
   },
   "buttons": {
     "submit": "Submit",
@@ -134,7 +153,7 @@
   },
   "homepage": {
     "hero": {
-      "title": "Explore thousands of openings and",
+      "title": "Explore thousands of",
       "titleHighlight": "talented",
       "titleEnd": "profiles all in one place.",
       "subtitle": "Access a wide pool of qualified candidates across all roles and industries.",
@@ -172,7 +191,7 @@
     "faq": {
       "label": "FAQ",
       "title": "Have a Question?",
-      "description": "Save time with straightforward answers to common questions recruiters and HR teams often ask.",
+      "description": "Save time with straightforward answers to common questions that business managers and HR teams often ask.",
       "gotMoreQuestions": "Got more questions?",
       "contactUsDescription": "Get in touch and we'll take care of the rest.",
       "contactUs": "Contact Us",
@@ -218,7 +237,7 @@
       "open": "Open",
       "addressValue": "Jeddah, Saudi Arabia",
       "emailValue": "hello@readytowork.sa",
-      "phoneValue": "5-918-6338",
+      "phoneValue": "053-969-6922",
       "hoursValue": "Sun – Thur / 9:00 AM – 6:00 PM",
       "copyright": "Copyright 2025 ©Readytowork. All rights reserved.",
       "designedBy": "Designed and Developed by",
@@ -236,20 +255,79 @@
       }
     }
   },
+  "candidatesPage": {
+    "heroTitle": "Candidates",
+    "searchLabel": "Search",
+    "disciplineLabel": "Discipline",
+    "resultsCount": "{count} candidate{plural}",
+    "resultsCountWithSearch": "{count} candidate{plural} for \"{search}\"",
+    "resultsCountWithDiscipline": "{count} candidate{plural} in {discipline}",
+    "sortBy": "Sort by",
+    "sortOptions": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "experienceHigh": "Experience ↓",
+      "experienceLow": "Experience ↑"
+    },
+    "noCandidatesFound": "No candidates found",
+    "noCandidatesDescription": "Try adjusting your filters or check back later.",
+    "loginToUnlock": "Login to unlock full access",
+    "searching": "Searching candidates...",
+    "searchError": "Search Error",
+    "searchErrorDescription": "{error}. Please try again or browse all candidates.",
+    "noCandidatesFoundSearch": "No candidates found",
+    "noCandidatesDescriptionSearch": "Try adjusting your search query or browse all candidates.",
+    "candidatesFound": "{count} candidate{plural} found for \"{search}\"",
+    "searchErrors": {
+      "unauthorized": "Please log in to search candidates",
+      "notSupported": "You do not have permission to search",
+      "failed": "Failed to search candidates"
+    },
+    "filters": {
+      "filterCandidates": "Filter Candidates",
+      "filters": "Filters",
+      "clearAll": "Clear All",
+      "activeFilters": "Active Filters",
+      "searchByFilter": "Search by Filter",
+      "applyFilters": "Apply Filters",
+      "cancel": "Cancel",
+      "location": "Location",
+      "jobDetails": "Job Details",
+      "candidateProfile": "Candidate Profile",
+      "availability": "Availability",
+      "country": "Country",
+      "stateCity": "State/City",
+      "jobType": "Job Type",
+      "majorDiscipline": "Major Discipline",
+      "category": "Category",
+      "subCategory": "Sub Category",
+      "skillLevel": "Skill Level",
+      "nationality": "Nationality",
+      "experience": "Experience",
+      "language": "Language",
+      "whenAvailable": "When available",
+      "all": "All",
+      "loading": "Loading...",
+      "loadingOptions": "Loading options...",
+      "noOptionsAvailable": "No options available",
+      "selectLabel": "Select {label}"
+    }
+  },
   "pricing": {
     "hero": {
       "title": "Pricing"
     },
     "intro": {
       "title": "Flexible Pricing for Every Team Size",
-      "description": "Find the right talent without complexity. Our pricing plans are designed to support different hiring requirements, giving you flexibility, clarity, and access to qualified candidates when you need it."
+      "description": "Find the right talent without complexity. Our pricing plans are designed to support different client requirements, giving you flexibility, clarity, and access to qualified candidates when you need it."
     },
     "cards": {
       "topPicks": "Top Picks",
+      "saudiNationals": "Saudi Nationals",
       "skilled": "Skilled Workers",
       "specialty": "Certified Technical",
       "eliteSpecialty": "Expert Licensed staff",
-      "custom": "Survey Package",
+      "custom": "Custom Filtration Package",
       "processing": "Processing...",
       "getStarted": "Get Started",
       "features": {
@@ -259,7 +337,7 @@
         "saudiOnly": "Saudi candidates only",
         "customMoreThan5": "Receive more than 5 matched candidates",
         "customTargetProfiles": "Target specific candidate profiles",
-        "customRespondQuestions": "Respond to up to 5 employer questions",
+        "customRespondQuestions": "Respond to up to 10 employer questions",
         "customAccessContact": "Access contact details of one candidate"
       },
       "toasts": {
@@ -277,7 +355,7 @@
     },
     "ourWork": {
       "title": "Our Work",
-      "description": "We know that recruiting is a complex and time-consuming task. Our solution integrates video technology, smart tools, efficient workflows, analytics, and collaborative feedback to streamline and optimize the hiring process.",
+      "description": "We know that finding the right candidates is a complex and time-consuming task. Our solution integrates video technology, smart tools, efficient workflows, analytics, and collaborative feedback to streamline and optimize the hiring process.",
       "learnMore": "Learn more"
     },
     "howItWorks": {
@@ -289,15 +367,15 @@
         },
         "step2": {
           "title": "Upload CV / Resume",
-          "description": "Add your CV and key details so employers can understand your experience and skills."
+          "description": "Add your CV and key details so employers can explore your experience and skills."
         },
         "step3": {
           "title": "Get matched & shortlisted",
-          "description": "We match you with relevant employers for interviews."
+          "description": "We match you with relevant employers in your field."
         },
         "step4": {
-          "title": "Interview & get hired",
-          "description": "Attend interviews and move forward with the employer that's right for you."
+          "title": "Meet potential employer & get Moving",
+          "description": "Meet and move forward with the employer that's right for you."
         }
       }
     },

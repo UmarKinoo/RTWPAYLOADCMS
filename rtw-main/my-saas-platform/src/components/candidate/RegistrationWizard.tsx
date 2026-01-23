@@ -334,7 +334,7 @@ export function RegistrationWizard() {
   // Show phone verification step after successful registration
   if (showPhoneVerification && candidateId && registrationData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-gray-50 flex flex-col" dir="ltr">
         <HomepageNavbar />
         
         <main className="flex-1 pt-24 sm:pt-28 md:pt-32 pb-8 sm:pb-12">
@@ -404,7 +404,7 @@ export function RegistrationWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col" dir="ltr">
       <HomepageNavbar />
       
       <main className="flex-1 pt-24 sm:pt-28 md:pt-32 pb-8 sm:pb-12">

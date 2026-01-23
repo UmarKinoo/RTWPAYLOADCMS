@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { CandidateCard } from '@/components/homepage/blocks/Candidates'
 import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
@@ -16,6 +17,7 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
+  const t = useTranslations('candidatesPage')
   const [candidates, setCandidates] = useState<CandidateListItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,12 +37,12 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
         setCandidates(result.candidates || [])
       } catch (err: any) {
         console.error('Search error:', err)
-        const errorMessage = err.message || 'Failed to search candidates'
+        const errorMessage = err.message || t('searchErrors.failed')
         setError(
           errorMessage.includes('Unauthorized')
-            ? 'Please log in to search candidates'
+            ? t('searchErrors.unauthorized')
             : errorMessage.includes('not yet supported')
-            ? 'You do not have permission to search'
+            ? t('searchErrors.notSupported')
             : errorMessage
         )
         setCandidates([])
@@ -55,7 +57,7 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm text-[#757575]">Searching candidates...</p>
+        <p className="text-sm text-[#757575]">{t('searching')}</p>
       </div>
     )
   }
@@ -64,10 +66,10 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <p className="text-lg font-semibold text-[#16252d] mb-2">
-          Search Error
+          {t('searchError')}
         </p>
         <p className="text-sm text-[#757575]">
-          {error}. Please try again or browse all candidates.
+          {t('searchErrorDescription', { error })}
         </p>
       </div>
     )
@@ -77,10 +79,10 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <p className="text-lg font-semibold text-[#16252d] mb-2">
-          No candidates found
+          {t('noCandidatesFoundSearch')}
         </p>
         <p className="text-sm text-[#757575]">
-          Try adjusting your search query or browse all candidates.
+          {t('noCandidatesDescriptionSearch')}
         </p>
       </div>
     )
@@ -90,7 +92,7 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
     <>
       <div className="mb-4 sm:mb-6">
         <p className="text-sm sm:text-base font-medium text-[#16252d]">
-          {candidates.length} candidate{candidates.length === 1 ? '' : 's'} found for &quot;{searchQuery}&quot;
+          {t('candidatesFound', { count: candidates.length, plural: candidates.length === 1 ? '' : 's', search: searchQuery })}
         </p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">

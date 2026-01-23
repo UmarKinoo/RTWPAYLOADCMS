@@ -15,8 +15,6 @@ export const Footer: React.FC = async () => {
   const quickLinks = [
     t('links.aboutUs'),
     t('links.companyInformation'),
-    t('links.codeOfConduct'),
-    t('links.investorRelations'),
     t('links.siteMap'),
   ]
 
@@ -134,28 +132,23 @@ export const Footer: React.FC = async () => {
               <h3 className="text-base sm:text-lg md:text-xl font-bold font-inter text-[#d8e530]">
                 {t('contactDetails')}
               </h3>
-              <div className="flex flex-col gap-1.5">
-                <p className="text-sm sm:text-base font-inter text-white">
-                  <span className="font-bold">{t('address')}: </span>
-                  <span>{t('addressValue')}</span>
-                </p>
-                <p className="text-sm sm:text-base font-inter text-white">
-                  <span className="font-bold">{t('email')}: </span>
-                  <a href={`mailto:${t('emailValue')}`} className="hover:text-[#d8e530] transition-colors">
-                    {t('emailValue')}
-                  </a>
-                </p>
-                <p className="text-sm sm:text-base font-inter text-white">
-                  <span className="font-bold">{t('phone')}: </span>
-                  <a href="tel:59186338" className="hover:text-[#d8e530] transition-colors">
+              <ul className="flex flex-col gap-1.5">
+                <li className="text-sm sm:text-base font-normal font-inter text-white">
+                  <span className="font-semibold">{t('address')}:</span> {t('addressValue')}
+                </li>
+                <li className="text-sm sm:text-base font-normal font-inter text-white">
+                  <span className="font-semibold">{t('phone')}:</span>{' '}
+                  <a
+                    href={`tel:${t('phoneValue')}`}
+                    className="hover:text-[#d8e530] transition-colors"
+                  >
                     {t('phoneValue')}
                   </a>
-                </p>
-                <p className="text-sm sm:text-base font-inter text-white">
-                  <span className="font-bold">{t('open')}: </span>
-                  <span>{t('hoursValue')}</span>
-                </p>
-              </div>
+                </li>
+                <li className="text-sm sm:text-base font-normal font-inter text-white">
+                  <span className="font-semibold">{t('open')}:</span> {t('hoursValue')}
+                </li>
+              </ul>
             </div>
           </div>
 
@@ -163,13 +156,9 @@ export const Footer: React.FC = async () => {
           <div className="w-full h-px bg-white/20 mb-6" />
 
           {/* Bottom Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-start">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
             <p className="text-xs sm:text-sm font-normal font-inter text-white">
               {t('copyright')}
-            </p>
-            <p className="text-xs sm:text-sm font-normal font-inter text-white">
-              {t('designedBy')}{' '}
-              <span className="font-bold text-[#d8e530]">MoodWeb</span>
             </p>
           </div>
         </div>

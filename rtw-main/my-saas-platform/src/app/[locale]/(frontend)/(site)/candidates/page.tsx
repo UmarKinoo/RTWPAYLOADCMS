@@ -64,7 +64,8 @@ interface CandidatesPageProps {
 
 export default async function CandidatesPage({ params, searchParams }: CandidatesPageProps) {
   const { locale } = await params
-  const t = await getTranslations('emptyStates')
+  const t = await getTranslations('candidatesPage')
+  const tEmpty = await getTranslations('emptyStates')
   const searchParamsResolved = await searchParams
   const disciplineSlug = searchParamsResolved.discipline
   const searchQuery = searchParamsResolved.search
@@ -181,7 +182,7 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
                     href="/candidates"
                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#e9d5ff] hover:bg-[#d9c5ef] rounded-lg text-sm font-medium text-[#16252d] transition-colors"
                   >
-                    <span>Search: "{searchQuery}"</span>
+                    <span>{t('searchLabel')}: "{searchQuery}"</span>
                     <X className="h-4 w-4" />
                   </Link>
                 )}
@@ -190,7 +191,7 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
                     href="/candidates"
                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#e9d5ff] hover:bg-[#d9c5ef] rounded-lg text-sm font-medium text-[#16252d] transition-colors"
                   >
-                    <span>Discipline: {disciplineName}</span>
+                    <span>{t('disciplineLabel')}: {disciplineName}</span>
                     <X className="h-4 w-4" />
                   </Link>
                 )}
@@ -202,8 +203,12 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
               {/* Results Count */}
               <p className="text-sm sm:text-base font-medium text-[#16252d]">
                 {totalDocs > 0
-                  ? `${totalDocs} candidate${totalDocs === 1 ? '' : 's'}${searchQuery ? ` for "${searchQuery}"` : disciplineName ? ` in ${disciplineName}` : ''}`
-                  : t('noCandidates')}
+                  ? searchQuery
+                    ? t('resultsCountWithSearch', { count: totalDocs, plural: totalDocs === 1 ? '' : 's', search: searchQuery })
+                    : disciplineName
+                    ? t('resultsCountWithDiscipline', { count: totalDocs, plural: totalDocs === 1 ? '' : 's', discipline: disciplineName })
+                    : t('resultsCount', { count: totalDocs, plural: totalDocs === 1 ? '' : 's' })
+                  : tEmpty('noCandidates')}
               </p>
 
               {/* Sort Dropdown */}
@@ -218,13 +223,13 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
                     'focus:ring-2 focus:ring-[#4644b8]',
                   )}
                 >
-                  <SelectValue placeholder="Sort by" />
+                  <SelectValue placeholder={t('sortBy')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest</SelectItem>
-                  <SelectItem value="oldest">Oldest</SelectItem>
-                  <SelectItem value="experience-high">Experience ↓</SelectItem>
-                  <SelectItem value="experience-low">Experience ↑</SelectItem>
+                  <SelectItem value="newest">{t('sortOptions.newest')}</SelectItem>
+                  <SelectItem value="oldest">{t('sortOptions.oldest')}</SelectItem>
+                  <SelectItem value="experience-high">{t('sortOptions.experienceHigh')}</SelectItem>
+                  <SelectItem value="experience-low">{t('sortOptions.experienceLow')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -258,10 +263,10 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <p className="text-lg font-semibold text-[#16252d] mb-2">
-                  No candidates found
+                  {t('noCandidatesFound')}
                 </p>
                 <p className="text-sm text-[#757575]">
-                  Try adjusting your filters or check back later.
+                  {t('noCandidatesDescription')}
                 </p>
               </div>
             )}
@@ -271,7 +276,7 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
               <Button
                 className="bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-full h-10 sm:h-11 px-5 sm:px-8 text-sm sm:text-base font-bold uppercase"
               >
-                Login to unlock full access
+                {t('loginToUnlock')}
               </Button>
             </div>
           </div>

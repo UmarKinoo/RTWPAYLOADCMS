@@ -15,6 +15,8 @@ import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Badge } from '@/components/ui/badge'
 import { useDebounce } from '@/utilities/useDebounce'
+import { useTranslations } from 'next-intl'
+import { usePathname } from 'next/navigation'
 
 interface Skill {
   id: string | number
@@ -33,6 +35,9 @@ interface SkillSearchProps {
 }
 
 export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
+  const t = useTranslations('registration.skillSearch')
+  const pathname = usePathname()
+  const locale = pathname.split('/')[1] || 'en'
   const [open, setOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState('')
   const [skills, setSkills] = React.useState<Skill[]>([])
@@ -59,7 +64,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
     setOpen(true)
     const controller = new AbortController()
     
-    fetch(`/api/skills/search?q=${encodeURIComponent(debouncedQuery)}&limit=10`, {
+    fetch(`/api/skills/search?q=${encodeURIComponent(debouncedQuery)}&limit=10&locale=${locale}`, {
       signal: controller.signal,
     })
       .then((res) => res.json())
@@ -82,7 +87,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
   // Fetch selected skill details if value is set
   React.useEffect(() => {
     if (value && !selectedSkill) {
-      fetch(`/api/skills/${value}`)
+      fetch(`/api/skills/${value}?locale=${locale}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.skill) {
@@ -97,7 +102,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
       setSelectedSkill(null)
       setSearchQuery('')
     }
-  }, [value, selectedSkill])
+  }, [value, selectedSkill, locale])
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -152,7 +157,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
 
   return (
     <Field data-invalid={!!error} className="relative">
-      <FieldLabel htmlFor="skill-search">Search your Job Role or Skill *</FieldLabel>
+      <FieldLabel htmlFor="skill-search">{t('label')}</FieldLabel>
       <Popover open={open && (loading || skills.length > 0 || (searchQuery.trim().length >= 2 && !loading))}>
         <div ref={containerRef} className="relative w-full">
           <PopoverAnchor asChild>
@@ -162,7 +167,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
                 ref={inputRef}
                 id="skill-search"
                 type="text"
-                placeholder="Type to search (e.g., Mason, Engineer, Electrician...)"
+                placeholder={t('placeholder')}
                 value={displayValue}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
@@ -181,7 +186,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
                   type="button"
                   onClick={handleClear}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Clear selection"
+                  aria-label={t('clearSelection')}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -202,14 +207,14 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
                 {loading && (
                   <div className="flex items-center justify-center p-6">
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    <span className="ml-2 text-sm text-muted-foreground">Searching...</span>
+                    <span className="ml-2 text-sm text-muted-foreground">{t('searching')}</span>
                   </div>
                 )}
                 {!loading && searchQuery.trim().length < 2 && (
                   <CommandEmpty>
                     <div className="py-6 text-center">
                       <p className="text-sm text-muted-foreground">
-                        Type at least 2 characters to search
+                        {t('minChars')}
                       </p>
                     </div>
                   </CommandEmpty>
@@ -218,10 +223,10 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
                   <CommandEmpty>
                     <div className="py-6 text-center">
                       <p className="text-sm text-muted-foreground mb-1">
-                        No skills found
+                        {t('noResults')}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Try a different search term
+                        {t('tryDifferent')}
                       </p>
                     </div>
                   </CommandEmpty>
@@ -271,7 +276,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
                 {selectedSkill.fullPath}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Billing Class: <span className="font-medium">{selectedSkill.billingClass}</span>
+                {t('billingClass')} <span className="font-medium">{selectedSkill.billingClass}</span>
               </p>
             </div>
           </div>

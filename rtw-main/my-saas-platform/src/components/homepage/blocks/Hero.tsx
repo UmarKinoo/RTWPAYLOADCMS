@@ -8,10 +8,18 @@ import { Input } from '@/components/ui/input'
 import { ImageWithSkeleton } from '../ImageWithSkeleton'
 import { Search, Building2, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 
 // Image assets from public/assets/
 const imgBusinessmanMakingCoffee20252 = '/assets/5902659f7a1d069cd46ab37be664dbed528febb1.webp'
 const imgBusinessmanMakingCoffee20251 = '/assets/9067d496e1f10f37d480e3dc99e0dd3a6af0fb6c.svg'
+
+// Government logos - using actual filenames from public/assets
+// Note: Next.js Image component handles URL encoding automatically
+const logoMediaAuthority = '/assets/شعار الهيئة العامة لتنظيم الإعلام بدقة عالية png – svg.svg'
+const logoVision2030 = '/assets/شعار رؤية المملكة 2030 – Saudi vision 2030 Logo SVG.svg'
+const logoSaudiBusinessCenter = '/assets/شعار المركز السعودي للأعمال – Saudi Business Center Logo – PNG – SVG.svg'
+const logoCommerceMinistry = '/assets/شعار وزارة التجارة SVG.svg'
 
 export const Hero: React.FC = () => {
   const t = useTranslations('homepage.hero')
@@ -119,10 +127,51 @@ export const Hero: React.FC = () => {
             </form>
           </div>
 
-          {/* Bottom Right Text - Hidden on very small screens */}
-          <p className="hidden sm:block absolute bottom-4 sm:bottom-6 end-4 sm:end-6 md:end-8 text-xs sm:text-sm font-medium text-white/80 text-end max-w-[200px] leading-tight">
-            {t('verifiedLogo')}
-          </p>
+          {/* Bottom Right Government Logos - Hidden on very small screens */}
+          <div className="hidden sm:flex absolute bottom-4 sm:bottom-6 end-4 sm:end-6 md:end-8 flex-wrap gap-2 sm:gap-3 items-center justify-end max-w-[280px] sm:max-w-[320px]">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <div className="relative h-8 w-auto sm:h-10">
+                <Image
+                  src={logoMediaAuthority}
+                  alt="الهيئة العامة لتنظيم الإعلام"
+                  width={40}
+                  height={40}
+                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
+                  unoptimized
+                />
+              </div>
+              <div className="relative h-8 w-auto sm:h-10">
+                <Image
+                  src={logoVision2030}
+                  alt="رؤية المملكة 2030"
+                  width={40}
+                  height={40}
+                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
+                  unoptimized
+                />
+              </div>
+              <div className="relative h-8 w-auto sm:h-10">
+                <Image
+                  src={logoSaudiBusinessCenter}
+                  alt="المركز السعودي للأعمال"
+                  width={40}
+                  height={40}
+                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
+                  unoptimized
+                />
+              </div>
+              <div className="relative h-8 w-auto sm:h-10">
+                <Image
+                  src={logoCommerceMinistry}
+                  alt="وزارة التجارة"
+                  width={40}
+                  height={40}
+                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
+                  unoptimized
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </HomepageSection>

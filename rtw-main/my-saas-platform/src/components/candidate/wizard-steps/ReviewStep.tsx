@@ -6,6 +6,7 @@ import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Edit, User, Mail, Briefcase, MapPin, FileCheck, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import type { CandidateFormData } from '../RegistrationWizard'
 
 interface ReviewStepProps {
@@ -17,6 +18,8 @@ interface ReviewStepProps {
 }
 
 export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditStep }: ReviewStepProps) {
+  const t = useTranslations('registration.legalStatements')
+  
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Not provided'
     try {
@@ -275,6 +278,21 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Legal Statements */}
+      <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {t('termsAgreement')}
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {t('platformDisclaimer')}
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {t('dataUsageAgreement')}
+          </p>
+        </div>
       </div>
 
       {/* Terms Acceptance */}

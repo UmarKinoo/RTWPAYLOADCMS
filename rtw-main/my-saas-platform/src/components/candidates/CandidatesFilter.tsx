@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from '@/i18n/routing'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -61,7 +62,8 @@ const FilterSelect: React.FC<{
   options: string[]
   isLoading?: boolean
   onValueChange: (value: string) => void
-}> = ({ label, value, options, isLoading = false, onValueChange }) => {
+  t?: ReturnType<typeof useTranslations<'candidatesPage.filters'>>
+}> = ({ label, value, options, isLoading = false, onValueChange, t }) => {
   const handleValueChange = (newValue: string) => {
     // Convert "__all__" to empty string to clear the filter
     if (newValue === '__all__') {
@@ -93,18 +95,18 @@ const FilterSelect: React.FC<{
             isLoading && "opacity-50 cursor-not-allowed"
           )}
         >
-          <SelectValue placeholder={isLoading ? "Loading..." : `Select ${label.toLowerCase()}`} />
+          <SelectValue placeholder={isLoading ? (t?.('loading') || 'Loading...') : (t ? t('selectLabel', { label: label.toLowerCase() }) : `Select ${label.toLowerCase()}`)} />
           {isLoading && (
             <Loader2 className="h-4 w-4 animate-spin text-gray-400 ml-2" />
           )}
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
-          <SelectItem value="__all__">All</SelectItem>
+          <SelectItem value="__all__">{t?.('all') || 'All'}</SelectItem>
           {isLoading ? (
             <SelectItem value="__loading__" disabled>
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Loading options...</span>
+                <span>{t?.('loadingOptions') || 'Loading options...'}</span>
               </div>
             </SelectItem>
           ) : options.length > 0 ? (
@@ -115,7 +117,7 @@ const FilterSelect: React.FC<{
             ))
           ) : (
             <SelectItem value="__no_options__" disabled>
-              No options available
+              {t?.('noOptionsAvailable') || 'No options available'}
             </SelectItem>
           )}
         </SelectContent>
@@ -131,7 +133,8 @@ const MobileFilterSheet: React.FC<{
   onClearAll: () => void
   filterConfigs: FilterConfig[]
   isLoadingOptions: boolean
-}> = ({ filters, onFilterChange, onClearAll, filterConfigs, isLoadingOptions }) => {
+  t: ReturnType<typeof useTranslations<'candidatesPage.filters'>>
+}> = ({ filters, onFilterChange, onClearAll, filterConfigs, isLoadingOptions, t }) => {
   const activeFilterCount = Object.values(filters).filter((v) => v).length
 
   const getFilterOptions = (param: string) => {
@@ -153,7 +156,7 @@ const MobileFilterSheet: React.FC<{
           )}
         >
           <SlidersHorizontal className="w-5 h-5" />
-          <span className="font-semibold">Filter Candidates</span>
+          <span className="font-semibold">{t('filterCandidates')}</span>
           {activeFilterCount > 0 && (
             <Badge className="bg-white text-[#4644b8] ml-1">{activeFilterCount}</Badge>
           )}
@@ -167,14 +170,14 @@ const MobileFilterSheet: React.FC<{
 
         <SheetHeader className="px-5 pb-4 border-b border-gray-100">
           <div className="flex items-center justify-between">
-            <SheetTitle className="text-xl font-bold text-[#16252d]">Filters</SheetTitle>
+            <SheetTitle className="text-xl font-bold text-[#16252d]">{t('filters')}</SheetTitle>
             <Button
               variant="ghost"
               size="sm"
               className="text-[#4644b8] font-medium hover:bg-[#4644b8]/10"
               onClick={onClearAll}
             >
-              Clear All
+              {t('clearAll')}
             </Button>
           </div>
         </SheetHeader>
@@ -185,7 +188,7 @@ const MobileFilterSheet: React.FC<{
             <div className="mb-5 pb-4 border-b border-gray-200">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Active Filters
+                  {t('activeFilters')}
                 </p>
                 <Button
                   variant="ghost"
@@ -193,7 +196,7 @@ const MobileFilterSheet: React.FC<{
                   className="text-[#4644b8] font-medium hover:bg-[#4644b8]/10 h-7 px-2 text-xs"
                   onClick={onClearAll}
                 >
-                  Clear All
+                  {t('clearAll')}
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -227,23 +230,25 @@ const MobileFilterSheet: React.FC<{
                   <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
                     <MapPin className="w-4 h-4 text-blue-600" />
                   </div>
-                  <span className="font-semibold text-[#16252d]">Location</span>
+                  <span className="font-semibold text-[#16252d]">{t('location')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-3">
                 <FilterSelect
-                  label="Country"
+                  label={t('country')}
                   value={filters.country}
                   options={getFilterOptions('country')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('country', value)}
+                  t={t}
                 />
                 <FilterSelect
-                  label="State/City"
+                  label={t('stateCity')}
                   value={filters.state}
                   options={getFilterOptions('state')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('state', value)}
+                  t={t}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -255,44 +260,49 @@ const MobileFilterSheet: React.FC<{
                   <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
                     <Briefcase className="w-4 h-4 text-purple-600" />
                   </div>
-                  <span className="font-semibold text-[#16252d]">Job Details</span>
+                  <span className="font-semibold text-[#16252d]">{t('jobDetails')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-3">
                 <FilterSelect
-                  label="Job Type"
+                  label={t('jobType')}
                   value={filters.jobType}
                   options={getFilterOptions('jobType')}
                   isLoading={false}
                   onValueChange={(value) => onFilterChange('jobType', value)}
+                  t={t}
                 />
                 <FilterSelect
-                  label="Major Discipline"
+                  label={t('majorDiscipline')}
                   value={filters.discipline}
                   options={getFilterOptions('discipline')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('discipline', value)}
+                  t={t}
                 />
                 <FilterSelect
-                  label="Category"
+                  label={t('category')}
                   value={filters.category}
                   options={getFilterOptions('category')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('category', value)}
+                  t={t}
                 />
                 <FilterSelect
-                  label="Sub Category"
+                  label={t('subCategory')}
                   value={filters.subCategory}
                   options={getFilterOptions('subCategory')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('subCategory', value)}
+                  t={t}
                 />
                 <FilterSelect
-                  label="Skill Level"
+                  label={t('skillLevel')}
                   value={filters.skillLevel}
                   options={getFilterOptions('skillLevel')}
                   isLoading={false}
                   onValueChange={(value) => onFilterChange('skillLevel', value)}
+                  t={t}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -304,30 +314,33 @@ const MobileFilterSheet: React.FC<{
                   <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
                     <User className="w-4 h-4 text-green-600" />
                   </div>
-                  <span className="font-semibold text-[#16252d]">Candidate Profile</span>
+                  <span className="font-semibold text-[#16252d]">{t('candidateProfile')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-3">
                 <FilterSelect
-                  label="Nationality"
+                  label={t('nationality')}
                   value={filters.nationality}
                   options={getFilterOptions('nationality')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('nationality', value)}
+                  t={t}
                 />
                 <FilterSelect
-                  label="Experience"
+                  label={t('experience')}
                   value={filters.experience}
                   options={getFilterOptions('experience')}
                   isLoading={false}
                   onValueChange={(value) => onFilterChange('experience', value)}
+                  t={t}
                 />
                 <FilterSelect
-                  label="Language"
+                  label={t('language')}
                   value={filters.language}
                   options={getFilterOptions('language')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('language', value)}
+                  t={t}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -339,16 +352,17 @@ const MobileFilterSheet: React.FC<{
                   <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
                     <Clock className="w-4 h-4 text-orange-600" />
                   </div>
-                  <span className="font-semibold text-[#16252d]">Availability</span>
+                  <span className="font-semibold text-[#16252d]">{t('availability')}</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2">
                 <FilterSelect
-                  label="When available"
+                  label={t('whenAvailable')}
                   value={filters.availability}
                   options={getFilterOptions('availability')}
                   isLoading={false}
                   onValueChange={(value) => onFilterChange('availability', value)}
+                  t={t}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -359,13 +373,13 @@ const MobileFilterSheet: React.FC<{
           <div className="flex gap-3 w-full">
             <SheetClose asChild>
               <Button variant="outline" className="flex-1 h-12 rounded-xl border-gray-200 font-medium">
-                Cancel
+                {t('cancel')}
               </Button>
             </SheetClose>
             <SheetClose asChild>
               <Button className="flex-1 h-12 bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-xl font-semibold shadow-md shadow-[#4644b8]/20">
                 <Search className="w-4 h-4 mr-2" />
-                Apply Filters
+                {t('applyFilters')}
               </Button>
             </SheetClose>
           </div>
@@ -379,6 +393,7 @@ const MobileFilterSheet: React.FC<{
 export const CandidatesFilter: React.FC = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('candidatesPage.filters')
   
   // Initialize all filters from URL params
   const initialFilters: Record<string, string> = {}
@@ -493,6 +508,7 @@ export const CandidatesFilter: React.FC = () => {
           onClearAll={clearAllFilters}
           filterConfigs={filterConfigs}
           isLoadingOptions={isLoadingOptions}
+          t={t}
         />
       </div>
 
@@ -525,7 +541,7 @@ export const CandidatesFilter: React.FC = () => {
           }}
         >
           <Search className="w-5 h-5" />
-          <span>Search by Filter</span>
+          <span>{t('searchByFilter')}</span>
         </Button>
 
         {/* Active Filters Display - At Top */}
@@ -533,7 +549,7 @@ export const CandidatesFilter: React.FC = () => {
           <div className="mb-5 pb-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Active Filters
+                {t('activeFilters')}
               </p>
               <Button
                 variant="ghost"
@@ -541,7 +557,7 @@ export const CandidatesFilter: React.FC = () => {
                 className="text-[#4644b8] font-medium hover:bg-[#4644b8]/10 h-7 px-2 text-xs"
                 onClick={clearAllFilters}
               >
-                Clear All
+                {t('clearAll')}
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -579,6 +595,7 @@ export const CandidatesFilter: React.FC = () => {
                 options={filter.options}
                 isLoading={needsLoading && isLoadingOptions}
                 onValueChange={(value) => updateFilters(filter.param, value)}
+                t={t}
               />
             )
           })}
