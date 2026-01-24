@@ -23,6 +23,39 @@ if (!process.env.PAYLOAD_SECRET) {
 // Now dynamically import config after env vars are loaded
 const configPromise = import('@payload-config')
 
+// Helper function to create minimal Lexical content
+function createMinimalLexicalContent(text: string) {
+  return {
+    root: {
+      children: [
+        {
+          children: [
+            {
+              detail: 0,
+              format: 0,
+              mode: 'normal' as const,
+              style: '',
+              text: text,
+              type: 'text' as const,
+              version: 1,
+            },
+          ],
+          direction: 'ltr' as const,
+          format: '' as const,
+          indent: 0,
+          type: 'paragraph' as const,
+          version: 1,
+        },
+      ],
+      direction: 'ltr' as const,
+      format: '' as const,
+      indent: 0,
+      type: 'root' as const,
+      version: 1,
+    },
+  }
+}
+
 async function createAboutPage() {
   console.log('📝 Creating about page...')
   console.log(`📁 Environment loaded from: ${envPath}`)
@@ -66,6 +99,9 @@ async function createAboutPage() {
       data: {
         title: 'About Us',
         slug: 'about',
+        hero: {
+          type: 'none',
+        },
         meta: {
           title: 'About Us | Ready to Work',
           description: 'Learn about Ready to Work - your trusted partner for connecting talented candidates with the right employers.',
@@ -77,41 +113,15 @@ async function createAboutPage() {
             columns: [
               {
                 size: 'full',
-                richText: {
-                  root: {
-                    children: [
-                      {
-                        children: [
-                          {
-                            detail: 0,
-                            format: 0,
-                            mode: 'normal',
-                            style: '',
-                            text: 'This is a placeholder. The about page uses custom components defined in the code.',
-                            type: 'text',
-                            version: 1,
-                          },
-                        ],
-                        direction: 'ltr',
-                        format: '',
-                        indent: 0,
-                        type: 'paragraph',
-                        version: 1,
-                      },
-                    ],
-                    direction: 'ltr',
-                    format: '',
-                    indent: 0,
-                    type: 'root',
-                    version: 1,
-                  },
-                },
+                richText: createMinimalLexicalContent(
+                  'This is a placeholder. The about page uses custom components defined in the code.'
+                ),
               },
             ],
           },
         ],
-        _status: 'published',
       },
+      draft: false,
     })
 
     console.log(`\n✅ About page created successfully!`)

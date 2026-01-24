@@ -33,24 +33,24 @@ function createMinimalLexicalContent(text: string) {
             {
               detail: 0,
               format: 0,
-              mode: 'normal',
+              mode: 'normal' as const,
               style: '',
               text: text,
-              type: 'text',
+              type: 'text' as const,
               version: 1,
             },
           ],
-          direction: 'ltr',
-          format: '',
+          direction: 'ltr' as const,
+          format: '' as const,
           indent: 0,
-          type: 'paragraph',
+          type: 'paragraph' as const,
           version: 1,
         },
       ],
-      direction: 'ltr',
-      format: '',
+      direction: 'ltr' as const,
+      format: '' as const,
       indent: 0,
-      type: 'root',
+      type: 'root' as const,
       version: 1,
     },
   }
@@ -168,6 +168,9 @@ async function createAllPages() {
           data: {
             title: pageConfig.title,
             slug: pageConfig.slug,
+            hero: {
+              type: 'none',
+            },
             meta: pageConfig.meta,
             layout: [
               {
@@ -183,8 +186,8 @@ async function createAllPages() {
                 ],
               },
             ],
-            _status: 'published',
           },
+          draft: false,
         })
 
         results.created.push(pageConfig.slug)

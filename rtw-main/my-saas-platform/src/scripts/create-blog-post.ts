@@ -30,17 +30,17 @@ function createParagraph(text: string) {
       {
         detail: 0,
         format: 0,
-        mode: 'normal',
+        mode: 'normal' as const,
         style: '',
         text: text,
-        type: 'text',
+        type: 'text' as const,
         version: 1,
       },
     ],
-    direction: 'ltr',
-    format: '',
+    direction: 'ltr' as const,
+    format: '' as const,
     indent: 0,
-    type: 'paragraph',
+    type: 'paragraph' as const,
     version: 1,
   }
 }
@@ -52,18 +52,18 @@ function createHeading(text: string, level: 1 | 2 | 3 | 4 = 2) {
       {
         detail: 0,
         format: 0,
-        mode: 'normal',
+        mode: 'normal' as const,
         style: '',
         text: text,
-        type: 'text',
+        type: 'text' as const,
         version: 1,
       },
     ],
-    direction: 'ltr',
-    format: '',
+    direction: 'ltr' as const,
+    format: '' as const,
     indent: 0,
     tag: `h${level}`,
-    type: 'heading',
+    type: 'heading' as const,
     version: 1,
   }
 }
@@ -123,10 +123,10 @@ function createLexicalContent() {
   return {
     root: {
       children: content,
-      direction: 'ltr',
-      format: '',
+      direction: 'ltr' as const,
+      format: '' as const,
       indent: 0,
-      type: 'root',
+      type: 'root' as const,
       version: 1,
     },
   }
@@ -141,7 +141,6 @@ const blogPostData = {
     description: 'Use smarter job listings to engage the right candidates, boost applications, and improve hiring outcomes with clear, transparent, and effective job postings.',
   },
   publishedAt: new Date().toISOString(),
-  _status: 'published' as const,
   content: createLexicalContent(),
 }
 
@@ -191,6 +190,7 @@ async function createBlogPost() {
         ...blogPostData,
         authors: authorId ? [authorId] : [],
       },
+      draft: false,
     })
 
     console.log(`\n✅ Blog post created successfully!`)
