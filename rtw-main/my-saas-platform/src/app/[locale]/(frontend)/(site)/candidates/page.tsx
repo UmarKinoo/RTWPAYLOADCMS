@@ -28,10 +28,12 @@ import { getTranslations } from 'next-intl/server'
 // Metadata
 // ============================================================================
 
-export const metadata: Metadata = {
-  title: 'Candidates | Ready to Work',
-  description:
-    'Browse our talented candidates. Find skilled workers, specialists, and elite professionals for your team.',
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPageBySlug } from '@/utilities/getPageBySlug'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const candidatesPage = await getPageBySlug('candidates')
+  return generateMeta({ doc: candidatesPage })
 }
 
 // ============================================================================

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { HomepageNavbar } from '@/components/homepage/Navbar'
+import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
@@ -22,15 +22,15 @@ export const metadata: Metadata = {
 // ============================================================================
 
 export default async function BlogArchivePage() {
-  // Fetch initial posts
+  // Fetch all published posts (using a high limit to get all posts)
   const { posts, totalDocs, totalPages, page } = await getPosts({
-    limit: 9,
+    limit: 1000, // High limit to fetch all posts
     page: 1,
   })
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <HomepageNavbar />
+      <HomepageNavbarWrapper />
       <BlogHero />
 
       {/* Blog Content */}

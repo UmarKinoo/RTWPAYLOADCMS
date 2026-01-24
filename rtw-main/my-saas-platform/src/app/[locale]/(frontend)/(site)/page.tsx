@@ -9,10 +9,12 @@ import { TrustedBy } from '@/components/homepage/blocks/TrustedBy'
 import { FAQ } from '@/components/homepage/blocks/FAQ'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPageBySlug } from '@/utilities/getPageBySlug'
 
-export const metadata: Metadata = {
-  title: 'Ready to Work | Connect with Talented Candidates',
-  description: 'Explore thousands of openings and talented profiles all in one place. Access a wide pool of qualified candidates across all roles and industries.',
+export async function generateMetadata(): Promise<Metadata> {
+  const homepage = await getPageBySlug('home')
+  return generateMeta({ doc: homepage })
 }
 
 export default async function Home() {
@@ -25,7 +27,6 @@ export default async function Home() {
       <MajorDisciplines />
       <UploadResume />
       <Blog />
-      <TrustedBy />
       <FAQ />
       <Newsletter />
       <Footer />

@@ -1,17 +1,20 @@
-import { HomepageNavbar } from '@/components/homepage/Navbar'
+import type { Metadata } from 'next'
+import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { AboutHero, OurWork, HowItWorks, ContactSection } from '@/components/about'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPageBySlug } from '@/utilities/getPageBySlug'
 
-export const metadata = {
-  title: 'About Us | Ready to Work',
-  description: 'Learn about Ready to Work - your trusted partner for connecting talented candidates with the right employers.',
+export async function generateMetadata(): Promise<Metadata> {
+  const aboutPage = await getPageBySlug('about')
+  return generateMeta({ doc: aboutPage })
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <HomepageNavbar />
+      <HomepageNavbarWrapper />
       <AboutHero />
       <OurWork />
       <HowItWorks />

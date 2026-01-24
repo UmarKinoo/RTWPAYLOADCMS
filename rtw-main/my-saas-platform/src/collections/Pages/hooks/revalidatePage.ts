@@ -28,14 +28,30 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
             }
           })
           .catch((error) => {
-            if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating page ${doc.id}: ${error.message}`)
+            if (error instanceof Error) {
+              if (
+                error.message.includes('static generation store') ||
+                error.message.includes('Cannot find module')
+              ) {
+                payload.logger.warn('Revalidation skipped (not in Next.js server context)')
+              } else {
+                payload.logger.error(`Error revalidating page ${doc.id}: ${error.message}`)
+              }
             }
           })
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      payload.logger.error(`Error revalidating page ${doc.id}: ${errorMessage}`)
+      // Silently fail if revalidation is not available
+      if (error instanceof Error) {
+        if (
+          error.message.includes('static generation store') ||
+          error.message.includes('Cannot find module')
+        ) {
+          payload.logger.warn(`Revalidation skipped: ${error.message}`)
+        } else {
+          payload.logger.error(`Error revalidating page ${doc.id}: ${error.message}`)
+        }
+      }
     }
   }
   return doc
@@ -52,14 +68,30 @@ export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { 
             revalidateTag('pages-sitemap', 'max')
           })
           .catch((error) => {
-            if (error instanceof Error && !error.message.includes('Cannot find module')) {
-              payload.logger.error(`Error revalidating deleted page ${doc.id}: ${error.message}`)
+            if (error instanceof Error) {
+              if (
+                error.message.includes('static generation store') ||
+                error.message.includes('Cannot find module')
+              ) {
+                payload.logger.warn('Revalidation skipped (not in Next.js server context)')
+              } else {
+                payload.logger.error(`Error revalidating deleted page ${doc.id}: ${error.message}`)
+              }
             }
           })
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      payload.logger.error(`Error revalidating deleted page ${doc.id}: ${errorMessage}`)
+      // Silently fail if revalidation is not available
+      if (error instanceof Error) {
+        if (
+          error.message.includes('static generation store') ||
+          error.message.includes('Cannot find module')
+        ) {
+          payload.logger.warn(`Revalidation skipped: ${error.message}`)
+        } else {
+          payload.logger.error(`Error revalidating deleted page ${doc.id}: ${error.message}`)
+        }
+      }
     }
   }
 

@@ -2,28 +2,24 @@
 
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from '@/i18n/routing'
+import { usePathname } from 'next/navigation'
 import { HomepageSection } from '../HomepageSection'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ImageWithSkeleton } from '../ImageWithSkeleton'
 import { Search, Building2, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import Image from 'next/image'
 
 // Image assets from public/assets/
 const imgBusinessmanMakingCoffee20252 = '/assets/5902659f7a1d069cd46ab37be664dbed528febb1.webp'
 const imgBusinessmanMakingCoffee20251 = '/assets/9067d496e1f10f37d480e3dc99e0dd3a6af0fb6c.svg'
 
-// Government logos - using actual filenames from public/assets
-// Note: Next.js Image component handles URL encoding automatically
-const logoMediaAuthority = '/assets/شعار الهيئة العامة لتنظيم الإعلام بدقة عالية png – svg.svg'
-const logoVision2030 = '/assets/شعار رؤية المملكة 2030 – Saudi vision 2030 Logo SVG.svg'
-const logoSaudiBusinessCenter = '/assets/شعار المركز السعودي للأعمال – Saudi Business Center Logo – PNG – SVG.svg'
-const logoCommerceMinistry = '/assets/شعار وزارة التجارة SVG.svg'
 
 export const Hero: React.FC = () => {
   const t = useTranslations('homepage.hero')
   const router = useRouter()
+  const pathname = usePathname()
+  const locale = pathname.split('/')[1] || 'en'
   const [searchQuery, setSearchQuery] = useState('')
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -71,23 +67,42 @@ export const Hero: React.FC = () => {
           <div className="max-w-2xl">
             {/* Main Heading */}
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold font-inter leading-tight text-white mb-4 sm:mb-6">
-              {t('title')}{' '}
-              <span className="bg-[#d8e530] text-[#16252d] px-1.5 sm:px-2 rounded-md inline-block">
-                {t('titleHighlight')}
-              </span>{' '}
-              {t('titleEnd')}
+              {(() => {
+                const title = t('title')
+                // Highlight "Talent" only (case-insensitive)
+                const parts = title.split(/(Talent)/i)
+                return parts.map((part, index) => {
+                  const isHighlight = /^Talent$/i.test(part)
+                  if (isHighlight) {
+                    return (
+                      <span key={index} className="bg-[#d8e530] text-[#16252d] px-1.5 sm:px-2 rounded-md inline-block">
+                        {part}
+                      </span>
+                    )
+                  }
+                  return <span key={index}>{part}</span>
+                })
+              })()}
             </h1>
 
             {/* Subtitle */}
-            <p className="text-sm sm:text-base lg:text-lg font-normal font-inter leading-relaxed text-white/90 mb-6 sm:mb-8">
+            <p className="text-sm sm:text-base lg:text-lg font-semibold font-inter leading-relaxed text-white/90 mb-4 sm:mb-5">
               {t('subtitle')}
             </p>
+
+            {/* Description */}
+            {t('description') && (
+              <p className="text-sm sm:text-base lg:text-lg font-normal font-inter leading-relaxed text-white/90 mb-6 sm:mb-8">
+                {t('description')}
+              </p>
+            )}
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <Button
                 variant="outline"
                 size="lg"
+                onClick={() => router.push(`/${locale}/employer/register`)}
                 className="h-auto rounded-xl px-4 py-3 flex items-center justify-center gap-2.5 text-sm font-bold uppercase tracking-wide bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 w-full sm:w-auto"
               >
                 <Building2 className="w-5 h-5" />
@@ -97,6 +112,7 @@ export const Hero: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
+                onClick={() => router.push(`/${locale}/register`)}
                 className="h-auto rounded-xl px-4 py-3 flex items-center justify-center gap-2.5 text-sm font-bold uppercase tracking-wide bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 w-full sm:w-auto"
               >
                 <User className="w-5 h-5" />
@@ -125,52 +141,6 @@ export const Hero: React.FC = () => {
                 </Button>
               </div>
             </form>
-          </div>
-
-          {/* Bottom Right Government Logos - Hidden on very small screens */}
-          <div className="hidden sm:flex absolute bottom-4 sm:bottom-6 end-4 sm:end-6 md:end-8 flex-wrap gap-2 sm:gap-3 items-center justify-end max-w-[280px] sm:max-w-[320px]">
-            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              <div className="relative h-8 w-auto sm:h-10">
-                <Image
-                  src={logoMediaAuthority}
-                  alt="الهيئة العامة لتنظيم الإعلام"
-                  width={40}
-                  height={40}
-                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
-                  unoptimized
-                />
-              </div>
-              <div className="relative h-8 w-auto sm:h-10">
-                <Image
-                  src={logoVision2030}
-                  alt="رؤية المملكة 2030"
-                  width={40}
-                  height={40}
-                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
-                  unoptimized
-                />
-              </div>
-              <div className="relative h-8 w-auto sm:h-10">
-                <Image
-                  src={logoSaudiBusinessCenter}
-                  alt="المركز السعودي للأعمال"
-                  width={40}
-                  height={40}
-                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
-                  unoptimized
-                />
-              </div>
-              <div className="relative h-8 w-auto sm:h-10">
-                <Image
-                  src={logoCommerceMinistry}
-                  alt="وزارة التجارة"
-                  width={40}
-                  height={40}
-                  className="h-8 w-auto sm:h-10 opacity-90 hover:opacity-100 transition-opacity object-contain"
-                  unoptimized
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>

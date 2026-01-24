@@ -2,11 +2,18 @@ import type { CollectionConfig } from 'payload'
 
 import {
   BlocksFeature,
+  BoldFeature,
   FixedToolbarFeature,
   HeadingFeature,
   HorizontalRuleFeature,
   InlineToolbarFeature,
+  ItalicFeature,
   lexicalEditor,
+  LinkFeature,
+  OrderedListFeature,
+  ParagraphFeature,
+  UnderlineFeature,
+  UnorderedListFeature,
 } from '@payloadcms/richtext-lexical'
 
 import { authenticated } from '../../access/authenticated'
@@ -87,11 +94,19 @@ export const Posts: CollectionConfig<'posts'> = {
               editor: lexicalEditor({
                 features: ({ rootFeatures }) => {
                   return [
+                    // Include root features first (contains basic formatting)
                     ...rootFeatures,
+                    // Headings
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+                    // Lists - MUST be included explicitly
+                    OrderedListFeature(),
+                    UnorderedListFeature(),
+                    // Blocks
                     BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    // Toolbar features
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
+                    // Other features
                     HorizontalRuleFeature(),
                   ]
                 },

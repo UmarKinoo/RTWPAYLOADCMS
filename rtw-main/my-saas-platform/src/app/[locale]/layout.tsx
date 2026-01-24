@@ -11,6 +11,7 @@ import { Toaster } from 'sonner'
 import { cn } from '@/lib/utils'
 import { getServerSideURL } from '@/utilities/getURL'
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import '@/globals.css'
 
 const fontSans = FontSans({
@@ -30,6 +31,9 @@ export const metadata: Metadata = {
   title: 'Ready to Work',
   description: 'Connect with talented candidates and find the right talent for your team. Ready to Work - Your trusted partner for hiring.',
   metadataBase: new URL(getServerSideURL()),
+  verification: {
+    google: 'google80006dce542d45d5',
+  },
   icons: {
     icon: [
       { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '16x16', type: 'image/png' },
@@ -92,7 +96,30 @@ export default async function LocaleLayout({
       className={cn(fontClassName, 'antialiased')}
       suppressHydrationWarning
     >
+      <head>
+        {/* Google Tag Manager */}
+        <Script
+          id="google-tag-manager"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KCL74CX7');`,
+          }}
+        />
+      </head>
       <body className={cn('flex flex-col min-h-screen', isArabic ? cairo.className : fontSans.className)}>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-KCL74CX7"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
         <Toaster richColors expand={true} closeButton />
         <Analytics />

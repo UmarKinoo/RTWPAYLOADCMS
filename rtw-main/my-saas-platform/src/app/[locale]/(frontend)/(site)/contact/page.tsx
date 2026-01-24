@@ -1,19 +1,20 @@
 import type { Metadata } from 'next'
-import { HomepageNavbar } from '@/components/homepage/Navbar'
+import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { ContactHero, ContactIntro, ContactForm } from '@/components/contact'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPageBySlug } from '@/utilities/getPageBySlug'
 
-export const metadata: Metadata = {
-  title: 'Contact Us | Ready to Work',
-  description:
-    "Get in touch with Ready to Work. We'd love to hear from you! Whether you have a question, feedback, or just want to say hello, feel free to reach out.",
+export async function generateMetadata(): Promise<Metadata> {
+  const contactPage = await getPageBySlug('contact')
+  return generateMeta({ doc: contactPage })
 }
 
-export default function ContactPage() {
+export default async function ContactPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <HomepageNavbar />
+      <HomepageNavbarWrapper />
       <ContactHero />
       <ContactIntro />
       <ContactForm />

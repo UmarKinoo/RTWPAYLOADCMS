@@ -20,15 +20,15 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
 }
 
 export const generateMeta = async (args: {
-  doc: Partial<Page> | Partial<Post> | null
+  doc: Partial<Page> | Partial<Post> | { meta?: { title?: string; description?: string; image?: Media | Config['db']['defaultIDType'] | null } } | null
 }): Promise<Metadata> => {
   const { doc } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
 
   const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Payload Website Template'
-    : 'Payload Website Template'
+    ? doc?.meta?.title + ' | Ready to Work'
+    : 'Ready to Work'
 
   return {
     metadataBase: new URL(getServerSideURL()),
@@ -43,7 +43,7 @@ export const generateMeta = async (args: {
           ]
         : undefined,
       title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      url: Array.isArray((doc as any)?.slug) ? (doc as any).slug.join('/') : '/',
     }),
     title,
   }

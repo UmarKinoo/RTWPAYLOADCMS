@@ -5,11 +5,10 @@ import { Badge } from '@/components/ui/badge'
 import { ImageWithSkeleton } from '../ImageWithSkeleton'
 import { Link } from '@/i18n/routing'
 import { getTranslations } from 'next-intl/server'
+import { getPosts, formatPostDate } from '@/lib/payload/posts'
 
-// Image assets
-const imgBlog1 = '/assets/ac0fd8c628d0f50b3bdcbedaff88d237be9a96fe.webp'
-const imgBlog2 = '/assets/b567b848ec5f99df60fdd857ed8f6b1bd549a09f.webp'
-const imgBlog3 = '/assets/66f1c9d350783934464a398f002f8006d6ca02f0.webp'
+// Default image for posts without hero images
+const DEFAULT_BLOG_IMAGE = '/assets/ac0fd8c628d0f50b3bdcbedaff88d237be9a96fe.webp'
 
 interface BlogCardProps {
   image: string
@@ -19,11 +18,12 @@ interface BlogCardProps {
   title: string
   description: string
   byLabel: string
+  slug?: string
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ image, tags, author, date, title, description, byLabel }) => {
-  return (
-    <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow border-0 bg-white">
+const BlogCard: React.FC<BlogCardProps> = ({ image, tags, author, date, title, description, byLabel, slug }) => {
+  const cardContent = (
+    <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow border-0 bg-white h-full cursor-pointer">
       {/* Image */}
       <div className="h-36 sm:h-40 md:h-44 lg:h-48 w-full overflow-hidden relative">
         <ImageWithSkeleton
@@ -68,39 +68,35 @@ const BlogCard: React.FC<BlogCardProps> = ({ image, tags, author, date, title, d
       </CardContent>
     </Card>
   )
+
+  if (slug) {
+    return (
+      <Link href={`/posts/${slug}`} className="block">
+        {cardContent}
+      </Link>
+    )
+  }
+
+  return cardContent
 }
 
 export const Blog: React.FC = async () => {
   const t = await getTranslations('homepage.blog')
-  const blogPosts = [
-    {
-      image: imgBlog1,
-      tags: ['Job Market', 'Career'],
-      author: 'Mona Amiri',
-      date: '13 Mar 2025',
-      title: 'When Should You Change Your Job?',
-      description:
-        'A professional resume increases your chances of getting hired. This article covers key tips like choosing the right format, highlighting skills, and writing concisely.',
-    },
-    {
-      image: imgBlog2,
-      tags: ['Freelancing', 'Skills'],
-      author: 'Fateme Moradi',
-      date: '16 Feb 2025',
-      title: 'Standing Out in Job Market',
-      description:
-        'In a competitive job market, showcasing unique skills, tailoring your resume, and building a strong online presence can set you apart.',
-    },
-    {
-      image: imgBlog3,
-      tags: ['Career', 'Interview'],
-      author: 'Ali Amiri',
-      date: '12 May 2025',
-      title: 'Skills Employers Seek',
-      description:
-        'Employers value a combination of technical expertise and soft skills. This article highlights key skills like communication and problem-solving.',
-    },
-  ]
+  
+  // Fetch latest 3 blog posts from Payload CMS
+  const { posts } = await getPosts({ limit: 3 })
+
+  // Map Payload posts to BlogCard format
+  const blogPosts = posts.map((post) => ({
+    id: post.id,
+    image: post.imageUrl || DEFAULT_BLOG_IMAGE,
+    tags: post.categories.map((cat) => cat.name),
+    author: post.author || 'Admin',
+    date: formatPostDate(post.publishedAt),
+    title: post.title,
+    description: post.description || '',
+    slug: post.slug,
+  }))
 
   return (
     <HomepageSection className="pb-12 sm:pb-16 md:pb-20">
@@ -115,11 +111,17 @@ export const Blog: React.FC = async () => {
       </div>
 
       {/* Blog Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-        {blogPosts.map((post, index) => (
-          <BlogCard key={index} {...post} byLabel={t('by')} />
-        ))}
-      </div>
+      {blogPosts.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+          {blogPosts.map((post) => (
+            <BlogCard key={post.id} {...post} byLabel={t('by')} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-[#757575] font-inter">{t('noPosts') || 'No blog posts available yet.'}</p>
+        </div>
+      )}
 
       {/* View All Link */}
       <div className="flex justify-center mt-6 sm:mt-8">

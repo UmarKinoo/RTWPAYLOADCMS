@@ -1,17 +1,20 @@
-import { HomepageNavbar } from '@/components/homepage/Navbar'
+import type { Metadata } from 'next'
+import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { TermsAndConditionsContent } from '@/components/terms-and-conditions/TermsAndConditionsContent'
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPageBySlug } from '@/utilities/getPageBySlug'
 
-export const metadata = {
-  title: 'Terms and Conditions | Ready to Work',
-  description: 'Read our terms and conditions to understand the rules and regulations for using our platform.',
+export async function generateMetadata(): Promise<Metadata> {
+  const termsPage = await getPageBySlug('terms-and-conditions')
+  return generateMeta({ doc: termsPage })
 }
 
-export default function TermsAndConditionsPage() {
+export default async function TermsAndConditionsPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <HomepageNavbar />
+      <HomepageNavbarWrapper />
       <TermsAndConditionsContent />
       <Newsletter />
       <Footer />

@@ -25,11 +25,19 @@ export async function GET(
 
     // Helper function to get localized name
     const getLocalizedName = (doc: any): string => {
-      if (locale === 'ar' && doc?.name_ar) return doc.name_ar
-      if (locale === 'en' && doc?.name_en) return doc.name_en
-      if (doc?.name_ar) return doc.name_ar // Fallback to Arabic if English not available
-      if (doc?.name_en) return doc.name_en // Fallback to English if Arabic not available
-      return doc?.name || ''
+      if (locale === 'ar') {
+        if (doc?.name_ar && doc.name_ar.trim()) return doc.name_ar
+        // Prefer base name before falling back to English
+        if (doc?.name && doc.name.trim()) return doc.name
+        if (doc?.name_en && doc.name_en.trim()) return doc.name_en
+        return ''
+      }
+      // locale === 'en'
+      if (doc?.name_en && doc.name_en.trim()) return doc.name_en
+      // Prefer base name before falling back to Arabic
+      if (doc?.name && doc.name.trim()) return doc.name
+      if (doc?.name_ar && doc.name_ar.trim()) return doc.name_ar
+      return ''
     }
 
     const subCategory = typeof skill.subCategory === 'object' ? skill.subCategory : null

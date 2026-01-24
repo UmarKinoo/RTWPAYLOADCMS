@@ -68,17 +68,19 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
             </div>
 
             {/* Right Side Actions */}
-            <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
               <LanguageSwitcher />
               {employer ? (
                 // Employer is logged in - show Employer UserMenu
                 <>
-                  <UserMenu employer={employer} />
+                  <div className="hidden sm:block">
+                    <UserMenu employer={employer} />
+                  </div>
                   {/* Mobile Menu Button */}
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="lg:hidden h-9 w-9 text-[#16252d]"
+                    className="lg:hidden h-9 w-9 text-[#16252d] flex-shrink-0"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     aria-label="Toggle menu"
                   >
@@ -88,12 +90,14 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
               ) : candidate ? (
                 // Candidate is logged in - show Candidate UserMenu
                 <>
-                  <CandidateUserMenu candidate={candidate} />
+                  <div className="hidden sm:block">
+                    <CandidateUserMenu candidate={candidate} />
+                  </div>
                   {/* Mobile Menu Button */}
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="lg:hidden h-9 w-9 text-[#16252d]"
+                    className="lg:hidden h-9 w-9 text-[#16252d] flex-shrink-0"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     aria-label="Toggle menu"
                   >
@@ -106,18 +110,19 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
                   {/* Login Link - Hidden on mobile */}
                   <Link
                     href="/login"
-                    className="hidden sm:block text-sm lg:text-base font-semibold font-inter text-[#16252d] hover:text-[#4545b8] transition-colors"
+                    className="hidden sm:block text-sm lg:text-base font-semibold font-inter text-[#16252d] hover:text-[#4545b8] transition-colors whitespace-nowrap"
                   >
                     {t('login')}
                   </Link>
 
-                  {/* Get Started Button */}
+                  {/* Get Started Button - Hidden on mobile when hamburger is shown */}
                   <Button
                     onClick={() => router.push(`/${locale}/register-type`)}
                     className={cn(
                       'bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-lg sm:rounded-xl',
-                      'px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5',
-                      'text-sm sm:text-base lg:text-lg font-bold whitespace-nowrap'
+                      'px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5',
+                      'text-xs sm:text-base lg:text-lg font-bold whitespace-nowrap',
+                      'hidden sm:inline-flex' // Hide on mobile
                     )}
                   >
                     {t('getStarted')}
@@ -127,7 +132,7 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="lg:hidden h-9 w-9 text-[#16252d]"
+                    className="lg:hidden h-9 w-9 text-[#16252d] flex-shrink-0"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     aria-label="Toggle menu"
                   >

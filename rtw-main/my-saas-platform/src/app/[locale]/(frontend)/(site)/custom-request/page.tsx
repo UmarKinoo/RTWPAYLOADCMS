@@ -1,19 +1,21 @@
 import type { Metadata } from 'next'
-import { HomepageNavbar } from '@/components/homepage/Navbar'
+import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPageBySlug } from '@/utilities/getPageBySlug'
 
-export const metadata: Metadata = {
-  title: 'Custom Plan Request | Ready to Work',
-  description: 'Request a custom pricing plan tailored to your needs.',
+export async function generateMetadata(): Promise<Metadata> {
+  const customRequestPage = await getPageBySlug('custom-request')
+  return generateMeta({ doc: customRequestPage })
 }
 
-export default function CustomRequestPage() {
+export default async function CustomRequestPage() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <HomepageNavbar />
+      <HomepageNavbarWrapper />
       
       <main className="pt-24 sm:pt-28 md:pt-32 pb-8 sm:pb-12">
         <HomepageSection>

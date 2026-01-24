@@ -152,18 +152,37 @@ export async function GET(request: NextRequest) {
 
         // 4. Format results for frontend with localized names
         const getLocalizedName = (name: string | null, name_en: string | null, name_ar: string | null): string => {
-          if (locale === 'ar' && name_ar) return name_ar
-          if (locale === 'en' && name_en) return name_en
-          if (name_ar) return name_ar // Fallback to Arabic if English not available
-          if (name_en) return name_en // Fallback to English if Arabic not available
-          return name || ''
+          if (locale === 'ar') {
+            if (name_ar && name_ar.trim()) return name_ar
+            // Prefer base name before falling back to English
+            if (name && name.trim()) return name
+            if (name_en && name_en.trim()) return name_en
+            return ''
+          }
+          // locale === 'en'
+          if (name_en && name_en.trim()) return name_en
+          // Prefer base name before falling back to Arabic
+          if (name && name.trim()) return name
+          if (name_ar && name_ar.trim()) return name_ar
+          return ''
         }
 
-        const skills = dbResult.rows.map((row) => {
+        const skills = dbResult.rows.map((row, index) => {
           const skillName = getLocalizedName(row.name, row.name_en, row.name_ar)
           const subCategoryName = getLocalizedName(row.subcategory_name, row.subcategory_name_en, row.subcategory_name_ar)
           const categoryName = getLocalizedName(row.category_name, row.category_name_en, row.category_name_ar)
           const disciplineName = getLocalizedName(row.discipline_name, row.discipline_name_en, row.discipline_name_ar)
+          
+          // Debug logging for first result
+          if (index === 0) {
+            console.log('[Skills Search] First result localization:', {
+              locale,
+              skillName,
+              name: row.name,
+              name_en: row.name_en,
+              name_ar: row.name_ar,
+            })
+          }
 
           return {
             id: String(row.id),
@@ -233,11 +252,19 @@ export async function GET(request: NextRequest) {
 
     // Helper function to get localized name
     const getLocalizedName = (doc: any): string => {
-      if (locale === 'ar' && doc?.name_ar) return doc.name_ar
-      if (locale === 'en' && doc?.name_en) return doc.name_en
-      if (doc?.name_ar) return doc.name_ar // Fallback to Arabic if English not available
-      if (doc?.name_en) return doc.name_en // Fallback to English if Arabic not available
-      return doc?.name || ''
+      if (locale === 'ar') {
+        if (doc?.name_ar && doc.name_ar.trim()) return doc.name_ar
+        // Prefer base name before falling back to English
+        if (doc?.name && doc.name.trim()) return doc.name
+        if (doc?.name_en && doc.name_en.trim()) return doc.name_en
+        return ''
+      }
+      // locale === 'en'
+      if (doc?.name_en && doc.name_en.trim()) return doc.name_en
+      // Prefer base name before falling back to Arabic
+      if (doc?.name && doc.name.trim()) return doc.name
+      if (doc?.name_ar && doc.name_ar.trim()) return doc.name_ar
+      return ''
     }
 
     // Format results for frontend with localized names

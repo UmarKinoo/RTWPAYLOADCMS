@@ -15,8 +15,7 @@ import { Popover, PopoverContent, PopoverAnchor } from '@/components/ui/popover'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Badge } from '@/components/ui/badge'
 import { useDebounce } from '@/utilities/useDebounce'
-import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface Skill {
   id: string | number
@@ -36,8 +35,7 @@ interface SkillSearchProps {
 
 export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
   const t = useTranslations('registration.skillSearch')
-  const pathname = usePathname()
-  const locale = pathname.split('/')[1] || 'en'
+  const locale = useLocale()
   const [open, setOpen] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState('')
   const [skills, setSkills] = React.useState<Skill[]>([])

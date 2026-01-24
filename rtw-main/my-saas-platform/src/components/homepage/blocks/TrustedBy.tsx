@@ -4,10 +4,10 @@ import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 
 // Government logos from Hero component
-const logoMediaAuthority = '/assets/شعار الهيئة العامة لتنظيم الإعلام بدقة عالية png – svg.svg'
-const logoVision2030 = '/assets/شعار رؤية المملكة 2030 – Saudi vision 2030 Logo SVG.svg'
-const logoSaudiBusinessCenter = '/assets/شعار المركز السعودي للأعمال – Saudi Business Center Logo – PNG – SVG.svg'
-const logoCommerceMinistry = '/assets/شعار وزارة التجارة SVG.svg'
+const logoMediaAuthority = '/assets/Media Authority Logo.svg'
+const logoVision2030 = '/assets/Saudi Vision 2030 Logo.svg'
+const logoSaudiBusinessCenter = '/assets/sbcw.webp'
+const logoCommerceMinistry = '/assets/Ministry of Commerce Logo.svg'
 
 // Government organizations data with balanced sizing
 const companies = [
@@ -38,28 +38,25 @@ export const TrustedBy: React.FC = async () => {
 
   return (
     <HomepageSection className="pb-12 sm:pb-16 md:pb-20">
-      {/* Header */}
-      <div className="text-center mb-6 sm:mb-8">
-        <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold font-inter text-[#16252d]">
-          {t('title')}
-        </h2>
-      </div>
-
       {/* Logos - Scrollable on mobile, centered on desktop */}
       <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible scrollbar-hide">
-        <div className="flex items-center justify-start sm:justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 min-w-max sm:min-w-0">
+        <div className="flex items-center justify-start sm:justify-center gap-4 sm:gap-5 md:gap-6 min-w-max sm:min-w-0">
           {companies.map((company, index) => (
             <div
               key={index}
-              className="bg-white hover:bg-gray-50 transition-colors rounded-lg px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-center shadow-sm border border-gray-100"
-              style={{ minWidth: '140px', maxWidth: '180px' }}
+              className="bg-white hover:bg-gray-50/50 transition-all duration-300 rounded-xl flex items-center justify-center shadow-sm hover:shadow-lg border border-[#EDEDED] hover:border-[#CBCBCB] overflow-hidden group"
+              style={{ 
+                width: '180px',
+                height: '120px',
+                padding: '20px 24px'
+              }}
             >
               <Image
                 src={company.logo}
                 alt={company.nameEn || company.name}
-                width={140}
-                height={60}
-                className="h-12 sm:h-14 md:h-16 w-auto opacity-90 hover:opacity-100 transition-opacity object-contain"
+                width={160}
+                height={88}
+                className="w-full h-full object-contain object-center opacity-90 group-hover:opacity-100 transition-opacity duration-300"
                 unoptimized
               />
             </div>
