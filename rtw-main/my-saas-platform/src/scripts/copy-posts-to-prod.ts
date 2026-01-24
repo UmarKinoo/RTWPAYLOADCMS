@@ -68,7 +68,6 @@ async function copyPostsToProd() {
     const prodConfig = await import('@payload-config')
     const prodPayload = await getPayload({ 
       config: prodConfig.default,
-      secret: process.env.PAYLOAD_SECRET || 'your-secret-here',
     })
     console.log('✅ Connected to production Payload')
     
