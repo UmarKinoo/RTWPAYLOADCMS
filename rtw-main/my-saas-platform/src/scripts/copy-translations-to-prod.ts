@@ -75,7 +75,7 @@ async function copyTranslationsToProd() {
     
     // Function to copy translations for a table
     async function copyTableTranslations(
-      tableName: 'skills' | 'categories' | 'subcategories',
+      tableName: 'skills' | 'categories' | 'subcategories' | 'disciplines',
       displayName: string
     ) {
       console.log(`\n📋 Copying ${displayName} translations...`)
@@ -171,19 +171,21 @@ async function copyTranslationsToProd() {
       return { updated, skipped, errors }
     }
     
-    // Copy translations for all three tables
+    // Copy translations for all four tables
     const skillsResult = await copyTableTranslations('skills', 'Skills')
     const categoriesResult = await copyTableTranslations('categories', 'Categories')
     const subcategoriesResult = await copyTableTranslations('subcategories', 'Subcategories')
+    const disciplinesResult = await copyTableTranslations('disciplines', 'Disciplines')
     
     // Overall summary
     console.log('\n\n🎉 Overall Summary:')
     console.log(`   Skills: ${skillsResult.updated} updated, ${skillsResult.skipped} skipped, ${skillsResult.errors} errors`)
     console.log(`   Categories: ${categoriesResult.updated} updated, ${categoriesResult.skipped} skipped, ${categoriesResult.errors} errors`)
     console.log(`   Subcategories: ${subcategoriesResult.updated} updated, ${subcategoriesResult.skipped} skipped, ${subcategoriesResult.errors} errors`)
+    console.log(`   Disciplines: ${disciplinesResult.updated} updated, ${disciplinesResult.skipped} skipped, ${disciplinesResult.errors} errors`)
     
-    const totalUpdated = skillsResult.updated + categoriesResult.updated + subcategoriesResult.updated
-    const totalErrors = skillsResult.errors + categoriesResult.errors + subcategoriesResult.errors
+    const totalUpdated = skillsResult.updated + categoriesResult.updated + subcategoriesResult.updated + disciplinesResult.updated
+    const totalErrors = skillsResult.errors + categoriesResult.errors + subcategoriesResult.errors + disciplinesResult.errors
     
     if (totalErrors === 0) {
       console.log(`\n✅ Successfully copied ${totalUpdated} translations to production!`)

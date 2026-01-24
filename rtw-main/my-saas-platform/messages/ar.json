@@ -350,6 +350,60 @@
       }
     }
   },
+  "employerRegistration": {
+    "title": "سجّل شركتك وانضم إلى نادينا.",
+    "description": "يرجى إدخال تفاصيلك الشخصية لإعداد حسابك وتخصيص تجربتك",
+    "fields": {
+      "responsiblePerson": "الشخص المسؤول",
+      "companyName": "اسم الشركة",
+      "email": "البريد الإلكتروني",
+      "phoneNumber": "رقم الهاتف",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور"
+    },
+    "placeholders": {
+      "responsiblePerson": "أدخل اسمك الكامل",
+      "companyName": "أدخل دورك",
+      "email": "أدخل بريدك الإلكتروني التجاري",
+      "phoneNumber": "+9665xxxxxxx أو 5xxxxxxx",
+      "password": "أدخل كلمة المرور",
+      "confirmPassword": "أكد كلمة المرور"
+    },
+    "validation": {
+      "responsiblePersonRequired": "يرجى إدخال اسم الشخص المسؤول",
+      "companyNameRequired": "يرجى إدخال اسم شركتك",
+      "emailRequired": "يرجى إدخال عنوان بريدك الإلكتروني",
+      "phoneRequired": "يرجى إدخال رقم هاتفك",
+      "passwordMinLength": "يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل",
+      "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+      "termsRequired": "يجب عليك الموافقة على الشروط والأحكام"
+    },
+    "termsAgreement": "أوافق على",
+    "termsAndConditions": "الشروط والأحكام وسياسة الخصوصية",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsAgreementEnd": "جميع بياناتي محمية بموجب",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "signingUp": "جاري التسجيل...",
+    "signUp": "اشترك",
+    "phoneVerification": {
+      "title": "تحقق من رقم هاتفك",
+      "description": "لقد أرسلنا رمز التحقق إلى هاتفك. يرجى إدخاله أدناه لإكمال تسجيلك.",
+      "verified": "تم التحقق من الهاتف!",
+      "verifiedDescription": "تم التحقق من رقم هاتفك بنجاح.",
+      "verificationSuccessfulLoginFailed": "تم التحقق بنجاح، لكن فشل تسجيل الدخول. يرجى تسجيل الدخول يدويًا."
+    },
+    "messages": {
+      "registrationSuccessful": "تم التسجيل بنجاح!",
+      "registrationSuccessfulDescription": "يرجى التحقق من رقم هاتفك للمتابعة.",
+      "registrationFailed": "فشل التسجيل",
+      "registrationFailedDescription": "يرجى المحاولة مرة أخرى.",
+      "unexpectedError": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+    },
+    "passwordToggle": {
+      "show": "إظهار كلمة المرور",
+      "hide": "إخفاء كلمة المرور"
+    }
+  },
   "about": {
     "hero": {
       "title": "من نحن"

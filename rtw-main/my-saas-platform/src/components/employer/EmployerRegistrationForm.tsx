@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Link, useRouter } from '@/i18n/routing'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -13,6 +12,7 @@ import { toast } from 'sonner'
 import Image from 'next/image'
 import { registerEmployer } from '@/lib/employer'
 import { PhoneVerification } from '@/components/auth/phone-verification'
+import { useTranslations } from 'next-intl'
 
 // Google logo
 const googleLogo = '/assets/8f7935e769322ac3c425296f0ab80d00c06649f5.png'
@@ -26,6 +26,10 @@ interface FloatingLabelInputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   name: string
   showPasswordToggle?: boolean
+  passwordToggleAriaLabel?: {
+    show: string
+    hide: string
+  }
 }
 
 const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
@@ -37,6 +41,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   onChange,
   name,
   showPasswordToggle = false,
+  passwordToggleAriaLabel,
 }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
@@ -76,7 +81,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a5a5a5] hover:text-[#757575] transition-colors"
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            aria-label={showPassword ? (passwordToggleAriaLabel?.hide || 'Hide password') : (passwordToggleAriaLabel?.show || 'Show password')}
           >
             {showPassword ? (
               <EyeOff className="w-5 h-5" />
@@ -91,6 +96,8 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 }
 
 export const EmployerRegistrationForm: React.FC = () => {
+  const t = useTranslations('employerRegistration')
+  const tAuth = useTranslations('auth')
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
   const [showPhoneVerification, setShowPhoneVerification] = useState(false)
@@ -120,57 +127,43 @@ export const EmployerRegistrationForm: React.FC = () => {
     try {
       // Client-side validation
       if (!formData.responsiblePerson.trim()) {
-        toast.error('Validation Error', {
-          description: 'Please enter the responsible person name',
-        })
+        toast.error(t('validation.responsiblePersonRequired'))
         setIsPending(false)
         return
       }
 
       if (!formData.companyName.trim()) {
-        toast.error('Validation Error', {
-          description: 'Please enter your company name',
-        })
+        toast.error(t('validation.companyNameRequired'))
         setIsPending(false)
         return
       }
 
       if (!formData.email.trim()) {
-        toast.error('Validation Error', {
-          description: 'Please enter your email address',
-        })
+        toast.error(t('validation.emailRequired'))
         setIsPending(false)
         return
       }
 
       if (!formData.phone.trim()) {
-        toast.error('Validation Error', {
-          description: 'Please enter your phone number',
-        })
+        toast.error(t('validation.phoneRequired'))
         setIsPending(false)
         return
       }
 
       if (!formData.password || formData.password.length < 8) {
-        toast.error('Validation Error', {
-          description: 'Password must be at least 8 characters long',
-        })
+        toast.error(t('validation.passwordMinLength'))
         setIsPending(false)
         return
       }
 
       if (formData.password !== formData.confirmPassword) {
-        toast.error('Validation Error', {
-          description: 'Passwords do not match',
-        })
+        toast.error(t('validation.passwordsDoNotMatch'))
         setIsPending(false)
         return
       }
 
       if (!formData.termsAccepted) {
-        toast.error('Validation Error', {
-          description: 'You must accept the terms and conditions',
-        })
+        toast.error(t('validation.termsRequired'))
         setIsPending(false)
         return
       }
@@ -187,23 +180,23 @@ export const EmployerRegistrationForm: React.FC = () => {
       })
 
       if (result.success && result.employerId) {
-        toast.success('Registration Successful!', {
-          description: 'Please verify your phone number to continue.',
+        toast.success(t('messages.registrationSuccessful'), {
+          description: t('messages.registrationSuccessfulDescription'),
         })
         // Show phone verification step
         setEmployerId(result.employerId)
         setShowPhoneVerification(true)
         setIsPending(false) // Registration complete, now showing verification
       } else {
-        toast.error('Registration Failed', {
-          description: result.error || 'Please try again.',
+        toast.error(t('messages.registrationFailed'), {
+          description: result.error || t('messages.registrationFailedDescription'),
         })
         setIsPending(false)
       }
     } catch (error) {
       console.error('Registration error:', error)
-      toast.error('Registration Failed', {
-        description: 'An unexpected error occurred. Please try again.',
+      toast.error(t('messages.registrationFailed'), {
+        description: t('messages.unexpectedError'),
       })
       setIsPending(false)
     }
@@ -222,10 +215,10 @@ export const EmployerRegistrationForm: React.FC = () => {
         {/* Title and Description */}
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#16252d] mb-3 sm:mb-4 leading-tight">
-            Verify Your Phone Number
+            {t('phoneVerification.title')}
           </h2>
           <p className="text-sm sm:text-base text-[#a5a5a5] leading-relaxed px-2">
-            We've sent a verification code to your phone. Please enter it below to complete your registration.
+            {t('phoneVerification.description')}
           </p>
         </div>
 
@@ -235,8 +228,8 @@ export const EmployerRegistrationForm: React.FC = () => {
           userId={employerId}
           userCollection="employers"
           onVerified={async () => {
-            toast.success('Phone Verified!', {
-              description: 'Your phone number has been verified successfully.',
+            toast.success(t('phoneVerification.verified'), {
+              description: t('phoneVerification.verifiedDescription'),
             })
             // Log in the employer after successful phone verification
             try {
@@ -253,12 +246,12 @@ export const EmployerRegistrationForm: React.FC = () => {
                 router.push('/dashboard')
                 router.refresh() // Refresh to update auth state
               } else {
-                toast.error('Verification successful, but login failed. Please log in manually.')
+                toast.error(t('phoneVerification.verificationSuccessfulLoginFailed'))
                 router.push('/login')
               }
             } catch (error) {
               console.error('Error logging in after verification:', error)
-              toast.error('Verification successful, but login failed. Please log in manually.')
+              toast.error(t('phoneVerification.verificationSuccessfulLoginFailed'))
               router.push('/login')
             }
           }}
@@ -278,10 +271,10 @@ export const EmployerRegistrationForm: React.FC = () => {
       {/* Title and Description */}
       <div className="text-center mb-6 sm:mb-8">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#16252d] mb-3 sm:mb-4 leading-tight">
-          Register your company and join our club.
+          {t('title')}
         </h2>
         <p className="text-sm sm:text-base text-[#a5a5a5] leading-relaxed px-2">
-          Please enter your personal details to set up your account and personalize your experience
+          {t('description')}
         </p>
       </div>
 
@@ -289,9 +282,9 @@ export const EmployerRegistrationForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         {/* Responsible Person */}
         <FloatingLabelInput
-          label="Responsible Person"
+          label={t('fields.responsiblePerson')}
           required
-          placeholder="Enter your Full Name"
+          placeholder={t('placeholders.responsiblePerson')}
           value={formData.responsiblePerson}
           onChange={handleInputChange}
           name="responsiblePerson"
@@ -299,9 +292,9 @@ export const EmployerRegistrationForm: React.FC = () => {
 
         {/* Company Name */}
         <FloatingLabelInput
-          label="Company Name"
+          label={t('fields.companyName')}
           required
-          placeholder="Enter your role"
+          placeholder={t('placeholders.companyName')}
           value={formData.companyName}
           onChange={handleInputChange}
           name="companyName"
@@ -309,10 +302,10 @@ export const EmployerRegistrationForm: React.FC = () => {
 
         {/* Email */}
         <FloatingLabelInput
-          label="Email"
+          label={t('fields.email')}
           required
           type="email"
-          placeholder="Enter your Bussiness Email"
+          placeholder={t('placeholders.email')}
           value={formData.email}
           onChange={handleInputChange}
           name="email"
@@ -320,10 +313,10 @@ export const EmployerRegistrationForm: React.FC = () => {
 
         {/* Phone */}
         <FloatingLabelInput
-          label="Phone Number"
+          label={t('fields.phoneNumber')}
           required
           type="tel"
-          placeholder="+9665xxxxxxx or 5xxxxxxx"
+          placeholder={t('placeholders.phoneNumber')}
           value={formData.phone}
           onChange={handleInputChange}
           name="phone"
@@ -331,24 +324,32 @@ export const EmployerRegistrationForm: React.FC = () => {
 
         {/* Password */}
         <FloatingLabelInput
-          label="Password"
+          label={t('fields.password')}
           required
-          placeholder="Enter your password"
+          placeholder={t('placeholders.password')}
           value={formData.password}
           onChange={handleInputChange}
           name="password"
           showPasswordToggle
+          passwordToggleAriaLabel={{
+            show: t('passwordToggle.show'),
+            hide: t('passwordToggle.hide'),
+          }}
         />
 
         {/* Confirm Password */}
         <FloatingLabelInput
-          label="Confirm Password"
+          label={t('fields.confirmPassword')}
           required
-          placeholder="Confirm your Password"
+          placeholder={t('placeholders.confirmPassword')}
           value={formData.confirmPassword}
           onChange={handleInputChange}
           name="confirmPassword"
           showPasswordToggle
+          passwordToggleAriaLabel={{
+            show: t('passwordToggle.show'),
+            hide: t('passwordToggle.hide'),
+          }}
         />
 
         {/* Terms and Conditions Checkbox */}
@@ -365,13 +366,13 @@ export const EmployerRegistrationForm: React.FC = () => {
             htmlFor="terms"
             className="text-xs sm:text-sm text-[#757575] leading-relaxed cursor-pointer"
           >
-            I agree to Ready To Work's{' '}
-            <Link href="/privacy-policy" className="underline hover:text-[#4644b8] transition-colors">
-              Terms and Conditions and Privacy Policy
+            {t('termsAgreement')}{' '}
+            <Link href="/terms-and-conditions" className="underline hover:text-[#4644b8] transition-colors">
+              {t('termsAndConditions')}
             </Link>
-            . All my data is protected with our{' '}
+            . {t('termsAgreementEnd')}{' '}
             <Link href="/privacy-policy" className="underline hover:text-[#4644b8] transition-colors">
-              Privacy Policy
+              {t('privacyPolicy')}
             </Link>
             .
           </label>
@@ -383,7 +384,7 @@ export const EmployerRegistrationForm: React.FC = () => {
           disabled={isPending}
           className="w-full h-12 sm:h-14 bg-[#4644b8] hover:bg-[#3a3aa0] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm sm:text-base font-medium mt-6"
         >
-          {isPending ? 'Signing up...' : 'Sign up'}
+          {isPending ? t('signingUp') : t('signUp')}
         </Button>
 
         {/* OR Divider - Google sign up temporarily commented out */}
@@ -412,9 +413,9 @@ export const EmployerRegistrationForm: React.FC = () => {
 
         {/* Login Link */}
         <div className="text-center text-xs sm:text-sm pt-2">
-          <span className="text-[#757575]">Do you already have an account? </span>
+          <span className="text-[#757575]">{t('alreadyHaveAccount')} </span>
           <Link href="/login" className="font-semibold text-[#4644b8] hover:underline transition-colors">
-            Login
+            {tAuth('login')}
           </Link>
         </div>
       </form>

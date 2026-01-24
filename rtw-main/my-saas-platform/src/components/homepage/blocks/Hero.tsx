@@ -2,7 +2,6 @@
 
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from '@/i18n/routing'
-import { usePathname } from 'next/navigation'
 import { HomepageSection } from '../HomepageSection'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,8 +17,6 @@ const imgBusinessmanMakingCoffee20251 = '/assets/9067d496e1f10f37d480e3dc99e0dd3
 export const Hero: React.FC = () => {
   const t = useTranslations('homepage.hero')
   const router = useRouter()
-  const pathname = usePathname()
-  const locale = pathname.split('/')[1] || 'en'
   const [searchQuery, setSearchQuery] = useState('')
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
@@ -102,7 +99,7 @@ export const Hero: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => router.push(`/${locale}/employer/register`)}
+                onClick={() => router.push('/employer/register')}
                 className="h-auto rounded-xl px-4 py-3 flex items-center justify-center gap-2.5 text-sm font-bold uppercase tracking-wide bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 w-full sm:w-auto"
               >
                 <Building2 className="w-5 h-5" />
@@ -112,7 +109,7 @@ export const Hero: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => router.push(`/${locale}/register`)}
+                onClick={() => router.push('/register')}
                 className="h-auto rounded-xl px-4 py-3 flex items-center justify-center gap-2.5 text-sm font-bold uppercase tracking-wide bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 w-full sm:w-auto"
               >
                 <User className="w-5 h-5" />

@@ -350,6 +350,60 @@
       }
     }
   },
+  "employerRegistration": {
+    "title": "Register your company and join our club.",
+    "description": "Please enter your personal details to set up your account and personalize your experience",
+    "fields": {
+      "responsiblePerson": "Responsible Person",
+      "companyName": "Company Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "placeholders": {
+      "responsiblePerson": "Enter your Full Name",
+      "companyName": "Enter your role",
+      "email": "Enter your Bussiness Email",
+      "phoneNumber": "+9665xxxxxxx or 5xxxxxxx",
+      "password": "Enter your password",
+      "confirmPassword": "Confirm your Password"
+    },
+    "validation": {
+      "responsiblePersonRequired": "Please enter the responsible person name",
+      "companyNameRequired": "Please enter your company name",
+      "emailRequired": "Please enter your email address",
+      "phoneRequired": "Please enter your phone number",
+      "passwordMinLength": "Password must be at least 8 characters long",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "termsRequired": "You must accept the terms and conditions"
+    },
+    "termsAgreement": "I agree to Ready To Work's",
+    "termsAndConditions": "Terms and Conditions and Privacy Policy",
+    "privacyPolicy": "Privacy Policy",
+    "termsAgreementEnd": "All my data is protected with our",
+    "alreadyHaveAccount": "Do you already have an account?",
+    "signingUp": "Signing up...",
+    "signUp": "Sign up",
+    "phoneVerification": {
+      "title": "Verify Your Phone Number",
+      "description": "We've sent a verification code to your phone. Please enter it below to complete your registration.",
+      "verified": "Phone Verified!",
+      "verifiedDescription": "Your phone number has been verified successfully.",
+      "verificationSuccessfulLoginFailed": "Verification successful, but login failed. Please log in manually."
+    },
+    "messages": {
+      "registrationSuccessful": "Registration Successful!",
+      "registrationSuccessfulDescription": "Please verify your phone number to continue.",
+      "registrationFailed": "Registration Failed",
+      "registrationFailedDescription": "Please try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again."
+    },
+    "passwordToggle": {
+      "show": "Show password",
+      "hide": "Hide password"
+    }
+  },
   "about": {
     "hero": {
       "title": "About Us"
