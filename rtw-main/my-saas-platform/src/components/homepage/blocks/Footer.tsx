@@ -12,18 +12,19 @@ const logoLightSrc = '/assets/ba0487a1acd5a7d0db5850ddb61c7571d272bfee.svg'
 export const Footer: React.FC = async () => {
   const t = await getTranslations('homepage.footer')
 
+  // Quicklinks with their routes
   const quickLinks = [
-    t('links.aboutUs'),
-    t('links.companyInformation'),
-    t('links.siteMap'),
+    { label: t('links.aboutUs'), href: '/about' },
+    { label: t('links.companyInformation'), href: '/about' }, // Company info can be part of about page
+    { label: t('links.siteMap'), href: '/about' }, // Sitemap can redirect to about or be a future page
   ]
 
+  // Policy links with their routes
   const policyLinks = [
-    t('links.policies'),
-    t('links.termsAndCondition'),
-    t('links.legal'),
-    t('links.disclaimer'),
-    t('links.privacyAndPolicy'),
+    { label: t('links.termsAndCondition'), href: '/terms-and-conditions' },
+    { label: t('links.privacyAndPolicy'), href: '/privacy-policy' },
+    { label: t('links.legal'), href: '/terms-and-conditions' }, // Legal info can be part of terms
+    { label: t('links.disclaimer'), href: '/terms-and-conditions' }, // Disclaimer can be part of terms
   ]
 
   return (
@@ -97,12 +98,12 @@ export const Footer: React.FC = async () => {
               <ul className="flex flex-col gap-1.5">
                 {quickLinks.map((link, index) => (
                   <li key={index}>
-                    <a
-                      href="#"
+                    <Link
+                      href={link.href}
                       className="text-sm sm:text-base font-normal font-inter text-white hover:text-[#d8e530] transition-colors"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -116,12 +117,12 @@ export const Footer: React.FC = async () => {
               <ul className="flex flex-col gap-1.5">
                 {policyLinks.map((link, index) => (
                   <li key={index}>
-                    <a
-                      href="#"
+                    <Link
+                      href={link.href}
                       className="text-sm sm:text-base font-normal font-inter text-white hover:text-[#d8e530] transition-colors"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
