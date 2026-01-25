@@ -18,9 +18,11 @@ import { JobBenefitsSection } from './dashboard/JobBenefitsSection'
 import { ResumeQualityWidget } from './dashboard/ResumeQualityWidget'
 import { ResumeUploadSection } from './dashboard/ResumeUploadSection'
 import { NotificationsView } from './dashboard/NotificationsView'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { VisuallyHidden } from '@/components/ui/visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
+import { BottomNav } from '@/components/homepage/BottomNav'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
 
 interface CandidateDashboardProps {
@@ -42,12 +44,12 @@ export function CandidateDashboard({ candidate: initialCandidate, unreadNotifica
   return (
     <div className="relative min-h-screen bg-[#f5f5f5]">
       {/* Mobile Menu Button */}
-      <div className="fixed left-4 top-4 z-50 lg:hidden">
+      <div className="fixed left-4 top-4 z-40 lg:hidden">
         <Button
           variant="outline"
           size="icon"
           onClick={() => setMobileMenuOpen(true)}
-          className="h-10 w-10 bg-white shadow-sm"
+          className="h-11 w-11 bg-white shadow-md border-2 border-gray-200"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -60,13 +62,16 @@ export function CandidateDashboard({ candidate: initialCandidate, unreadNotifica
 
       {/* Mobile Sidebar Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-[220px] p-0">
+        <SheetContent side="left" className="w-full max-w-[280px] sm:w-[320px] p-0 flex flex-col overflow-hidden z-[110]">
+          <VisuallyHidden>
+            <SheetTitle>Navigation Menu</SheetTitle>
+          </VisuallyHidden>
           <DashboardSidebar mobile onClose={() => setMobileMenuOpen(false)} unreadNotificationsCount={unreadNotificationsCount} />
         </SheetContent>
       </Sheet>
 
       {/* Main Content */}
-      <div className="px-4 pb-8 pt-16 sm:px-6 lg:ml-[220px] lg:pr-6 lg:pt-6">
+      <div className="px-4 pb-20 md:pb-8 pt-16 sm:px-6 lg:ml-[220px] lg:pr-6 lg:pt-6">
         {/* Header Section */}
         <DashboardHeader 
           candidate={candidate} 
@@ -78,9 +83,9 @@ export function CandidateDashboard({ candidate: initialCandidate, unreadNotifica
         {currentView === 'notifications' ? (
           <NotificationsView candidate={candidate} notifications={notifications} />
         ) : (
-          <div className="mt-6 flex flex-col gap-4 xl:flex-row">
+          <div className="mt-4 sm:mt-6 flex flex-col gap-3 sm:gap-4 xl:flex-row">
             {/* Left Column - Main Content */}
-            <div className="flex flex-1 flex-col gap-4">
+            <div className="flex flex-1 flex-col gap-3 sm:gap-4">
               {/* Profile Section */}
               <ProfileSection candidate={candidate} onUpdate={handleUpdate} />
 
@@ -113,7 +118,7 @@ export function CandidateDashboard({ candidate: initialCandidate, unreadNotifica
             </div>
 
             {/* Right Column - Widgets */}
-            <div className="flex w-full flex-col gap-4 xl:w-[340px]">
+            <div className="flex w-full flex-col gap-3 sm:gap-4 xl:w-[340px]">
               {/* Resume Quality Widget */}
               <ResumeQualityWidget candidate={candidate} />
 
@@ -123,6 +128,9 @@ export function CandidateDashboard({ candidate: initialCandidate, unreadNotifica
           </div>
         )}
       </div>
+
+      {/* Bottom Navigation */}
+      <BottomNav candidate={candidate} />
     </div>
   )
 }

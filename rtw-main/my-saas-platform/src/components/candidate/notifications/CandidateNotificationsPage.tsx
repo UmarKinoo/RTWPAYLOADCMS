@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { markNotificationAsRead } from '@/lib/candidate/notifications'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { BottomNav } from '@/components/homepage/BottomNav'
 import type { Candidate } from '@/payload-types'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
 import { cn } from '@/lib/utils'
@@ -91,8 +92,8 @@ export function CandidateNotificationsPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen bg-[#f5f5f5] pb-20 md:pb-8">
+      <div className="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -189,6 +190,9 @@ export function CandidateNotificationsPage({
           </Card>
         )}
       </div>
+
+      {/* Bottom Navigation */}
+      <BottomNav candidate={candidate} />
     </div>
   )
 }
