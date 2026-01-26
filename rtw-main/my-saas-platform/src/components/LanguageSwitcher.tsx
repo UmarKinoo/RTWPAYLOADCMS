@@ -29,33 +29,29 @@ export function LanguageSwitcher() {
   // Switch locale while preserving the rest of the path
   // usePathname() from next-intl returns pathname WITHOUT locale prefix
   const switchLocale = () => {
-    try {
-      // Get the pathname without locale (already done by usePathname from next-intl)
-      // Ensure we have a valid path
-      let pathWithoutLocale = pathname || '/'
-      
-      // Remove any existing locale prefix if somehow it's there (defensive check)
-      pathWithoutLocale = pathWithoutLocale.replace(/^\/(en|ar)/, '') || '/'
-      
-      // Ensure path starts with /
-      if (!pathWithoutLocale.startsWith('/')) {
-        pathWithoutLocale = `/${pathWithoutLocale}`
-      }
-      
-      // Construct the new path with the other locale
-      // If pathname is '/', we want '/ar' or '/en'
-      // If pathname is '/about', we want '/ar/about' or '/en/about'
-      const newPath = pathWithoutLocale === '/' 
-        ? `/${otherLocale}` 
-        : `/${otherLocale}${pathWithoutLocale}`
-      
-      // Use push to navigate to the new locale
-      router.push(newPath)
-    } catch (error) {
-      console.error('Error switching locale:', error)
-      // Fallback: just navigate to the other locale's homepage
-      router.push(`/${otherLocale}`)
+    // Get the actual browser pathname to ensure we have the full path
+    const actualPathname = typeof window !== 'undefined' ? window.location.pathname : ''
+    
+    // Extract path without locale (remove /en or /ar prefix)
+    let pathWithoutLocale = actualPathname.replace(/^\/(en|ar)/, '') || '/'
+    
+    // Ensure path starts with /
+    if (!pathWithoutLocale.startsWith('/')) {
+      pathWithoutLocale = `/${pathWithoutLocale}`
     }
+    
+    // Construct the new path with the other locale
+    const newPath = pathWithoutLocale === '/' 
+      ? `/${otherLocale}` 
+      : `/${otherLocale}${pathWithoutLocale}`
+    
+    // Preserve query string and hash if they exist
+    const search = typeof window !== 'undefined' ? window.location.search : ''
+    const hash = typeof window !== 'undefined' ? window.location.hash : ''
+    const fullPath = `${newPath}${search}${hash}`
+    
+    // Use window.location for direct navigation to avoid locale conflicts
+    window.location.href = fullPath
   }
 
   return (
