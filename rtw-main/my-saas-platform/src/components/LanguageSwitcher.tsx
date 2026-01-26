@@ -27,10 +27,35 @@ export function LanguageSwitcher() {
   }
 
   // Switch locale while preserving the rest of the path
+  // usePathname() from next-intl returns pathname WITHOUT locale prefix
   const switchLocale = () => {
-    const pathWithoutLocale = pathname.replace(`/${currentLocale}`, '') || '/'
-    const newPath = `/${otherLocale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`
-    router.push(newPath)
+    try {
+      // Get the pathname without locale (already done by usePathname from next-intl)
+      // Ensure we have a valid path
+      let pathWithoutLocale = pathname || '/'
+      
+      // Remove any existing locale prefix if somehow it's there (defensive check)
+      pathWithoutLocale = pathWithoutLocale.replace(/^\/(en|ar)/, '') || '/'
+      
+      // Ensure path starts with /
+      if (!pathWithoutLocale.startsWith('/')) {
+        pathWithoutLocale = `/${pathWithoutLocale}`
+      }
+      
+      // Construct the new path with the other locale
+      // If pathname is '/', we want '/ar' or '/en'
+      // If pathname is '/about', we want '/ar/about' or '/en/about'
+      const newPath = pathWithoutLocale === '/' 
+        ? `/${otherLocale}` 
+        : `/${otherLocale}${pathWithoutLocale}`
+      
+      // Use push to navigate to the new locale
+      router.push(newPath)
+    } catch (error) {
+      console.error('Error switching locale:', error)
+      // Fallback: just navigate to the other locale's homepage
+      router.push(`/${otherLocale}`)
+    }
   }
 
   return (
