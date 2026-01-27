@@ -130,7 +130,7 @@ export async function getFilterOptions(): Promise<FilterOptions> {
       }
     })
     Object.keys(categoriesByDiscipline).forEach((k) => {
-      categoriesByDiscipline[k] = categoriesByDiscipline[k].toSorted((a, b) =>
+      categoriesByDiscipline[k] = [...categoriesByDiscipline[k]].sort((a, b) =>
         a.localeCompare(b, undefined, { sensitivity: 'base' }),
       )
     })
@@ -144,7 +144,7 @@ export async function getFilterOptions(): Promise<FilterOptions> {
       }
     })
     Object.keys(subCategoriesByCategory).forEach((k) => {
-      subCategoriesByCategory[k] = subCategoriesByCategory[k].toSorted((a, b) =>
+      subCategoriesByCategory[k] = [...subCategoriesByCategory[k]].sort((a, b) =>
         a.localeCompare(b, undefined, { sensitivity: 'base' }),
       )
     })
