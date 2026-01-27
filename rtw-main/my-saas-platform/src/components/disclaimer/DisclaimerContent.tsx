@@ -25,7 +25,7 @@ export async function DisclaimerContent() {
     },
   }
 
-  const data = isArabic ? content.ar : content.en
+  const title = isArabic ? content.ar.title : content.en.title
 
   return (
     <div className="pt-24 sm:pt-28 md:pt-32 pb-16">
@@ -33,7 +33,7 @@ export async function DisclaimerContent() {
         {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#16252d] mb-4">
-            {data.title}
+            {title}
           </h1>
           <div className="w-24 h-1 bg-[#4644b8] mx-auto rounded-full" />
         </div>
@@ -42,14 +42,14 @@ export async function DisclaimerContent() {
         <div className="prose prose-lg max-w-none prose-headings:text-[#4644b8] prose-p:text-[#16252d] prose-li:text-[#16252d]">
           {isArabic ? (
             <section className="mb-10">
-              <p className="text-[#16252d] leading-relaxed mb-4">{data.text}</p>
-              <p className="text-[#16252d] leading-relaxed mb-4">{data.text2}</p>
-              <p className="text-[#16252d] leading-relaxed">{data.text3}</p>
+              <p className="text-[#16252d] leading-relaxed mb-4">{content.ar.text}</p>
+              <p className="text-[#16252d] leading-relaxed mb-4">{content.ar.text2}</p>
+              <p className="text-[#16252d] leading-relaxed">{content.ar.text3}</p>
             </section>
           ) : (
             <section className="mb-10">
               <ul className="space-y-4 list-disc list-inside text-[#16252d]">
-                {data.items.map((item, index) => (
+                {content.en.items.map((item, index) => (
                   <li key={index} className="leading-relaxed">{item}</li>
                 ))}
               </ul>
