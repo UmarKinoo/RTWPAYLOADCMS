@@ -1,16 +1,16 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { getCurrentUserType } from '@/lib/currentUserType'
-import { NotificationsPageView } from '@/components/candidate/dashboard/NotificationsPageView'
+import { ResumeView } from '@/components/candidate/dashboard/ResumeView'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
 
 export const dynamic = 'force-dynamic'
 
-type NotificationsPageProps = {
+type ResumePageProps = {
   params: Promise<{ locale: string }>
 }
 
-export default async function NotificationsPage({ params }: NotificationsPageProps) {
+export default async function ResumePage({ params }: ResumePageProps) {
   const { locale } = await params
   try {
     const userType = await getCurrentUserType()
@@ -40,19 +40,18 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
           </div>
         }
       >
-        <NotificationsPageView
+        <ResumeView
           candidate={candidate}
           unreadNotificationsCount={unreadCount}
           notifications={notifications}
         />
       </Suspense>
     )
-  } catch (error: unknown) {
-    const err = error as { digest?: string }
-    if (err?.digest?.startsWith('NEXT_REDIRECT')) {
+  } catch (error: any) {
+    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
       throw error
     }
-    console.error('Notifications page error:', error)
+    console.error('Resume page error:', error)
     redirect(`/${locale}/login`)
   }
 }

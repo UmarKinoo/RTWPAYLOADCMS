@@ -93,7 +93,7 @@ export async function PrivacyPolicyContent() {
         title: 'Article (12): Contact and Inquiries',
         text: 'For any inquiries or complaints related to the protection of personal data, you can contact us at:',
         email: 'Marketing@ReadyToWork.sa',
-        phone: '053-969-6922',
+        phone: '+966 53 969 6922',
         address: 'Jeddah City – Kingdom of Saudi Arabia',
       },
       general: {
@@ -191,7 +191,7 @@ export async function PrivacyPolicyContent() {
         title: 'المادة (12): الاتصال والاستفسارات',
         text: 'لأي استفسارات أو شكاوى تتعلق بحماية البيانات الشخصية، يمكنكم التواصل معنا عبر:',
         email: 'Marketing@ReadyToWork.sa',
-        phone: '053-969-6922',
+        phone: '+966 53 969 6922',
         address: 'مدينة جدة – المملكة العربية السعودية',
       },
       general: {

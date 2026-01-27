@@ -38,36 +38,26 @@ export const BottomNav: React.FC<BottomNavProps> = ({ employer, candidate }) => 
     if (href === '/') {
       return pathname === '/' || pathname === '/en' || pathname === '/ar'
     }
-    // Handle query params in href
     const hrefPath = href.split('?')[0]
-    const currentPath = pathname || ''
-    
-    // Special handling for dashboard routes with view params
+    // Normalize pathname: strip leading locale so /en/dashboard/notifications -> /dashboard/notifications
+    const currentPath = (pathname || '').replace(/^\/(en|ar)(\/|$)/, (_, __, s) => s || '/')
+
+    // Employer dashboard views (query params)
     if (href.includes('view=')) {
       const viewParam = href.split('view=')[1]?.split('&')[0]
       const currentView = searchParams?.get('view')
       return currentPath === hrefPath && currentView === viewParam
     }
-    
-    // For base dashboard routes, check if we're on the exact path
+
+    // Base dashboard: active only when on exactly /dashboard (no sub-routes)
     if (hrefPath === '/employer/dashboard' || hrefPath === '/dashboard') {
-      const currentView = searchParams?.get('view')
-      // If href is base dashboard, only active if no view param
-      if (currentPath === hrefPath) {
-        return !currentView
-      }
-      // Also check for /dashboard/notifications route
-      if (hrefPath === '/dashboard' && currentPath === '/dashboard/notifications') {
-        return false // Notifications has its own route
-      }
+      const onBaseDashboard = currentPath === hrefPath || currentPath === hrefPath + '/'
+      const onSubRoute = /\/dashboard\/(resume|settings|notifications|activity)/.test(currentPath)
+      return onBaseDashboard && !onSubRoute
     }
-    
-    // For /dashboard/notifications
-    if (href === '/dashboard/notifications') {
-      return currentPath === '/dashboard/notifications'
-    }
-    
-    return currentPath?.startsWith(hrefPath) || false
+
+    // Sub-routes: match by path (locale may prefix pathname)
+    return currentPath === hrefPath || currentPath?.startsWith(hrefPath + '/') || (pathname ?? '').includes(hrefPath)
   }
 
   // Employer navigation items
@@ -115,11 +105,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ employer, candidate }) => 
       label: 'Notifications',
       href: '/dashboard/notifications',
       icon: Bell,
-      badge: false, // We could add unread count here if needed
     },
     {
       label: 'Profile',
-      href: '/dashboard?view=profile',
+      href: '/dashboard/settings',
       icon: User,
     },
   ]

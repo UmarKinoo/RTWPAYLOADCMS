@@ -2,11 +2,11 @@
 
 import React from 'react'
 import { format } from 'date-fns'
-import { Activity, ArrowLeft } from 'lucide-react'
+import { Activity } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import type { Candidate } from '@/payload-types'
 import type { ActivityItem } from '@/lib/payload/candidate-activity'
 import { cn } from '@/lib/utils'
@@ -43,26 +43,7 @@ export function ActivityView({
 
   return (
     <div className="mt-6">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="h-10 w-10">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">Activity</h1>
-            <p className="text-sm text-[#757575]">
-              {initialActivities.length > 0
-                ? `${initialActivities.length} activity item${initialActivities.length > 1 ? 's' : ''}`
-                : 'No activity yet'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Activity List */}
+      {/* Activity List — title lives in DashboardHeader above */}
       {initialActivities.length > 0 ? (
         <div className="space-y-3">
           {initialActivities.map((activity) => (

@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react'
 import { format } from 'date-fns'
-import { Bell, Check, CheckCheck, ArrowLeft } from 'lucide-react'
+import { Bell, Check, CheckCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { markNotificationAsRead } from '@/lib/candidate/notifications'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import type { Candidate } from '@/payload-types'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
 import { cn } from '@/lib/utils'
@@ -86,28 +86,15 @@ export function NotificationsView({
 
   return (
     <div className="mt-6">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="h-10 w-10">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">Notifications</h1>
-            <p className="text-sm text-[#757575]">
-              {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
-            </p>
-          </div>
-        </div>
-        {unreadCount > 0 && (
+      {/* Actions — title lives in DashboardHeader above */}
+      {unreadCount > 0 && (
+        <div className="mb-6 flex justify-end">
           <Button onClick={handleMarkAllAsRead} variant="outline" size="sm">
             <CheckCheck className="mr-2 h-4 w-4" />
             Mark all as read
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Notifications List */}
       {notifications.length > 0 ? (

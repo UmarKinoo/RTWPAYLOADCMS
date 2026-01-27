@@ -1,16 +1,17 @@
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { getCurrentUserType } from '@/lib/currentUserType'
-import { NotificationsPageView } from '@/components/candidate/dashboard/NotificationsPageView'
+import { ActivityPageView } from '@/components/candidate/dashboard/ActivityPageView'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
+import { getCandidateActivity } from '@/lib/payload/candidate-activity'
 
 export const dynamic = 'force-dynamic'
 
-type NotificationsPageProps = {
+type ActivityPageProps = {
   params: Promise<{ locale: string }>
 }
 
-export default async function NotificationsPage({ params }: NotificationsPageProps) {
+export default async function ActivityPage({ params }: ActivityPageProps) {
   const { locale } = await params
   try {
     const userType = await getCurrentUserType()
@@ -24,9 +25,10 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
     }
 
     const candidate = userType.candidate
-    const [unreadCount, notifications] = await Promise.all([
+    const [unreadCount, notifications, activities] = await Promise.all([
       getUnreadNotificationCount(candidate.id).catch(() => 0),
       getCandidateNotifications(candidate.id).catch(() => []),
+      getCandidateActivity(candidate.id).catch(() => []),
     ])
 
     return (
@@ -40,10 +42,11 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
           </div>
         }
       >
-        <NotificationsPageView
+        <ActivityPageView
           candidate={candidate}
           unreadNotificationsCount={unreadCount}
           notifications={notifications}
+          activities={activities}
         />
       </Suspense>
     )
@@ -52,7 +55,7 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
     if (err?.digest?.startsWith('NEXT_REDIRECT')) {
       throw error
     }
-    console.error('Notifications page error:', error)
+    console.error('Activity page error:', error)
     redirect(`/${locale}/login`)
   }
 }

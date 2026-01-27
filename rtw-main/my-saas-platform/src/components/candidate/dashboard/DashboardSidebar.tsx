@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
   LayoutGrid,
@@ -37,8 +37,17 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsCount = 0 }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const dashboardBase = pathname?.match(/^\/[^/]+\/dashboard/)?.[0] ?? pathname?.replace(/\/dashboard.*/, '/dashboard') ?? '/dashboard'
+  const dashboardPath = dashboardBase.replace(/\?.*$/, '')
+  const menuItems = [
+    { icon: LayoutGrid, label: 'Dashboard', href: dashboardPath, view: null },
+    { icon: User, label: 'My Resume', href: `${dashboardPath}/resume`, view: null },
+    { icon: Bell, label: 'Notification', href: `${dashboardPath}/notifications`, view: null, badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : undefined },
+    { icon: Settings, label: 'Account Setting', href: `${dashboardPath}/settings`, view: null },
+    { icon: SlidersHorizontal, label: 'Activity', href: `${dashboardPath}/activity`, view: null },
+  ]
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -136,20 +145,17 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
           </p>
         )}
 
-        {/* Menu Items */}
+        {/* Menu Items - Notification opens in dashboard (like Activity), badge only when > 0 */}
         <div className={cn('flex flex-col', mobile ? 'gap-2' : 'gap-2')}>
-          {[
-            { icon: LayoutGrid, label: 'Dashboard', href: '/dashboard' },
-            { icon: User, label: 'My Resume', href: '/dashboard/resume' },
-            { icon: Bell, label: 'Notification', href: '/dashboard/notifications', badge: unreadNotificationsCount },
-            { icon: Settings, label: 'Account Setting', href: '/dashboard/settings' },
-            { icon: SlidersHorizontal, label: 'Activity', href: '/dashboard?view=activity' },
-          ].map((item) => {
+          {menuItems.map((item) => {
             const Icon = item.icon
-            const isActive = 
-              pathname === item.href || 
-              (item.href.includes('notifications') && pathname?.includes('notifications')) ||
-              (item.href.includes('view=activity') && pathname === '/dashboard' && searchParams?.get('view') === 'activity')
+            const isActive =
+              pathname === item.href ||
+              (item.href?.includes('/resume') && pathname?.includes('/resume')) ||
+              (item.href?.includes('/settings') && pathname?.includes('/settings')) ||
+              (item.href?.includes('/notifications') && pathname?.includes('/notifications')) ||
+              (item.href?.includes('/activity') && pathname?.includes('/activity')) ||
+              (item.href === dashboardPath && pathname?.replace(/\?.*$/, '') === dashboardPath && !pathname?.includes('/resume') && !pathname?.includes('/settings') && !pathname?.includes('/notifications') && !pathname?.includes('/activity'))
             return (
               <Link
                 key={item.href}

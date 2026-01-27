@@ -109,8 +109,11 @@ export const EmployerRegistrationForm: React.FC = () => {
     phone: '',
     password: '',
     confirmPassword: '',
-    termsAccepted: false,
+    acceptPrivacyTerms: false,
+    acceptDataConsent: false,
+    acceptPlatformDisclaimer: false,
   })
+  const tLegal = useTranslations('employerRegistration.legalStatements')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -162,13 +165,13 @@ export const EmployerRegistrationForm: React.FC = () => {
         return
       }
 
-      if (!formData.termsAccepted) {
+      if (!formData.acceptPrivacyTerms || !formData.acceptDataConsent || !formData.acceptPlatformDisclaimer) {
         toast.error(t('validation.termsRequired'))
         setIsPending(false)
         return
       }
 
-      // Call server action
+      // Call server action (all three consent checkboxes accepted)
       const result = await registerEmployer({
         responsiblePerson: formData.responsiblePerson,
         companyName: formData.companyName,
@@ -176,7 +179,7 @@ export const EmployerRegistrationForm: React.FC = () => {
         phone: formData.phone,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
-        termsAccepted: formData.termsAccepted,
+        termsAccepted: true,
       })
 
       if (result.success && result.employerId) {
@@ -352,30 +355,56 @@ export const EmployerRegistrationForm: React.FC = () => {
           }}
         />
 
-        {/* Terms and Conditions Checkbox */}
-        <div className="flex items-start gap-3 pt-2">
-          <Checkbox
-            id="terms"
-            checked={formData.termsAccepted}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, termsAccepted: checked === true }))
-            }
-            className="mt-1"
-          />
-          <label
-            htmlFor="terms"
-            className="text-xs sm:text-sm text-[#757575] leading-relaxed cursor-pointer"
-          >
-            {t('termsAgreement')}{' '}
-            <Link href="/terms-and-conditions" className="underline hover:text-[#4644b8] transition-colors">
-              {t('termsAndConditions')}
-            </Link>
-            . {t('termsAgreementEnd')}{' '}
-            <Link href="/privacy-policy" className="underline hover:text-[#4644b8] transition-colors">
-              {t('privacyPolicy')}
-            </Link>
-            .
-          </label>
+        {/* Consent checkboxes – one per statement (employer) */}
+        <div className="flex flex-col gap-3 pt-2">
+          <div className="flex items-start gap-3 p-3 border border-border rounded-lg">
+            <Checkbox
+              id="acceptPrivacyTerms"
+              checked={formData.acceptPrivacyTerms}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({ ...prev, acceptPrivacyTerms: checked === true }))
+              }
+              className="mt-0.5"
+            />
+            <label
+              htmlFor="acceptPrivacyTerms"
+              className="text-xs sm:text-sm text-[#757575] leading-relaxed cursor-pointer flex-1"
+            >
+              {tLegal('acceptPrivacyTerms')} *
+            </label>
+          </div>
+          <div className="flex items-start gap-3 p-3 border border-border rounded-lg">
+            <Checkbox
+              id="acceptDataConsent"
+              checked={formData.acceptDataConsent}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({ ...prev, acceptDataConsent: checked === true }))
+              }
+              className="mt-0.5"
+            />
+            <label
+              htmlFor="acceptDataConsent"
+              className="text-xs sm:text-sm text-[#757575] leading-relaxed cursor-pointer flex-1"
+            >
+              {tLegal('acceptDataConsent')} *
+            </label>
+          </div>
+          <div className="flex items-start gap-3 p-3 border border-border rounded-lg">
+            <Checkbox
+              id="acceptPlatformDisclaimer"
+              checked={formData.acceptPlatformDisclaimer}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({ ...prev, acceptPlatformDisclaimer: checked === true }))
+              }
+              className="mt-0.5"
+            />
+            <label
+              htmlFor="acceptPlatformDisclaimer"
+              className="text-xs sm:text-sm text-[#757575] leading-relaxed cursor-pointer flex-1"
+            >
+              {tLegal('acceptPlatformDisclaimer')} *
+            </label>
+          </div>
         </div>
 
         {/* Sign Up Button */}

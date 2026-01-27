@@ -1,8 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Settings, ArrowLeft, Lock, Mail, Phone, MessageSquare, Trash2, CheckCircle2, XCircle, Loader2, Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
+import { Settings, Lock, Mail, Phone, MessageSquare, Trash2, CheckCircle2, XCircle, Loader2, Eye, EyeOff } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -91,21 +90,8 @@ export function SettingsView({ candidate: initialCandidate, unreadNotificationsC
           notifications={[]}
         />
 
-        {/* Settings Content */}
+        {/* Settings Content — title lives in DashboardHeader above */}
         <div className="mt-6">
-          {/* Header */}
-          <div className="mb-6 flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="icon" className="h-10 w-10">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">Account Settings</h1>
-              <p className="text-sm text-[#757575]">Manage your account security and preferences</p>
-            </div>
-          </div>
-
           {/* Settings Sections */}
           <div className="space-y-6">
             {/* Change Password Section */}

@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { Search } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Input } from '@/components/ui/input'
@@ -15,22 +15,31 @@ interface DashboardHeaderProps {
   notifications?: CandidateNotification[]
 }
 
+const HEADER_BY_PATH: Record<string, { title: string; description: string }> = {
+  activity: { title: 'Activity', description: 'View your recent activity and interview updates' },
+  notifications: { title: 'Notifications', description: 'View and manage your notifications' },
+  resume: { title: 'My Resume', description: 'Updating your information will offer you the most relevant content' },
+  settings: { title: 'Account Settings', description: 'Manage your account security and preferences' },
+  dashboard: { title: 'Dashboard', description: 'Updating your information will offer you the most relevant content' },
+}
+
 export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notifications = [] }: DashboardHeaderProps) {
-  const searchParams = useSearchParams()
-  const currentView = searchParams.get('view') || 'dashboard'
+  const pathname = usePathname() ?? ''
 
   const getHeaderTitle = () => {
-    if (currentView === 'notifications') {
-      return 'Notifications'
-    }
-    return 'My Resume'
+    if (pathname.includes('/activity')) return HEADER_BY_PATH.activity.title
+    if (pathname.includes('/notifications')) return HEADER_BY_PATH.notifications.title
+    if (pathname.includes('/resume')) return HEADER_BY_PATH.resume.title
+    if (pathname.includes('/settings')) return HEADER_BY_PATH.settings.title
+    return HEADER_BY_PATH.dashboard.title
   }
 
   const getHeaderDescription = () => {
-    if (currentView === 'notifications') {
-      return 'View and manage your notifications'
-    }
-    return 'Updating your information will offer you the most relevant content'
+    if (pathname.includes('/activity')) return HEADER_BY_PATH.activity.description
+    if (pathname.includes('/notifications')) return HEADER_BY_PATH.notifications.description
+    if (pathname.includes('/resume')) return HEADER_BY_PATH.resume.description
+    if (pathname.includes('/settings')) return HEADER_BY_PATH.settings.description
+    return HEADER_BY_PATH.dashboard.description
   }
 
   return (

@@ -19,24 +19,20 @@ export const FAQ: React.FC = () => {
   
   const faqItems = [
     {
-      question: t('items.freeTrial.question'),
-      answer: t('items.freeTrial.answer'),
+      question: t('items.verifiedTalent.question'),
+      answer: t('items.verifiedTalent.answer'),
     },
     {
-      question: t('items.cancelSubscription.question'),
-      answer: t('items.cancelSubscription.answer'),
+      question: t('items.topAgency.question'),
+      answer: t('items.topAgency.answer'),
     },
     {
-      question: t('items.linkedinIntegration.question'),
-      answer: t('items.linkedinIntegration.answer'),
+      question: t('items.applyForJobs.question'),
+      answer: t('items.applyForJobs.answer'),
     },
     {
-      question: t('items.dataSecurity.question'),
-      answer: t('items.dataSecurity.answer'),
-    },
-    {
-      question: t('items.customizeWorkflows.question'),
-      answer: t('items.customizeWorkflows.answer'),
+      question: t('items.startupsLargeCompanies.question'),
+      answer: t('items.startupsLargeCompanies.answer'),
     },
   ]
 

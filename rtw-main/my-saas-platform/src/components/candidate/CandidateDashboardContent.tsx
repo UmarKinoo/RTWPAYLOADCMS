@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import type { Candidate } from '@/payload-types'
 import { DashboardSidebar } from './dashboard/DashboardSidebar'
 import { DashboardHeader } from './dashboard/DashboardHeader'
@@ -17,28 +16,22 @@ import { JobPreferencesSection } from './dashboard/JobPreferencesSection'
 import { JobBenefitsSection } from './dashboard/JobBenefitsSection'
 import { ResumeQualityWidget } from './dashboard/ResumeQualityWidget'
 import { ResumeUploadSection } from './dashboard/ResumeUploadSection'
-import { NotificationsView } from './dashboard/NotificationsView'
-import { ActivityView } from './dashboard/ActivityView'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@/components/ui/visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import { BottomNav } from '@/components/homepage/BottomNav'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
-import type { ActivityItem } from '@/lib/payload/candidate-activity'
 
 interface CandidateDashboardContentProps {
   candidate: Candidate
   unreadNotificationsCount?: number
   notifications?: CandidateNotification[]
-  activities?: ActivityItem[]
 }
 
-export function CandidateDashboardContent({ candidate: initialCandidate, unreadNotificationsCount = 0, notifications = [], activities = [] }: CandidateDashboardContentProps) {
+export function CandidateDashboardContent({ candidate: initialCandidate, unreadNotificationsCount = 0, notifications = [] }: CandidateDashboardContentProps) {
   const [candidate, setCandidate] = useState(initialCandidate)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const searchParams = useSearchParams()
-  const currentView = searchParams.get('view') || 'dashboard'
 
   const handleUpdate = (updatedData: Partial<Candidate>) => {
     setCandidate((prev) => ({ ...prev, ...updatedData } as Candidate))
@@ -82,13 +75,8 @@ export function CandidateDashboardContent({ candidate: initialCandidate, unreadN
           notifications={notifications}
         />
 
-        {/* Content Area - Show different views based on currentView */}
-        {currentView === 'notifications' ? (
-          <NotificationsView candidate={candidate} notifications={notifications} />
-        ) : currentView === 'activity' ? (
-          <ActivityView candidate={candidate} activities={activities} />
-        ) : (
-          <div className="mt-4 sm:mt-6 flex flex-col gap-4 xl:flex-row">
+        {/* Content Area - Dashboard overview (Activity & Notifications are separate routes) */}
+        <div className="mt-4 sm:mt-6 flex flex-col gap-4 xl:flex-row">
             {/* Left Column - Main Content */}
             <div className="flex flex-1 flex-col gap-3 sm:gap-4">
               {/* Profile Section */}
@@ -131,7 +119,6 @@ export function CandidateDashboardContent({ candidate: initialCandidate, unreadN
               <ResumeUploadSection candidate={candidate} onUpdate={handleUpdate} />
             </div>
           </div>
-        )}
       </div>
 
       {/* Bottom Navigation */}

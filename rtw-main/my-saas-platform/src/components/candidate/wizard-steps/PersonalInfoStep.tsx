@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import * as React from 'react'
 import { UseFormRegister, FieldErrors, Control, UseFormSetValue, Controller, useWatch } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 import { Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -83,25 +84,33 @@ export function PersonalInfoStep({
       setDobDate(undefined)
     }
   }, [watchedDob, dobInputValue])
-  const [locationCountryCode, setLocationCountryCode] = useState<string>('MU') // Mauritius default
+  const KSA_COUNTRY_CODE = 'SA'
+  const [locationCountryCode] = useState<string>(KSA_COUNTRY_CODE) // Fixed to Saudi Arabia
   const [showOtherLocation, setShowOtherLocation] = useState(false)
   const [locationSearchOpen, setLocationSearchOpen] = useState(false)
-  const [locationCountrySearchOpen, setLocationCountrySearchOpen] = useState(false)
+  const t = useTranslations('registration.location')
   const [nationalitySearchOpen, setNationalitySearchOpen] = useState(false)
 
   // Get all countries for nationality
   const countries = useMemo(() => Country.getAllCountries(), [])
 
-  // Get cities for Mauritius (default) or selected country
+  // Get cities for Saudi Arabia (fixed), deduplicated by name
   const cities = useMemo(() => {
     const countryCities = City.getCitiesOfCountry(locationCountryCode) || []
-    // Create unique keys by combining city name with state code to handle duplicates
-    return countryCities.map((city, index) => ({
-      value: city.name,
-      label: city.name,
-      key: `${city.name}-${city.stateCode || index}-${locationCountryCode}`,
-      stateCode: city.stateCode,
-    }))
+    const seen = new Set<string>()
+    return countryCities
+      .filter((city) => {
+        const name = (city.name || '').trim()
+        if (!name || seen.has(name)) return false
+        seen.add(name)
+        return true
+      })
+      .map((city, index) => ({
+        value: city.name,
+        label: city.name,
+        key: `ksa-city-${city.name}-${index}`,
+        stateCode: city.stateCode,
+      }))
   }, [locationCountryCode])
 
   // Get country flag emoji from ISO code
@@ -157,13 +166,6 @@ export function PersonalInfoStep({
       setShowOtherLocation(false)
       setValue('location', value, { shouldValidate: true })
     }
-  }
-
-  const handleLocationCountryChange = (countryCode: string) => {
-    setLocationCountryCode(countryCode)
-    // Clear location when country changes
-    setValue('location', '', { shouldValidate: true })
-    setShowOtherLocation(false)
   }
 
   return (
@@ -383,62 +385,18 @@ export function PersonalInfoStep({
         </Field>
       </div>
 
-      {/* Current Location - Country and City Selector */}
+      {/* Current Location - Fixed to Saudi Arabia, city selector only */}
       <Field data-invalid={!!errors.location}>
-        <FieldLabel htmlFor="location">Current Location *</FieldLabel>
-        <div className="space-y-4">
-          {/* Country Selector */}
-          <Popover open={locationCountrySearchOpen} onOpenChange={setLocationCountrySearchOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={locationCountrySearchOpen}
-                className="w-full justify-between h-10 font-normal"
-              >
-                <span className="truncate">
-                  {(() => {
-                    const selectedCountry = countries.find(
-                      (c) => c.isoCode === locationCountryCode
-                    )
-                    return selectedCountry
-                      ? `${getCountryFlag(selectedCountry.isoCode)} ${selectedCountry.name}`
-                      : 'Select country'
-                  })()}
-                </span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Search country..." />
-                <CommandList>
-                  <CommandEmpty>No country found.</CommandEmpty>
-                  <CommandGroup>
-                    {countries.map((country) => (
-                      <CommandItem
-                        key={country.isoCode}
-                        value={country.name}
-                        onSelect={() => {
-                          handleLocationCountryChange(country.isoCode)
-                          setLocationCountrySearchOpen(false)
-                        }}
-                      >
-                        <span className="mr-2">{getCountryFlag(country.isoCode)}</span>
-                        {country.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-
-          {/* City Selector or Other Input */}
+        <FieldLabel htmlFor="location">{t('currentLocationLabel')}</FieldLabel>
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {getCountryFlag(KSA_COUNTRY_CODE)} {t('countryFixed')}
+          </p>
           {showOtherLocation ? (
             <Input
               id="location"
               {...register('location')}
-              placeholder="Enter your location"
+              placeholder={t('enterLocationPlaceholder')}
             />
           ) : (
             <Popover open={locationSearchOpen} onOpenChange={setLocationSearchOpen}>
@@ -448,14 +406,13 @@ export function PersonalInfoStep({
                   role="combobox"
                   aria-expanded={locationSearchOpen}
                   className="w-full justify-between h-10 font-normal"
-                  disabled={!locationCountryCode}
                 >
                   <Controller
                     name="location"
                     control={control}
                     render={({ field }) => (
                       <span className="truncate">
-                        {field.value || 'Select city'}
+                        {field.value || t('selectCity')}
                       </span>
                     )}
                   />
@@ -463,9 +420,9 @@ export function PersonalInfoStep({
               </PopoverTrigger>
               <PopoverContent className="w-[300px] p-0" align="start">
                 <Command>
-                  <CommandInput placeholder="Search city..." />
+                  <CommandInput placeholder={t('searchCity')} />
                   <CommandList>
-                    <CommandEmpty>No city found.</CommandEmpty>
+                    <CommandEmpty>{t('noCityFound')}</CommandEmpty>
                     <CommandGroup>
                       {cities.length > 0 ? (
                         cities.map((city) => (
@@ -486,7 +443,7 @@ export function PersonalInfoStep({
                           </CommandItem>
                         ))
                       ) : (
-                        <CommandItem disabled>No cities available for this country</CommandItem>
+                        <CommandItem disabled>{t('noCitiesAvailable')}</CommandItem>
                       )}
                       <CommandItem
                         value="other"
@@ -495,7 +452,7 @@ export function PersonalInfoStep({
                           setLocationSearchOpen(false)
                         }}
                       >
-                        Other
+                        {t('other')}
                       </CommandItem>
                     </CommandGroup>
                   </CommandList>
@@ -505,6 +462,33 @@ export function PersonalInfoStep({
           )}
         </div>
         {errors.location && <FieldError>{errors.location.message}</FieldError>}
+      </Field>
+
+      {/* Confirm currently in Saudi Arabia */}
+      <Field data-invalid={!!errors.currentlyInKSA}>
+        <div className="flex items-start gap-3 rounded-lg border border-border p-4">
+          <Controller
+            name="currentlyInKSA"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="currentlyInKSA"
+                checked={field.value || false}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+                className="mt-0.5"
+              />
+            )}
+          />
+          <label
+            htmlFor="currentlyInKSA"
+            className="text-sm leading-relaxed cursor-pointer flex-1"
+          >
+            {t('confirmInKSA')} *
+          </label>
+        </div>
+        {errors.currentlyInKSA && (
+          <FieldError>{errors.currentlyInKSA.message}</FieldError>
+        )}
       </Field>
     </div>
   )

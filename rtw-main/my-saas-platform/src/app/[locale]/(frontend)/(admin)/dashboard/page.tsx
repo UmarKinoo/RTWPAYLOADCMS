@@ -3,7 +3,6 @@ import { Suspense } from 'react'
 import { getCurrentUserType } from '@/lib/currentUserType'
 import { CandidateDashboardContent } from '@/components/candidate/CandidateDashboardContent'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
-import { getCandidateActivity } from '@/lib/payload/candidate-activity'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,19 +36,15 @@ export default async function Dashboard({ params }: DashboardProps) {
       }
       const candidate = userType.candidate
 
-      // Fetch notifications and activity data with timeout protection
-      // Use Promise.allSettled to prevent one failure from blocking the other
-      const [unreadResult, notificationsResult, activitiesResult] = await Promise.allSettled([
+      // Fetch notifications for header dropdown; Activity is on its own route
+      const [unreadResult, notificationsResult] = await Promise.allSettled([
         getUnreadNotificationCount(candidate.id),
         getCandidateNotifications(candidate.id),
-        getCandidateActivity(candidate.id),
       ])
-      
+
       const unreadNotificationsCount = unreadResult.status === 'fulfilled' ? unreadResult.value : 0
       const notifications = notificationsResult.status === 'fulfilled' ? notificationsResult.value : []
-      const activities = activitiesResult.status === 'fulfilled' ? activitiesResult.value : []
 
-      // Suspense boundary must be at server component level for useSearchParams()
       return (
         <Suspense fallback={
           <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -63,7 +58,6 @@ export default async function Dashboard({ params }: DashboardProps) {
             candidate={candidate}
             unreadNotificationsCount={unreadNotificationsCount}
             notifications={notifications}
-            activities={activities}
           />
         </Suspense>
       )

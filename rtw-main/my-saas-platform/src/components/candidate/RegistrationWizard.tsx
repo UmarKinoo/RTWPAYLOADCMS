@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -47,6 +47,9 @@ const candidateSchema = z
     dob: z.string().min(1, 'Date of birth is required'),
     nationality: z.string().min(1, 'Nationality is required'),
     languages: z.string().min(1, 'Languages are required'),
+    currentlyInKSA: z.boolean().refine((val) => val === true, {
+      message: 'Please confirm you are currently located in Saudi Arabia',
+    }),
 
     // Work
     jobTitle: z.string().min(1, 'Job title is required'),
@@ -63,9 +66,15 @@ const candidateSchema = z
     visaExpiry: z.string().optional(),
     visaProfession: z.string().optional(),
 
-    // Terms
-    termsAccepted: z.boolean().refine((val) => val === true, {
-      message: 'You must accept the terms and conditions',
+    // Consent checkboxes – one per statement (same as employer)
+    acceptPrivacyTerms: z.boolean().refine((val) => val === true, {
+      message: 'You must accept the Privacy Policy and Terms and Conditions',
+    }),
+    acceptDataConsent: z.boolean().refine((val) => val === true, {
+      message: 'You must consent to data collection and publication',
+    }),
+    acceptPlatformDisclaimer: z.boolean().refine((val) => val === true, {
+      message: 'You must acknowledge the platform disclaimer',
     }),
   })
   .refine((data) => validatePassword(data.password).valid, {
@@ -92,6 +101,7 @@ export function RegistrationWizard() {
   const [showPhoneVerification, setShowPhoneVerification] = useState(false)
   const [candidateId, setCandidateId] = useState<string | undefined>(undefined)
   const [registrationData, setRegistrationData] = useState<CandidateFormData | null>(null)
+  const navigatedToStep6At = useRef<number>(0)
 
   const STEPS = [
     { id: 1, title: t('steps.account.title'), description: t('steps.account.description'), shortTitle: t('steps.account.shortTitle'), stepperTitle: t('steps.account.stepperTitle'), icon: Mail },
@@ -109,13 +119,17 @@ export function RegistrationWizard() {
     watch,
     control,
     trigger,
+    clearErrors,
     formState: { errors },
   } = useForm<CandidateFormData>({
     resolver: zodResolver(candidateSchema),
     mode: 'onChange',
     defaultValues: {
       sameAsPhone: false,
-      termsAccepted: false,
+      currentlyInKSA: false,
+      acceptPrivacyTerms: false,
+      acceptDataConsent: false,
+      acceptPlatformDisclaimer: false,
     },
   })
 
@@ -135,14 +149,28 @@ export function RegistrationWizard() {
     }
   }, [sameAsPhone, phone, setValue])
 
+  // Don't show consent-checkbox errors until we're on step 6
+  React.useEffect(() => {
+    if (currentStep !== 6) {
+      clearErrors(['acceptPrivacyTerms', 'acceptDataConsent', 'acceptPlatformDisclaimer'])
+    }
+  }, [currentStep, clearErrors])
+
+  // Don't show currentlyInKSA error until we're on step 2
+  React.useEffect(() => {
+    if (currentStep !== 2) {
+      clearErrors(['currentlyInKSA'])
+    }
+  }, [currentStep, clearErrors])
+
   const validateStep = async (step: number): Promise<boolean> => {
     const fieldsToValidate: (keyof CandidateFormData)[] = {
       1: ['email', 'password', 'confirmPassword'],
-      2: ['firstName', 'lastName', 'phone', 'gender', 'dob', 'nationality', 'languages', 'location'],
+      2: ['firstName', 'lastName', 'phone', 'gender', 'dob', 'nationality', 'languages', 'location', 'currentlyInKSA'],
       3: ['primarySkill'],
       4: ['jobTitle', 'experienceYears', 'saudiExperience', 'availabilityDate'],
       5: ['visaStatus'],
-      6: ['termsAccepted'],
+      6: ['acceptPrivacyTerms', 'acceptDataConsent', 'acceptPlatformDisclaimer'],
     }[step] as (keyof CandidateFormData)[]
 
     const result = await trigger(fieldsToValidate)
@@ -161,6 +189,9 @@ export function RegistrationWizard() {
     
     const isValid = await validateStep(currentStep)
     if (isValid && currentStep < STEPS.length) {
+      if (currentStep === 5) {
+        navigatedToStep6At.current = Date.now()
+      }
       setCurrentStep(currentStep + 1)
       // Scroll to top on step change
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -189,13 +220,8 @@ export function RegistrationWizard() {
 
   const onSubmit = async (data: CandidateFormData) => {
     console.log('Form submission started', { data })
-    
-    // Validate terms acceptance before proceeding
-    if (!data.termsAccepted) {
-      toast.error('Please accept the terms and conditions to continue')
-      return
-    }
-    
+
+    // All three consent checkboxes are validated by schema
     setIsPending(true)
 
     try {
@@ -204,7 +230,7 @@ export function RegistrationWizard() {
         lastName: data.lastName,
         email: data.email,
         primarySkill: data.primarySkill,
-        termsAccepted: data.termsAccepted,
+        termsAccepted: true,
       })
 
       const result = await registerCandidate({
@@ -228,7 +254,7 @@ export function RegistrationWizard() {
         visaStatus: data.visaStatus,
         visaExpiry: data.visaExpiry,
         visaProfession: data.visaProfession,
-        termsAccepted: data.termsAccepted,
+        termsAccepted: true, // all three consent checkboxes were accepted
       })
 
       console.log('Registration result:', result)
@@ -254,6 +280,15 @@ export function RegistrationWizard() {
       })
       setIsPending(false)
     }
+  }
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (navigatedToStep6At.current && Date.now() - navigatedToStep6At.current < 400) {
+      navigatedToStep6At.current = 0
+      e.preventDefault()
+      return
+    }
+    handleSubmit(onSubmit, handleFormError)(e)
   }
 
   const handleFormError = (errors: any) => {
@@ -597,7 +632,7 @@ export function RegistrationWizard() {
 
             {/* Form Card - Right Side */}
             <div className="flex-1">
-              <form onSubmit={handleSubmit(onSubmit, handleFormError)}>
+              <form onSubmit={handleFormSubmit}>
                 <Card>
                   <CardHeader className="space-y-2">
                     <div className="flex items-center justify-between">

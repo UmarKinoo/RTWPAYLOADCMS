@@ -2,7 +2,7 @@
 
 import { Control, Controller, FieldErrors } from 'react-hook-form'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldLabel, FieldError } from '@/components/ui/field'
+import { Field, FieldError } from '@/components/ui/field'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Edit, User, Mail, Briefcase, MapPin, FileCheck, ChevronRight } from 'lucide-react'
@@ -261,7 +261,11 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Location:</span>
-                <span className="font-medium">{formValues.location || 'Not provided'}</span>
+                <span className="font-medium">
+                  {formValues.location
+                    ? `${formValues.location}, Saudi Arabia`
+                    : 'Not provided'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Visa Status:</span>
@@ -280,52 +284,95 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
         </Card>
       </div>
 
-      {/* Legal Statements */}
-      <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {t('termsAgreement')}
-          </p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {t('platformDisclaimer')}
-          </p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {t('dataUsageAgreement')}
-          </p>
-        </div>
-      </div>
-
-      {/* Terms Acceptance */}
-      <Field data-invalid={!!errors.termsAccepted}>
+      {/* Consent checkboxes – one per statement (same labels as employer) */}
+      <Field data-invalid={!!errors.acceptPrivacyTerms}>
         <Controller
-          name="termsAccepted"
+          name="acceptPrivacyTerms"
           control={control}
           render={({ field }) => (
             <div
               className={`flex items-start space-x-3 p-4 border-2 rounded-lg transition-all duration-200 ${
-                field.value 
-                  ? 'border-primary bg-primary/5' 
-                  : 'border-border hover:border-primary/50'
+                field.value ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
               }`}
             >
               <Checkbox
-                id="termsAccepted"
+                id="acceptPrivacyTerms"
                 checked={field.value || false}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked === true)
-                }}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
                 className="mt-0.5"
               />
               <label
-                htmlFor="termsAccepted"
+                htmlFor="acceptPrivacyTerms"
                 className="text-sm font-medium leading-relaxed cursor-pointer select-none flex-1"
               >
-                I accept the terms and conditions / Agreement Accepted *
+                {t('acceptPrivacyTerms')} *
               </label>
             </div>
           )}
         />
-        {errors.termsAccepted && <FieldError>{errors.termsAccepted.message}</FieldError>}
+        {errors.acceptPrivacyTerms && (
+          <FieldError>{errors.acceptPrivacyTerms.message}</FieldError>
+        )}
+      </Field>
+
+      <Field data-invalid={!!errors.acceptDataConsent}>
+        <Controller
+          name="acceptDataConsent"
+          control={control}
+          render={({ field }) => (
+            <div
+              className={`flex items-start space-x-3 p-4 border-2 rounded-lg transition-all duration-200 ${
+                field.value ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+              }`}
+            >
+              <Checkbox
+                id="acceptDataConsent"
+                checked={field.value || false}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+                className="mt-0.5"
+              />
+              <label
+                htmlFor="acceptDataConsent"
+                className="text-sm font-medium leading-relaxed cursor-pointer select-none flex-1"
+              >
+                {t('acceptDataConsent')} *
+              </label>
+            </div>
+          )}
+        />
+        {errors.acceptDataConsent && (
+          <FieldError>{errors.acceptDataConsent.message}</FieldError>
+        )}
+      </Field>
+
+      <Field data-invalid={!!errors.acceptPlatformDisclaimer}>
+        <Controller
+          name="acceptPlatformDisclaimer"
+          control={control}
+          render={({ field }) => (
+            <div
+              className={`flex items-start space-x-3 p-4 border-2 rounded-lg transition-all duration-200 ${
+                field.value ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+              }`}
+            >
+              <Checkbox
+                id="acceptPlatformDisclaimer"
+                checked={field.value || false}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+                className="mt-0.5"
+              />
+              <label
+                htmlFor="acceptPlatformDisclaimer"
+                className="text-sm font-medium leading-relaxed cursor-pointer select-none flex-1"
+              >
+                {t('acceptPlatformDisclaimer')} *
+              </label>
+            </div>
+          )}
+        />
+        {errors.acceptPlatformDisclaimer && (
+          <FieldError>{errors.acceptPlatformDisclaimer.message}</FieldError>
+        )}
       </Field>
     </div>
   )

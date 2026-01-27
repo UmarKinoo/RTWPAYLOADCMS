@@ -94,9 +94,9 @@
     "pleaseTryAgainLater": "Please try again later",
     "somethingWentWrong": "Something went wrong",
     "legalStatements": {
-      "termsAgreement": "By clicking on the Sign-up button you agree to ReadyToWork's Terms and Conditions and Privacy Policy. All your data doesn't appear to job seekers and protected with our Privacy Policy.",
-      "platformDisclaimer": "I acknowledge that ReadyToWork.sa provides access to published professional data only and does not act as a recruitment agency or intermediary. I accept full responsibility for verifying candidate information, complying with Saudi Labor Law, and any engagement, communication, or contractual arrangement entered into outside the platform.",
-      "dataUsageAgreement": "I agree not to misuse, copy, resell, or commercially exploit any data accessed through ReadyToWork.sa outside the scope of my active subscription and in violation of the platform's Terms & Conditions."
+      "acceptPrivacyTerms": "Accept the Privacy Policy, the Terms and Conditions / Agreement Accepted (Y-N)",
+      "acceptDataConsent": "I consent to the collection, processing, and publication of my professional data (including my CV, qualifications, and experience) on ReadyToWork.sa, and to making such data accessible to subscribed employers for professional evaluation purposes.",
+      "acceptPlatformDisclaimer": "I acknowledge that ReadyToWork.sa is not a recruitment agency and does not guarantee employment or participate in any hiring decision."
     },
     "skillSearch": {
       "label": "Search your Job Role or Skill *",
@@ -110,6 +110,17 @@
     },
     "jobRole": {
       "description": "Search and select your primary job role or skill. This will help us match you with relevant opportunities."
+    },
+    "location": {
+      "currentLocationLabel": "Current Location (Saudi Arabia) *",
+      "countryFixed": "Saudi Arabia",
+      "selectCity": "Select your city in Saudi Arabia",
+      "searchCity": "Search city...",
+      "noCityFound": "No city found.",
+      "noCitiesAvailable": "No cities available.",
+      "other": "Other",
+      "enterLocationPlaceholder": "Enter your city or area",
+      "confirmInKSA": "I confirm I am currently located in Saudi Arabia"
     }
   },
   "buttons": {
@@ -197,25 +208,21 @@
       "contactUsDescription": "Get in touch and we'll take care of the rest.",
       "contactUs": "Contact Us",
       "items": {
-        "freeTrial": {
-          "question": "How does the free trial work?",
-          "answer": "You get full access to all features for 14 days, no credit card required."
+        "verifiedTalent": {
+          "question": "How can I find verified talent in Saudi Arabia?",
+          "answer": "Ready to Work provides a curated database of pre-screened professionals across industries. Employers can quickly access qualified candidates without worrying about unreliable or fake profiles."
         },
-        "cancelSubscription": {
-          "question": "Can I cancel my subscription anytime?",
-          "answer": "Yes, you can cancel or upgrade at any time."
+        "topAgency": {
+          "question": "What makes Ready to Work a top Saudi recruitment agency?",
+          "answer": "The platform combines technology with local hiring knowledge for precise talent matching. Employers and candidates benefit from a digital-first approach and reliable, long-term results."
         },
-        "linkedinIntegration": {
-          "question": "Does Ready to Work integrate with LinkedIn?",
-          "answer": "Yes, we offer seamless LinkedIn integration for profile imports."
+        "applyForJobs": {
+          "question": "How do I apply for jobs through Ready to Work?",
+          "answer": "Candidates can upload resumes and apply directly through the platform. The system ensures applications reach verified employers, making the job search faster and more efficient."
         },
-        "dataSecurity": {
-          "question": "Is my data secure?",
-          "answer": "We use industry-standard encryption and security practices."
-        },
-        "customizeWorkflows": {
-          "question": "Can I customize workflows?",
-          "answer": "Absolutely! Our platform offers flexible workflow customization."
+        "startupsLargeCompanies": {
+          "question": "Can Ready to Work help startups and large companies hire effectively?",
+          "answer": "Yes, the portal provides scalable hiring solutions tailored to company size and industry. From startups to established firms, businesses can confidently fill roles with the right talent."
         }
       }
     },
@@ -238,7 +245,7 @@
       "open": "Open",
       "addressValue": "Jeddah, Saudi Arabia",
       "emailValue": "hello@readytowork.sa",
-      "phoneValue": "053-969-6922",
+      "phoneValue": "+966 53 969 6922",
       "hoursValue": "Sun – Thur / 9:00 AM – 6:00 PM",
       "copyright": "Copyright 2025 ©Readytowork. All rights reserved.",
       "designedBy": "Designed and Developed by",
@@ -378,6 +385,11 @@
       "passwordsDoNotMatch": "Passwords do not match",
       "termsRequired": "You must accept the terms and conditions"
     },
+    "legalStatements": {
+      "acceptPrivacyTerms": "By clicking on the Sign-up button you agree to ReadyToWork's Terms and Conditions and Privacy Policy. All your data doesn't appear to job seekers and protected with our Privacy Policy.",
+      "acceptDataConsent": "I acknowledge that ReadyToWork.sa provides access to published professional data only and does not act as a recruitment agency or intermediary. I accept full responsibility for verifying candidate information, complying with Saudi Labor Law, and any engagement, communication, or contractual arrangement entered into outside the platform.",
+      "acceptPlatformDisclaimer": "I agree not to misuse, copy, resell, or commercially exploit any data accessed through ReadyToWork.sa outside the scope of my active subscription and in violation of the platform's Terms & Conditions."
+    },
     "termsAgreement": "I agree to Ready To Work's",
     "termsAndConditions": "Terms and Conditions and Privacy Policy",
     "privacyPolicy": "Privacy Policy",
@@ -438,7 +450,7 @@
       "label": "Contact us",
       "title": "Need help? Contact us, and we'll respond soon.",
       "description": "Reach out to us for any questions, support, or collaboration opportunities, we're always happy to assist!",
-      "phone": "+84 982 900 108",
+      "phone": "+966 53 969 6922",
       "email": "info@readytowork.sa",
       "form": {
         "name": "Your Name",

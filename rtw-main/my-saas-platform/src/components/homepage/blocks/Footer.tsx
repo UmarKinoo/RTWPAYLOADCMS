@@ -23,8 +23,7 @@ export const Footer: React.FC = async () => {
   const policyLinks = [
     { label: t('links.termsAndCondition'), href: '/terms-and-conditions' },
     { label: t('links.privacyAndPolicy'), href: '/privacy-policy' },
-    { label: t('links.legal'), href: '/terms-and-conditions' }, // Legal info can be part of terms
-    { label: t('links.disclaimer'), href: '/terms-and-conditions' }, // Disclaimer can be part of terms
+    { label: t('links.disclaimer'), href: '/disclaimer' },
   ]
 
   return (
