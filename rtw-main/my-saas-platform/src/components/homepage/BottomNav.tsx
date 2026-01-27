@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react'
 import { Link, usePathname } from '@/i18n/routing'
 import { useSearchParams } from 'next/navigation'
-import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Home, LayoutDashboard, Bell, User, Search } from 'lucide-react'
 import type { Employer, Candidate } from '@/payload-types'
@@ -14,7 +13,6 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ employer, candidate }) => {
-  const t = useTranslations('nav')
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const isLoggedIn = !!employer || !!candidate

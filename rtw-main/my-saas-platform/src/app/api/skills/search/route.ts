@@ -132,7 +132,7 @@ async function runTextSearch(
 export async function GET(request: NextRequest) {
   const sp = new URL(request.url).searchParams
   const searchQuery = (sp.get('q') || '').trim()
-  const limit = Math.min(parseInt(sp.get('limit') || '10', 10) || 10, 100)
+  const limit = Math.min(Number.parseInt(sp.get('limit') || '10', 10) || 10, 100)
   const locale = (sp.get('locale') || 'en') as Locale
 
   if (searchQuery.length < 2) {

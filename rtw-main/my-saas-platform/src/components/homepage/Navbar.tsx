@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Link, useRouter } from '@/i18n/routing'
+import { Link, useRouter, usePathname } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
-import { Menu, X, LogOut, LayoutDashboard, DollarSign, FileText, Users, BookOpen, Info, Mail, Search } from 'lucide-react'
+import { Menu, LogOut, LayoutDashboard, DollarSign, FileText, Users, BookOpen, Info, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { UserMenu } from '@/components/navbar/UserMenu'
@@ -18,7 +18,6 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@/components/ui/visually-hidden'
-import { usePathname } from '@/i18n/routing'
 import { Separator } from '@/components/ui/separator'
 import { clearAuthCookies } from '@/lib/auth'
 import { toast } from 'sonner'
@@ -58,12 +57,12 @@ type NavCtx = {
   router: { push: (url: string) => void; refresh: () => void }
 }
 
-function NavRightSide(props: {
+function NavRightSide(props: Readonly<{
   kind: 'employer' | 'candidate' | 'guest'
   employer?: Employer | null
   candidate?: Candidate | null
   ctx: NavCtx
-}) {
+}>) {
   const { kind, employer, candidate, ctx } = props
   if (kind === 'employer' && employer) return <EmployerNavActions employer={employer} ctx={ctx} />
   if (kind === 'candidate' && candidate) return <CandidateNavActions candidate={candidate} ctx={ctx} />
@@ -71,8 +70,8 @@ function NavRightSide(props: {
 }
 
 // Sub-components to keep HomepageNavbar complexity low (Sonar brain-overload)
-function EmployerNavActions({ employer, ctx }: { employer: Employer; ctx: NavCtx }) {
-  const { mobileMenuOpen, setMobileMenuOpen, handleLogout, pathname, t, navLinks } = ctx
+function EmployerNavActions({ employer, ctx }: Readonly<{ employer: Employer; ctx: NavCtx }>) {
+  const { mobileMenuOpen, setMobileMenuOpen, handleLogout, pathname, navLinks } = ctx
   const name = getEmployerDisplayName(employer)
   const sheetCls = cn('flex flex-1 flex-col px-6 pt-20 overflow-y-auto overscroll-contain', 'pb-24 md:pb-6')
   const linkCls = (active: boolean) =>
@@ -108,7 +107,7 @@ function EmployerNavActions({ employer, ctx }: { employer: Employer; ctx: NavCtx
                 const Icon = link.icon
                 const isActive = Boolean(pathname === link.href || pathname?.startsWith(link.href + '/'))
                 return (
-                  <Link key={i} href={link.href} className={linkCls(isActive)} onClick={() => setMobileMenuOpen(false)}>
+                  <Link key={link.href} href={link.href} className={linkCls(isActive)} onClick={() => setMobileMenuOpen(false)}>
                     <div className={iconBoxCls(isActive)}><Icon className={cn('h-5 w-5', isActive ? 'text-white' : 'text-[#f6b500]')} /></div>
                     <span className={cn('font-medium flex-1 text-base', isActive && 'text-white')}>{link.label}</span>
                   </Link>
@@ -141,8 +140,8 @@ function EmployerNavActions({ employer, ctx }: { employer: Employer; ctx: NavCtx
   )
 }
 
-function CandidateNavActions({ candidate, ctx }: { candidate: Candidate; ctx: NavCtx }) {
-  const { mobileMenuOpen, setMobileMenuOpen, handleLogout, pathname, t, navLinks } = ctx
+function CandidateNavActions({ candidate, ctx }: Readonly<{ candidate: Candidate; ctx: NavCtx }>) {
+  const { mobileMenuOpen, setMobileMenuOpen, handleLogout, pathname, navLinks } = ctx
   const name = getCandidateDisplayName(candidate)
   const sheetCls = cn('flex flex-1 flex-col px-6 pt-20 overflow-y-auto overscroll-contain', 'pb-24 md:pb-6')
   const linkCls = (active: boolean) =>
@@ -169,11 +168,11 @@ function CandidateNavActions({ candidate, ctx }: { candidate: Candidate; ctx: Na
             </div>
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Navigation</h2>
             <div className="flex flex-col gap-2 mb-6">
-              {navLinks.map((link, i) => {
+              {navLinks.map((link) => {
                 const Icon = link.icon
                 const isActive = Boolean(pathname === link.href || pathname?.startsWith(link.href + '/'))
                 return (
-                  <Link key={i} href={link.href} className={linkCls(isActive)} onClick={() => setMobileMenuOpen(false)}>
+                  <Link key={link.href} href={link.href} className={linkCls(isActive)} onClick={() => setMobileMenuOpen(false)}>
                     <div className={iconBoxCls(isActive)}><Icon className={cn('h-5 w-5', isActive ? 'text-white' : 'text-[#4644b8]')} /></div>
                     <span className={cn('font-medium flex-1 text-base', isActive && 'text-white')}>{link.label}</span>
                   </Link>
@@ -206,7 +205,7 @@ function CandidateNavActions({ candidate, ctx }: { candidate: Candidate; ctx: Na
   )
 }
 
-function GuestNavActions({ ctx }: { ctx: NavCtx }) {
+function GuestNavActions({ ctx }: Readonly<{ ctx: NavCtx }>) {
   const { mobileMenuOpen, setMobileMenuOpen, pathname, t, navLinks, router } = ctx
   const sheetCls = cn('flex flex-1 flex-col px-6 pt-20 overflow-y-auto overscroll-contain', 'pb-24 md:pb-6')
   const linkCls = (active: boolean) =>
@@ -229,11 +228,11 @@ function GuestNavActions({ ctx }: { ctx: NavCtx }) {
           <div className={sheetCls}>
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Navigation</h2>
             <div className="flex flex-col gap-2 mb-6">
-              {navLinks.map((link, i) => {
+              {navLinks.map((link) => {
                 const Icon = link.icon
                 const isActive = Boolean(pathname === link.href || pathname?.startsWith(link.href + '/'))
                 return (
-                  <Link key={i} href={link.href} className={linkCls(isActive)} onClick={() => setMobileMenuOpen(false)}>
+                  <Link key={link.href} href={link.href} className={linkCls(isActive)} onClick={() => setMobileMenuOpen(false)}>
                     <div className={iconBoxCls(isActive)}><Icon className={cn('h-5 w-5', isActive ? 'text-white' : 'text-[#4644b8]')} /></div>
                     <span className={cn('font-medium flex-1 text-base', isActive && 'text-white')}>{link.label}</span>
                   </Link>
@@ -267,7 +266,7 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const handleLogout = async () => {
+  const handleLogoutAsync = async () => {
     try {
       const result = await clearAuthCookies()
       if (result.success) {
@@ -282,6 +281,9 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
       console.error('Logout error:', error)
       toast.error('An error occurred while logging out')
     }
+  }
+  const handleLogout = () => {
+    void handleLogoutAsync()
   }
 
   const navLinks = [
@@ -315,9 +317,9 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-6 xl:gap-8">
-              {navLinks.map((link, index) => (
+              {navLinks.map((link) => (
                 <Link
-                  key={index}
+                  key={link.href}
                   href={link.href}
                   className="text-sm lg:text-base xl:text-lg font-semibold font-inter text-[#16252d] hover:text-[#4545b8] transition-colors whitespace-nowrap"
                 >

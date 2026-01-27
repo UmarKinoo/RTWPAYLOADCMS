@@ -4,10 +4,10 @@ import { ModeratorHeader } from '@/components/admin/ModeratorHeader'
 
 export const dynamic = 'force-dynamic'
 
-type AdminLayoutProps = {
+type AdminLayoutProps = Readonly<{
   children: React.ReactNode
-  params: Promise<{ locale?: string }>
-}
+  params?: Promise<{ locale?: string }>
+}>
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
   const userType = await getCurrentUserType()

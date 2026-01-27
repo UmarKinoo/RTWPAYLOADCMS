@@ -129,7 +129,11 @@ export async function getFilterOptions(): Promise<FilterOptions> {
         categoriesByDiscipline[discName].push(c.name)
       }
     })
-    Object.keys(categoriesByDiscipline).forEach((k) => categoriesByDiscipline[k].sort())
+    Object.keys(categoriesByDiscipline).forEach((k) => {
+      categoriesByDiscipline[k] = categoriesByDiscipline[k].toSorted((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: 'base' }),
+      )
+    })
 
     allSubCategories.docs.forEach((sc) => {
       const cat = sc.category as { id?: string; name?: string } | null | undefined
@@ -139,7 +143,11 @@ export async function getFilterOptions(): Promise<FilterOptions> {
         subCategoriesByCategory[catName].push(sc.name)
       }
     })
-    Object.keys(subCategoriesByCategory).forEach((k) => subCategoriesByCategory[k].sort())
+    Object.keys(subCategoriesByCategory).forEach((k) => {
+      subCategoriesByCategory[k] = subCategoriesByCategory[k].toSorted((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: 'base' }),
+      )
+    })
 
     // Use nationality for countries (users select their nationality/country)
     // Use location for states/cities (users select city within a country)
@@ -147,15 +155,16 @@ export async function getFilterOptions(): Promise<FilterOptions> {
     const countries = new Set<string>(nationalities) // Nationality = Country
     const states = new Set<string>(locations) // Location = City/State
 
+    const localeSort = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: 'base' })
     return {
-      locations: Array.from(locations).sort(),
-      countries: Array.from(countries).sort(),
-      states: Array.from(states).sort(),
-      nationalities: Array.from(nationalities).sort(),
-      languages: Array.from(languages).sort(),
-      disciplines: Array.from(disciplines).sort(),
-      categories: Array.from(categories).sort(),
-      subCategories: Array.from(subCategories).sort(),
+      locations: Array.from(locations).sort(localeSort),
+      countries: Array.from(countries).sort(localeSort),
+      states: Array.from(states).sort(localeSort),
+      nationalities: Array.from(nationalities).sort(localeSort),
+      languages: Array.from(languages).sort(localeSort),
+      disciplines: Array.from(disciplines).sort(localeSort),
+      categories: Array.from(categories).sort(localeSort),
+      subCategories: Array.from(subCategories).sort(localeSort),
       categoriesByDiscipline,
       subCategoriesByCategory,
     }

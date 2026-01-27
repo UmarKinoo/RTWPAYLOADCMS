@@ -1,12 +1,11 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LogOut, ShieldCheck, LayoutDashboard } from 'lucide-react'
 import { clearAuthCookies } from '@/lib/auth'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -16,7 +15,7 @@ interface ModeratorHeaderProps {
   kind: ModeratorKind
 }
 
-export function ModeratorHeader({ kind }: ModeratorHeaderProps) {
+export function ModeratorHeader({ kind }: Readonly<ModeratorHeaderProps>) {
   const pathname = usePathname() ?? ''
   const locale = pathname.split('/')[1] || 'en'
   const router = useRouter()

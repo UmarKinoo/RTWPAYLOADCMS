@@ -86,12 +86,12 @@ const DEFAULT_PROFILE = '/assets/aa541dc65d58ecc58590a815ca3bf2c27c889667.webp'
 // Sub-components (keep page.tsx complexity low)
 // ============================================================================
 
-function ActiveFilterBadges(props: {
+function ActiveFilterBadges(props: Readonly<{
   disciplineName: string | null
   searchQuery?: string
   showBadges: boolean
   t: (key: string) => string
-}) {
+}>) {
   const { disciplineName, searchQuery, showBadges, t } = props
   if (!showBadges) return null
   return (
@@ -118,11 +118,11 @@ function ActiveFilterBadges(props: {
   )
 }
 
-function CandidateGridCard(props: {
+function CandidateGridCard(props: Readonly<{
   candidate: any
   hasEmployerAccess: boolean
   locale: string
-}) {
+}>) {
   const { candidate, hasEmployerAccess, locale } = props
   const name = `${candidate.firstName} ${candidate.lastName}`
   const card = (
@@ -136,7 +136,7 @@ function CandidateGridCard(props: {
       profileImage={candidate.profilePictureUrl || DEFAULT_PROFILE}
       billingClass={candidate.billingClass}
       locked={!hasEmployerAccess}
-      displayLabel={!hasEmployerAccess ? candidate.jobTitle : undefined}
+      displayLabel={hasEmployerAccess ? undefined : candidate.jobTitle}
     />
   )
   if (hasEmployerAccess) {
@@ -302,14 +302,14 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
   )
 }
 
-function CandidatesBody(props: {
+function CandidatesBody(props: Readonly<{
   isSearchMode: boolean
   searchQuery: string
   candidates: any[]
   hasEmployerAccess: boolean
   locale: string
   t: (key: string) => string
-}) {
+}>) {
   const { isSearchMode, searchQuery, candidates, hasEmployerAccess, locale, t } = props
   if (isSearchMode) {
     if (hasEmployerAccess) {

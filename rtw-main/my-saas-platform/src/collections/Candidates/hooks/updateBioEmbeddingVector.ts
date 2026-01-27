@@ -2,10 +2,10 @@ import type { CollectionAfterChangeHook } from 'payload'
 import type { Candidate } from '../../../payload-types'
 import { query as dbQuery } from '../../../lib/db'
 
-const AUTH_FIELDS = [
+const AUTH_FIELDS = new Set([
   'password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt',
   'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified',
-]
+])
 
 function shouldSkipVectorUpdate(
   req: { context?: { skipVectorUpdate?: boolean }; data?: Record<string, unknown> },
@@ -15,13 +15,13 @@ function shouldSkipVectorUpdate(
 ): boolean {
   if (req.context?.skipVectorUpdate) return true
   if (operation !== 'update') return false
-  const data = req.data as Record<string, unknown> | undefined
+  const data = req.data
   if (data) {
     const keys = Object.keys(data).filter((k) => data[k] !== undefined)
     if (keys.length === 0) return false
     if ('bio_embedding' in data) return false
-    const hasAuth = keys.some((k) => AUTH_FIELDS.includes(k))
-    const onlyAuth = keys.every((k) => AUTH_FIELDS.includes(k) || k === 'updatedAt')
+    const hasAuth = keys.some((k) => AUTH_FIELDS.has(k))
+    const onlyAuth = keys.every((k) => AUTH_FIELDS.has(k) || k === 'updatedAt')
     if (hasAuth || onlyAuth) return true
   }
   if (!previousDoc) return false

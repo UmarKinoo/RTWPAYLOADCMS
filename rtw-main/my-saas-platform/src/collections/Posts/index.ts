@@ -2,17 +2,12 @@ import type { CollectionConfig } from 'payload'
 
 import {
   BlocksFeature,
-  BoldFeature,
   FixedToolbarFeature,
   HeadingFeature,
   HorizontalRuleFeature,
   InlineToolbarFeature,
-  ItalicFeature,
   lexicalEditor,
-  LinkFeature,
   OrderedListFeature,
-  ParagraphFeature,
-  UnderlineFeature,
   UnorderedListFeature,
 } from '@payloadcms/richtext-lexical'
 
