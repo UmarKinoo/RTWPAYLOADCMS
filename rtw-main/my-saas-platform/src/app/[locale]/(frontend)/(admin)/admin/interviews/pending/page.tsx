@@ -13,8 +13,8 @@ export default async function PendingInterviewsAdminPage() {
     redirect('/login')
   }
 
-  // Only allow admin users
-  if (userType.kind !== 'admin') {
+  // Allow admin and moderator (moderators use this panel only; no Payload admin)
+  if (userType.kind !== 'admin' && userType.kind !== 'moderator') {
     redirect('/dashboard')
   }
 

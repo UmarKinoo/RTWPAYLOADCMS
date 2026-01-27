@@ -71,11 +71,11 @@ export default async function Dashboard({ params }: DashboardProps) {
     redirect(`/${locale}/employer/dashboard`)
   }
 
-  if (userType.kind === 'admin') {
-    // Admin users - redirect to admin dashboard or show admin view
-    // For now, redirect to a placeholder - you may want to create an admin dashboard
+  if (userType.kind === 'admin' || userType.kind === 'moderator') {
+    // Admin and moderator users: redirect to moderator panel (pending interview requests)
+    // Moderators use this frontend-only panel; they do not need Payload admin access
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[DASHBOARD ${timestamp}] Admin detected, redirecting to /admin/interviews/pending`)
+      console.log(`[DASHBOARD ${timestamp}] ${userType.kind} detected, redirecting to /admin/interviews/pending`)
     }
     redirect(`/${locale}/admin/interviews/pending`)
   }

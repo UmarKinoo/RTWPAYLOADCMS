@@ -5,6 +5,8 @@ import config from '@payload-config'
 import { headers } from 'next/headers'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { Interview } from '@/payload-types'
+import { sendEmail } from '@/lib/email'
+import { interviewInvitationEmailTemplate } from '@/lib/email-templates'
 
 export interface ApproveInterviewRequestData {
   scheduledAt?: string
@@ -28,6 +30,11 @@ export interface RejectInterviewRequestResponse {
  * Approve an interview request
  * This should be called by a moderator/admin
  */
+function canModerateInterviews(user: unknown): boolean {
+  const u = user as { collection?: string; role?: string }
+  return u?.collection === 'users' && (u?.role === 'admin' || u?.role === 'moderator')
+}
+
 export async function approveInterviewRequest(
   interviewId: number,
   data?: ApproveInterviewRequestData,
@@ -36,11 +43,13 @@ export async function approveInterviewRequest(
     const payload = await getPayload({ config })
     const headersList = await headers()
 
-    // Get current user (should be admin/moderator)
     const { user } = await payload.auth({ headers: headersList })
 
     if (!user) {
       return { success: false, error: 'Authentication required.' }
+    }
+    if (!canModerateInterviews(user)) {
+      return { success: false, error: 'Only moderators or admins can approve interview requests.' }
     }
 
     // Get the interview request
@@ -135,6 +144,30 @@ export async function approveInterviewRequest(
       },
     })
 
+    // Send email to candidate (in addition to in-app notification)
+    const candidateEmail = 'email' in candidate ? (candidate as { email: string }).email : undefined
+    if (candidateEmail) {
+      const employerName = 'companyName' in employer ? (employer as { companyName?: string }).companyName : undefined
+      const html = interviewInvitationEmailTemplate({
+        candidateFirstName: candidate.firstName,
+        employerName: employerName || (employer as { email: string }).email,
+        scheduledAt: String(updatedInterview.scheduledAt),
+        jobPosition: updatedInterview.jobPosition ?? undefined,
+        jobLocation: updatedInterview.jobLocation ?? undefined,
+        salary: updatedInterview.salary ?? undefined,
+        accommodationIncluded: updatedInterview.accommodationIncluded ?? undefined,
+        transportation: updatedInterview.transportation ?? undefined,
+      })
+      const emailResult = await sendEmail({
+        to: candidateEmail,
+        subject: 'New Interview Invitation – Ready to Work',
+        html,
+      })
+      if (!emailResult.success) {
+        console.error('[approveInterviewRequest] Failed to send interview invitation email to candidate:', emailResult.error)
+      }
+    }
+
     // Employer notification
     await payload.create({
       collection: 'notifications',
@@ -176,11 +209,13 @@ export async function rejectInterviewRequest(
     const payload = await getPayload({ config })
     const headersList = await headers()
 
-    // Get current user (should be admin/moderator)
     const { user } = await payload.auth({ headers: headersList })
 
     if (!user) {
       return { success: false, error: 'Authentication required.' }
+    }
+    if (!canModerateInterviews(user)) {
+      return { success: false, error: 'Only moderators or admins can reject interview requests.' }
     }
 
     // Get the interview request

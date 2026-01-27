@@ -60,6 +60,62 @@ export type ResetPasswordResponse = {
   errorCode?: string
 }
 
+// Helpers (reduce cognitive complexity of exported functions)
+async function attemptLogin(
+  payload: Payload,
+  collection: 'users' | 'candidates' | 'employers',
+  email: string,
+  password: string,
+  rememberMe: boolean,
+): Promise<LoginResponse> {
+  try {
+    const result = await payload.login({ collection, data: { email, password } })
+    if (!result.token) {
+      return { success: false, error: 'Invalid email or password', errorCode: 'INVALID_CREDENTIALS' }
+    }
+    const cookieStore = await cookies()
+    const expiresIn = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000
+    cookieStore.set('payload-token', result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      expires: new Date(Date.now() + expiresIn),
+    })
+    return { success: true }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error'
+    console.error('Login attempt failed:', msg)
+    if (err instanceof Error && err.message.includes('credentials')) {
+      return { success: false, error: 'The email or password you entered is incorrect', errorCode: 'INVALID_CREDENTIALS' }
+    }
+    return { success: false, error: 'Authentication failed. Please try again later.', errorCode: 'AUTH_ERROR' }
+  }
+}
+
+async function findUserByEmail(
+  payload: Payload,
+  email: string,
+): Promise<{ user: User | Candidate | Employer; collection: 'users' | 'candidates' | 'employers'; userType: 'candidate' | 'employer' } | null> {
+  for (const coll of ['employers', 'candidates', 'users'] as const) {
+    try {
+      const res = await payload.find({
+        collection: coll,
+        where: { email: { equals: email } },
+        limit: 1,
+      })
+      if (res.docs.length > 0) {
+        const user = res.docs[0]
+        const userType = coll === 'employers' ? 'employer' : 'candidate'
+        return { user, collection: coll, userType }
+      }
+    } catch {
+      /* not in this collection */
+    }
+  }
+  return null
+}
+
 // Auth Actions
 
 /**
@@ -100,84 +156,21 @@ export async function loginUser({
   email,
   password,
   rememberMe = false,
-  collection = 'users', // Default to 'users' collection for backward compatibility
+  collection = 'users',
 }: LoginParams): Promise<LoginResponse> {
-  // Validate inputs first
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
     return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
-
   if (!password) {
     return { success: false, error: 'Password is required', errorCode: 'MISSING_PASSWORD' }
   }
-
   try {
     const payload = await getPayload({ config })
-
-    // Track login attempts (could be extended with rate limiting)
-    try {
-      // Type-safe collection login
-      const result = await payload.login({
-        collection: collection as 'users' | 'candidates' | 'employers',
-        data: { email, password },
-      })
-
-      if (result.token) {
-        const cookieStore = await cookies()
-
-        // Calculate expiration date based on rememberMe flag
-        const expiresIn = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000 // 30 days or 1 day in milliseconds
-        const expiresDate = new Date(Date.now() + expiresIn)
-
-        cookieStore.set('payload-token', result.token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          path: '/',
-          expires: expiresDate,
-        })
-
-        return { success: true }
-      }
-
-      return {
-        success: false,
-        error: 'Invalid email or password',
-        errorCode: 'INVALID_CREDENTIALS',
-      }
-    } catch (error) {
-      // SECURITY: Never log passwords or sensitive data
-      // Only log error message, not the full error object which might contain request data
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      console.error('Login attempt failed:', errorMessage)
-
-      // Provide more specific error messages based on error type
-      if (error instanceof Error) {
-        if (error.message.includes('credentials')) {
-          return {
-            success: false,
-            error: 'The email or password you entered is incorrect',
-            errorCode: 'INVALID_CREDENTIALS',
-          }
-        }
-      }
-
-      return {
-        success: false,
-        error: 'Authentication failed. Please try again later.',
-        errorCode: 'AUTH_ERROR',
-      }
-    }
+    return attemptLogin(payload, collection as 'users' | 'candidates' | 'employers', email, password, rememberMe)
   } catch (error) {
-    // SECURITY: Never log passwords or sensitive data
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Login system error:', errorMessage)
-    return {
-      success: false,
-      error: 'We encountered a system error. Please try again later.',
-      errorCode: 'SYSTEM_ERROR',
-    }
+    console.error('Login system error:', error instanceof Error ? error.message : 'Unknown error')
+    return { success: false, error: 'We encountered a system error. Please try again later.', errorCode: 'SYSTEM_ERROR' }
   }
 }
 
@@ -336,102 +329,17 @@ export async function registerUser({ email, password }: RegisterParams): Promise
  * @returns Response indicating success or failure
  */
 export async function forgotPassword(email: string): Promise<ForgotPasswordResponse> {
-  console.log('[FORGOT_PASSWORD] Starting forgot password flow for email:', email)
-  
-  // Validate email
   const emailValidation = validateEmail(email)
   if (!emailValidation.valid) {
-    console.log('[FORGOT_PASSWORD] Email validation failed:', emailValidation.errorKey || 'Invalid email')
     return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
-  console.log('[FORGOT_PASSWORD] Email validation passed')
-
   try {
-    console.log('[FORGOT_PASSWORD] Initializing Payload...')
     const payload = await getPayload({ config: await configPromise })
-    console.log('[FORGOT_PASSWORD] Payload initialized successfully')
-
-    // Try to find user in all collections (users, candidates, employers)
-    let user: User | Candidate | Employer | null = null
-    let collection: 'users' | 'candidates' | 'employers' = 'users'
-    let userType: 'candidate' | 'employer' = 'candidate'
-
-    // Try employers first
-    console.log('[FORGOT_PASSWORD] Searching in employers collection...')
-    try {
-      const employers = await payload.find({
-        collection: 'employers',
-        where: {
-          email: { equals: email },
-        },
-        limit: 1,
-      })
-      console.log('[FORGOT_PASSWORD] Employers search result:', { found: employers.docs.length > 0, count: employers.docs.length })
-      if (employers.docs.length > 0) {
-        user = employers.docs[0]
-        collection = 'employers'
-        userType = 'employer'
-        console.log('[FORGOT_PASSWORD] User found in employers collection, ID:', user.id)
-      }
-    } catch (employerError) {
-      console.error('[FORGOT_PASSWORD] Error searching employers:', employerError instanceof Error ? employerError.message : String(employerError))
-      // Not found in employers
-    }
-
-    // Try candidates
-    if (!user) {
-      console.log('[FORGOT_PASSWORD] Searching in candidates collection...')
-      try {
-        const candidates = await payload.find({
-          collection: 'candidates',
-          where: {
-            email: { equals: email },
-          },
-          limit: 1,
-        })
-        console.log('[FORGOT_PASSWORD] Candidates search result:', { found: candidates.docs.length > 0, count: candidates.docs.length })
-        if (candidates.docs.length > 0) {
-          user = candidates.docs[0]
-          collection = 'candidates'
-          userType = 'candidate'
-          console.log('[FORGOT_PASSWORD] User found in candidates collection, ID:', user.id)
-        }
-      } catch (candidateError) {
-        console.error('[FORGOT_PASSWORD] Error searching candidates:', candidateError instanceof Error ? candidateError.message : String(candidateError))
-        // Not found in candidates
-      }
-    }
-
-    // Try users
-    if (!user) {
-      console.log('[FORGOT_PASSWORD] Searching in users collection...')
-      try {
-        const users = await payload.find({
-          collection: 'users',
-          where: {
-            email: { equals: email },
-          },
-          limit: 1,
-        })
-        console.log('[FORGOT_PASSWORD] Users search result:', { found: users.docs.length > 0, count: users.docs.length })
-        if (users.docs.length > 0) {
-          user = users.docs[0]
-          collection = 'users'
-          userType = 'candidate'
-          console.log('[FORGOT_PASSWORD] User found in users collection, ID:', user.id)
-        }
-      } catch (userError) {
-        console.error('[FORGOT_PASSWORD] Error searching users:', userError instanceof Error ? userError.message : String(userError))
-        // Not found in users
-      }
-    }
-
-    // Always return success to prevent email enumeration attacks
-    // Even if user doesn't exist, we say we sent an email
-    if (!user) {
-      console.log('[FORGOT_PASSWORD] User not found in any collection, returning success (security: prevent email enumeration)')
+    const found = await findUserByEmail(payload, email)
+    if (!found) {
       return { success: true }
     }
+    const { user, collection, userType } = found
 
     console.log('[FORGOT_PASSWORD] User found:', { collection, id: user.id, userType })
 

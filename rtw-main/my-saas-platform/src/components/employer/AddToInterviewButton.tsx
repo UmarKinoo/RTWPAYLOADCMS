@@ -31,7 +31,7 @@ export function AddToInterviewButton({
             'mt-2 rounded-lg',
             'h-8 px-2.5 text-xs font-medium',
             'flex items-center gap-1.5',
-            'bg-[rgba(151,185,255,0.1)] border-0 text-[#4644b8] hover:bg-[rgba(151,185,255,0.2)]',
+            'bg-[rgba(151,185,255,0.1)] border-0 text-[#4644b8] hover:bg-[rgba(151,185,255,0.2)] hover:text-[#4644b8]',
             className
           )}
         >
@@ -53,7 +53,7 @@ export function AddToInterviewButton({
       <Button
         onClick={() => setIsModalOpen(true)}
         className={cn(
-          'mt-4 sm:mt-6 bg-[#4644b8] hover:bg-[#3a3aa0] text-white',
+          'mt-4 sm:mt-6 bg-[#4644b8] hover:bg-[#3a3aa0] text-white hover:text-white',
           'rounded-xl h-12 sm:h-14 px-6 sm:px-8',
           'text-[16px] sm:text-[18px] md:text-[20px] font-medium font-inter',
           'flex items-center gap-3',

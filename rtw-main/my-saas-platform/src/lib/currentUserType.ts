@@ -7,6 +7,7 @@ import type { User, Candidate, Employer } from '@/payload-types'
 
 export type CurrentUserType =
   | { kind: 'admin'; user: User }
+  | { kind: 'moderator'; user: User }
   | { kind: 'candidate'; user: User; candidate: Candidate }
   | { kind: 'employer'; user: User; employer: Employer }
   | { kind: 'unknown'; user: User }
@@ -37,14 +38,20 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
       return null
     }
 
-    // Check if user is admin (from Users collection with role='admin')
-    // We check if the user has a 'role' property, which only exists on User type from 'users' collection
-    const userWithRole = user as any
+    // Check if user is admin or moderator (from Users collection)
+    // Only Users have a 'role' property; candidates/employers do not
+    const userWithRole = user as { role?: string }
     if (userWithRole.role === 'admin') {
       if (process.env.NODE_ENV === 'development') {
         console.log('[getCurrentUserType] User is admin')
       }
       return { kind: 'admin', user: user as User }
+    }
+    if (userWithRole.role === 'moderator') {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[getCurrentUserType] User is moderator')
+      }
+      return { kind: 'moderator', user: user as User }
     }
 
     // Try to find candidate or employer profile

@@ -23,9 +23,10 @@ interface LoginPageClientProps {
 
 export function LoginPageClient({ success, error, initialCollection }: LoginPageClientProps) {
   const t = useTranslations('auth')
-  const [selectedType, setSelectedType] = useState<'candidate' | 'employer' | null>(
-    initialCollection === 'employers' ? 'employer' : 
-    initialCollection === 'candidates' ? 'candidate' : 
+  const [selectedType, setSelectedType] = useState<'candidate' | 'employer' | 'staff' | null>(
+    initialCollection === 'employers' ? 'employer' :
+    initialCollection === 'candidates' ? 'candidate' :
+    initialCollection === 'users' ? 'staff' :
     null
   )
 
@@ -85,8 +86,10 @@ export function LoginPageClient({ success, error, initialCollection }: LoginPage
                 {selectedType ? t('login') : t('loginAs')}
               </h1>
               <p className="mt-0.5 text-xs text-gray-500">
-                {selectedType 
-                  ? `Sign in as ${selectedType === 'candidate' ? 'Candidate' : 'Employer'}`
+                {selectedType
+                  ? selectedType === 'staff'
+                    ? 'Moderator or admin'
+                    : `Sign in as ${selectedType === 'candidate' ? 'Candidate' : 'Employer'}`
                   : 'Select your account type to continue'
                 }
               </p>
@@ -150,19 +153,34 @@ export function LoginPageClient({ success, error, initialCollection }: LoginPage
                   </button>
 
                   {/* Login Form */}
-                  <LoginForm collection={selectedType === 'employer' ? 'employers' : 'candidates'} />
+                  <LoginForm
+                    collection={
+                      selectedType === 'employer' ? 'employers' :
+                      selectedType === 'staff' ? 'users' : 'candidates'
+                    }
+                  />
                 </div>
               )}
 
               {/* Sign Up Link */}
-              <div className="mt-4 pt-3 border-t border-gray-100 text-center">
-                <p className="text-xs text-gray-600">
+              <div className="mt-4 space-y-2 pt-3 border-t border-gray-100">
+                <p className="text-center text-xs text-gray-600">
                   {t('dontHaveAccount')}{' '}
                   <RegisterTypeModalWrapper>
                     <button className="text-[#4644b8] hover:text-[#3a3aa0] font-semibold transition-colors hover:underline underline-offset-2">
                       {t('signUpNow')}
                     </button>
                   </RegisterTypeModalWrapper>
+                </p>
+                <p className="text-center text-xs text-gray-500">
+                  Moderator or admin?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedType('staff')}
+                    className="text-[#4644b8] hover:text-[#3a3aa0] font-medium hover:underline underline-offset-2 cursor-pointer"
+                  >
+                    Staff login
+                  </button>
                 </p>
               </div>
             </div>

@@ -28,7 +28,7 @@ export interface PageHeroProps {
  */
 const getOverlayStyle = (overlayOpacity: string): React.CSSProperties => {
   const [color, opacity] = overlayOpacity.split('/')
-  const opacityValue = opacity ? parseInt(opacity, 10) / 100 : 0.3
+  const opacityValue = opacity ? Number.parseInt(opacity, 10) / 100 : 0.3
   
   if (color === 'black') {
     return { backgroundColor: `rgba(0, 0, 0, ${opacityValue})` }

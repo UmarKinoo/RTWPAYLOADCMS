@@ -23,10 +23,14 @@ export const Users: CollectionConfig = {
       type: 'select',
       options: [
         { label: 'Admin', value: 'admin' },
+        { label: 'Moderator', value: 'moderator' },
         { label: 'User', value: 'user' },
       ],
       required: true,
       defaultValue: 'user',
+      admin: {
+        description: 'Admin: full Payload access. Moderator: can approve/reject interview requests only (no Payload admin).',
+      },
     },
     {
       name: 'emailVerified',

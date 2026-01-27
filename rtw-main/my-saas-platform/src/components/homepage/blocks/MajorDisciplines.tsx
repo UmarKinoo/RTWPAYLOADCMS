@@ -64,8 +64,13 @@ export async function MajorDisciplines() {
       // Only include if we have an image (matches Figma design)
       if (!image) return null
       
+      const rawTitle = discipline.localizedName
+      const title =
+        rawTitle === 'Media & Visuialisation' || rawTitle === 'Media & Visualisation'
+          ? 'Media & Visualization'
+          : rawTitle
       return {
-        title: discipline.localizedName, // Already localized from getDisciplines
+        title,
         image,
         slug: discipline.slug || generateSlug(discipline.name || discipline.name_en || ''), // Use actual slug from database, fallback to generated
       }

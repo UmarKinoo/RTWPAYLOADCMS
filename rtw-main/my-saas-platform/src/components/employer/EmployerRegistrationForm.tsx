@@ -10,9 +10,11 @@ import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import Image from 'next/image'
+import PhoneInput from 'react-phone-number-input'
 import { registerEmployer } from '@/lib/employer'
 import { PhoneVerification } from '@/components/auth/phone-verification'
 import { useTranslations } from 'next-intl'
+import 'react-phone-number-input/style.css'
 
 // Google logo
 const googleLogo = '/assets/8f7935e769322ac3c425296f0ab80d00c06649f5.png'
@@ -149,6 +151,11 @@ export const EmployerRegistrationForm: React.FC = () => {
 
       if (!formData.phone.trim()) {
         toast.error(t('validation.phoneRequired'))
+        setIsPending(false)
+        return
+      }
+      if (!formData.phone.startsWith('+966')) {
+        toast.error(t('validation.phoneKSAOnly'))
         setIsPending(false)
         return
       }
@@ -314,16 +321,28 @@ export const EmployerRegistrationForm: React.FC = () => {
           name="email"
         />
 
-        {/* Phone */}
-        <FloatingLabelInput
-          label={t('fields.phoneNumber')}
-          required
-          type="tel"
-          placeholder={t('placeholders.phoneNumber')}
-          value={formData.phone}
-          onChange={handleInputChange}
-          name="phone"
-        />
+        {/* Phone – KSA only */}
+        <div className="relative w-full">
+          <label
+            className={cn(
+              'absolute left-3 -top-2 bg-white px-2 py-0.5 rounded-full text-sm font-medium text-[#16252d] transition-all z-10',
+              formData.phone ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            )}
+          >
+            {t('fields.phoneNumber')} <span className="text-[#dc0000] ml-0.5">*</span>
+          </label>
+          <div className="[&_.PhoneInputCountryIcon]:!w-6 [&_.PhoneInputCountryIcon]:!h-4 [&_.PhoneInputCountryIconImg]:!w-6 [&_.PhoneInputCountryIconImg]:!h-4">
+            <PhoneInput
+              international
+              defaultCountry="SA"
+              countries={['SA']}
+              value={formData.phone}
+              onChange={(value) => setFormData((prev) => ({ ...prev, phone: value || '' }))}
+              placeholder="+966 ..."
+              className="h-14 w-full border border-[#a5a5a5] rounded-lg px-4 text-sm text-[#757575] placeholder:text-[#757575] focus-visible:border-[#4644b8] focus-visible:ring-[#4644b8]/20 focus-visible:ring-2 transition-all"
+            />
+          </div>
+        </div>
 
         {/* Password */}
         <FloatingLabelInput

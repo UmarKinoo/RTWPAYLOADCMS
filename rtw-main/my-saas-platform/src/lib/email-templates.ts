@@ -389,3 +389,76 @@ export function employerWelcomeEmailTemplate(companyName: string, responsiblePer
   
   return baseEmailTemplate(content, 'Welcome to Ready to Work')
 }
+
+export interface InterviewInvitationEmailParams {
+  candidateFirstName: string
+  employerName: string
+  scheduledAt: string
+  jobPosition?: string
+  jobLocation?: string
+  salary?: string
+  accommodationIncluded?: boolean
+  transportation?: boolean
+}
+
+/**
+ * Interview invitation email sent to candidate when an interview request is approved
+ */
+export function interviewInvitationEmailTemplate(params: InterviewInvitationEmailParams): string {
+  const appUrl = getAppUrl()
+  const interviewsUrl = `${appUrl}/${defaultLocale}/dashboard/interviews`
+
+  const scheduledDate = new Date(params.scheduledAt)
+  const formattedDate = scheduledDate.toLocaleDateString('en-SA', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+  const formattedTime = scheduledDate.toLocaleTimeString('en-SA', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  const details: string[] = []
+  if (params.jobPosition) details.push(`<strong>Position:</strong> ${params.jobPosition}`)
+  if (params.jobLocation) details.push(`<strong>Location:</strong> ${params.jobLocation}`)
+  if (params.salary) details.push(`<strong>Salary:</strong> ${params.salary}`)
+  if (params.accommodationIncluded !== undefined) {
+    details.push(`<strong>Accommodation:</strong> ${params.accommodationIncluded ? 'Included' : 'Not included'}`)
+  }
+  if (params.transportation !== undefined) {
+    details.push(`<strong>Transportation:</strong> ${params.transportation ? 'Provided' : 'Not provided'}`)
+  }
+  const detailsHtml = details.length > 0
+    ? `<div class="alert alert-info" style="margin: 20px 0;"><p style="margin: 0; font-size: 14px;">${details.join(' &middot; ')}</p></div>`
+    : ''
+
+  const content = `
+    <h1 class="email-title">New Interview Invitation</h1>
+    <p class="email-content">
+      Hi ${params.candidateFirstName},
+    </p>
+    <p class="email-content">
+      <strong>${params.employerName}</strong> has invited you to an interview via Ready to Work.
+    </p>
+    <div class="alert alert-success">
+      <strong>📅 ${formattedDate}</strong><br/>
+      <strong>🕐 ${formattedTime}</strong>
+    </div>
+    ${detailsHtml}
+    <p class="email-content">
+      Log in to your dashboard to view full details, accept or decline, and manage your interviews.
+    </p>
+    <div style="text-align: center;">
+      <a href="${interviewsUrl}" class="button">View interview in dashboard</a>
+    </div>
+    <div class="divider"></div>
+    <p class="email-content" style="font-size: 14px; color: #757575;">
+      You're also receiving an in-app notification. If you have any questions, contact our support team.
+    </p>
+  `
+
+  return baseEmailTemplate(content, 'New Interview Invitation - Ready to Work')
+}

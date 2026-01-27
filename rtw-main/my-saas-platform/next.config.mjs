@@ -3,8 +3,10 @@ import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts')
 
-// Build remotePatterns from env (for R2 public hostname, etc.)
-const remotePatterns = []
+// Build remotePatterns from env (for R2 public hostname, etc.) and known hosts (e.g. flagcdn for candidate nationality flags)
+const remotePatterns = [
+  { protocol: 'https', hostname: 'flagcdn.com', pathname: '/**' },
+]
 const r2PublicURL = process.env.R2_PUBLIC_URL
 if (r2PublicURL && r2PublicURL.trim() !== '') {
   try {

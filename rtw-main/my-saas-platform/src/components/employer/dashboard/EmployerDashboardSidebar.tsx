@@ -141,7 +141,7 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
         )}
 
         {/* Menu Items */}
-        <div className={cn('flex flex-col', mobile ? 'gap-2' : 'gap-2')}>
+        <div className="flex flex-col gap-2">
           {menuItems.map((item) => {
             const Icon = item.icon
             const currentView = searchParams?.get('view')
@@ -215,7 +215,7 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
             Support
           </h2>
         )}
-        <div className={cn('flex flex-col', mobile ? 'gap-2' : 'gap-2')}>
+        <div className="flex flex-col gap-2">
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}

@@ -423,6 +423,12 @@ export const CandidatesFilter: React.FC = () => {
     subCategory: [],
   })
 
+  // Hierarchy maps for cascading discipline -> category -> subCategory
+  const [hierarchyMaps, setHierarchyMaps] = useState<{
+    categoriesByDiscipline: Record<string, string[]>
+    subCategoriesByCategory: Record<string, string[]>
+  }>({ categoriesByDiscipline: {}, subCategoriesByCategory: {} })
+
   // Loading state for filter options
   const [isLoadingOptions, setIsLoadingOptions] = useState(true)
 
@@ -441,6 +447,10 @@ export const CandidatesFilter: React.FC = () => {
           category: data.categories || [],
           subCategory: data.subCategories || [],
         })
+        setHierarchyMaps({
+          categoriesByDiscipline: data.categoriesByDiscipline ?? {},
+          subCategoriesByCategory: data.subCategoriesByCategory ?? {},
+        })
       } catch (error) {
         console.error('Failed to fetch filter options:', error)
       } finally {
@@ -450,29 +460,36 @@ export const CandidatesFilter: React.FC = () => {
     loadFilterOptions()
   }, [])
 
-  // Build filter configs with dynamic options
+  // Build filter configs with dynamic options; category/subCategory cascade from hierarchy
   const filterConfigs = baseFilterConfigs.map((config) => {
-    // Use dynamic options if available, otherwise use static options
-    if (filterOptions[config.param] && filterOptions[config.param].length > 0) {
+    if (config.param === 'category') {
+      const opts = hierarchyMaps.categoriesByDiscipline[filters.discipline] ?? []
+      return { ...config, options: opts }
+    }
+    if (config.param === 'subCategory') {
+      const opts = hierarchyMaps.subCategoriesByCategory[filters.category] ?? []
+      return { ...config, options: opts }
+    }
+    if (filterOptions[config.param]?.length) {
       return { ...config, options: filterOptions[config.param] }
     }
-    // Keep static options for filters that don't have dynamic data yet
     return config
   })
 
-  // Update URL params when filters change
+  // Update URL params when filters change; clear dependent filters when parent changes
   const updateFilters = useCallback(
     (key: string, value: string) => {
-      const newFilters = { ...filters, [key]: value }
+      let newFilters = { ...filters, [key]: value }
+      if (key === 'discipline') {
+        newFilters = { ...newFilters, category: '', subCategory: '' }
+      } else if (key === 'category') {
+        newFilters = { ...newFilters, subCategory: '' }
+      }
       setFilters(newFilters)
 
       // Build new URL params
       const params = new URLSearchParams(searchParams.toString())
-      
-      // Remove page param when filters change (reset to page 1)
       params.delete('page')
-      
-      // Update or remove filter params
       Object.entries(newFilters).forEach(([filterKey, filterValue]) => {
         if (filterValue) {
           params.set(filterKey, filterValue)
@@ -481,7 +498,6 @@ export const CandidatesFilter: React.FC = () => {
         }
       })
 
-      // Navigate to new URL
       router.push(`/candidates?${params.toString()}`, { scroll: false })
     },
     [filters, router, searchParams]

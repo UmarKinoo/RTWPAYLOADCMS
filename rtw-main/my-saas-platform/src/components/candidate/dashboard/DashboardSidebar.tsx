@@ -146,7 +146,7 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
         )}
 
         {/* Menu Items - Notification opens in dashboard (like Activity), badge only when > 0 */}
-        <div className={cn('flex flex-col', mobile ? 'gap-2' : 'gap-2')}>
+        <div className="flex flex-col gap-2">
           {menuItems.map((item) => {
             const Icon = item.icon
             const isActive =
@@ -221,7 +221,7 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
             Support
           </h2>
         )}
-        <div className={cn('flex flex-col', mobile ? 'gap-2' : 'gap-2')}>
+        <div className="flex flex-col gap-2">
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}

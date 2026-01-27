@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { Hero } from '@/components/homepage/blocks/Hero'
+import { getCurrentUserType } from '@/lib/currentUserType'
 import { Candidates } from '@/components/homepage/blocks/Candidates'
 import { MajorDisciplines } from '@/components/homepage/blocks/MajorDisciplines'
 import { UploadResume } from '@/components/homepage/blocks/UploadResume'
@@ -18,10 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
+  const userType = await getCurrentUserType()
+  const showSmartSearch = userType?.kind === 'employer'
   return (
     <div className="min-h-screen bg-[#ffffff] overflow-x-hidden">
       <HomepageNavbarWrapper />
-      <Hero />
+      <Hero showSmartSearch={showSmartSearch} />
       <TrustedBy />
       <Candidates />
       <MajorDisciplines />

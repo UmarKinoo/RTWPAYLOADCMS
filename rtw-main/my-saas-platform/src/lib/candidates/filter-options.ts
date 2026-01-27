@@ -12,6 +12,10 @@ export interface FilterOptions {
   disciplines: string[]
   categories: string[]
   subCategories: string[]
+  /** discipline name -> category names */
+  categoriesByDiscipline: Record<string, string[]>
+  /** category name -> subcategory names */
+  subCategoriesByCategory: Record<string, string[]>
 }
 
 export async function getFilterOptions(): Promise<FilterOptions> {
@@ -113,6 +117,30 @@ export async function getFilterOptions(): Promise<FilterOptions> {
       subCategories.add(sc.name)
     })
 
+    // Build hierarchy maps for cascading filters
+    const categoriesByDiscipline: Record<string, string[]> = {}
+    const subCategoriesByCategory: Record<string, string[]> = {}
+
+    allCategories.docs.forEach((c) => {
+      const disc = c.discipline as { id?: string; name?: string } | null | undefined
+      const discName = disc && typeof disc === 'object' && disc.name ? disc.name : ''
+      if (discName && c.name) {
+        if (!categoriesByDiscipline[discName]) categoriesByDiscipline[discName] = []
+        categoriesByDiscipline[discName].push(c.name)
+      }
+    })
+    Object.keys(categoriesByDiscipline).forEach((k) => categoriesByDiscipline[k].sort())
+
+    allSubCategories.docs.forEach((sc) => {
+      const cat = sc.category as { id?: string; name?: string } | null | undefined
+      const catName = cat && typeof cat === 'object' && cat.name ? cat.name : ''
+      if (catName && sc.name) {
+        if (!subCategoriesByCategory[catName]) subCategoriesByCategory[catName] = []
+        subCategoriesByCategory[catName].push(sc.name)
+      }
+    })
+    Object.keys(subCategoriesByCategory).forEach((k) => subCategoriesByCategory[k].sort())
+
     // Use nationality for countries (users select their nationality/country)
     // Use location for states/cities (users select city within a country)
     // Both fields are already collected from the registration form
@@ -128,6 +156,8 @@ export async function getFilterOptions(): Promise<FilterOptions> {
       disciplines: Array.from(disciplines).sort(),
       categories: Array.from(categories).sort(),
       subCategories: Array.from(subCategories).sort(),
+      categoriesByDiscipline,
+      subCategoriesByCategory,
     }
   } catch (error: any) {
     console.error('Error fetching filter options:', error)

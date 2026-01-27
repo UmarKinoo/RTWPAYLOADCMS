@@ -180,7 +180,10 @@
       "findMore": "اعثر على المزيد من المرشحين",
       "experience": "تجربة",
       "nationality": "الجنسية",
-      "location": "الموقع"
+      "location": "الموقع",
+      "signInAsEmployerToView": "سجّل الدخول كصاحب عمل للعرض",
+      "candidatesCount": "{count} مرشح",
+      "zeroCandidatesMessage": "تُضاف ملفات جديدة بانتظام. تصفّح الدليل الكامل عندما تكون جاهزًا."
     },
     "majorDisciplines": {
       "title": "استكشف الوظائف حسب التخصص الرئيسي",
@@ -286,8 +289,12 @@
     "noCandidatesFoundSearch": "لم يتم العثور على مرشحين",
     "noCandidatesDescriptionSearch": "حاول تعديل استعلام البحث أو تصفح جميع المرشحين.",
     "candidatesFound": "تم العثور على {count} مرشح{plural} لـ \"{search}\"",
+    "employerOnlySearch": "البحث الذكي لأصحاب العمل فقط",
+    "employerOnlySearchDescription": "سجّل الدخول أو أنشئ حسابًا كصاحب عمل للبحث وعرض ملفات المرشحين.",
+    "signInAsEmployer": "تسجيل الدخول كصاحب عمل",
+    "employerOnlyViewCandidates": "سجّل الدخول كصاحب عمل لعرض ملفات المرشحين وبيانات التواصل.",
     "searchErrors": {
-      "unauthorized": "يرجى تسجيل الدخول للبحث عن المرشحين",
+      "unauthorized": "يرجى تسجيل الدخول كصاحب عمل للبحث عن المرشحين",
       "notSupported": "ليس لديك إذن للبحث",
       "failed": "فشل البحث عن المرشحين"
     },
@@ -381,6 +388,7 @@
       "companyNameRequired": "يرجى إدخال اسم شركتك",
       "emailRequired": "يرجى إدخال عنوان بريدك الإلكتروني",
       "phoneRequired": "يرجى إدخال رقم هاتفك",
+      "phoneKSAOnly": "يُقبل فقط أرقام الهواتف السعودية. استخدم +966...",
       "passwordMinLength": "يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل",
       "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
       "termsRequired": "يجب عليك الموافقة على الشروط والأحكام"

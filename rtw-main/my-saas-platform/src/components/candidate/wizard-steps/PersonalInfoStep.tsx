@@ -203,10 +203,11 @@ export function PersonalInfoStep({
               <div className="relative [&_.PhoneInputCountryIcon]:!w-6 [&_.PhoneInputCountryIcon]:!h-4 [&_.PhoneInputCountryIconImg]:!w-6 [&_.PhoneInputCountryIconImg]:!h-4">
                 <PhoneInput
                   value={field.value}
-                  defaultCountry="MU"
+                  defaultCountry="SA"
+                  countries={['SA']}
                   international
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="Enter phone number"
+                  placeholder="+966 ..."
                   onChange={(value) => {
                     field.onChange(value || '')
                     if (sameAsPhone && value) {
@@ -230,10 +231,11 @@ export function PersonalInfoStep({
                 <div className="relative [&_.PhoneInputCountryIcon]:!w-6 [&_.PhoneInputCountryIcon]:!h-4 [&_.PhoneInputCountryIconImg]:!w-6 [&_.PhoneInputCountryIconImg]:!h-4">
                   <PhoneInput
                     value={field.value}
-                    defaultCountry="MU"
+                    defaultCountry="SA"
+                    countries={['SA']}
                     international
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Enter WhatsApp number if different"
+                    placeholder="+966 ... (if different)"
                     disabled={sameAsPhone}
                     onChange={(value) => field.onChange(value || '')}
                   />
@@ -355,6 +357,7 @@ export function PersonalInfoStep({
                                   setValue('nationality', country.name, { shouldValidate: true })
                                   setNationalitySearchOpen(false)
                                 }}
+                                className="data-[highlighted]:text-white data-[selected=true]:text-white"
                               >
                                 <span className="mr-2 text-lg flex-shrink-0" role="img" aria-label={`${country.name} flag`}>
                                   {flag || country.isoCode}

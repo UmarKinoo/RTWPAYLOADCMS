@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Link } from '@/i18n/routing'
 import { HomepageNavbar } from '@/components/homepage/Navbar'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
@@ -11,8 +12,11 @@ import {
   getCandidates,
 } from '@/lib/payload/candidates'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
+import { getCurrentUserType } from '@/lib/currentUserType'
 import { cn } from '@/lib/utils'
 import { getServerSideURL } from '@/utilities/getURL'
+import { Button } from '@/components/ui/button'
+import { getTranslations } from 'next-intl/server'
 
 // ============================================================================
 // Types
@@ -106,11 +110,14 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
     notFound()
   }
 
-  // Fetch similar candidates (excluding current)
+  const userType = await getCurrentUserType()
+  const hasEmployerAccess = userType?.kind === 'employer'
+
+  // Fetch similar candidates only when employer (for "Similar Candidates" block)
   const { candidates: allCandidates } = await getCandidates({ limit: 5 })
-  const similarCandidates = allCandidates
-    .filter((c) => c.id !== candidateId)
-    .slice(0, 4)
+  const similarCandidates = hasEmployerAccess
+    ? allCandidates.filter((c) => c.id !== candidateId).slice(0, 4)
+    : []
 
   const fullName = `${candidate.firstName} ${candidate.lastName}`
   const profileImage = candidate.profilePictureUrl || DEFAULT_PROFILE
@@ -129,6 +136,44 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
     .split(',')
     .map((lang) => lang.trim())
     .filter(Boolean)
+
+  // Locked view for non-employers: teaser + CTA only
+  if (!hasEmployerAccess) {
+    const t = await getTranslations('candidatesPage')
+    return (
+      <div className="min-h-screen bg-white overflow-x-hidden">
+        <HomepageNavbar />
+        <HomepageSection className="pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-12 sm:pb-16 md:pb-20">
+          <div className="flex flex-col items-center justify-center max-w-lg mx-auto text-center py-12">
+            <CandidateCard
+              name={fullName}
+              jobTitle={candidate.jobTitle}
+              experience={formatExperience(candidate.experienceYears)}
+              nationality={candidate.nationality}
+              nationalityFlag={flagImage}
+              location={candidate.location}
+              profileImage={profileImage}
+              billingClass={candidate.billingClass}
+              locked
+              displayLabel={candidate.jobTitle}
+            />
+            <div className="mt-8 space-y-4">
+              <p className="text-base sm:text-lg font-medium text-[#16252d]">
+                {t('employerOnlyViewCandidates')}
+              </p>
+              <Link href="/employer/register">
+                <Button className="bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-full h-11 px-8 text-sm sm:text-base font-bold uppercase cursor-pointer">
+                  {t('signInAsEmployer')}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </HomepageSection>
+        <Newsletter />
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">

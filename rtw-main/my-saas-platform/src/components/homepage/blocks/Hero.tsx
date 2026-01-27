@@ -14,7 +14,12 @@ const imgBusinessmanMakingCoffee20252 = '/assets/5902659f7a1d069cd46ab37be664dbe
 const imgBusinessmanMakingCoffee20251 = '/assets/9067d496e1f10f37d480e3dc99e0dd3a6af0fb6c.svg'
 
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  /** Show Smart Search bar (employers only). Hidden for guests and candidates. */
+  showSmartSearch?: boolean
+}
+
+export const Hero: React.FC<HeroProps> = ({ showSmartSearch = false }) => {
   const t = useTranslations('homepage.hero')
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
@@ -23,7 +28,6 @@ export const Hero: React.FC = () => {
     e.preventDefault()
     const query = searchQuery.trim()
     if (query.length >= 2) {
-      // Navigate to candidates page with search query
       router.push(`/candidates?search=${encodeURIComponent(query)}`)
     }
   }
@@ -117,27 +121,29 @@ export const Hero: React.FC = () => {
               </Button>
             </div>
 
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative w-full max-w-md">
-              <div className="relative backdrop-blur-md bg-white/20 rounded-xl flex items-center">
-                <Input
-                  type="text"
-                  placeholder={t('searchPlaceholder')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-transparent border-none text-white !placeholder-white placeholder:text-white text-sm sm:text-base font-normal px-4 py-3 h-12 pe-14 focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
-                <Button
-                  type="submit"
-                  variant="default"
-                  size="icon"
-                  className="absolute end-1.5 bg-white rounded-lg w-10 h-10 hover:bg-gray-100 shadow-sm"
-                  disabled={searchQuery.trim().length < 2}
-                >
-                  <Search className="w-4 h-4 text-[#16252d]" />
-                </Button>
-              </div>
-            </form>
+            {/* Smart Search – employers only */}
+            {showSmartSearch && (
+              <form onSubmit={handleSearch} className="relative w-full max-w-md">
+                <div className="relative backdrop-blur-md bg-white/20 rounded-xl flex items-center">
+                  <Input
+                    type="text"
+                    placeholder={t('searchPlaceholder')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent border-none text-white !placeholder-white placeholder:text-white text-sm sm:text-base font-normal px-4 py-3 h-12 pe-14 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                  <Button
+                    type="submit"
+                    variant="default"
+                    size="icon"
+                    className="absolute end-1.5 bg-white rounded-lg w-10 h-10 hover:bg-gray-100 shadow-sm"
+                    disabled={searchQuery.trim().length < 2}
+                  >
+                    <Search className="w-4 h-4 text-[#16252d]" />
+                  </Button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       </div>

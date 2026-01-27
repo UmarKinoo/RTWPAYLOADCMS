@@ -180,7 +180,10 @@
       "findMore": "Find more candidates",
       "experience": "Experience",
       "nationality": "Nationality",
-      "location": "Location"
+      "location": "Location",
+      "signInAsEmployerToView": "Sign in as employer to view",
+      "candidatesCount": "{count} candidates",
+      "zeroCandidatesMessage": "New profiles are added regularly. Browse the full directory when you're ready."
     },
     "majorDisciplines": {
       "title": "Explore job by Major Discipline",
@@ -254,7 +257,7 @@
         "companyInformation": "Company Information",
         "codeOfConduct": "Code of Conduct",
         "investorRelations": "Investor Relations",
-        "siteMap": "Site map",
+        "siteMap": "Sitemap",
         "policies": "Policies",
         "termsAndCondition": "Terms and Condition",
         "legal": "Legal",
@@ -286,8 +289,12 @@
     "noCandidatesFoundSearch": "No candidates found",
     "noCandidatesDescriptionSearch": "Try adjusting your search query or browse all candidates.",
     "candidatesFound": "{count} candidate{plural} found for \"{search}\"",
+    "employerOnlySearch": "Smart Search is for employers only",
+    "employerOnlySearchDescription": "Sign in or register as an employer to search and view candidate profiles.",
+    "signInAsEmployer": "Sign in as employer",
+    "employerOnlyViewCandidates": "Sign in as an employer to view candidate profiles and contact details.",
     "searchErrors": {
-      "unauthorized": "Please log in to search candidates",
+      "unauthorized": "Please log in as an employer to search candidates",
       "notSupported": "You do not have permission to search",
       "failed": "Failed to search candidates"
     },
@@ -381,6 +388,7 @@
       "companyNameRequired": "Please enter your company name",
       "emailRequired": "Please enter your email address",
       "phoneRequired": "Please enter your phone number",
+      "phoneKSAOnly": "Only Saudi Arabia (KSA) phone numbers are accepted. Use +966...",
       "passwordMinLength": "Password must be at least 8 characters long",
       "passwordsDoNotMatch": "Passwords do not match",
       "termsRequired": "You must accept the terms and conditions"

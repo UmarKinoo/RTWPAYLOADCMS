@@ -89,6 +89,10 @@ const candidateSchema = z
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   })
+  .refine((data) => (data.phone || '').startsWith('+966'), {
+    message: 'Only Saudi Arabia (KSA) phone numbers are accepted. Use +966...',
+    path: ['phone'],
+  })
 
 export type CandidateFormData = z.infer<typeof candidateSchema>
 
