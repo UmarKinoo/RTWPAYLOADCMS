@@ -73,6 +73,10 @@ supabase_local_dump.sql
 *prod-connection*.ts
 *with-password*.ts
 
+# One-off / prod-only scripts (do not commit)
+src/scripts/copy-translations-to-prod.ts
+src/scripts/fix-employers-wallet-columns.ts
+
 # Configuration files with potential secrets
 config.local.*
 *.local.*
