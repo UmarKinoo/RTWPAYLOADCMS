@@ -493,7 +493,7 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
                   <Button
                     onClick={() => router.push('/register-type')}
                     className={cn(
-                      'bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-lg sm:rounded-xl',
+                      'cursor-pointer bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-lg sm:rounded-xl',
                       'px-3 sm:px-5 lg:px-6 py-2 sm:py-2.5',
                       'text-xs sm:text-base lg:text-lg font-bold whitespace-nowrap',
                       'hidden sm:inline-flex' // Hide on mobile
@@ -608,7 +608,7 @@ export const HomepageNavbar: React.FC<HomepageNavbarProps> = ({ employer, candid
                               setMobileMenuOpen(false)
                               router.push('/register-type')
                             }}
-                            className="group flex w-full items-center gap-3 rounded-lg px-4 py-3.5 h-auto min-h-[52px] bg-[#4644b8] hover:bg-[#3a3aa0] text-white"
+                            className="cursor-pointer group flex w-full items-center gap-3 rounded-lg px-4 py-3.5 h-auto min-h-[52px] bg-[#4644b8] hover:bg-[#3a3aa0] text-white"
                           >
                             <div className="flex items-center justify-center rounded-lg bg-white/20 transition-colors h-10 w-10">
                               <div className="h-2 w-2 rounded-full bg-white" />
