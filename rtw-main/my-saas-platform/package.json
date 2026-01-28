@@ -26,6 +26,10 @@
     "start:standalone": "cross-env NODE_OPTIONS=--no-deprecation node .next/standalone/server.js"
   },
   "pnpm": {
+    "overrides": {
+      "sharp": "0.34.5",
+      "@img/sharp-libvips-darwin-arm64": "1.2.4"
+    },
     "onlyBuiltDependencies": [
       "esbuild",
       "sharp"
@@ -109,7 +113,7 @@
     "react-wrap-balancer": "^1.1.1",
     "recharts": "2.15.4",
     "resend": "^4.8.0",
-    "sharp": "0.33.5",
+    "sharp": "0.34.5",
     "sonner": "^2.0.7",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.1.17",

@@ -11,7 +11,7 @@ This project is configured to run with PostgreSQL in Docker.
 cp .env.docker .env
 ```
 
-2. Update the `PAYLOAD_SECRET` in `.env` with a secure random string.
+2. Set `POSTGRES_PASSWORD` in `.env` (used by the Postgres container; no default in code). Update `PAYLOAD_SECRET` with a secure random string.
 
 3. Start the services:
 ```bash
@@ -48,9 +48,10 @@ docker run -p 3000:3000 \
 
 ## Database Connection
 
-For local development with docker-compose:
+For local development with docker-compose, set `POSTGRES_PASSWORD` in `.env`, then use the same value in `DATABASE_URI`:
 ```
-DATABASE_URI=postgres://postgres:postgres@postgres:5432/payload
+POSTGRES_PASSWORD=your-chosen-password
+DATABASE_URI=postgres://postgres:your-chosen-password@postgres:5432/payload
 ```
 
 For external PostgreSQL:

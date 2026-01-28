@@ -1,4 +1,5 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
+import { deleteRelatedBeforeEmployerDelete } from './Employers/hooks/deleteRelatedBeforeEmployerDelete'
 
 const authenticated = ({ req }: { req: PayloadRequest }) => {
   return !!req.user
@@ -7,6 +8,9 @@ const authenticated = ({ req }: { req: PayloadRequest }) => {
 export const Employers: CollectionConfig = {
   slug: 'employers',
   auth: true,
+  hooks: {
+    beforeDelete: [deleteRelatedBeforeEmployerDelete],
+  },
   access: {
     create: () => true, // Allow public registration
     read: authenticated,

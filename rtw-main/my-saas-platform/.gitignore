@@ -77,6 +77,10 @@ supabase_local_dump.sql
 src/scripts/copy-translations-to-prod.ts
 src/scripts/fix-employers-wallet-columns.ts
 
+# Local / WSL / helper scripts (do not commit)
+restore-via-wsl.sh
+scripts/prevent-secrets.sh
+
 # Configuration files with potential secrets
 config.local.*
 *.local.*
