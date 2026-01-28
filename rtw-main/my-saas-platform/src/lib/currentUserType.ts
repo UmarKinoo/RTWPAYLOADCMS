@@ -3,8 +3,8 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { headers, cookies } from 'next/headers'
-import { jwtVerify } from 'jose'
 import type { User, Candidate, Employer } from '@/payload-types'
+import { clearSessionCookies } from '@/lib/auth'
 
 export type CurrentUserType =
   | { kind: 'admin'; user: User }
@@ -39,56 +39,37 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
       return null
     }
 
-    // Single-session: if token was issued before lastLoginAt, another device logged in — invalidate this session
-    const cookieStore = await cookies()
-    const token = cookieStore.get('payload-token')?.value
-    if (token && process.env.PAYLOAD_SECRET && process.env.PAYLOAD_SECRET.length >= 32) {
+    // Single-session: DB.sessionId must match cookie rtw-sid; legacy: if DB.sessionId null, allow
+    type AuthCollection = 'users' | 'candidates' | 'employers'
+    const userCollection = (user as { collection?: AuthCollection }).collection
+    const collectionsToCheck: AuthCollection[] = userCollection
+      ? [userCollection]
+      : (['candidates', 'employers', 'users'] as const)
+    let sessionValid = false
+    for (const coll of collectionsToCheck) {
       try {
-        const secretKey = new TextEncoder().encode(process.env.PAYLOAD_SECRET)
-        const { payload: jwtPayload } = await jwtVerify(token, secretKey, { algorithms: ['HS256'] })
-        const iat = typeof jwtPayload.iat === 'number' ? jwtPayload.iat : undefined
-        if (iat != null) {
-          type AuthCollection = 'users' | 'candidates' | 'employers'
-          const userCollection = (user as { collection?: AuthCollection }).collection
-          const collectionsToCheck: AuthCollection[] = userCollection
-            ? [userCollection]
-            : (['candidates', 'employers', 'users'] as const)
-          let lastLoginAt: Date | string | null = null
-          for (const coll of collectionsToCheck) {
-            try {
-              const doc = await payload.findByID({ collection: coll, id: user.id, depth: 0 })
-              const last = (doc as { lastLoginAt?: Date | string } | null)?.lastLoginAt
-              if (last != null) {
-                lastLoginAt = last
-                break
-              }
-            } catch {
-              /* not in this collection */
-            }
-          }
-          if (lastLoginAt != null) {
-            const lastMs = typeof lastLoginAt === 'string' ? new Date(lastLoginAt).getTime() : lastLoginAt.getTime()
-            const iatMs = iat * 1000
-            if (lastMs > iatMs) {
-              // Clear cookie so next request is unauthenticated (match auth.ts set options for consistency)
-              cookieStore.set('payload-token', '', {
-                path: '/',
-                maxAge: 0,
-                expires: new Date(0),
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-              })
-              if (process.env.NODE_ENV === 'development') {
-                console.log('[getCurrentUserType] Session stale (other device logged in), cookie cleared')
-              }
-              return null
-            }
-          }
+        const doc = await payload.findByID({ collection: coll, id: user.id, depth: 0 })
+        const sessionId = (doc as { sessionId?: string } | null)?.sessionId
+        if (sessionId == null) {
+          sessionValid = true
+          break
+        }
+        const cookieStore = await cookies()
+        const rtwSid = cookieStore.get('rtw-sid')?.value
+        if (rtwSid != null && sessionId === rtwSid) {
+          sessionValid = true
+          break
         }
       } catch {
-        /* invalid token or verify error — leave auth as-is, Payload already validated */
+        /* not in this collection */
       }
+    }
+    if (!sessionValid) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[getCurrentUserType] Session invalid (rtw-sid !== DB.sessionId), cookies cleared')
+      }
+      await clearSessionCookies()
+      return null
     }
 
     // Check if user is admin or moderator (from Users collection)

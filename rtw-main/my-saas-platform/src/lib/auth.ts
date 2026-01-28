@@ -73,22 +73,29 @@ async function attemptLogin(
     if (!result.token) {
       return { success: false, error: 'Invalid email or password', errorCode: 'INVALID_CREDENTIALS' }
     }
-    // Single-session: bump lastLoginAt so other devices' tokens become stale
+    // Single-session: rotate sessionId so other devices' rtw-sid no longer matches → instant logout on next request
+    const sessionId = randomBytes(32).toString('hex')
     try {
       await payload.update({
         collection,
         id: result.user.id,
-        data: { lastLoginAt: new Date().toISOString() },
+        data: { sessionId },
         overrideAccess: true,
         context: { skipVectorUpdate: true, disableRevalidate: true }, // skip candidate hooks for login-only update
       })
     } catch (updateErr) {
-      // Log but don't fail login if lastLoginAt update fails (e.g. column not yet migrated)
-      console.warn('[auth] lastLoginAt update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
+      console.warn('[auth] sessionId update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
     }
     const cookieStore = await cookies()
     const expiresIn = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000
     cookieStore.set('payload-token', result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      expires: new Date(Date.now() + expiresIn),
+    })
+    cookieStore.set('rtw-sid', sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -129,6 +136,43 @@ async function findUserByEmail(
   return null
 }
 
+/** Clear payload-token and rtw-sid so next request is unauthenticated (single-session invalidation). */
+export async function clearSessionCookies() {
+  const cookieStore = await cookies()
+  const opts = {
+    path: '/',
+    maxAge: 0,
+    expires: new Date(0),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+  }
+  cookieStore.set('payload-token', '', opts)
+  cookieStore.set('rtw-sid', '', opts)
+}
+
+/**
+ * Verify DB.sessionId === cookie rtw-sid for the given user; clear session and return false if invalid.
+ * Legacy: if DB.sessionId is null (user never logged in after deploy), allow so we don't mass-logout.
+ */
+async function verifySessionId(
+  payload: Payload,
+  user: { id: string },
+  collection: 'users' | 'candidates' | 'employers',
+): Promise<boolean> {
+  const cookieStore = await cookies()
+  try {
+    const doc = await payload.findByID({ collection, id: user.id, depth: 0 })
+    const sessionId = (doc as { sessionId?: string } | null)?.sessionId
+    if (sessionId == null) return true // legacy: no sessionId in DB yet, allow
+    const rtwSid = cookieStore.get('rtw-sid')?.value
+    if (rtwSid == null || sessionId !== rtwSid) return false
+    return true
+  } catch {
+    return false
+  }
+}
+
 // Auth Actions
 
 /**
@@ -141,19 +185,33 @@ export async function getUser(): Promise<User | null> {
     const payload: Payload = await getPayload({ config: await configPromise })
 
     const { user } = await payload.auth({ headers })
-    // Return the authenticated user (could be from users, candidates, or employers collection)
-    // The caller (getCurrentUserType) will determine the actual type
-    if (user) {
-      // Check if it's a User type by checking for 'role' property (only Users have this)
-      if ('role' in user) {
-        return user as User
+    if (!user) return null
+
+    // Single-session: DB.sessionId must match cookie rtw-sid
+    type AuthCollection = 'users' | 'candidates' | 'employers'
+    const userCollection = (user as { collection?: AuthCollection }).collection
+    const collectionsToCheck: AuthCollection[] = userCollection
+      ? [userCollection]
+      : (['candidates', 'employers', 'users'] as const)
+    let verified = false
+    for (const coll of collectionsToCheck) {
+      try {
+        if (await verifySessionId(payload, user, coll)) {
+          verified = true
+          break
+        }
+      } catch {
+        /* try next collection */
       }
-      // If it's not a User type, return null - getCurrentCandidate/getCurrentEmployer will handle it
+    }
+    if (!verified) {
+      await clearSessionCookies()
       return null
     }
+
+    if ('role' in user) return user as User
     return null
   } catch (error) {
-    // SECURITY: Never log passwords or sensitive data
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Error getting user:', errorMessage)
     return null
@@ -193,10 +251,8 @@ export async function loginUser({
 export async function logoutUser() {
   try {
     const cookieStore = await cookies()
-    // Delete the auth cookie
     cookieStore.delete('payload-token')
-
-    // Clear any other auth-related cookies if they exist
+    cookieStore.delete('rtw-sid')
     cookieStore.delete('user-session')
 
     redirect('/')
@@ -215,10 +271,8 @@ export async function logoutUser() {
 export async function clearAuthCookies(): Promise<{ success: boolean }> {
   try {
     const cookieStore = await cookies()
-    // Delete the Payload auth cookie
     cookieStore.delete('payload-token')
-
-    // Clear any other auth-related cookies if they exist
+    cookieStore.delete('rtw-sid')
     cookieStore.delete('user-session')
 
     // NextAuth cookies (commented out - NextAuth not in use, Google login disabled)

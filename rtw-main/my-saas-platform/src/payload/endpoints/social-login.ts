@@ -17,6 +17,7 @@ import { cookies } from 'next/headers'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { SignJWT, jwtVerify } from 'jose'
+import { randomBytes } from 'crypto'
 import type { User } from '@/payload-types'
 
 interface SocialLoginRequestBody {
@@ -204,11 +205,30 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    // Set auth cookie (matching Payload's cookie configuration)
+    // Single-session: rotate sessionId so other devices' rtw-sid no longer matches
+    const sessionId = randomBytes(32).toString('hex')
+    try {
+      await payload.update({
+        collection: 'users',
+        id: user.id,
+        data: { sessionId },
+        overrideAccess: true,
+      })
+    } catch (updateErr) {
+      console.warn('[social-login] sessionId update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
+    }
+
     const cookieStore = await cookies()
     const expiresDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days (matching token expiration)
 
     cookieStore.set('payload-token', payloadToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      expires: expiresDate,
+    })
+    cookieStore.set('rtw-sid', sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

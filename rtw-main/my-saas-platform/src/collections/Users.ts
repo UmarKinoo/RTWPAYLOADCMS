@@ -73,7 +73,15 @@ export const Users: CollectionConfig = {
       type: 'date',
       admin: {
         hidden: true,
-        description: 'Set on each login; used for single-session (invalidate other devices).',
+        description: 'Deprecated for single-session; use sessionId + rtw-sid cookie instead.',
+      },
+    },
+    {
+      name: 'sessionId',
+      type: 'text',
+      admin: {
+        hidden: true,
+        description: 'Single session per account: DB.sessionId === cookie rtw-sid; rotate on login to log out other devices.',
       },
     },
     // If you want to add a username field, uncomment the following lines

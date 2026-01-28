@@ -19,7 +19,7 @@ const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({
       !('bio_embedding' in data) && // Make sure bio_embedding is not being updated
       dataKeys.every(key => 
         ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
-         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified', 'lastLoginAt'].includes(key)
+         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified', 'lastLoginAt', 'sessionId'].includes(key)
       )
 
     if (isPasswordOnlyUpdate) {
@@ -134,7 +134,15 @@ export const Candidates: CollectionConfig = {
       type: 'date',
       admin: {
         hidden: true,
-        description: 'Set on each login; used for single-session (invalidate other devices).',
+        description: 'Deprecated for single-session; use sessionId + rtw-sid cookie instead.',
+      },
+    },
+    {
+      name: 'sessionId',
+      type: 'text',
+      admin: {
+        hidden: true,
+        description: 'Single session per account: DB.sessionId === cookie rtw-sid; rotate on login to log out other devices.',
       },
     },
     // Identity
