@@ -2,7 +2,8 @@
 
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
+import { jwtVerify } from 'jose'
 import type { User, Candidate, Employer } from '@/payload-types'
 
 export type CurrentUserType =
@@ -36,6 +37,45 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
         console.log('[getCurrentUserType] No authenticated user found')
       }
       return null
+    }
+
+    // Single-session: if token was issued before lastLoginAt, another device logged in — invalidate
+    const cookieStore = await cookies()
+    const token = cookieStore.get('payload-token')?.value
+    if (token && process.env.PAYLOAD_SECRET && process.env.PAYLOAD_SECRET.length >= 32) {
+      try {
+        const secretKey = new TextEncoder().encode(process.env.PAYLOAD_SECRET)
+        const { payload: jwtPayload } = await jwtVerify(token, secretKey, { algorithms: ['HS256'] })
+        const iat = typeof jwtPayload.iat === 'number' ? jwtPayload.iat : undefined
+        if (iat != null) {
+          const collections: Array<'users' | 'candidates' | 'employers'> = ['candidates', 'employers', 'users']
+          let lastLoginAt: Date | string | null = null
+          for (const coll of collections) {
+            try {
+              const doc = await payload.findByID({ collection: coll, id: user.id, depth: 0 })
+              const last = (doc as { lastLoginAt?: Date | string } | null)?.lastLoginAt
+              if (last != null) {
+                lastLoginAt = last
+                break
+              }
+            } catch {
+              /* not in this collection */
+            }
+          }
+          if (lastLoginAt != null) {
+            const lastMs = typeof lastLoginAt === 'string' ? new Date(lastLoginAt).getTime() : lastLoginAt.getTime()
+            if (lastMs > iat * 1000) {
+              cookieStore.set('payload-token', '', { path: '/', maxAge: 0 })
+              if (process.env.NODE_ENV === 'development') {
+                console.log('[getCurrentUserType] Session stale (other device logged in), cookie cleared')
+              }
+              return null
+            }
+          }
+        }
+      } catch {
+        /* invalid token or verify error — leave auth as-is, Payload already validated */
+      }
     }
 
     // Check if user is admin or moderator (from Users collection)

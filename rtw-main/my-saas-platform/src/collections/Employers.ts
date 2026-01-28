@@ -23,6 +23,14 @@ export const Employers: CollectionConfig = {
   },
   fields: [
     {
+      name: 'lastLoginAt',
+      type: 'date',
+      admin: {
+        hidden: true,
+        description: 'Set on each login; used for single-session (invalidate other devices).',
+      },
+    },
+    {
       name: 'responsiblePerson',
       type: 'text',
       label: 'Responsible Person',

@@ -73,6 +73,18 @@ async function attemptLogin(
     if (!result.token) {
       return { success: false, error: 'Invalid email or password', errorCode: 'INVALID_CREDENTIALS' }
     }
+    // Single-session: bump lastLoginAt so other devices' tokens become stale
+    try {
+      await payload.update({
+        collection,
+        id: result.user.id,
+        data: { lastLoginAt: new Date() },
+        overrideAccess: true,
+      })
+    } catch (updateErr) {
+      // Log but don't fail login if lastLoginAt update fails (e.g. column not yet migrated)
+      console.warn('[auth] lastLoginAt update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
+    }
     const cookieStore = await cookies()
     const expiresIn = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000
     cookieStore.set('payload-token', result.token, {

@@ -1,0 +1,104 @@
+# CI: migrations and schema drift
+# - PR: run migrations on a shadow DB, then check drift (fail on drift or pending migrations).
+# - Deploy: run db:migrate before build (use ci job or deploy workflow).
+
+name: CI Migrations
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+env:
+  NODE_OPTIONS: --no-deprecation
+
+jobs:
+  # PR: ensure no drift and no unapplied migrations
+  drift-check:
+    name: Drift & migration status
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate env for CI DB
+        run: |
+          echo "DATABASE_URI=postgresql://postgres:postgres@localhost:5432/postgres" >> .env
+
+      - name: Run migrations
+        run: pnpm db:migrate
+
+      - name: Check schema drift
+        run: pnpm db:diff
+        # Fails (exit 1) if current DB schema differs from .schema-snapshot.txt
+
+      - name: Migration status (informational)
+        run: pnpm db:status
+
+  # Deploy: run migrations then build (use when deploying; or call db:migrate in your deploy job)
+  deploy-ready:
+    name: Migrate & build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate env for CI
+        run: |
+          echo "DATABASE_URI=postgresql://postgres:postgres@localhost:5432/postgres" >> .env
+
+      - name: Run migrations and build
+        run: pnpm ci

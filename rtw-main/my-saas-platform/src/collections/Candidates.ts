@@ -19,7 +19,7 @@ const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({
       !('bio_embedding' in data) && // Make sure bio_embedding is not being updated
       dataKeys.every(key => 
         ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
-         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified'].includes(key)
+         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified', 'lastLoginAt'].includes(key)
       )
 
     if (isPasswordOnlyUpdate) {
@@ -129,6 +129,14 @@ export const Candidates: CollectionConfig = {
     defaultColumns: ['firstName', 'lastName', 'email', 'primarySkill', 'billingClass', 'updatedAt'],
   },
   fields: [
+    {
+      name: 'lastLoginAt',
+      type: 'date',
+      admin: {
+        hidden: true,
+        description: 'Set on each login; used for single-session (invalidate other devices).',
+      },
+    },
     // Identity
     {
       name: 'firstName',

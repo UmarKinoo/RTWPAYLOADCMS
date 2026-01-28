@@ -68,6 +68,14 @@ export const Users: CollectionConfig = {
         hidden: true,
       },
     },
+    {
+      name: 'lastLoginAt',
+      type: 'date',
+      admin: {
+        hidden: true,
+        description: 'Set on each login; used for single-session (invalidate other devices).',
+      },
+    },
     // If you want to add a username field, uncomment the following lines
     // {
     //   name: 'username',
