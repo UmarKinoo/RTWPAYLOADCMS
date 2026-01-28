@@ -78,7 +78,7 @@ async function attemptLogin(
       await payload.update({
         collection,
         id: result.user.id,
-        data: { lastLoginAt: new Date() },
+        data: { lastLoginAt: new Date().toISOString() },
         overrideAccess: true,
       })
     } catch (updateErr) {
