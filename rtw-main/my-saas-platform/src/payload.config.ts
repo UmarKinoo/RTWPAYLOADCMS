@@ -123,6 +123,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    // Only allow push in local/dev; production and Vercel (including staging) use migrations only
+    push: process.env.NODE_ENV !== 'production' && !process.env.VERCEL,
     afterSchemaInit: [
       ({ schema, extendTable }) => {
         // Define vector type for pgvector columns (1536 dimensions)
