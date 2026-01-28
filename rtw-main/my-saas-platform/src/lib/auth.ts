@@ -157,7 +157,7 @@ export async function clearSessionCookies() {
  */
 async function verifySessionId(
   payload: Payload,
-  user: { id: string },
+  user: { id: string | number },
   collection: 'users' | 'candidates' | 'employers',
 ): Promise<boolean> {
   const cookieStore = await cookies()
