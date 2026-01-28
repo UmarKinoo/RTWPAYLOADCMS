@@ -5,6 +5,7 @@ import { query as dbQuery } from '../../../lib/db'
 const AUTH_FIELDS = new Set([
   'password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt',
   'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified',
+  'lastLoginAt', // single-session bump; skip vector update
 ])
 
 function shouldSkipVectorUpdate(

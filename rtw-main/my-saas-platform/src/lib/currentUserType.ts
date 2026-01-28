@@ -39,7 +39,7 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
       return null
     }
 
-    // Single-session: if token was issued before lastLoginAt, another device logged in — invalidate
+    // Single-session: if token was issued before lastLoginAt, another device logged in — invalidate this session
     const cookieStore = await cookies()
     const token = cookieStore.get('payload-token')?.value
     if (token && process.env.PAYLOAD_SECRET && process.env.PAYLOAD_SECRET.length >= 32) {
@@ -48,9 +48,13 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
         const { payload: jwtPayload } = await jwtVerify(token, secretKey, { algorithms: ['HS256'] })
         const iat = typeof jwtPayload.iat === 'number' ? jwtPayload.iat : undefined
         if (iat != null) {
-          const collections: Array<'users' | 'candidates' | 'employers'> = ['candidates', 'employers', 'users']
+          type AuthCollection = 'users' | 'candidates' | 'employers'
+          const userCollection = (user as { collection?: AuthCollection }).collection
+          const collectionsToCheck: AuthCollection[] = userCollection
+            ? [userCollection]
+            : (['candidates', 'employers', 'users'] as const)
           let lastLoginAt: Date | string | null = null
-          for (const coll of collections) {
+          for (const coll of collectionsToCheck) {
             try {
               const doc = await payload.findByID({ collection: coll, id: user.id, depth: 0 })
               const last = (doc as { lastLoginAt?: Date | string } | null)?.lastLoginAt
@@ -64,8 +68,17 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
           }
           if (lastLoginAt != null) {
             const lastMs = typeof lastLoginAt === 'string' ? new Date(lastLoginAt).getTime() : lastLoginAt.getTime()
-            if (lastMs > iat * 1000) {
-              cookieStore.set('payload-token', '', { path: '/', maxAge: 0 })
+            const iatMs = iat * 1000
+            if (lastMs > iatMs) {
+              // Clear cookie so next request is unauthenticated (match auth.ts set options for consistency)
+              cookieStore.set('payload-token', '', {
+                path: '/',
+                maxAge: 0,
+                expires: new Date(0),
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+              })
               if (process.env.NODE_ENV === 'development') {
                 console.log('[getCurrentUserType] Session stale (other device logged in), cookie cleared')
               }

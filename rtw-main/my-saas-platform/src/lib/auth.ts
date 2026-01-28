@@ -80,6 +80,7 @@ async function attemptLogin(
         id: result.user.id,
         data: { lastLoginAt: new Date().toISOString() },
         overrideAccess: true,
+        context: { skipVectorUpdate: true, disableRevalidate: true }, // skip candidate hooks for login-only update
       })
     } catch (updateErr) {
       // Log but don't fail login if lastLoginAt update fails (e.g. column not yet migrated)
