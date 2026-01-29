@@ -221,9 +221,9 @@ export async function getUser(): Promise<User | null> {
       }
     }
     if (!verified) {
-      await clearSessionCookies()
       const locale = await getLocaleFromRequest()
-      redirect(`/${locale}/login?error=logged-out`)
+      const loginUrl = `/${locale}/login?error=logged-out`
+      redirect(`/api/auth/clear-session?next=${encodeURIComponent(loginUrl)}`)
     }
 
     if ('role' in user) return user as User

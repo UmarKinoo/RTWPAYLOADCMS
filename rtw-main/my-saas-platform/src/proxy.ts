@@ -61,8 +61,11 @@ async function handleAuth(request: NextRequest) {
   }
 
   // 3. If the user is logged in and trying to access login/auth pages, redirect to dashboard
+  // Exception: when error=logged-out we're in the "logged out elsewhere" flow — let them through to login
+  const isLoggedOutFlow = pathname === `/${locale}/login` && request.nextUrl.searchParams.get('error') === 'logged-out'
   if (
     token &&
+    !isLoggedOutFlow &&
     (pathname === `/${locale}/login` ||
       pathname === `/${locale}/forgot-password` ||
       pathname === `/${locale}/reset-password`)

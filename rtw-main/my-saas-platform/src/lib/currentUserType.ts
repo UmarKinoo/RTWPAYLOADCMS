@@ -5,7 +5,7 @@ import configPromise from '@payload-config'
 import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { User, Candidate, Employer } from '@/payload-types'
-import { clearSessionCookies, getLocaleFromRequest } from '@/lib/auth'
+import { getLocaleFromRequest } from '@/lib/auth'
 
 export type CurrentUserType =
   | { kind: 'admin'; user: User }
@@ -67,11 +67,11 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
     }
     if (!sessionValid) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[getCurrentUserType] Session invalid (rtw-sid !== DB.sessionId), cookies cleared')
+        console.log('[getCurrentUserType] Session invalid (rtw-sid !== DB.sessionId), redirecting to clear-session')
       }
-      await clearSessionCookies()
       const locale = await getLocaleFromRequest()
-      redirect(`/${locale}/login?error=logged-out`)
+      const loginUrl = `/${locale}/login?error=logged-out`
+      redirect(`/api/auth/clear-session?next=${encodeURIComponent(loginUrl)}`)
     }
 
     // Check if user is admin or moderator (from Users collection)
