@@ -228,6 +228,9 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
     } as User
     return { kind: 'unknown', user: userObj }
   } catch (error) {
+    if (error && typeof error === 'object' && 'digest' in error && String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')) {
+      throw error
+    }
     console.error('[getCurrentUserType] Error getting current user type:', error)
     return null
   }
