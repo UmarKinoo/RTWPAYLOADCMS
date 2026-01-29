@@ -193,9 +193,10 @@ async function verifySessionId(
 
 /**
  * Get the currently authenticated user
+ * @param options.onLoginPage - When true and session is invalid, return null without redirecting (breaks redirect loop when login page has stale cookies)
  * @returns The authenticated user or null if not authenticated
  */
-export async function getUser(): Promise<User | null> {
+export async function getUser(options?: { onLoginPage?: boolean }): Promise<User | null> {
   try {
     const headers = await getHeaders()
     const payload: Payload = await getPayload({ config: await configPromise })
@@ -221,6 +222,7 @@ export async function getUser(): Promise<User | null> {
       }
     }
     if (!verified) {
+      if (options?.onLoginPage) return null
       const locale = await getLocaleFromRequest()
       const loginUrl = `/${locale}/login?error=logged-out`
       redirect(`/api/auth/clear-session?next=${encodeURIComponent(loginUrl)}`)

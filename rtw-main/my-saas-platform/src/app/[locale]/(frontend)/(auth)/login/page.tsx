@@ -15,7 +15,7 @@ export default async function LoginPage({
   searchParams: Promise<{ success?: string; error?: string; collection?: string }>
 }) {
   const { locale } = await params
-  const user: User | null = await getUser()
+  const user: User | null = await getUser({ onLoginPage: true })
 
   if (user) {
     redirect(`/${locale}/dashboard`)
