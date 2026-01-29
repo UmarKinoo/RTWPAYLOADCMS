@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface LoginPageToastProps {
   success?: string
@@ -9,6 +10,8 @@ interface LoginPageToastProps {
 }
 
 export function LoginPageToast({ success, error }: LoginPageToastProps) {
+  const t = useTranslations('auth')
+
   useEffect(() => {
     if (success) {
       switch (success) {
@@ -26,6 +29,11 @@ export function LoginPageToast({ success, error }: LoginPageToastProps) {
 
     if (error) {
       switch (error) {
+        case 'logged-out':
+          toast.info(t('loggedOut'), {
+            description: t('loggedOutDescription'),
+          })
+          break
         case 'invalid-verification-link':
           toast.error('Invalid Verification Link', {
             description: 'The verification link is invalid. Please try again.',
@@ -47,7 +55,7 @@ export function LoginPageToast({ success, error }: LoginPageToastProps) {
           })
       }
     }
-  }, [success, error])
+  }, [success, error, t])
 
   return null
 }

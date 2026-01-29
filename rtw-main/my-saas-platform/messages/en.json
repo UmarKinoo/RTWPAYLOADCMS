@@ -32,7 +32,9 @@
     "redirectingToDashboard": "Redirecting to dashboard...",
     "emailOrPasswordIncorrect": "The email or password you entered is incorrect",
     "pleaseTryAgainLater": "Please try again later",
-    "somethingWentWrong": "Something went wrong"
+    "somethingWentWrong": "Something went wrong",
+    "loggedOut": "You've been logged out",
+    "loggedOutDescription": "Please log in again to continue."
   },
   "registration": {
     "title": "Candidate Registration",

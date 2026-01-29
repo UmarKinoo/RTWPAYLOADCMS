@@ -136,6 +136,22 @@ async function findUserByEmail(
   return null
 }
 
+/** Get locale from request (referer path) for redirects; default 'en'. */
+export async function getLocaleFromRequest(): Promise<string> {
+  const headersList = await getHeaders()
+  const referer = headersList.get('referer')
+  if (referer) {
+    try {
+      const path = new URL(referer).pathname
+      const seg = path.split('/').filter(Boolean)
+      if (seg[0] === 'ar' || seg[0] === 'en') return seg[0]
+    } catch {
+      /* ignore */
+    }
+  }
+  return 'en'
+}
+
 /** Clear payload-token and rtw-sid so next request is unauthenticated (single-session invalidation). */
 export async function clearSessionCookies() {
   const cookieStore = await cookies()
@@ -206,7 +222,8 @@ export async function getUser(): Promise<User | null> {
     }
     if (!verified) {
       await clearSessionCookies()
-      return null
+      const locale = await getLocaleFromRequest()
+      redirect(`/${locale}/login?error=logged-out`)
     }
 
     if ('role' in user) return user as User

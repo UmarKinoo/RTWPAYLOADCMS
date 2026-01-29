@@ -32,7 +32,9 @@
     "redirectingToDashboard": "إعادة التوجيه إلى لوحة التحكم...",
     "emailOrPasswordIncorrect": "البريد الإلكتروني أو كلمة المرور التي أدخلتها غير صحيحة",
     "pleaseTryAgainLater": "يرجى المحاولة مرة أخرى لاحقًا",
-    "somethingWentWrong": "حدث خطأ ما"
+    "somethingWentWrong": "حدث خطأ ما",
+    "loggedOut": "تم تسجيل خروجك",
+    "loggedOutDescription": "يرجى تسجيل الدخول مرة أخرى للمتابعة."
   },
   "registration": {
     "title": "تسجيل المرشح",
