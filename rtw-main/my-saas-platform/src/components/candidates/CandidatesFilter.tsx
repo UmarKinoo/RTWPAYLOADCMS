@@ -564,6 +564,7 @@ export const CandidatesFilter: React.FC = () => {
           filterConfigs={filterConfigs}
           isLoadingOptions={isLoadingOptions}
           t={t}
+          labelMaps={labelMaps}
         />
       </div>
 
