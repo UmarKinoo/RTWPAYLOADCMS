@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Globe, Edit2, Save, X } from 'lucide-react'
 import { useState } from 'react'
 import type { Candidate } from '@/payload-types'
@@ -17,6 +18,8 @@ interface LanguagesSectionProps {
 }
 
 export function LanguagesSection({ candidate, onUpdate }: LanguagesSectionProps) {
+  const t = useTranslations('candidateDashboard.languages')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isEditing, setIsEditing] = useState(false)
   const [languages, setLanguages] = useState(candidate.languages || '')
   const [isSaving, setIsSaving] = useState(false)
@@ -31,12 +34,12 @@ export function LanguagesSection({ candidate, onUpdate }: LanguagesSectionProps)
       if (result.success) {
         onUpdate(result.candidate || {})
         setIsEditing(false)
-        toast.success('Languages updated successfully')
+        toast.success(t('languagesUpdated'))
       } else {
-        toast.error(result.error || 'Failed to update')
+        toast.error(result.error || tCommon('failedToUpdate'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
     }
@@ -53,7 +56,7 @@ export function LanguagesSection({ candidate, onUpdate }: LanguagesSectionProps)
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <Globe className="size-5 text-[#282828] sm:size-6" />
-          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">Languages</h3>
+          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">{t('title')}</h3>
         </div>
         {!isEditing ? (
           <Button
@@ -63,13 +66,13 @@ export function LanguagesSection({ candidate, onUpdate }: LanguagesSectionProps)
             className="text-[#4644b8] hover:text-[#4644b8] hover:bg-[#4644b8]/10"
           >
             <Edit2 className="mr-2 size-4" />
-            Edit
+            {tCommon('edit')}
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleCancel}>
               <X className="mr-2 size-4" />
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               size="sm"
@@ -78,7 +81,7 @@ export function LanguagesSection({ candidate, onUpdate }: LanguagesSectionProps)
               className="bg-[#4644b8] hover:bg-[#3a3aa0]"
             >
               <Save className="mr-2 size-4" />
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? tCommon('saving') : tCommon('save')}
             </Button>
           </div>
         )}
@@ -87,16 +90,13 @@ export function LanguagesSection({ candidate, onUpdate }: LanguagesSectionProps)
       {/* Content */}
       {isEditing ? (
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Languages</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('title')}</FieldLabel>
           <Input
             value={languages}
             onChange={(e) => setLanguages(e.target.value)}
-            placeholder="e.g., English, Arabic, French"
+            placeholder={t('placeholder')}
             className="h-10 rounded-lg border-[#ededed] text-sm"
           />
-          <p className="mt-1 text-xs text-[#757575]">
-            Enter languages separated by commas
-          </p>
         </Field>
       ) : (
         <div>
@@ -112,7 +112,7 @@ export function LanguagesSection({ candidate, onUpdate }: LanguagesSectionProps)
               ))}
             </div>
           ) : (
-            <p className="text-sm font-medium text-[#757575]">No languages specified</p>
+            <p className="text-sm font-medium text-[#757575]">{tCommon('notSet')}</p>
           )}
         </div>
       )}

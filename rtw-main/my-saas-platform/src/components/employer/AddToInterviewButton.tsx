@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -18,6 +19,7 @@ export function AddToInterviewButton({
   variant = 'default',
   className,
 }: AddToInterviewButtonProps) {
+  const t = useTranslations('requestInterview')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   if (variant === 'outline') {
@@ -35,8 +37,8 @@ export function AddToInterviewButton({
             className
           )}
         >
-          <span className="hidden sm:inline">Add to Interview</span>
-          <span className="sm:hidden">Add</span>
+          <span className="hidden sm:inline">{t('addToInterview')}</span>
+          <span className="sm:hidden">{t('add')}</span>
           <Plus className="w-3.5 h-3.5" />
         </Button>
         <InterviewRequestModal
@@ -60,7 +62,7 @@ export function AddToInterviewButton({
           className
         )}
       >
-        <span>Add to Interview</span>
+        <span>{t('addToInterview')}</span>
         <Plus className="w-6 h-6" />
       </Button>
       <InterviewRequestModal

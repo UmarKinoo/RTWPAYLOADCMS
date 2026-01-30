@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   Dialog,
   DialogContent,
@@ -47,6 +48,7 @@ export function InterviewRequestModal({
     }, 5000)
   }
 
+  const t = useTranslations('requestInterview')
   const candidateName = `${candidate.firstName} ${candidate.lastName}`
 
   return (
@@ -60,10 +62,10 @@ export function InterviewRequestModal({
       >
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="text-xl sm:text-2xl font-semibold text-[#16252d]">
-            Request interview with {candidateName}
+            {t('modalTitle', { name: candidateName })}
           </DialogTitle>
           <DialogDescription className="text-sm text-[#757575] mt-1">
-            Set date, time, role, and location. The request will be sent for approval.
+            {t('modalDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -72,16 +74,16 @@ export function InterviewRequestModal({
             {success && (
               <Alert className="border-emerald-200 bg-emerald-50 text-emerald-800 [&>svg]:text-emerald-600 shadow-sm">
                 <CheckCircle2 className="size-4" />
-                <AlertTitle className="font-semibold">Invitation sent</AlertTitle>
+                <AlertTitle className="font-semibold">{t('invitationSent')}</AlertTitle>
                 <AlertDescription>
-                  Your request has been sent and is pending moderator approval. The candidate will be notified once approved.
+                  {t('invitationSentDescription')}
                 </AlertDescription>
               </Alert>
             )}
             {error && (
               <Alert variant="destructive" className="shadow-sm">
                 <AlertCircle className="size-4" />
-                <AlertTitle className="font-semibold">Request failed</AlertTitle>
+                <AlertTitle className="font-semibold">{t('requestFailed')}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -96,7 +98,7 @@ export function InterviewRequestModal({
             <div className="flex flex-col gap-2">
               <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#757575]">
                 <User className="size-3.5" aria-hidden />
-                Candidate
+                {t('candidate')}
               </p>
               <Card className="overflow-hidden border-[#e5e5e5] bg-[#fafafa] shadow-sm">
                 <CardContent className="p-4 sm:p-5">
@@ -109,7 +111,7 @@ export function InterviewRequestModal({
             <div className="min-w-0 flex flex-col gap-2">
               <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#757575]" id="request-details-label">
                 <CalendarClock className="size-3.5" aria-hidden />
-                Schedule & details
+                {t('scheduleAndDetails')}
               </p>
               <InterviewRequestForm
                 candidateId={candidate.id}

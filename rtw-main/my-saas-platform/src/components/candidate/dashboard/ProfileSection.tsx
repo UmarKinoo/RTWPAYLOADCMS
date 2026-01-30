@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { ImagePlus, Download, Loader2 } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,8 @@ interface ProfileSectionProps {
 }
 
 export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
+  const t = useTranslations('candidateDashboard.profile')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isEditing, setIsEditing] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -40,8 +43,8 @@ export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
     // Validate file type (images only)
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Invalid file type', {
-        description: 'Please upload an image file (JPG, PNG, WEBP, or GIF).',
+      toast.error(t('invalidFileType'), {
+        description: t('invalidFileTypeDesc'),
       })
       return
     }
@@ -49,8 +52,8 @@ export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
     // Validate file size (max 5MB for images)
     const maxSize = 5 * 1024 * 1024 // 5MB
     if (file.size > maxSize) {
-      toast.error('File too large', {
-        description: 'Please upload an image smaller than 5MB.',
+      toast.error(t('fileTooLarge'), {
+        description: t('fileTooLargeDesc'),
       })
       return
     }
@@ -89,18 +92,18 @@ export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
 
       if (result.success) {
         onUpdate(result.candidate || {})
-        toast.success('Profile picture uploaded successfully', {
-          description: 'Your profile picture has been updated.',
+        toast.success(t('profilePictureUpdated'), {
+          description: t('profilePictureUpdatedDesc'),
         })
       } else {
-        toast.error('Failed to save profile picture', {
-          description: result.error || 'Please try again.',
+        toast.error(t('failedToSaveProfilePicture'), {
+          description: result.error || t('pleaseTryAgain'),
         })
       }
     } catch (error: any) {
       console.error('Upload error:', error)
-      toast.error('Upload failed', {
-        description: error.message || 'Please try again.',
+      toast.error(t('uploadFailed'), {
+        description: error.message || t('pleaseTryAgain'),
       })
     } finally {
       setIsUploading(false)
@@ -119,7 +122,7 @@ export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
     if (typeof candidate.primarySkill === 'object' && candidate.primarySkill?.name) {
       return candidate.primarySkill.name
     }
-    return 'Not set'
+    return tCommon('notSet')
   }
 
   return (
@@ -161,10 +164,10 @@ export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
             </h2>
             <div className="mt-1 flex flex-col items-center gap-2 sm:flex-row sm:items-center">
               <p className="text-sm text-[#282828]">
-                {candidate.jobTitle || 'No job title'} • {candidate.location || 'No location'}
+                {candidate.jobTitle || t('noJobTitle')} • {candidate.location || t('noLocation')}
               </p>
               <Badge className="bg-[#4644b8]/10 text-[#4644b8] hover:bg-[#4644b8]/20 border-[#4644b8]/20 text-xs">
-                Working but looking for new opportunities
+                {t('workingButLooking')}
               </Badge>
             </div>
           </div>
@@ -173,7 +176,7 @@ export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
             className="w-fit mx-auto border-[#4644b8] text-[#4644b8] hover:bg-[#4644b8] hover:text-white sm:mx-0"
           >
             <Download className="mr-2 size-4" />
-            Download PDF Resume
+            {t('downloadPdfResume')}
           </Button>
         </div>
       </div>

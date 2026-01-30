@@ -124,12 +124,12 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Phone:</span>
-                <span className="font-medium">{formValues.phone || 'Not provided'}</span>
+                <span dir="ltr" className="font-medium">{formValues.phone || 'Not provided'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">WhatsApp:</span>
                 <span className="font-medium">
-                  {sameAsPhone ? formValues.phone || 'Same as phone' : formValues.whatsapp || 'Not provided'}
+                  <span dir="ltr">{sameAsPhone ? formValues.phone || 'Same as phone' : formValues.whatsapp || 'Not provided'}</span>
                 </span>
               </div>
               <div className="flex justify-between">

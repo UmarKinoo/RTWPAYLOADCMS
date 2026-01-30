@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { format } from 'date-fns'
+import { useTranslations } from 'next-intl'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Popover,
   PopoverContent,
@@ -34,21 +36,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { requestInterview } from '@/lib/employer/interviews'
 import { useRouter } from 'next/navigation'
 
-const interviewRequestSchema = z.object({
-  date: z.date({ message: 'Date is required' }).optional(),
-  time: z.string().min(1, 'Time is required'),
-  jobPosition: z.string().min(1, 'Job position is required'),
-  jobLocation: z.string().min(1, 'Job location is required'),
-  salary: z.string().min(1, 'Salary is required'),
-  accommodationIncluded: z.enum(['yes', 'no'], {
-    message: 'Please select an option',
-  }),
-  transportation: z.enum(['yes', 'no'], {
-    message: 'Please select an option',
-  }),
-})
-
-type InterviewRequestFormData = z.infer<typeof interviewRequestSchema>
+const LOCATION_KEYS = ['riyadh', 'jeddah', 'dammam', 'khobar', 'mecca', 'medina', 'tabuk', 'yanbu', 'abha', 'other'] as const
 
 interface InterviewRequestFormProps {
   candidateId: number
@@ -62,7 +50,24 @@ export function InterviewRequestForm({
   onError,
 }: InterviewRequestFormProps) {
   const router = useRouter()
+  const t = useTranslations('requestInterview')
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+
+  const interviewRequestSchema = React.useMemo(
+    () =>
+      z.object({
+        date: z.date({ message: t('dateRequired') }).optional(),
+        time: z.string().min(1, t('timeRequired')),
+        jobPosition: z.string().min(1, t('jobPositionRequired')),
+        jobLocation: z.string().min(1, t('jobLocationRequired')),
+        salary: z.string().min(1, t('salaryRequired')),
+        accommodationIncluded: z.enum(['yes', 'no'], { message: t('pleaseSelectOption') }),
+        transportation: z.enum(['yes', 'no'], { message: t('pleaseSelectOption') }),
+        message: z.string().optional(),
+      }),
+    [t]
+  )
+  type InterviewRequestFormData = z.infer<typeof interviewRequestSchema>
 
   const form = useForm<InterviewRequestFormData>({
     resolver: zodResolver(interviewRequestSchema),
@@ -74,12 +79,13 @@ export function InterviewRequestForm({
       salary: '',
       accommodationIncluded: undefined,
       transportation: undefined,
+      message: '',
     },
   })
 
   const onSubmit = async (data: InterviewRequestFormData) => {
     if (!data.date) {
-      onError?.('Please select a date')
+      onError?.(t('pleaseSelectDate'))
       return
     }
 
@@ -98,16 +104,17 @@ export function InterviewRequestForm({
         salary: data.salary,
         accommodationIncluded: data.accommodationIncluded === 'yes',
         transportation: data.transportation === 'yes',
+        notes: data.message || undefined,
       })
 
       if (result.success) {
         onSuccess?.()
         router.refresh()
       } else {
-        onError?.(result.error || 'Failed to send invitation')
+        onError?.(result.error || t('failedToSend'))
       }
     } catch (error: any) {
-      onError?.(error.message || 'An error occurred')
+      onError?.(error.message || t('anErrorOccurred'))
     } finally {
       setIsSubmitting(false)
     }
@@ -124,7 +131,7 @@ export function InterviewRequestForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium text-[#16252d]">
-                  Date *
+                  {t('date')}
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -137,7 +144,7 @@ export function InterviewRequestForm({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-                        {field.value ? format(field.value, 'MMM d, yyyy') : 'Pick date'}
+                        {field.value ? format(field.value, 'MMM d, yyyy') : t('pickDate')}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
@@ -161,7 +168,7 @@ export function InterviewRequestForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium text-[#16252d]">
-                  Time *
+                  {t('time')}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -176,7 +183,7 @@ export function InterviewRequestForm({
           />
         </div>
 
-        {/* Role & location */}
+        {/* Job offered (text) & location (Saudi cities) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -184,23 +191,15 @@ export function InterviewRequestForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium text-[#16252d]">
-                  Job position offered *
+                  {t('jobOffered')}
                 </FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-11 bg-white border-[#d9d9d9] rounded-lg focus:ring-[#4644b8]">
-                      <SelectValue placeholder="Select position" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="rounded-lg border-[#e5e5e5]">
-                    <SelectItem value="barista">Barista</SelectItem>
-                    <SelectItem value="waiter">Waiter</SelectItem>
-                    <SelectItem value="chef">Chef</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="cashier">Cashier</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <Input
+                    placeholder={t('jobOfferedPlaceholder')}
+                    className="h-11 bg-white border-[#d9d9d9] rounded-lg placeholder:text-muted-foreground focus-visible:ring-[#4644b8]"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
             )}
@@ -211,22 +210,20 @@ export function InterviewRequestForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium text-[#16252d]">
-                  Job location *
+                  {t('jobLocation')}
                 </FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger className="h-11 bg-white border-[#d9d9d9] rounded-lg focus:ring-[#4644b8]">
-                      <SelectValue placeholder="Select location" />
+                      <SelectValue placeholder={t('selectLocation')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="rounded-lg border-[#e5e5e5]">
-                    <SelectItem value="riyadh">Riyadh</SelectItem>
-                    <SelectItem value="jeddah">Jeddah</SelectItem>
-                    <SelectItem value="dammam">Dammam</SelectItem>
-                    <SelectItem value="khobar">Khobar</SelectItem>
-                    <SelectItem value="mecca">Mecca</SelectItem>
-                    <SelectItem value="medina">Medina</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    {LOCATION_KEYS.map((key) => (
+                      <SelectItem key={key} value={key}>
+                        {t(`locations.${key}`)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage className="text-xs" />
@@ -239,15 +236,36 @@ export function InterviewRequestForm({
         <FormField
           control={form.control}
           name="salary"
-          render={({ field }) => (
+            render={({ field }) => (
             <FormItem>
               <FormLabel className="text-sm font-medium text-[#16252d]">
-                Salary offered *
+                {t('salaryOffered')}
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="e.g. 3,000 SAR"
+                  placeholder={t('salaryPlaceholder')}
                   className="h-11 bg-white border-[#d9d9d9] rounded-lg placeholder:text-muted-foreground focus-visible:ring-[#4644b8]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+
+        {/* Message */}
+        <FormField
+          control={form.control}
+          name="message"
+            render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium text-[#16252d]">
+                {t('messageOptional')}
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder={t('messagePlaceholder')}
+                  className="min-h-[100px] bg-white border-[#d9d9d9] rounded-lg placeholder:text-muted-foreground focus-visible:ring-[#4644b8] resize-y"
                   {...field}
                 />
               </FormControl>
@@ -264,7 +282,7 @@ export function InterviewRequestForm({
             render={({ field }) => (
               <FormItem className="space-y-3">
                 <FormLabel className="text-sm font-medium text-[#16252d]">
-                  Accommodation included *
+                  {t('accommodationIncluded')}
                 </FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -274,11 +292,11 @@ export function InterviewRequestForm({
                   >
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <RadioGroupItem value="yes" id="accommodation-yes" className="border-[#d9d9d9]" />
-                      <span className="text-sm text-[#16252d]">Yes</span>
+                      <span className="text-sm text-[#16252d]">{t('yes')}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <RadioGroupItem value="no" id="accommodation-no" className="border-[#d9d9d9]" />
-                      <span className="text-sm text-[#16252d]">No</span>
+                      <span className="text-sm text-[#16252d]">{t('no')}</span>
                     </label>
                   </RadioGroup>
                 </FormControl>
@@ -292,7 +310,7 @@ export function InterviewRequestForm({
             render={({ field }) => (
               <FormItem className="space-y-3">
                 <FormLabel className="text-sm font-medium text-[#16252d]">
-                  Transportation *
+                  {t('transportation')}
                 </FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -302,11 +320,11 @@ export function InterviewRequestForm({
                   >
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <RadioGroupItem value="yes" id="transportation-yes" className="border-[#d9d9d9]" />
-                      <span className="text-sm text-[#16252d]">Yes</span>
+                      <span className="text-sm text-[#16252d]">{t('yes')}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer select-none">
                       <RadioGroupItem value="no" id="transportation-no" className="border-[#d9d9d9]" />
-                      <span className="text-sm text-[#16252d]">No</span>
+                      <span className="text-sm text-[#16252d]">{t('no')}</span>
                     </label>
                   </RadioGroup>
                 </FormControl>
@@ -322,7 +340,7 @@ export function InterviewRequestForm({
           disabled={isSubmitting}
           className="w-full h-11 bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-lg text-sm font-semibold cursor-pointer"
         >
-          {isSubmitting ? 'Sending…' : 'Send invitation'}
+          {isSubmitting ? t('sending') : t('sendInvitation')}
         </Button>
       </form>
     </Form>

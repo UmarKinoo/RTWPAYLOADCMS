@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { EmployerDashboardSidebar } from './EmployerDashboardSidebar'
 import { DashboardHeader } from './DashboardHeader'
 import { StatisticsChart } from './StatisticsChart'
@@ -55,6 +56,7 @@ export function EmployerDashboardClient({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const searchParams = useSearchParams()
   const currentView = searchParams.get('view') || 'dashboard'
+  const t = useTranslations('employerDashboard')
 
   return (
     <div className="relative min-h-screen bg-[#f5f5f5] overflow-x-hidden">
@@ -79,7 +81,7 @@ export function EmployerDashboardClient({
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-full max-w-[280px] sm:w-[320px] p-0 flex flex-col overflow-hidden z-[110]">
           <VisuallyHidden>
-            <SheetTitle>Navigation Menu</SheetTitle>
+            <SheetTitle>{t('navMenuTitle')}</SheetTitle>
           </VisuallyHidden>
           <EmployerDashboardSidebar mobile onClose={() => setMobileMenuOpen(false)} unreadNotificationsCount={unreadNotificationsCount} />
         </SheetContent>

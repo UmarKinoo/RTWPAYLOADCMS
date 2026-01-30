@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,15 +18,16 @@ interface DashboardHeaderProps {
   notifications: NotificationListItem[]
 }
 
-function getDisplayName(employer: Employer): string {
+function getDisplayName(employer: Employer, fallback: string): string {
   if (employer.companyName) return employer.companyName
   if (employer.responsiblePerson) return employer.responsiblePerson
   if (employer.email) return employer.email.split('@')[0]
-  return 'Employer'
+  return fallback
 }
 
 export function DashboardHeader({ employer, unreadNotificationsCount, notifications }: DashboardHeaderProps) {
-  const displayName = getDisplayName(employer)
+  const t = useTranslations('employerDashboard.header')
+  const displayName = getDisplayName(employer, t('employerFallback'))
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   
@@ -50,10 +52,10 @@ export function DashboardHeader({ employer, unreadNotificationsCount, notificati
       {/* Left Section */}
       <div className="flex flex-col gap-0.5">
         <h1 className="text-2xl font-semibold leading-normal text-[#282828] sm:text-[28px]">
-          Activity
+          {t('activity')}
         </h1>
         <p className="text-xs font-normal leading-normal text-[#515151] sm:text-sm">
-          Updating your information will offer you the most relevant content
+          {t('activityDescription')}
         </p>
       </div>
 
@@ -67,7 +69,7 @@ export function DashboardHeader({ employer, unreadNotificationsCount, notificati
           <div className="relative w-full sm:w-[240px] lg:w-[320px]">
             <Input
               type="search"
-              placeholder="Search candidates..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={handleSearchChange}
               className="h-10 w-full rounded-lg border border-[#ededed] bg-white px-3 pr-10 text-base text-[#a5a5a5] sm:h-12"
@@ -82,7 +84,7 @@ export function DashboardHeader({ employer, unreadNotificationsCount, notificati
             variant="outline"
             className="h-10 gap-2 border border-[#282828] px-4 py-2 sm:h-12"
           >
-            <span className="text-sm font-medium text-[#282828] sm:text-lg">Candidates</span>
+            <span className="text-sm font-medium text-[#282828] sm:text-lg">{t('candidates')}</span>
           </Button>
         </Link>
 

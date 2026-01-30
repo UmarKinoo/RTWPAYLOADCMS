@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { User as UserIcon, Edit2, Save, X } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
@@ -23,6 +24,8 @@ interface PersonalInfoSectionProps {
 }
 
 export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSectionProps) {
+  const t = useTranslations('candidateDashboard.personalInfo')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     firstName: candidate.firstName || '',
@@ -54,12 +57,12 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
       if (result.success) {
         onUpdate(result.candidate || {})
         setIsEditing(false)
-        toast.success('Personal information updated successfully')
+        toast.success(t('personalInfoUpdated'))
       } else {
-        toast.error(result.error || 'Failed to update')
+        toast.error(result.error || tCommon('failedToUpdate'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
     }
@@ -86,7 +89,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <UserIcon className="size-5 text-[#282828] sm:size-6" />
-          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">Personal Information</h3>
+          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">{t('title')}</h3>
         </div>
         {!isEditing ? (
           <Button
@@ -96,13 +99,13 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
             className="text-[#4644b8] hover:text-[#4644b8] hover:bg-[#4644b8]/10"
           >
             <Edit2 className="mr-2 size-4" />
-            Edit
+            {tCommon('edit')}
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleCancel}>
               <X className="mr-2 size-4" />
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               size="sm"
@@ -111,7 +114,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
               className="bg-[#4644b8] hover:bg-[#3a3aa0]"
             >
               <Save className="mr-2 size-4" />
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? tCommon('saving') : tCommon('save')}
             </Button>
           </div>
         )}
@@ -121,7 +124,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         {/* First name */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">First name</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('firstName')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.firstName}
@@ -135,7 +138,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
 
         {/* Last name */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Last name</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('lastName')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.lastName}
@@ -149,13 +152,13 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
 
         {/* Email */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Email Address</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('emailAddress')}</FieldLabel>
           <p className="text-sm font-medium text-[#282828]">{formData.email}</p>
         </Field>
 
         {/* Mobile Number */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Mobile Number</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('mobileNumber')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.phone}
@@ -163,13 +166,13 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
               className="h-10 rounded-lg border-[#ededed] text-sm"
             />
           ) : (
-            <p className="text-sm font-medium text-[#282828]">{candidate.phone || 'Not set'}</p>
+            <p className="text-sm font-medium text-[#282828]"><span dir="ltr">{candidate.phone || tCommon('notSet')}</span></p>
           )}
         </Field>
 
         {/* WhatsApp */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">WhatsApp Number</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('whatsAppNumber')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.whatsapp}
@@ -177,13 +180,13 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
               className="h-10 rounded-lg border-[#ededed] text-sm"
             />
           ) : (
-            <p className="text-sm font-medium text-[#282828]">{formData.whatsapp || 'Not set'}</p>
+            <p className="text-sm font-medium text-[#282828]">{formData.whatsapp || tCommon('notSet')}</p>
           )}
         </Field>
 
         {/* Location */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Location</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('location')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.location}
@@ -191,13 +194,13 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
               className="h-10 rounded-lg border-[#ededed] text-sm"
             />
           ) : (
-            <p className="text-sm font-medium text-[#282828]">{candidate.location || 'Not set'}</p>
+            <p className="text-sm font-medium text-[#282828]">{candidate.location || tCommon('notSet')}</p>
           )}
         </Field>
 
         {/* Date of Birth */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Date of Birth</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('dateOfBirth')}</FieldLabel>
           {isEditing ? (
             <Input
               type="date"
@@ -207,37 +210,37 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {candidate.dob ? new Date(candidate.dob).toLocaleDateString() : 'Not set'}
+              {candidate.dob ? new Date(candidate.dob).toLocaleDateString() : tCommon('notSet')}
             </p>
           )}
         </Field>
 
         {/* Gender */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Gender</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('gender')}</FieldLabel>
           {isEditing ? (
             <Select
               value={formData.gender}
               onValueChange={(value) => setFormData({ ...formData, gender: value as 'male' | 'female' })}
             >
               <SelectTrigger className="h-10 rounded-lg border-[#ededed]">
-                <SelectValue placeholder="Select gender" />
+                <SelectValue placeholder={t('selectGender')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="male">{t('male')}</SelectItem>
+                <SelectItem value="female">{t('female')}</SelectItem>
               </SelectContent>
             </Select>
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {candidate.gender === 'male' ? 'Male' : candidate.gender === 'female' ? 'Female' : 'Not set'}
+              {candidate.gender === 'male' ? t('male') : candidate.gender === 'female' ? t('female') : tCommon('notSet')}
             </p>
           )}
         </Field>
 
         {/* Nationality */}
         <Field className="sm:col-span-2">
-          <FieldLabel className="text-xs text-[#757575]">Nationality</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('nationality')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.nationality}
@@ -245,7 +248,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
               className="h-10 rounded-lg border-[#ededed] text-sm"
             />
           ) : (
-            <p className="text-sm font-medium text-[#282828]">{candidate.nationality || 'Not set'}</p>
+            <p className="text-sm font-medium text-[#282828]">{candidate.nationality || tCommon('notSet')}</p>
           )}
         </Field>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { Users, MessageSquare, UserCheck, Clock, ArrowUpRight } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { getEmployerStats } from '@/lib/payload/employer-dashboard'
@@ -10,12 +11,13 @@ interface StatsCardsProps {
 
 export async function StatsCards({ employerId }: StatsCardsProps) {
   const stats = await getEmployerStats(employerId)
+  const t = await getTranslations('employerDashboard.statsCards')
 
   const statCards = [
     {
       icon: Users,
       value: stats.candidatesToReview.toString(),
-      label: 'candidates to review',
+      label: t('candidatesToReview'),
       bgColor: 'bg-[#f9f9f9]',
       borderColor: 'border-[#cbcbcb]',
       href: '/employer/dashboard?view=candidates-to-review',
@@ -23,7 +25,7 @@ export async function StatsCards({ employerId }: StatsCardsProps) {
     {
       icon: MessageSquare,
       value: stats.notificationsCount.toString(),
-      label: 'Notifications',
+      label: t('notifications'),
       bgColor: 'bg-white',
       borderColor: 'border-[#ededed]',
       href: '/employer/dashboard?view=notifications',
@@ -31,7 +33,7 @@ export async function StatsCards({ employerId }: StatsCardsProps) {
     {
       icon: UserCheck,
       value: stats.interviewsCount.toString(),
-      label: 'Scheduled Interviews',
+      label: t('scheduledInterviews'),
       bgColor: 'bg-white',
       borderColor: 'border-[#ededed]',
       href: '/employer/dashboard?view=interviews',
@@ -39,7 +41,7 @@ export async function StatsCards({ employerId }: StatsCardsProps) {
     {
       icon: Clock,
       value: stats.pendingInterviewRequestsCount.toString(),
-      label: 'Pending Requests',
+      label: t('pendingRequests'),
       bgColor: stats.pendingInterviewRequestsCount > 0 ? 'bg-yellow-50' : 'bg-white',
       borderColor: stats.pendingInterviewRequestsCount > 0 ? 'border-yellow-200' : 'border-[#ededed]',
       href: '/employer/dashboard?view=pending-requests',

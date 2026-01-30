@@ -37,7 +37,8 @@ export function CandidateNotificationDropdown({
       unreadCount={unreadCount}
       onMarkAsRead={handleMarkAsRead}
       onMarkAllAsRead={handleMarkAllAsRead}
-      viewAllUrl="/dashboard?view=notifications"
+      viewAllUrl="/dashboard/notifications"
+      notificationsNamespace="candidateDashboard"
     />
   )
 }

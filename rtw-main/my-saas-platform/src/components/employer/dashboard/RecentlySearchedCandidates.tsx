@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ChevronRight, User, MapPin, Briefcase } from 'lucide-react'
@@ -13,17 +14,18 @@ interface RecentlySearchedCandidatesProps {
 
 export async function RecentlySearchedCandidates({ employerId }: RecentlySearchedCandidatesProps) {
   const recentSearches = await getRecentCandidateSearches(employerId)
+  const t = await getTranslations('employerDashboard.recentlySearched')
 
   if (recentSearches.length === 0) {
     return (
       <Card className="flex flex-col gap-4 overflow-hidden rounded-2xl bg-white p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold text-[#222] sm:text-lg">
-            Recently Searched Candidates
+            {t('title')}
           </h3>
         </div>
         <div className="flex items-center justify-center py-8 text-sm text-[#757575]">
-          No recent candidate searches
+          {t('noRecentSearches')}
         </div>
       </Card>
     )
@@ -34,11 +36,11 @@ export async function RecentlySearchedCandidates({ employerId }: RecentlySearche
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-[#222] sm:text-lg">
-          Recently Searched Candidates
+          {t('title')}
         </h3>
         <Link href="/candidates">
           <Button variant="ghost" className="h-8 w-fit gap-2 px-4 py-2">
-            <span className="text-sm font-medium text-[#222]">View All</span>
+            <span className="text-sm font-medium text-[#222]">{t('viewAll')}</span>
             <ChevronRight className="size-6 text-[#222]" />
           </Button>
         </Link>

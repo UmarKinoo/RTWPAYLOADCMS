@@ -16,9 +16,21 @@ export interface FilterOptions {
   categoriesByDiscipline: Record<string, string[]>
   /** category name -> subcategory names */
   subCategoriesByCategory: Record<string, string[]>
+  /** Optional: canonical name -> localized label for dropdown display (when locale is passed) */
+  labelMaps?: {
+    discipline: Record<string, string>
+    category: Record<string, string>
+    subCategory: Record<string, string>
+  }
 }
 
-export async function getFilterOptions(): Promise<FilterOptions> {
+function getLocalizedName(doc: { name?: string | null; name_en?: string | null; name_ar?: string | null }, locale: string): string {
+  if (locale === 'ar' && doc.name_ar) return doc.name_ar
+  if (doc.name_en) return doc.name_en
+  return doc.name ?? ''
+}
+
+export async function getFilterOptions(locale?: string): Promise<FilterOptions> {
   try {
     const payload = await getPayload({ config: await configPromise })
 
@@ -156,6 +168,29 @@ export async function getFilterOptions(): Promise<FilterOptions> {
     const states = new Set<string>(locations) // Location = City/State
 
     const localeSort = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: 'base' })
+
+    // Build localized label maps for discipline/category/subCategory when locale is provided
+    let labelMaps: FilterOptions['labelMaps'] | undefined
+    if (locale === 'ar' || locale === 'en') {
+      const disciplineMap: Record<string, string> = {}
+      const categoryMap: Record<string, string> = {}
+      const subCategoryMap: Record<string, string> = {}
+      // Keys must match option values (we use .name in the options arrays)
+      allDisciplines.docs.forEach((d: any) => {
+        const key = d.name ?? ''
+        if (key) disciplineMap[key] = getLocalizedName(d, locale)
+      })
+      allCategories.docs.forEach((c: any) => {
+        const key = c.name ?? ''
+        if (key) categoryMap[key] = getLocalizedName(c, locale)
+      })
+      allSubCategories.docs.forEach((sc: any) => {
+        const key = sc.name ?? ''
+        if (key) subCategoryMap[key] = getLocalizedName(sc, locale)
+      })
+      labelMaps = { discipline: disciplineMap, category: categoryMap, subCategory: subCategoryMap }
+    }
+
     return {
       locations: Array.from(locations).sort(localeSort),
       countries: Array.from(countries).sort(localeSort),
@@ -167,6 +202,7 @@ export async function getFilterOptions(): Promise<FilterOptions> {
       subCategories: Array.from(subCategories).sort(localeSort),
       categoriesByDiscipline,
       subCategoriesByCategory,
+      labelMaps,
     }
   } catch (error: any) {
     console.error('Error fetching filter options:', error)

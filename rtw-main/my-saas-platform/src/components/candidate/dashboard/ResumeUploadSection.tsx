@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Upload, FileText, X, Download } from 'lucide-react'
 import { useState, useRef } from 'react'
 import type { Candidate, Media } from '@/payload-types'
@@ -14,6 +15,8 @@ interface ResumeUploadSectionProps {
 }
 
 export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSectionProps) {
+  const t = useTranslations('candidateDashboard.resumeUpload')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -24,9 +27,9 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
   const resumeId = typeof resume === 'object' && resume ? resume.id : typeof resume === 'number' ? resume : null
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
+    if (bytes === 0) return '0 ' + t('bytes')
     const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const sizes = [t('bytes'), 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
   }
@@ -38,8 +41,8 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
     // Validate file type
     const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Invalid file type', {
-        description: 'Please upload a PDF, DOC, or DOCX file.',
+      toast.error(t('invalidFileType'), {
+        description: t('invalidFileTypeDesc'),
       })
       return
     }
@@ -47,8 +50,8 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
     // Validate file size (max 10MB)
     const maxSize = 10 * 1024 * 1024 // 10MB
     if (file.size > maxSize) {
-      toast.error('File too large', {
-        description: 'Please upload a file smaller than 10MB.',
+      toast.error(t('fileTooLarge'), {
+        description: t('fileTooLargeDesc'),
       })
       return
     }
@@ -86,18 +89,18 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
 
       if (result.success) {
         onUpdate(result.candidate || {})
-        toast.success('Resume uploaded successfully', {
-          description: 'Your resume has been uploaded and saved.',
+        toast.success(t('resumeUploadedSuccess'), {
+          description: t('resumeUploadedSuccessDesc'),
         })
       } else {
-        toast.error('Failed to save resume', {
-          description: result.error || 'Please try again.',
+        toast.error(t('failedToSaveResume'), {
+          description: result.error || t('pleaseTryAgain'),
         })
       }
     } catch (error: any) {
       console.error('Upload error:', error)
-      toast.error('Upload failed', {
-        description: error.message || 'Please try again.',
+      toast.error(t('uploadFailed'), {
+        description: error.message || t('pleaseTryAgain'),
       })
     } finally {
       setIsUploading(false)
@@ -116,14 +119,14 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
 
       if (result.success) {
         onUpdate(result.candidate || {})
-        toast.success('Resume removed successfully')
+        toast.success(t('resumeRemovedSuccess'))
       } else {
-        toast.error('Failed to remove resume', {
-          description: result.error || 'Please try again.',
+        toast.error(t('failedToRemoveResume'), {
+          description: result.error || t('pleaseTryAgain'),
         })
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
     }
@@ -139,9 +142,9 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
     <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       {/* Header */}
       <div className="mb-4 text-center sm:mb-6">
-        <h3 className="text-base font-semibold text-[#4644b8] sm:text-lg">Resume/CV</h3>
+        <h3 className="text-base font-semibold text-[#4644b8] sm:text-lg">{t('resumeCv')}</h3>
         <p className="mt-1 text-xs text-[#757575]">
-          {resumeMedia ? 'Your resume is uploaded' : 'Upload your resume or CV document'}
+          {resumeMedia ? t('yourResumeUploaded') : t('uploadResumeOrCv')}
         </p>
       </div>
 
@@ -177,7 +180,7 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
                 className="border-[#4644b8] text-[#4644b8] hover:bg-[#4644b8] hover:text-white"
               >
                 <Download className="mr-2 size-4" />
-                Download
+                {t('download')}
               </Button>
               <Button
                 variant="outline"
@@ -187,7 +190,7 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
                 className="border-[#dc0000] text-[#dc0000] hover:bg-[#dc0000] hover:text-white"
               >
                 <X className="mr-2 size-4" />
-                Remove
+                {t('remove')}
               </Button>
             </div>
           </>
@@ -196,9 +199,9 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
             <div className="flex size-10 items-center justify-center rounded-xl border border-[#4644b8] sm:size-12">
               <Upload className="size-5 text-[#4644b8] sm:size-6" />
             </div>
-            <p className="text-sm font-medium text-[#282828]">No file uploaded</p>
+            <p className="text-sm font-medium text-[#282828]">{t('noFileUploaded')}</p>
             <p className="text-center text-xs text-[#757575]">
-              Supported formats: PDF, DOC, DOCX (Max 10MB)
+              {t('supportedFormats')}
             </p>
           </>
         )}
@@ -214,17 +217,17 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
         {isUploading ? (
           <>
             <Upload className="mr-2 size-4 animate-pulse" />
-            Uploading...
+            {t('uploading')}
           </>
         ) : resumeMedia ? (
           <>
             <Upload className="mr-2 size-4" />
-            Replace Resume
+            {t('replaceResume')}
           </>
         ) : (
           <>
             <Upload className="mr-2 size-4" />
-            Upload Resume
+            {t('uploadResume')}
           </>
         )}
       </Button>

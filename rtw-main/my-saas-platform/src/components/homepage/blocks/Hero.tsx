@@ -70,10 +70,12 @@ export const Hero: React.FC<HeroProps> = ({ showSmartSearch = false }) => {
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold font-inter leading-tight text-white mb-4 sm:mb-6">
               {(() => {
                 const title = t('title')
-                // Highlight "Talent" only (case-insensitive)
-                const parts = title.split(/(Talent)/i)
+                const highlightWord = t('titleHighlight')
+                const parts = highlightWord
+                  ? title.split(new RegExp(`(${highlightWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`))
+                  : title.split(/(Talent)/i)
                 return parts.map((part, index) => {
-                  const isHighlight = /^Talent$/i.test(part)
+                  const isHighlight = highlightWord ? part === highlightWord : /^Talent$/i.test(part)
                   if (isHighlight) {
                     return (
                       <span key={index} className="bg-[#d8e530] text-[#16252d] px-1.5 sm:px-2 rounded-md inline-block">

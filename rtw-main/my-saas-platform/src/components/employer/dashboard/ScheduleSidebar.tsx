@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { Card } from '@/components/ui/card'
 import { Calendar, Video } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -11,6 +12,9 @@ interface ScheduleSidebarProps {
 
 export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
   const interviews = await getTodaysInterviews(employerId)
+  const t = await getTranslations('employerDashboard.schedule')
+  const locale = await getLocale()
+  const dateLocale = locale === 'ar' ? 'ar-SA' : 'en-US'
 
   // Generate calendar days (today and next 4 days)
   const today = new Date()
@@ -19,7 +23,7 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
     const date = new Date(today)
     date.setDate(today.getDate() + i)
     scheduleDays.push({
-      day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      day: date.toLocaleDateString(dateLocale, { weekday: 'short' }),
       date: date.getDate(),
       active: i === 0, // Today is active
     })
@@ -29,12 +33,12 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
   const formatTime = (scheduledAt: string, duration: number) => {
     const start = new Date(scheduledAt)
     const end = new Date(start.getTime() + duration * 60 * 1000)
-    const startTime = start.toLocaleTimeString('en-US', {
+    const startTime = start.toLocaleTimeString(dateLocale, {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
     })
-    const endTime = end.toLocaleTimeString('en-US', {
+    const endTime = end.toLocaleTimeString(dateLocale, {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
@@ -47,7 +51,7 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
       {/* Header */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-[#222]">Schedule</h3>
+          <h3 className="text-base font-semibold text-[#222]">{t('title')}</h3>
           <Calendar className="size-6 text-[#222]" />
         </div>
 
@@ -76,7 +80,7 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
 
       {/* Today's Interviews */}
       <div className="flex flex-1 flex-col gap-3 overflow-hidden">
-        <h4 className="text-base font-semibold text-[#222]">Today&apos;s Interview</h4>
+        <h4 className="text-base font-semibold text-[#222]">{t('todaysInterview')}</h4>
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
           {interviews.length > 0 ? (
             interviews.map((interview) => (
@@ -86,7 +90,7 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
               >
                 <div className="flex flex-1 flex-col gap-2">
                   <p className="text-[10px] font-medium text-[#515151]">
-                    <span className="text-[#757575]">Interview with </span>
+                    <span className="text-[#757575]">{t('interviewWith')}</span>
                     <span className="text-[#282828]">
                       {interview.candidate.firstName} {interview.candidate.lastName}
                     </span>
@@ -114,7 +118,7 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
             ))
           ) : (
             <div className="flex items-center justify-center py-8 text-sm text-[#757575]">
-              No interviews scheduled for today
+              {t('noInterviewsToday')}
             </div>
           )}
         </div>
@@ -123,7 +127,7 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
             href="/employer/dashboard/interviews"
             className="text-xs font-medium text-[#4644b8] hover:underline text-center mt-2"
           >
-            View All
+            {t('viewAll')}
           </Link>
         )}
       </div>

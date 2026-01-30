@@ -349,7 +349,7 @@ export async function PrivacyPolicyContent() {
                     href={`tel:${data.contact.phone}`}
                     className="text-[#4644b8] hover:underline"
                   >
-                    {data.contact.phone}
+                    <span dir="ltr">{data.contact.phone}</span>
                   </a>
                 </div>
               </div>

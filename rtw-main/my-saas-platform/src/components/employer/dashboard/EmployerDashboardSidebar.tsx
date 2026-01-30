@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   LayoutGrid,
   Bell,
@@ -35,12 +36,13 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const t = useTranslations('employerDashboard.sidebar')
 
   const menuItems = [
-    { icon: LayoutGrid, label: 'Dashboard', href: '/employer/dashboard' },
-    { icon: Bell, label: 'Notification', href: '/employer/dashboard?view=notifications', badge: unreadNotificationsCount },
-    { icon: Settings, label: 'Account Setting', href: '/employer/dashboard?view=settings' },
-    { icon: Users, label: 'Candidates', href: '/candidates' },
+    { icon: LayoutGrid, label: t('dashboard'), href: '/employer/dashboard' },
+    { icon: Bell, label: t('notification'), href: '/employer/dashboard?view=notifications', badge: unreadNotificationsCount },
+    { icon: Settings, label: t('accountSetting'), href: '/employer/dashboard?view=settings' },
+    { icon: Users, label: t('candidates'), href: '/candidates' },
   ]
 
   const handleLogout = async () => {
@@ -49,20 +51,20 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
       const result = await clearAuthCookies()
 
       if (result.success) {
-        toast.success('Logged out successfully', {
-          description: 'You have been signed out of your account.',
+        toast.success(t('loggedOutSuccess'), {
+          description: t('loggedOutDescription'),
         })
         router.push('/')
         router.refresh()
       } else {
-        toast.error('Logout failed', {
-          description: 'Please try again.',
+        toast.error(t('logoutFailed'), {
+          description: t('pleaseTryAgain'),
         })
         setIsLoggingOut(false)
       }
     } catch (error) {
-      toast.error('Logout failed', {
-        description: 'Please try again.',
+      toast.error(t('logoutFailed'), {
+        description: t('pleaseTryAgain'),
       })
       setIsLoggingOut(false)
     }
@@ -131,11 +133,11 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
         {/* Main Menu Label */}
         {mobile ? (
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Main Menu
+            {t('mainMenu')}
           </h2>
         ) : (
           <p className="mb-4 text-sm font-normal text-[#757575]">
-            Main
+            {t('main')}
           </p>
         )}
 
@@ -211,7 +213,7 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
         {mobile && <Separator className="mb-4 bg-gray-200" />}
         {mobile && (
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Support
+            {t('support')}
           </h2>
         )}
         <div className="flex flex-col gap-2">
@@ -233,7 +235,7 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
               <LogOut className={cn('flex-shrink-0 text-[#dc0000]', mobile ? 'h-5 w-5' : 'h-4 w-4')} />
             </div>
             <span className={cn('font-medium flex-1 text-left', mobile ? 'text-base' : 'text-sm')}>
-              Log out
+              {t('logOut')}
             </span>
             {!mobile && <ChevronLeft className="size-4 text-[#dc0000] ml-auto opacity-50" />}
           </button>
@@ -254,7 +256,7 @@ export function EmployerDashboardSidebar({ mobile = false, onClose, unreadNotifi
             )}>
               <HelpCircle className={cn('flex-shrink-0 text-[#f6b500]', mobile ? 'h-5 w-5' : 'h-4 w-4')} />
             </div>
-            <span className={cn('font-medium flex-1', mobile ? 'text-base' : 'text-sm')}>Help</span>
+            <span className={cn('font-medium flex-1', mobile ? 'text-base' : 'text-sm')}>{t('help')}</span>
             {!mobile && <ChevronLeft className="size-4 text-[#757575] ml-auto" />}
           </Link>
         </div>

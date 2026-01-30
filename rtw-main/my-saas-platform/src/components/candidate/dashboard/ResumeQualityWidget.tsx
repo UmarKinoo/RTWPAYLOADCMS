@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { Candidate } from '@/payload-types'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -11,6 +12,7 @@ interface ResumeQualityWidgetProps {
 }
 
 export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
+  const t = useTranslations('candidateDashboard.resumeQuality')
   // Calculate resume completeness (simplified)
   const calculateCompleteness = () => {
     let score = 0
@@ -32,7 +34,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
     <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       {/* Header */}
       <h3 className="mb-4 text-center text-base font-semibold text-[#282828] sm:mb-6 sm:text-lg">
-        Your Resume Quality
+        {t('title')}
       </h3>
 
       {/* Progress Display */}
@@ -48,7 +50,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
       {/* Improvement Suggestions */}
       <div className="space-y-3 sm:space-y-4">
         <p className="text-center text-xs font-semibold text-[#282828] sm:text-sm">
-          Your resume is {completeness}% complete! Let's improve it
+          {t('resumeCompletePercent', { percent: completeness })}
         </p>
         <div className="space-y-2 sm:space-y-3">
           {!candidate.jobTitle && (
@@ -56,7 +58,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
               <Badge className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] hover:bg-[#4644b8]/20 text-[10px] sm:text-xs">
                 +5%
               </Badge>
-              <p className="text-[10px] text-[#757575] sm:text-xs">Complete your job title</p>
+              <p className="text-[10px] text-[#757575] sm:text-xs">{t('completeJobTitle')}</p>
             </div>
           )}
           {!candidate.location && (
@@ -64,7 +66,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
               <Badge className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] hover:bg-[#4644b8]/20 text-[10px] sm:text-xs">
                 +5%
               </Badge>
-              <p className="text-[10px] text-[#757575] sm:text-xs">Complete personal information</p>
+              <p className="text-[10px] text-[#757575] sm:text-xs">{t('completePersonalInfo')}</p>
             </div>
           )}
           {!candidate.experienceYears && (
@@ -72,7 +74,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
               <Badge className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] hover:bg-[#4644b8]/20 text-[10px] sm:text-xs">
                 +5%
               </Badge>
-              <p className="text-[10px] text-[#757575] sm:text-xs">Add your work experience</p>
+              <p className="text-[10px] text-[#757575] sm:text-xs">{t('addWorkExperience')}</p>
             </div>
           )}
         </div>

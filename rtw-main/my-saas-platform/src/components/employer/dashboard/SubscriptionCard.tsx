@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CreditCard, Clock } from 'lucide-react'
@@ -13,14 +14,17 @@ interface SubscriptionCardProps {
 }
 
 export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardProps) {
+  const t = useTranslations('employerDashboard.subscription')
+  const locale = useLocale()
+  const dateLocale = locale === 'ar' ? 'ar-SA' : 'en-US'
   // Get plan info
   const plan = typeof employer.activePlan === 'object' ? employer.activePlan : null
-  const planName = plan?.title || 'Free'
-  const planType = 'Monthly' // All plans are monthly by default
+  const planName = plan?.title || t('free')
+  const planType = t('monthly') // All plans are monthly by default
 
   // Calculate joined date from employer creation
   const joinedDate = employer.createdAt
-    ? new Date(employer.createdAt).toLocaleDateString('en-US', {
+    ? new Date(employer.createdAt).toLocaleDateString(dateLocale, {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -66,7 +70,7 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
         <div className="flex w-full items-start justify-between gap-4">
           <div className="flex flex-1 flex-col gap-2">
             <p className="text-xs font-normal text-[#353535]">
-              <span>Joined on </span>
+              <span>{t('joinedOn')}</span>
               <span className="text-[#515151]">{joinedDate}</span>
             </p>
             <div className="flex flex-col gap-0.5">
@@ -77,13 +81,13 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
               <div className="flex items-center gap-1">
                 <CreditCard className="size-4 text-[#353535]" />
                 <span className="text-xs font-normal text-[#353535]">
-                  Automatic renewal
+                  {t('automaticRenewal')}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="size-4 text-[#353535]" />
                 <span className="text-xs font-normal text-[#353535]">
-                  {daysLeft} Days left
+                  {t('daysLeft', { count: daysLeft })}
                 </span>
               </div>
             </div>
@@ -124,7 +128,7 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
                   <span className="text-xs font-normal text-[#515151]">/{maxCredits}</span>
                 )}
               </div>
-              <span className="text-[10px] font-normal text-[#515151] mt-0.5">Credits</span>
+              <span className="text-[10px] font-normal text-[#515151] mt-0.5">{t('credits')}</span>
             </div>
           </div>
         </div>
@@ -136,7 +140,7 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
             className="h-8 w-full border border-[#282828] px-4 py-2"
           >
             <span className="text-sm font-medium text-[#282828]">
-              Manage Subscription
+              {t('manageSubscription')}
             </span>
           </Button>
         </Link>

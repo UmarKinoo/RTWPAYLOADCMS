@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { format } from 'date-fns'
+import { useTranslations } from 'next-intl'
 import { Bell, Check, CheckCheck, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,6 +25,7 @@ export function NotificationsView({
   notifications: initialNotifications,
 }: NotificationsViewProps) {
   const router = useRouter()
+  const t = useTranslations('employerDashboard.notifications')
   const [notifications, setNotifications] = useState(initialNotifications)
   const [markingAsRead, setMarkingAsRead] = useState<number | null>(null)
 
@@ -37,13 +39,13 @@ export function NotificationsView({
         setNotifications((prev) =>
           prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
         )
-        toast.success('Notification marked as read')
+        toast.success(t('markedAsRead'))
         router.refresh()
       } else {
-        toast.error(result.error || 'Failed to mark notification as read')
+        toast.error(result.error || t('failedToMarkRead'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(t('anErrorOccurred'))
     } finally {
       setMarkingAsRead(null)
     }
@@ -52,7 +54,7 @@ export function NotificationsView({
   const handleMarkAllAsRead = async () => {
     const unreadNotifications = notifications.filter((n) => !n.read)
     if (unreadNotifications.length === 0) {
-      toast.info('All notifications are already read')
+      toast.info(t('allAlreadyRead'))
       return
     }
 
@@ -60,13 +62,13 @@ export function NotificationsView({
       const result = await markAllNotificationsRead()
       if (result.success) {
         setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
-        toast.success('All notifications marked as read')
+        toast.success(t('markedAllAsRead'))
         router.refresh()
       } else {
-        toast.error(result.error || 'Failed to mark all notifications as read')
+        toast.error(result.error || t('failedToMarkAllRead'))
       }
     } catch (error) {
-      toast.error('Failed to mark all notifications as read')
+      toast.error(t('failedToMarkAllRead'))
     }
   }
 
@@ -107,9 +109,13 @@ export function NotificationsView({
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">Notifications</h1>
+            <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">{t('title')}</h1>
             <p className="text-sm text-[#757575]">
-              {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}` : 'All caught up!'}
+              {unreadCount > 0
+                ? unreadCount === 1
+                  ? t('unreadCount', { count: unreadCount })
+                  : t('unreadCountPlural', { count: unreadCount })
+                : t('allCaughtUp')}
             </p>
           </div>
         </div>
@@ -120,7 +126,7 @@ export function NotificationsView({
             className="gap-2"
           >
             <CheckCheck className="h-4 w-4" />
-            Mark all as read
+            {t('markAllAsRead')}
           </Button>
         )}
       </div>
@@ -157,7 +163,7 @@ export function NotificationsView({
                   </div>
                   <div className="flex items-center gap-2">
                     {!notification.read && (
-                      <Badge className="bg-[#4644b8] text-white">New</Badge>
+                      <Badge className="bg-[#4644b8] text-white">{t('new')}</Badge>
                     )}
                     {!notification.read && (
                       <Button
@@ -178,7 +184,7 @@ export function NotificationsView({
                 {notification.actionUrl && (
                   <Link href={notification.actionUrl}>
                     <Button variant="link" className="mt-2 h-auto p-0 text-[#4644b8]">
-                      View details →
+                      {t('viewDetails')}
                     </Button>
                   </Link>
                 )}
@@ -190,9 +196,9 @@ export function NotificationsView({
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Bell className="mb-4 h-12 w-12 text-[#cbcbcb]" />
-            <h3 className="mb-2 text-lg font-semibold text-[#282828]">No notifications</h3>
+            <h3 className="mb-2 text-lg font-semibold text-[#282828]">{t('noNotifications')}</h3>
             <p className="text-sm text-[#757575]">
-              You're all caught up! New notifications will appear here.
+              {t('noNotificationsDescription')}
             </p>
           </CardContent>
         </Card>

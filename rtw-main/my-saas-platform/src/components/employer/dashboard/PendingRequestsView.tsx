@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { useTranslations } from 'next-intl'
 import { ArrowLeft, Clock, Briefcase, MapPin, DollarSign, Home, Car, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +17,7 @@ interface PendingRequestsViewProps {
 }
 
 export function PendingRequestsView({ requests }: PendingRequestsViewProps) {
+  const t = useTranslations('employerDashboard.pendingRequests')
   return (
     <div className="mt-6">
       {/* Header */}
@@ -27,10 +29,12 @@ export function PendingRequestsView({ requests }: PendingRequestsViewProps) {
         </Link>
         <div>
           <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">
-            Pending Interview Requests
+            {t('title')}
           </h1>
           <p className="text-sm text-[#757575]">
-            {requests.length} request{requests.length === 1 ? '' : 's'} awaiting admin approval
+            {requests.length === 1
+              ? t('requestsAwaiting', { count: 1 })
+              : t('requestsAwaitingPlural', { count: requests.length })}
           </p>
         </div>
       </div>
@@ -60,19 +64,19 @@ export function PendingRequestsView({ requests }: PendingRequestsViewProps) {
                           <CardTitle className="text-lg">
                             {request.candidate.firstName} {request.candidate.lastName}
                           </CardTitle>
-                          <Badge className="bg-yellow-500 text-white">Pending</Badge>
+                          <Badge className="bg-yellow-500 text-white">{t('pending')}</Badge>
                         </div>
                         {request.candidate.jobTitle && (
                           <p className="text-sm text-[#757575]">{request.candidate.jobTitle}</p>
                         )}
                         <p className="text-xs text-[#757575] mt-1">
-                          Requested {format(requestedDate, 'MMM d, yyyy • h:mm a')}
+                          {t('requested')}{format(requestedDate, 'MMM d, yyyy • h:mm a')}
                         </p>
                       </div>
                     </div>
                     <Link href={`/candidates/${request.candidate.id}`}>
                       <Button variant="ghost" size="sm">
-                        View Profile
+                        {t('viewProfile')}
                       </Button>
                     </Link>
                   </div>
@@ -110,13 +114,13 @@ export function PendingRequestsView({ requests }: PendingRequestsViewProps) {
                         {request.accommodationIncluded && (
                           <Badge variant="outline" className="gap-1.5">
                             <Home className="size-3" />
-                            Accommodation
+                            {t('accommodation')}
                           </Badge>
                         )}
                         {request.transportation && (
                           <Badge variant="outline" className="gap-1.5">
                             <Car className="size-3" />
-                            Transportation
+                            {t('transportation')}
                           </Badge>
                         )}
                       </div>
@@ -128,7 +132,7 @@ export function PendingRequestsView({ requests }: PendingRequestsViewProps) {
                     <div className="flex items-start gap-2">
                       <Clock className="size-4 text-yellow-700 shrink-0 mt-0.5" />
                       <p className="text-sm text-yellow-800">
-                        This interview request is pending admin approval. You'll be notified once it's reviewed.
+                        {t('pendingMessage')}
                       </p>
                     </div>
                   </div>
@@ -141,19 +145,19 @@ export function PendingRequestsView({ requests }: PendingRequestsViewProps) {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Clock className="mb-4 h-12 w-12 text-[#cbcbcb]" />
-            <h3 className="mb-2 text-lg font-semibold text-[#282828]">No pending requests</h3>
+            <h3 className="mb-2 text-lg font-semibold text-[#282828]">{t('noPendingRequests')}</h3>
             <p className="text-sm text-[#757575]">
-              All your interview requests have been processed. Check your scheduled interviews or request new ones.
+              {t('noPendingDescription')}
             </p>
             <div className="flex gap-3 mt-4">
               <Link href="/employer/dashboard?view=interviews">
                 <Button variant="outline" className="border-[#4644b8] text-[#4644b8]">
-                  View Scheduled
+                  {t('viewScheduled')}
                 </Button>
               </Link>
               <Link href="/candidates">
                 <Button variant="outline" className="border-[#4644b8] text-[#4644b8]">
-                  Browse Candidates
+                  {t('browseCandidates')}
                 </Button>
               </Link>
             </div>

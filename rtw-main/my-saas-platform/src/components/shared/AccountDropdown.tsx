@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/routing'
 import { useRouter } from 'next/navigation'
 import {
@@ -44,24 +45,25 @@ export function AccountDropdown({
   additionalMenuItems,
 }: AccountDropdownProps) {
   const router = useRouter()
+  const t = useTranslations('accountDropdown')
 
   const handleLogout = async () => {
     try {
       const result = await clearAuthCookies()
       if (result.success) {
-        toast.success('Logged out successfully')
+        toast.success(t('loggedOutSuccess'))
         router.push('/')
         router.refresh()
       } else {
-        toast.error('Failed to log out')
+        toast.error(t('logoutFailed'))
       }
     } catch (error) {
       console.error('Logout error:', error)
-      toast.error('An error occurred while logging out')
+      toast.error(t('errorLoggingOut'))
     }
   }
 
-  const roleLabel = role === 'employer' ? 'Employer' : 'Candidate'
+  const roleLabel = role === 'employer' ? t('employer') : t('candidate')
   const defaultDashboardUrl = role === 'employer' ? '/employer/dashboard' : '/dashboard'
 
   return (
@@ -74,7 +76,7 @@ export function AccountDropdown({
             'focus:outline-none focus:ring-2 focus:ring-[#4644b8] focus:ring-offset-2',
             className,
           )}
-          aria-label="Account menu"
+          aria-label={t('accountMenu')}
         >
           <AvatarCircle name={displayName} size={avatarSize} />
           <span className="hidden sm:block text-sm font-semibold text-[#16252d] max-w-[120px] sm:max-w-[150px] truncate">
@@ -108,13 +110,13 @@ export function AccountDropdown({
               <div className="flex flex-col gap-1.5 text-xs">
                 {interviewCredits !== undefined && (
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Interview Credits</span>
+                    <span className="text-muted-foreground">{t('interviewCredits')}</span>
                     <span className="font-semibold text-[#4644b8]">{interviewCredits}</span>
                   </div>
                 )}
                 {contactUnlockCredits !== undefined && (
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Contact Unlocks</span>
+                    <span className="text-muted-foreground">{t('contactUnlocks')}</span>
                     <span className="font-semibold text-[#4644b8]">{contactUnlockCredits}</span>
                   </div>
                 )}
@@ -131,7 +133,7 @@ export function AccountDropdown({
             className="flex items-center gap-2 cursor-pointer"
           >
             <LayoutDashboard className="size-4" />
-            <span>Dashboard</span>
+            <span>{t('dashboard')}</span>
           </Link>
         </DropdownMenuItem>
 
@@ -140,7 +142,7 @@ export function AccountDropdown({
           <DropdownMenuItem asChild>
             <Link href="/pricing" className="flex items-center gap-2 cursor-pointer">
               <DollarSign className="size-4" />
-              <span>Pricing</span>
+              <span>{t('pricing')}</span>
             </Link>
           </DropdownMenuItem>
         )}
@@ -149,7 +151,7 @@ export function AccountDropdown({
           <DropdownMenuItem asChild>
             <Link href="/dashboard/resume" className="flex items-center gap-2 cursor-pointer">
               <FileText className="size-4" />
-              <span>My Resume</span>
+              <span>{t('myResume')}</span>
             </Link>
           </DropdownMenuItem>
         )}
@@ -166,7 +168,7 @@ export function AccountDropdown({
           className="cursor-pointer focus:bg-destructive/10 focus:text-destructive"
         >
           <LogOut className="size-4" />
-          <span>Logout</span>
+          <span>{t('logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

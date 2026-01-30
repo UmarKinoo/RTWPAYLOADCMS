@@ -22,6 +22,7 @@ export interface RequestInterviewData {
   salary: string
   accommodationIncluded: boolean
   transportation: boolean
+  notes?: string
 }
 
 export interface RequestInterviewResponse {
@@ -242,6 +243,7 @@ export async function requestInterview(
         salary: data.salary,
         accommodationIncluded: data.accommodationIncluded,
         transportation: data.transportation,
+        notes: data.notes ?? undefined,
       },
     }) as Interview
 

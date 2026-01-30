@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Building, Edit2, Save, X } from 'lucide-react'
 import { useState } from 'react'
 import type { Candidate } from '@/payload-types'
@@ -16,6 +17,8 @@ interface WorkExperienceSectionProps {
 }
 
 export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSectionProps) {
+  const t = useTranslations('candidateDashboard.workExperience')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     jobTitle: candidate.jobTitle || '',
@@ -42,12 +45,12 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
       if (result.success) {
         onUpdate(result.candidate || {})
         setIsEditing(false)
-        toast.success('Work experience updated successfully')
+        toast.success(t('workExperienceUpdated'))
       } else {
-        toast.error(result.error || 'Failed to update')
+        toast.error(result.error || tCommon('failedToUpdate'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
     }
@@ -72,7 +75,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <Building className="size-5 text-[#282828] sm:size-6" />
-          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">Work Experience</h3>
+          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">{t('title')}</h3>
         </div>
         {!isEditing ? (
           <Button
@@ -82,13 +85,13 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             className="text-[#4644b8] hover:text-[#4644b8] hover:bg-[#4644b8]/10"
           >
             <Edit2 className="mr-2 size-4" />
-            Edit
+            {tCommon('edit')}
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleCancel}>
               <X className="mr-2 size-4" />
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               size="sm"
@@ -97,7 +100,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
               className="bg-[#4644b8] hover:bg-[#3a3aa0]"
             >
               <Save className="mr-2 size-4" />
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? tCommon('saving') : tCommon('save')}
             </Button>
           </div>
         )}
@@ -107,7 +110,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         {/* Job Title */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Job Title</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('jobTitle')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.jobTitle}
@@ -116,14 +119,14 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {candidate.jobTitle || 'Not set'}
+              {candidate.jobTitle || tCommon('notSet')}
             </p>
           )}
         </Field>
 
         {/* Current Employer */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Current Employer</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('currentEmployer')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.currentEmployer}
@@ -132,14 +135,14 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {(candidate as any).currentEmployer || 'Not set'}
+              {(candidate as any).currentEmployer || tCommon('notSet')}
             </p>
           )}
         </Field>
 
         {/* Total Experience */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Total Experience (Years)</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('totalExperienceYears')}</FieldLabel>
           {isEditing ? (
             <Input
               type="number"
@@ -150,14 +153,14 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {candidate.experienceYears || 0} years
+              {candidate.experienceYears || 0} {t('years')}
             </p>
           )}
         </Field>
 
         {/* Saudi Experience */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Saudi Experience (Years)</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('saudiExperienceYears')}</FieldLabel>
           {isEditing ? (
             <Input
               type="number"
@@ -168,14 +171,14 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {(candidate as any).saudiExperience || 0} years
+              {(candidate as any).saudiExperience || 0} {t('years')}
             </p>
           )}
         </Field>
 
         {/* Availability Date */}
         <Field className="sm:col-span-2">
-          <FieldLabel className="text-xs text-[#757575]">Availability Date</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('availabilityDate')}</FieldLabel>
           {isEditing ? (
             <Input
               type="date"
@@ -187,7 +190,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             <p className="text-sm font-medium text-[#282828]">
               {candidate.availabilityDate
                 ? new Date(candidate.availabilityDate).toLocaleDateString()
-                : 'Not set'}
+                : tCommon('notSet')}
             </p>
           )}
         </Field>

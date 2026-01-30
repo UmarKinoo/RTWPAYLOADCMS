@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import type { Candidate } from '@/payload-types'
 import { DashboardSidebar } from './dashboard/DashboardSidebar'
 import { DashboardHeader } from './dashboard/DashboardHeader'
@@ -30,6 +31,7 @@ interface CandidateDashboardContentProps {
 }
 
 export function CandidateDashboardContent({ candidate: initialCandidate, unreadNotificationsCount = 0, notifications = [] }: CandidateDashboardContentProps) {
+  const t = useTranslations('candidateDashboard')
   const [candidate, setCandidate] = useState(initialCandidate)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -60,7 +62,7 @@ export function CandidateDashboardContent({ candidate: initialCandidate, unreadN
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-full max-w-[280px] sm:w-[320px] p-0 flex flex-col overflow-hidden z-[110]">
           <VisuallyHidden>
-            <SheetTitle>Navigation Menu</SheetTitle>
+            <SheetTitle>{t('navMenuTitle')}</SheetTitle>
           </VisuallyHidden>
           <DashboardSidebar mobile onClose={() => setMobileMenuOpen(false)} unreadNotificationsCount={unreadNotificationsCount} />
         </SheetContent>

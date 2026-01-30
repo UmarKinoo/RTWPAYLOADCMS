@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { ArrowLeft, User, MapPin, Briefcase, Calendar, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,6 +16,7 @@ interface CandidatesToReviewViewProps {
 }
 
 export function CandidatesToReviewView({ candidates }: CandidatesToReviewViewProps) {
+  const t = useTranslations('employerDashboard.candidatesToReview')
   return (
     <div className="mt-6">
       {/* Header */}
@@ -26,10 +28,12 @@ export function CandidatesToReviewView({ candidates }: CandidatesToReviewViewPro
         </Link>
         <div>
           <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">
-            Candidates to Review
+            {t('title')}
           </h1>
           <p className="text-sm text-[#757575]">
-            {candidates.length} new candidate{candidates.length === 1 ? '' : 's'} to review
+            {candidates.length === 1
+              ? t('newCandidatesCount', { count: 1 })
+              : t('newCandidatesCountPlural', { count: candidates.length })}
           </p>
         </div>
       </div>
@@ -72,7 +76,7 @@ export function CandidatesToReviewView({ candidates }: CandidatesToReviewViewPro
                           </div>
                           {candidate.billingClass && (
                             <Badge variant="outline" className="shrink-0">
-                              Class {candidate.billingClass}
+                              {t('class')}{candidate.billingClass}
                             </Badge>
                           )}
                         </div>
@@ -87,7 +91,7 @@ export function CandidatesToReviewView({ candidates }: CandidatesToReviewViewPro
                           )}
                           <div className="flex items-center gap-1.5 text-sm text-[#515151]">
                             <Calendar className="size-3.5 shrink-0 text-[#4644b8]" />
-                            <span>{formatExperience(candidate.experienceYears)} experience</span>
+                            <span>{formatExperience(candidate.experienceYears)} {t('experience')}</span>
                           </div>
                           {candidate.location && (
                             <div className="flex items-center gap-1.5 text-sm text-[#515151]">
@@ -113,7 +117,7 @@ export function CandidatesToReviewView({ candidates }: CandidatesToReviewViewPro
                           }}
                         >
                           <User className="mr-2 size-4" />
-                          View Profile
+                          {t('viewProfile')}
                         </Button>
                       </div>
                     </div>
@@ -127,13 +131,13 @@ export function CandidatesToReviewView({ candidates }: CandidatesToReviewViewPro
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <User className="mb-4 h-12 w-12 text-[#cbcbcb]" />
-            <h3 className="mb-2 text-lg font-semibold text-[#282828]">No candidates to review</h3>
+            <h3 className="mb-2 text-lg font-semibold text-[#282828]">{t('noCandidatesToReview')}</h3>
             <p className="text-sm text-[#757575]">
-              You've reviewed all available candidates. Check back later for new candidates.
+              {t('noCandidatesDescription')}
             </p>
             <Link href="/candidates" className="mt-4">
               <Button variant="outline" className="border-[#4644b8] text-[#4644b8]">
-                Browse All Candidates
+                {t('browseAllCandidates')}
               </Button>
             </Link>
           </CardContent>

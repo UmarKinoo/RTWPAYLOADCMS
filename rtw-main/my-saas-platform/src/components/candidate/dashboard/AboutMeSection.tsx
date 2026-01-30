@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { User as UserAlt, Edit2, Save, X, Loader2 } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,8 @@ interface AboutMeSectionProps {
 }
 
 export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
+  const t = useTranslations('candidateDashboard.aboutMe')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isEditing, setIsEditing] = useState(false)
   const [aboutMe, setAboutMe] = useState((candidate as any).aboutMe || '')
   const [isSaving, setIsSaving] = useState(false)
@@ -29,12 +32,12 @@ export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
       if (result.success) {
         onUpdate(result.candidate || {})
         setIsEditing(false)
-        toast.success('About me updated successfully')
+        toast.success(t('aboutMeUpdated'))
       } else {
-        toast.error(result.error || 'Failed to update')
+        toast.error(result.error || tCommon('failedToUpdate'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
     }
@@ -51,7 +54,7 @@ export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <UserAlt className="size-5 text-[#282828] sm:size-6" />
-          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">About me</h3>
+          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">{t('title')}</h3>
         </div>
         {!isEditing && (
           <Button
@@ -61,7 +64,7 @@ export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
             className="h-8 gap-2 text-[#4644b8] hover:bg-[#4644b8]/10"
           >
             <Edit2 className="size-4" />
-            <span className="hidden sm:inline">Edit</span>
+            <span className="hidden sm:inline">{tCommon('edit')}</span>
           </Button>
         )}
       </div>
@@ -72,13 +75,13 @@ export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
           <Textarea
             value={aboutMe}
             onChange={(e) => setAboutMe(e.target.value)}
-            placeholder="Tell employers about yourself, your background, skills, and what makes you unique..."
+            placeholder={t('placeholder')}
             className="min-h-[200px] resize-none text-sm"
             maxLength={2000}
           />
           <div className="flex items-center justify-between">
             <p className="text-xs text-[#757575]">
-              {aboutMe.length}/2000 characters
+              {aboutMe.length}/2000 {t('characters')}
             </p>
             <div className="flex gap-2">
               <Button
@@ -89,7 +92,7 @@ export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
                 className="h-9"
               >
                 <X className="mr-2 size-4" />
-                Cancel
+                {tCommon('cancel')}
               </Button>
               <Button
                 size="sm"
@@ -100,12 +103,12 @@ export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Saving...
+                    {tCommon('saving')}
                   </>
                 ) : (
                   <>
                     <Save className="mr-2 size-4" />
-                    Save
+                    {tCommon('save')}
                   </>
                 )}
               </Button>
@@ -120,14 +123,14 @@ export function AboutMeSection({ candidate, onUpdate }: AboutMeSectionProps) {
             </p>
           ) : (
             <div className="flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#ededed] p-4">
-              <p className="text-sm font-medium text-[#757575]">No information added yet</p>
+              <p className="text-sm font-medium text-[#757575]">{t('noInformationAddedYet')}</p>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(true)}
                 className="border-[#4644b8] text-[#4644b8] hover:bg-[#4644b8] hover:text-white"
               >
-                Add about me
+                {t('addAboutMe')}
               </Button>
             </div>
           )}

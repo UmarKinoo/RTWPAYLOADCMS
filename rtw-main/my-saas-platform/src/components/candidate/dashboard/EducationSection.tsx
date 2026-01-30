@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { GraduationCap, Plus, Edit2, Trash2, Save, X, Loader2 } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
@@ -25,6 +26,8 @@ interface EducationSectionProps {
 }
 
 export function EducationSection({ candidate, onUpdate }: EducationSectionProps) {
+  const t = useTranslations('candidateDashboard.education')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isAdding, setIsAdding] = useState(false)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [educations, setEducations] = useState<Education[]>((candidate as any).education || [])
@@ -62,7 +65,7 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
 
   const handleSave = async () => {
     if (!formData.degree || !formData.institution) {
-      toast.error('Please fill in at least Degree and Institution')
+      toast.error(t('fillDegreeInstitution'))
       return
     }
 
@@ -108,13 +111,13 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
 
       if (result.success) {
         onUpdate(result.candidate || {})
-        toast.success('Education updated successfully')
+        toast.success(t('educationUpdated'))
       } else {
-        toast.error(result.error || 'Failed to update')
+        toast.error(result.error || tCommon('failedToUpdate'))
         setEducations((candidate as any).education || [])
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
       setEducations((candidate as any).education || [])
     } finally {
       setIsSaving(false)
@@ -127,7 +130,7 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <GraduationCap className="size-5 text-[#282828] sm:size-6" />
-          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">Education</h3>
+          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">{t('title')}</h3>
         </div>
         {!isAdding && editingIndex === null && (
           <Button
@@ -137,7 +140,7 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
             className="h-8 gap-2 border-[#4644b8] text-[#4644b8] hover:bg-[#4644b8] hover:text-white"
           >
             <Plus className="size-4" />
-            <span className="hidden sm:inline">Add</span>
+            <span className="hidden sm:inline">{tCommon('add')}</span>
           </Button>
         )}
       </div>
@@ -148,42 +151,42 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-medium text-[#282828]">
-                Degree/Certification <span className="text-red-500">*</span>
+                {t('degreeCertification')} <span className="text-red-500">*</span>
               </label>
               <Input
                 value={formData.degree}
                 onChange={(e) => setFormData({ ...formData, degree: e.target.value })}
-                placeholder="e.g., Bachelor's Degree"
+                placeholder={t('degreePlaceholder')}
                 className="h-9"
               />
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-[#282828]">
-                Institution <span className="text-red-500">*</span>
+                {t('institution')} <span className="text-red-500">*</span>
               </label>
               <Input
                 value={formData.institution}
                 onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-                placeholder="e.g., University Name"
+                placeholder={t('institutionPlaceholder')}
                 className="h-9"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#282828]">Field of Study</label>
+              <label className="mb-1 block text-xs font-medium text-[#282828]">{t('fieldOfStudy')}</label>
               <Input
                 value={formData.fieldOfStudy}
                 onChange={(e) => setFormData({ ...formData, fieldOfStudy: e.target.value })}
-                placeholder="e.g., Computer Science"
+                placeholder={t('fieldPlaceholder')}
                 className="h-9"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#282828]">Graduation Year</label>
+              <label className="mb-1 block text-xs font-medium text-[#282828]">{t('graduationYear')}</label>
               <Input
                 type="number"
                 value={formData.graduationYear || ''}
                 onChange={(e) => setFormData({ ...formData, graduationYear: e.target.value ? parseInt(e.target.value) : undefined })}
-                placeholder="e.g., 2020"
+                placeholder={t('yearPlaceholder')}
                 className="h-9"
                 min="1900"
                 max="2100"
@@ -191,18 +194,18 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-[#282828]">Description</label>
+            <label className="mb-1 block text-xs font-medium text-[#282828]">{t('description')}</label>
             <Textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Additional details about your education..."
+              placeholder={t('descriptionPlaceholder')}
               className="min-h-[80px] resize-none text-sm"
             />
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm" onClick={handleCancel} disabled={isSaving} className="h-9">
               <X className="mr-2 size-4" />
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               size="sm"
@@ -213,12 +216,12 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
-                  Saving...
+                  {tCommon('saving')}
                 </>
               ) : (
                 <>
                   <Save className="mr-2 size-4" />
-                  Save
+                  {tCommon('save')}
                 </>
               )}
             </Button>
@@ -273,7 +276,7 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
         </div>
       ) : !isAdding && (
         <div className="flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#ededed] p-4">
-          <p className="text-sm font-medium text-[#757575]">No education added yet</p>
+          <p className="text-sm font-medium text-[#757575]">{t('noEducationAddedYet')}</p>
           <Button
             variant="outline"
             size="sm"
@@ -281,7 +284,7 @@ export function EducationSection({ candidate, onUpdate }: EducationSectionProps)
             className="border-[#4644b8] text-[#4644b8] hover:bg-[#4644b8] hover:text-white"
           >
             <Plus className="mr-2 size-4" />
-            Add Education
+            {t('addEducation')}
           </Button>
         </div>
       )}

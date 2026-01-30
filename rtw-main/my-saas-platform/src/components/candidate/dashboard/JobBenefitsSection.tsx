@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Sparkles, Plus, Save, X, Loader2, Trash2 } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
@@ -27,20 +28,18 @@ interface JobBenefitsSectionProps {
   onUpdate: (data: Partial<Candidate>) => void
 }
 
-const BENEFIT_OPTIONS = [
-  { label: 'Health Insurance', value: 'health_insurance' },
-  { label: 'Accommodation Provided', value: 'accommodation' },
-  { label: 'Transportation Provided', value: 'transportation' },
-  { label: 'Annual Leave', value: 'annual_leave' },
-  { label: 'End of Service Benefits', value: 'end_of_service' },
-  { label: 'Training & Development', value: 'training' },
-  { label: 'Performance Bonus', value: 'performance_bonus' },
-  { label: 'Overtime Pay', value: 'overtime_pay' },
-  { label: 'Meal Allowance', value: 'meal_allowance' },
-  { label: 'Other', value: 'other' },
-]
+const BENEFIT_OPTION_KEYS = [
+  'healthInsurance', 'accommodationProvided', 'transportationProvided', 'annualLeave', 'endOfService',
+  'training', 'performanceBonus', 'overtimePay', 'mealAllowance', 'other',
+] as const
+const BENEFIT_VALUES = [
+  'health_insurance', 'accommodation', 'transportation', 'annual_leave', 'end_of_service',
+  'training', 'performance_bonus', 'overtime_pay', 'meal_allowance', 'other',
+] as const
 
 export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionProps) {
+  const t = useTranslations('candidateDashboard.jobBenefits')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isAdding, setIsAdding] = useState(false)
   const [benefits, setBenefits] = useState<Benefit[]>((candidate as any).preferredBenefits || [])
   const [isSaving, setIsSaving] = useState(false)
@@ -65,12 +64,12 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
 
   const handleSave = async () => {
     if (!formData.benefit) {
-      toast.error('Please select a benefit')
+      toast.error(t('selectBenefit'))
       return
     }
 
     if (formData.benefit === 'other' && !formData.otherBenefit) {
-      toast.error('Please specify the other benefit')
+      toast.error(t('specifyOtherBenefit'))
       return
     }
 
@@ -101,13 +100,13 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
 
       if (result.success) {
         onUpdate(result.candidate || {})
-        toast.success('Preferred benefits updated successfully')
+        toast.success(t('jobBenefitsUpdated'))
       } else {
-        toast.error(result.error || 'Failed to update')
+        toast.error(result.error || tCommon('failedToUpdate'))
         setBenefits((candidate as any).preferredBenefits || [])
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
       setBenefits((candidate as any).preferredBenefits || [])
     } finally {
       setIsSaving(false)
@@ -116,9 +115,10 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
 
   const getBenefitLabel = (benefit: Benefit) => {
     if (benefit.benefit === 'other') {
-      return benefit.otherBenefit || 'Other'
+      return benefit.otherBenefit || t('other')
     }
-    return BENEFIT_OPTIONS.find((opt) => opt.value === benefit.benefit)?.label || benefit.benefit
+    const idx = BENEFIT_VALUES.indexOf(benefit.benefit as typeof BENEFIT_VALUES[number])
+    return idx >= 0 ? t(BENEFIT_OPTION_KEYS[idx]) : benefit.benefit
   }
 
   return (
@@ -127,7 +127,7 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <Sparkles className="size-5 text-[#282828] sm:size-6" />
-          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">Preferred Job Benefits</h3>
+          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">{t('title')}</h3>
         </div>
         {!isAdding && (
           <Button
@@ -137,7 +137,7 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
             className="h-8 gap-2 border-[#4644b8] text-[#4644b8] hover:bg-[#4644b8] hover:text-white"
           >
             <Plus className="size-4" />
-            <span className="hidden sm:inline">Add</span>
+            <span className="hidden sm:inline">{tCommon('add')}</span>
           </Button>
         )}
       </div>
@@ -147,19 +147,19 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
         <div className="mb-4 space-y-3 rounded-lg border border-[#ededed] bg-[#fafafa] p-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-[#282828]">
-              Benefit <span className="text-red-500">*</span>
+              {t('benefit')} <span className="text-red-500">*</span>
             </label>
             <Select
               value={formData.benefit}
               onValueChange={(value) => setFormData({ ...formData, benefit: value, otherBenefit: value !== 'other' ? '' : formData.otherBenefit })}
             >
               <SelectTrigger className="h-9">
-                <SelectValue placeholder="Select a benefit" />
+                <SelectValue placeholder={t('selectBenefit')} />
               </SelectTrigger>
               <SelectContent>
-                {BENEFIT_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                {BENEFIT_VALUES.map((value, idx) => (
+                  <SelectItem key={value} value={value}>
+                    {t(BENEFIT_OPTION_KEYS[idx])}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -168,12 +168,12 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
           {formData.benefit === 'other' && (
             <div>
               <label className="mb-1 block text-xs font-medium text-[#282828]">
-                Specify Benefit <span className="text-red-500">*</span>
+                {t('specifyBenefit')} <span className="text-red-500">*</span>
               </label>
               <Input
                 value={formData.otherBenefit}
                 onChange={(e) => setFormData({ ...formData, otherBenefit: e.target.value })}
-                placeholder="Enter benefit name"
+                placeholder={t('otherBenefitPlaceholder')}
                 className="h-9"
               />
             </div>
@@ -181,7 +181,7 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
           <div className="flex justify-end gap-2">
             <Button variant="outline" size="sm" onClick={handleCancel} disabled={isSaving} className="h-9">
               <X className="mr-2 size-4" />
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               size="sm"
@@ -192,12 +192,12 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
-                  Saving...
+                  {tCommon('saving')}
                 </>
               ) : (
                 <>
                   <Save className="mr-2 size-4" />
-                  Save
+                  {tCommon('save')}
                 </>
               )}
             </Button>
@@ -227,7 +227,7 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
         </div>
       ) : !isAdding && (
         <div className="flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#ededed] p-4">
-          <p className="text-sm font-medium text-[#757575]">No benefits added yet</p>
+          <p className="text-sm font-medium text-[#757575]">{t('noBenefitsAddedYet')}</p>
           <Button
             variant="outline"
             size="sm"
@@ -235,7 +235,7 @@ export function JobBenefitsSection({ candidate, onUpdate }: JobBenefitsSectionPr
             className="border-[#4644b8] text-[#4644b8] hover:bg-[#4644b8] hover:text-white"
           >
             <Plus className="mr-2 size-4" />
-            Add Benefit
+            {t('addBenefit')}
           </Button>
         </div>
       )}

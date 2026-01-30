@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from '@/i18n/routing'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -40,6 +40,21 @@ interface FilterConfig {
   options: string[]
 }
 
+// Param to translation key for filter labels (so filters display in current locale)
+const paramToLabelKey: Record<string, string> = {
+  country: 'country',
+  state: 'stateCity',
+  jobType: 'jobType',
+  discipline: 'majorDiscipline',
+  category: 'category',
+  subCategory: 'subCategory',
+  skillLevel: 'skillLevel',
+  availability: 'whenAvailable',
+  nationality: 'nationality',
+  experience: 'experience',
+  language: 'language',
+}
+
 // Base filter configuration
 const baseFilterConfigs: FilterConfig[] = [
   { label: 'Country', param: 'country', options: [] },
@@ -63,7 +78,9 @@ const FilterSelect: React.FC<{
   isLoading?: boolean
   onValueChange: (value: string) => void
   t?: ReturnType<typeof useTranslations<'candidatesPage.filters'>>
-}> = ({ label, value, options, isLoading = false, onValueChange, t }) => {
+  /** Optional: map option value -> display label (e.g. localized discipline name) */
+  getOptionLabel?: (value: string) => string
+}> = ({ label, value, options, isLoading = false, onValueChange, t, getOptionLabel }) => {
   const handleValueChange = (newValue: string) => {
     // Convert "__all__" to empty string to clear the filter
     if (newValue === '__all__') {
@@ -112,7 +129,7 @@ const FilterSelect: React.FC<{
           ) : options.length > 0 ? (
             options.map((opt) => (
               <SelectItem key={opt} value={opt}>
-                {opt}
+                {getOptionLabel ? getOptionLabel(opt) : opt}
               </SelectItem>
             ))
           ) : (
@@ -134,11 +151,17 @@ const MobileFilterSheet: React.FC<{
   filterConfigs: FilterConfig[]
   isLoadingOptions: boolean
   t: ReturnType<typeof useTranslations<'candidatesPage.filters'>>
-}> = ({ filters, onFilterChange, onClearAll, filterConfigs, isLoadingOptions, t }) => {
+  labelMaps: { discipline: Record<string, string>; category: Record<string, string>; subCategory: Record<string, string> } | null
+}> = ({ filters, onFilterChange, onClearAll, filterConfigs, isLoadingOptions, t, labelMaps }) => {
   const activeFilterCount = Object.values(filters).filter((v) => v).length
 
   const getFilterOptions = (param: string) => {
     return filterConfigs.find((f) => f.param === param)?.options || []
+  }
+
+  const getOptionLabelForParam = (param: string) => {
+    if (!labelMaps || (param !== 'discipline' && param !== 'category' && param !== 'subCategory')) return undefined
+    return (val: string) => labelMaps[param as keyof typeof labelMaps][val] ?? val
   }
 
   return (
@@ -203,13 +226,16 @@ const MobileFilterSheet: React.FC<{
                 {Object.entries(filters).map(([key, value]) => {
                   if (!value) return null
                   const config = filterConfigs.find((f) => f.param === key)
+                  const displayValue = labelMaps && (key === 'discipline' || key === 'category' || key === 'subCategory')
+                    ? (labelMaps[key as keyof typeof labelMaps][value] ?? value)
+                    : value
                   return (
                     <Badge
                       key={key}
                       variant="outline"
                       className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-3.5 py-2 text-sm font-medium flex items-center gap-2"
                     >
-                      {config?.label}: {value}
+                      {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
                       <X
                         className="w-3 h-3 cursor-pointer"
                         onClick={() => onFilterChange(key, '')}
@@ -392,6 +418,7 @@ const MobileFilterSheet: React.FC<{
 // Main Filter Component
 export const CandidatesFilter: React.FC = () => {
   const router = useRouter()
+  const locale = useLocale()
   const searchParams = useSearchParams()
   const t = useTranslations('candidatesPage.filters')
   
@@ -429,15 +456,22 @@ export const CandidatesFilter: React.FC = () => {
     subCategoriesByCategory: Record<string, string[]>
   }>({ categoriesByDiscipline: {}, subCategoriesByCategory: {} })
 
+  // Label maps for localized option display (discipline, category, subCategory)
+  const [labelMaps, setLabelMaps] = useState<{
+    discipline: Record<string, string>
+    category: Record<string, string>
+    subCategory: Record<string, string>
+  } | null>(null)
+
   // Loading state for filter options
   const [isLoadingOptions, setIsLoadingOptions] = useState(true)
 
-  // Fetch dynamic filter options using Server Action
+  // Fetch dynamic filter options using Server Action (pass locale for localized labels)
   useEffect(() => {
     const loadFilterOptions = async () => {
       setIsLoadingOptions(true)
       try {
-        const data = await fetchFilterOptions()
+        const data = await fetchFilterOptions(locale)
         setFilterOptions({
           country: data.countries || [],
           state: data.states || [],
@@ -451,6 +485,11 @@ export const CandidatesFilter: React.FC = () => {
           categoriesByDiscipline: data.categoriesByDiscipline ?? {},
           subCategoriesByCategory: data.subCategoriesByCategory ?? {},
         })
+        if (data.labelMaps) {
+          setLabelMaps(data.labelMaps)
+        } else {
+          setLabelMaps(null)
+        }
       } catch (error) {
         console.error('Failed to fetch filter options:', error)
       } finally {
@@ -458,7 +497,7 @@ export const CandidatesFilter: React.FC = () => {
       }
     }
     loadFilterOptions()
-  }, [])
+  }, [locale])
 
   // Build filter configs with dynamic options; category/subCategory cascade from hierarchy
   const filterConfigs = baseFilterConfigs.map((config) => {
@@ -580,13 +619,16 @@ export const CandidatesFilter: React.FC = () => {
               {Object.entries(filters).map(([key, value]) => {
                 if (!value) return null
                 const config = filterConfigs.find((f) => f.param === key)
+                const displayValue = labelMaps && (key === 'discipline' || key === 'category' || key === 'subCategory')
+                  ? (labelMaps[key as keyof typeof labelMaps][value] ?? value)
+                  : value
                 return (
                   <Badge
                     key={key}
                     variant="outline"
                     className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-2.5 py-1 text-xs font-medium flex items-center gap-1.5"
                   >
-                    {config?.label}: {value}
+                    {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
                     <X
                       className="w-3 h-3 cursor-pointer hover:text-[#3a3aa0]"
                       onClick={() => updateFilters(key, '')}
@@ -601,17 +643,21 @@ export const CandidatesFilter: React.FC = () => {
         {/* Filter Dropdowns */}
         <div className="space-y-4">
           {filterConfigs.map((filter) => {
-            // Determine if this filter needs loading state
             const needsLoading = ['country', 'state', 'nationality', 'language', 'discipline', 'category', 'subCategory'].includes(filter.param)
+            const labelKey = paramToLabelKey[filter.param] ?? filter.param
+            const getOptionLabel = labelMaps && (filter.param === 'discipline' || filter.param === 'category' || filter.param === 'subCategory')
+              ? (val: string) => labelMaps[filter.param as keyof typeof labelMaps][val] ?? val
+              : undefined
             return (
               <FilterSelect
                 key={filter.param}
-                label={filter.label}
+                label={t(labelKey)}
                 value={filters[filter.param]}
                 options={filter.options}
                 isLoading={needsLoading && isLoadingOptions}
                 onValueChange={(value) => updateFilters(filter.param, value)}
                 t={t}
+                getOptionLabel={getOptionLabel}
               />
             )
           })}

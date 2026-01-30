@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Settings, Lock, Mail, Phone, MessageSquare, Trash2, CheckCircle2, XCircle, Loader2, Eye, EyeOff } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
@@ -44,6 +45,7 @@ interface SettingsViewProps {
 }
 
 export function SettingsView({ candidate: initialCandidate, unreadNotificationsCount = 0 }: SettingsViewProps) {
+  const t = useTranslations('candidateDashboard.settings')
   const [candidate, setCandidate] = useState(initialCandidate)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
@@ -75,7 +77,7 @@ export function SettingsView({ candidate: initialCandidate, unreadNotificationsC
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-full max-w-[280px] sm:w-[320px] p-0 flex flex-col overflow-hidden z-[110]">
           <VisuallyHidden>
-            <SheetTitle>Navigation Menu</SheetTitle>
+            <SheetTitle>{t('navMenuTitle')}</SheetTitle>
           </VisuallyHidden>
           <DashboardSidebar mobile onClose={() => setMobileMenuOpen(false)} unreadNotificationsCount={unreadNotificationsCount} />
         </SheetContent>
@@ -120,6 +122,8 @@ export function SettingsView({ candidate: initialCandidate, unreadNotificationsC
 
 // Change Password Component
 function ChangePasswordSection() {
+  const t = useTranslations('candidateDashboard.settings.changePassword')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -134,7 +138,7 @@ function ChangePasswordSection() {
     e.preventDefault()
     
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match')
+      toast.error(t('passwordsDoNotMatch'))
       return
     }
 
@@ -143,15 +147,15 @@ function ChangePasswordSection() {
       const result = await changePassword(currentPassword, newPassword)
       
       if (result.success) {
-        toast.success('Password changed successfully')
+        toast.success(t('passwordChangedSuccess'))
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
       } else {
-        toast.error(result.error || 'Failed to change password')
+        toast.error(result.error || t('failedToChangePassword'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
     }
@@ -162,14 +166,14 @@ function ChangePasswordSection() {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Lock className="size-5 text-[#282828]" />
-          <CardTitle>Change Password</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </div>
-        <CardDescription>Update your password to keep your account secure</CardDescription>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="current-password" className="text-sm font-medium">Current Password</Label>
+            <Label htmlFor="current-password" className="text-sm font-medium">{t('currentPassword')}</Label>
             <div className="relative">
               <Input
                 id="current-password"
@@ -195,7 +199,7 @@ function ChangePasswordSection() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new-password" className="text-sm font-medium">New Password</Label>
+            <Label htmlFor="new-password" className="text-sm font-medium">{t('newPassword')}</Label>
             <div className="relative">
               <Input
                 id="new-password"
@@ -221,11 +225,11 @@ function ChangePasswordSection() {
               </Button>
             </div>
             <p className="text-xs text-[#757575]">
-              Must be at least 8 characters with uppercase, lowercase, number, and special character
+              {t('passwordHint')}
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirm-password" className="text-sm font-medium">Confirm New Password</Label>
+            <Label htmlFor="confirm-password" className="text-sm font-medium">{t('confirmPassword')}</Label>
             <div className="relative">
               <Input
                 id="confirm-password"
@@ -254,10 +258,10 @@ function ChangePasswordSection() {
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                Changing...
+                {t('changing')}
               </>
             ) : (
-              'Change Password'
+              t('submitButton')
             )}
           </Button>
         </form>
@@ -268,6 +272,8 @@ function ChangePasswordSection() {
 
 // Email Section Component
 function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate: (data: Partial<Candidate>) => void }) {
+  const t = useTranslations('candidateDashboard.settings.email')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [newEmail, setNewEmail] = useState('')
   const [isChanging, setIsChanging] = useState(false)
   const [isResending, setIsResending] = useState(false)
@@ -276,7 +282,7 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
   const handleChangeEmail = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newEmail || newEmail === candidate.email) {
-      toast.error('Please enter a different email address')
+      toast.error(t('pleaseEnterDifferentEmail'))
       return
     }
 
@@ -285,14 +291,14 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
       const result = await changeEmail(newEmail)
       
       if (result.success) {
-        toast.success('Verification email sent. Please check your new email address.')
+        toast.success(t('verificationEmailSentNew'))
         setNewEmail('')
         onUpdate({ email: newEmail, emailVerified: false } as any)
       } else {
-        toast.error(result.error || 'Failed to change email')
+        toast.error(result.error || t('failedToChangeEmail'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsChanging(false)
     }
@@ -304,12 +310,12 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
       const result = await resendEmailVerification()
       
       if (result.success) {
-        toast.success('Verification email sent. Please check your inbox.')
+        toast.success(t('verificationEmailSent'))
       } else {
-        toast.error(result.error || 'Failed to send verification email')
+        toast.error(result.error || t('failedToSendVerification'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsResending(false)
     }
@@ -320,24 +326,24 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
       <CardHeader>
         <div className="flex items-center gap-2">
           <Mail className="size-5 text-[#282828]" />
-          <CardTitle>Email Address</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </div>
-        <CardDescription>Manage your email address and verification</CardDescription>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Current Email</Label>
+          <Label className="text-sm font-medium">{t('currentEmail')}</Label>
           <div className="flex items-center gap-2">
             <Input value={candidate.email} disabled className="bg-[#f5f5f5]" />
             {emailVerified ? (
               <div className="flex items-center gap-1 text-sm text-green-600">
                 <CheckCircle2 className="size-4" />
-                <span>Verified</span>
+                <span>{t('verified')}</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 text-sm text-amber-600">
                 <XCircle className="size-4" />
-                <span>Not Verified</span>
+                <span>{t('notVerified')}</span>
               </div>
             )}
           </div>
@@ -354,12 +360,12 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
               {isResending ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
-                  Sending...
+                  {t('sending')}
                 </>
               ) : (
                 <>
                   <Mail className="mr-2 size-4" />
-                  Resend Verification Email
+                  {t('resendVerificationEmail')}
                 </>
               )}
             </Button>
@@ -370,13 +376,13 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
 
         <form onSubmit={handleChangeEmail} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="new-email" className="text-sm font-medium">New Email Address</Label>
+            <Label htmlFor="new-email" className="text-sm font-medium">{t('newEmailAddress')}</Label>
             <Input
               id="new-email"
               type="email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              placeholder="Enter new email address"
+              placeholder={t('placeholder')}
               required
             />
           </div>
@@ -384,10 +390,10 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
             {isChanging ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                Changing...
+                {t('changing')}
               </>
             ) : (
-              'Change Email'
+              t('changeEmail')
             )}
           </Button>
         </form>
@@ -398,6 +404,9 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
 
 // Phone Section Component
 function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate: (data: Partial<Candidate>) => void }) {
+  const t = useTranslations('candidateDashboard.settings.phone')
+  const tCommon = useTranslations('candidateDashboard.common')
+  const tEmail = useTranslations('candidateDashboard.settings.email')
   const [phone, setPhone] = useState(candidate.phone || '')
   const [isUpdating, setIsUpdating] = useState(false)
   const [showVerification, setShowVerification] = useState(false)
@@ -406,7 +415,7 @@ function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
   const handleUpdatePhone = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!phone || phone === candidate.phone) {
-      toast.error('Please enter a different phone number')
+      toast.error(t('pleaseEnterDifferentPhone'))
       return
     }
 
@@ -415,14 +424,14 @@ function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
       const result = await updatePhone(phone)
       
       if (result.success && result.candidate) {
-        toast.success('Phone number updated. Please verify your new number.')
+        toast.success(t('phoneUpdatedVerify'))
         onUpdate(result.candidate)
         setShowVerification(true)
       } else {
-        toast.error(result.error || 'Failed to update phone')
+        toast.error(result.error || t('failedToUpdatePhone'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsUpdating(false)
     }
@@ -438,24 +447,24 @@ function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
       <CardHeader>
         <div className="flex items-center gap-2">
           <Phone className="size-5 text-[#282828]" />
-          <CardTitle>Phone Number</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </div>
-        <CardDescription>Update your phone number and verify it</CardDescription>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Current Phone</Label>
+          <Label className="text-sm font-medium">{t('currentPhone')}</Label>
           <div className="flex items-center gap-2">
-            <Input value={candidate.phone} disabled className="bg-[#f5f5f5]" />
+            <Input value={candidate.phone} disabled className="bg-[#f5f5f5]" dir="ltr" />
             {phoneVerified ? (
               <div className="flex items-center gap-1 text-sm text-green-600">
                 <CheckCircle2 className="size-4" />
-                <span>Verified</span>
+                <span>{tEmail('verified')}</span>
               </div>
             ) : (
               <div className="flex items-center gap-1 text-sm text-amber-600">
                 <XCircle className="size-4" />
-                <span>Not Verified</span>
+                <span>{tEmail('notVerified')}</span>
               </div>
             )}
           </div>
@@ -474,13 +483,13 @@ function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
           <>
             <form onSubmit={handleUpdatePhone} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="new-phone" className="text-sm font-medium">New Phone Number</Label>
+                <Label htmlFor="new-phone" className="text-sm font-medium">{t('newPhoneNumber')}</Label>
                 <Input
                   id="new-phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter new phone number"
+                  placeholder={t('placeholder')}
                   required
                 />
               </div>
@@ -488,10 +497,10 @@ function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
                 {isUpdating ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Updating...
+                    {t('updating')}
                   </>
                 ) : (
-                  'Update Phone'
+                  t('updatePhone')
                 )}
               </Button>
             </form>
@@ -514,6 +523,9 @@ function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
 
 // WhatsApp Section Component
 function WhatsAppSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate: (data: Partial<Candidate>) => void }) {
+  const t = useTranslations('candidateDashboard.settings.whatsApp')
+  const tCommon = useTranslations('candidateDashboard.common')
+  const tPhone = useTranslations('candidateDashboard.settings.phone')
   const [whatsapp, setWhatsapp] = useState((candidate as any).whatsapp || '')
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -524,13 +536,13 @@ function WhatsAppSection({ candidate, onUpdate }: { candidate: Candidate; onUpda
       const result = await updateWhatsApp(whatsapp)
       
       if (result.success && result.candidate) {
-        toast.success('WhatsApp number updated successfully')
+        toast.success(t('whatsAppUpdatedSuccess'))
         onUpdate(result.candidate)
       } else {
-        toast.error(result.error || 'Failed to update WhatsApp')
+        toast.error(result.error || t('failedToUpdateWhatsApp'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsUpdating(false)
     }
@@ -541,30 +553,30 @@ function WhatsAppSection({ candidate, onUpdate }: { candidate: Candidate; onUpda
       <CardHeader>
         <div className="flex items-center gap-2">
           <MessageSquare className="size-5 text-[#282828]" />
-          <CardTitle>WhatsApp Number</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </div>
-        <CardDescription>Update your WhatsApp number (optional, leave empty if same as phone)</CardDescription>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleUpdateWhatsApp} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="whatsapp" className="text-sm font-medium">WhatsApp Number</Label>
+            <Label htmlFor="whatsapp" className="text-sm font-medium">{t('whatsAppNumber')}</Label>
             <Input
               id="whatsapp"
               type="tel"
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="Enter WhatsApp number (optional)"
+              placeholder={t('placeholder')}
             />
           </div>
           <Button type="submit" disabled={isUpdating} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
             {isUpdating ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                Updating...
+                {tPhone('updating')}
               </>
             ) : (
-              'Update WhatsApp'
+              t('updateWhatsApp')
             )}
           </Button>
         </form>
@@ -575,6 +587,8 @@ function WhatsAppSection({ candidate, onUpdate }: { candidate: Candidate; onUpda
 
 // Delete Account Section Component
 function DeleteAccountSection() {
+  const t = useTranslations('candidateDashboard.settings.deleteAccount')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [password, setPassword] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const [open, setOpen] = useState(false)
@@ -582,7 +596,7 @@ function DeleteAccountSection() {
 
   const handleDelete = async () => {
     if (!password) {
-      toast.error('Please enter your password to confirm')
+      toast.error(t('pleaseEnterPassword'))
       return
     }
 
@@ -591,16 +605,16 @@ function DeleteAccountSection() {
       const result = await deleteAccount(password)
       
       if (result.success) {
-        toast.success('Account deleted successfully')
+        toast.success(t('accountDeletedSuccess'))
         await clearAuthCookies()
         router.push('/')
         router.refresh()
       } else {
-        toast.error(result.error || 'Failed to delete account')
+        toast.error(result.error || t('failedToDeleteAccount'))
         setOpen(false)
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
       setOpen(false)
     } finally {
       setIsDeleting(false)
@@ -612,10 +626,10 @@ function DeleteAccountSection() {
       <CardHeader>
         <div className="flex items-center gap-2">
           <Trash2 className="size-5 text-red-600" />
-          <CardTitle className="text-red-600">Delete Account</CardTitle>
+          <CardTitle className="text-red-600">{t('title')}</CardTitle>
         </div>
         <CardDescription className="text-red-700">
-          Permanently delete your account and all associated data. This action cannot be undone.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -626,30 +640,30 @@ function DeleteAccountSection() {
           <AlertDialogTrigger asChild>
             <Button variant="destructive" className="bg-red-600 hover:bg-red-700">
               <Trash2 className="mr-2 size-4" />
-              Delete Account
+              {t('deleteButton')}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
               <AlertDialogDescription className="space-y-3">
-                <p>This action cannot be undone. This will permanently delete your account and remove all your data from our servers.</p>
-                <p className="font-semibold text-red-600">All your profile information, interviews, and activity will be lost.</p>
+                <p>{t('deleteWarning')}</p>
+                <p className="font-semibold text-red-600">{t('deleteWarningDetail')}</p>
                 <div className="space-y-2 pt-2">
-                  <Label htmlFor="delete-password" className="text-sm font-medium">Enter your password to confirm</Label>
+                  <Label htmlFor="delete-password" className="text-sm font-medium">{t('enterPasswordToConfirm')}</Label>
                   <Input
                     id="delete-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder={t('passwordPlaceholder')}
                     required
                   />
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setPassword('')}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel onClick={() => setPassword('')}>{t('cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
                 disabled={isDeleting || !password}
@@ -658,10 +672,10 @@ function DeleteAccountSection() {
                 {isDeleting ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Deleting...
+                    {t('deleting')}
                   </>
                 ) : (
-                  'Delete Account'
+                  t('deleteButton')
                 )}
               </AlertDialogAction>
             </AlertDialogFooter>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Link } from '@/i18n/routing'
-import { HomepageNavbar } from '@/components/homepage/Navbar'
+import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
@@ -35,11 +35,12 @@ type Args = {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { id } = await paramsPromise
   const candidateId = parseInt(id, 10)
+  const t = await getTranslations('candidateDetail')
 
   if (isNaN(candidateId)) {
     return {
-      title: 'Candidate Not Found | Ready to Work',
-      description: 'The requested candidate profile could not be found.',
+      title: t('notFoundTitle'),
+      description: t('notFoundDescription'),
     }
   }
 
@@ -47,8 +48,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
   if (!candidate) {
     return {
-      title: 'Candidate Not Found | Ready to Work',
-      description: 'The requested candidate profile could not be found.',
+      title: t('notFoundTitle'),
+      description: t('notFoundDescription'),
     }
   }
 
@@ -122,13 +123,14 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
   const fullName = `${candidate.firstName} ${candidate.lastName}`
   const profileImage = candidate.profilePictureUrl || DEFAULT_PROFILE
   const flagImage = getNationalityFlag(candidate.nationality)
+  const t = await getTranslations('candidateDetail')
 
   // Visa status labels
   const visaStatusLabels: Record<string, string> = {
-    active: 'Active Visa',
-    expired: 'Expired',
-    nearly_expired: 'Nearly Expired',
-    none: 'Availability to relocate',
+    active: t('visaActive'),
+    expired: t('visaExpired'),
+    nearly_expired: t('visaNearlyExpired'),
+    none: t('visaNone'),
   }
 
   // Languages as list
@@ -142,7 +144,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
     const t = await getTranslations('candidatesPage')
     return (
       <div className="min-h-screen bg-white overflow-x-hidden">
-        <HomepageNavbar />
+        <HomepageNavbarWrapper />
         <HomepageSection className="pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-12 sm:pb-16 md:pb-20">
           <div className="flex flex-col items-center justify-center max-w-lg mx-auto text-center py-12">
             <CandidateCard
@@ -177,7 +179,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      <HomepageNavbar />
+      <HomepageNavbarWrapper />
 
       {/* Main Content */}
       <HomepageSection className="pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-12 sm:pb-16 md:pb-20">
@@ -203,18 +205,18 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
           {/* Right: Info Cards Grid */}
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 content-start">
             {/* Row 1: Visa Status + Saudi Experience */}
-            <InfoCard title="Visa Statutes">
+            <InfoCard title={t('visaStatutes')}>
               {visaStatusLabels[candidate.visaStatus]}
             </InfoCard>
 
-            <InfoCard title="Years of Experience in Saudi Arabia">
-              {candidate.saudiExperience} Years
+            <InfoCard title={t('yearsInSaudi')}>
+              {candidate.saudiExperience} {t('yearsSuffix')}
             </InfoCard>
 
             {/* Row 2: Job Name + Languages */}
-            <InfoCard title="Job Name">{candidate.jobTitle}</InfoCard>
+            <InfoCard title={t('jobName')}>{candidate.jobTitle}</InfoCard>
 
-            <InfoCard title="Languages">
+            <InfoCard title={t('languages')}>
               <ul className="list-disc list-inside space-y-1">
                 {languagesList.map((lang, idx) => (
                   <li key={idx}>{lang}</li>
@@ -223,17 +225,17 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
             </InfoCard>
 
             {/* Row 3: Tools & Skills (Full width) */}
-            <InfoCard title="Tools & Skills" className="sm:col-span-2">
+            <InfoCard title={t('toolsAndSkills')} className="sm:col-span-2">
               <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%]">
-                <li>Specialized in {candidate.jobTitle}</li>
+                <li>{t('specializedIn')} {candidate.jobTitle}</li>
                 <li>
-                  {candidate.experienceYears} years of professional experience
+                  {candidate.experienceYears} {t('yearsProfessional')}
                 </li>
-                <li>{candidate.saudiExperience} years experience in Saudi Arabia</li>
+                <li>{candidate.saudiExperience} {t('yearsSaudi')}</li>
                 {candidate.currentEmployer && (
-                  <li>Currently employed at {candidate.currentEmployer}</li>
+                  <li>{t('currentlyEmployedAt')} {candidate.currentEmployer}</li>
                 )}
-                <li>Available for immediate placement</li>
+                <li>{t('availableImmediate')}</li>
               </ul>
             </InfoCard>
           </div>
@@ -241,7 +243,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
 
         {/* Work History Section */}
         <div className="mt-8 sm:mt-10 lg:mt-12">
-          <InfoCard title="Work History" className="w-full">
+          <InfoCard title={t('workHistory')} className="w-full">
             <div className="space-y-4">
               {/* Work Entry */}
               <div className="space-y-2">
@@ -253,25 +255,25 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
                     )}
                   </p>
                   <p className="text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
-                    {candidate.experienceYears} years experience
+                    {candidate.experienceYears} {t('yearsExperience')}
                   </p>
                 </div>
 
                 <div className="flex flex-wrap gap-2 text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
-                  <span>{candidate.experienceYears} years</span>
+                  <span>{candidate.experienceYears} {t('yearsSuffix')}</span>
                   <span>•</span>
-                  <span>Full-time</span>
+                  <span>{t('fullTime')}</span>
                   <span>•</span>
                   <span>{candidate.location}</span>
                 </div>
 
                 <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%] font-medium text-[#2c2c2c]">
-                  <li>Professional {candidate.jobTitle} with proven track record</li>
+                  <li>{t('professionalWith', { jobTitle: candidate.jobTitle })}</li>
                   <li>
-                    {candidate.saudiExperience} years of experience working in Saudi Arabia
+                    {candidate.saudiExperience} {t('yearsWorkingSaudi')}
                   </li>
-                  <li>Fluent in {candidate.languages}</li>
-                  <li>Strong commitment to quality and professionalism</li>
+                  <li>{t('fluentIn')} {candidate.languages}</li>
+                  <li>{t('strongCommitment')}</li>
                 </ul>
               </div>
             </div>
@@ -280,19 +282,19 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
 
         {/* Education Section */}
         <div className="mt-6 sm:mt-8">
-          <InfoCard title="Education" className="w-full">
+          <InfoCard title={t('education')} className="w-full">
             <div className="space-y-2">
               <p className="font-semibold text-[#2c2c2c] text-sm sm:text-base leading-[140%]">
-                Professional Training & Certification
+                {t('professionalTraining')}
               </p>
               <div className="flex flex-wrap gap-2 text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
-                <span>Professional Certification</span>
+                <span>{t('professionalCertification')}</span>
                 <span>•</span>
                 <span>{candidate.jobTitle}</span>
               </div>
               <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%] font-medium text-[#2c2c2c]">
-                <li>Completed professional training in {candidate.jobTitle}</li>
-                <li>Certified for work in Saudi Arabia</li>
+                <li>{t('completedTraining', { jobTitle: candidate.jobTitle })}</li>
+                <li>{t('certifiedSaudi')}</li>
               </ul>
             </div>
           </InfoCard>
@@ -303,7 +305,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
       {similarCandidates.length > 0 && (
         <HomepageSection className="py-12 sm:py-16 md:py-20 bg-[rgba(175,183,255,0.1)]">
           <h2 className="font-inter font-semibold text-[#16252d] text-xl sm:text-2xl md:text-3xl leading-[120%] mb-6 sm:mb-8 md:mb-10 lg:mb-12">
-            Similar Candidates
+            {t('similarCandidates')}
           </h2>
 
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">

@@ -1,13 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { FolderOpen, Eye, FileText, TrendingUp, TrendingDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { StatisticsDataPoint } from '@/lib/payload/employer-dashboard'
-
-const timePeriods = ['Week', 'Month', 'Year'] as const
 
 interface StatisticsChartProps {
   employerId: number
@@ -20,9 +19,9 @@ export function StatisticsChart({
   initialData,
   initialPeriod,
 }: StatisticsChartProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState<'Week' | 'Month' | 'Year'>(
-    initialPeriod === 'week' ? 'Week' : initialPeriod === 'month' ? 'Month' : 'Year',
-  )
+  const t = useTranslations('employerDashboard.statisticsChart')
+  const timePeriodKeys = ['week', 'month', 'year'] as const
+  const [selectedPeriodKey, setSelectedPeriodKey] = useState<'week' | 'month' | 'year'>(initialPeriod)
   const [chartData, setChartData] = useState<StatisticsDataPoint[]>(initialData)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -30,8 +29,7 @@ export function StatisticsChart({
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const period = selectedPeriod.toLowerCase() as 'week' | 'month' | 'year'
-        const response = await fetch(`/api/employer/statistics?employerId=${employerId}&period=${period}`)
+        const response = await fetch(`/api/employer/statistics?employerId=${employerId}&period=${selectedPeriodKey}`)
         if (response.ok) {
           const data = await response.json()
           setChartData(data)
@@ -43,10 +41,10 @@ export function StatisticsChart({
       }
     }
 
-    if (selectedPeriod.toLowerCase() !== initialPeriod) {
+    if (selectedPeriodKey !== initialPeriod) {
       fetchData()
     }
-  }, [selectedPeriod, employerId, initialPeriod])
+  }, [selectedPeriodKey, employerId, initialPeriod])
 
   // Calculate max value for scaling
   const maxValue = Math.max(
@@ -62,7 +60,7 @@ export function StatisticsChart({
   // Format date for display
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    if (selectedPeriod === 'Week') {
+    if (selectedPeriodKey === 'week') {
       return date.toLocaleDateString('en-US', { weekday: 'short' })
     }
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -71,27 +69,27 @@ export function StatisticsChart({
   const statsCards = [
     {
       icon: FolderOpen,
-      label: 'opened',
+      labelKey: 'opened' as const,
       value: totalViews.toString(),
       change: '+0',
       trend: 'up' as const,
-      period: selectedPeriod.toLowerCase(),
+      periodKey: selectedPeriodKey,
     },
     {
       icon: Eye,
-      label: 'views',
+      labelKey: 'views' as const,
       value: totalViews.toString(),
       change: '+0',
       trend: 'up' as const,
-      period: selectedPeriod.toLowerCase(),
+      periodKey: selectedPeriodKey,
     },
     {
       icon: FileText,
-      label: 'interviewed',
+      labelKey: 'interviewed' as const,
       value: totalInterviewed.toString(),
       change: '+0',
       trend: 'up' as const,
-      period: selectedPeriod.toLowerCase(),
+      periodKey: selectedPeriodKey,
     },
   ]
 
@@ -101,29 +99,29 @@ export function StatisticsChart({
       <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <h3 className="text-base font-semibold text-[#222] sm:text-lg">
-            Candidate statistics
+            {t('title')}
           </h3>
           <p className="text-xs font-normal text-[#757575]">
-            Showing statistics for {selectedPeriod.toLowerCase()}
+            {t('showingFor', { period: t(selectedPeriodKey) })}
           </p>
         </div>
 
         {/* Time Period Selector */}
         <div className="flex h-8 overflow-hidden rounded-lg border border-[#cbcbcb]">
-          {timePeriods.map((period) => (
+          {timePeriodKeys.map((periodKey) => (
             <button
-              key={period}
-              onClick={() => setSelectedPeriod(period)}
+              key={periodKey}
+              onClick={() => setSelectedPeriodKey(periodKey)}
               disabled={isLoading}
               className={cn(
                 'h-8 flex-1 px-4 py-1.5 text-sm font-medium transition-colors sm:flex-none',
-                selectedPeriod === period
+                selectedPeriodKey === periodKey
                   ? 'bg-[#4644b8] text-white'
                   : 'text-[#757575] hover:bg-[#f4f4f4]',
                 isLoading && 'opacity-50 cursor-not-allowed',
               )}
             >
-              {period}
+              {t(periodKey)}
             </button>
           ))}
         </div>
@@ -134,21 +132,21 @@ export function StatisticsChart({
         {/* Chart Section */}
         <div className="flex flex-1 flex-col gap-2">
           {/* Statistics Title */}
-          <p className="text-base font-semibold text-[#222]">Statistics</p>
+          <p className="text-base font-semibold text-[#222]">{t('statistics')}</p>
 
           {/* Legend */}
           <div className="mb-2 flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-1">
               <div className="size-2 rounded bg-[#4644b8]" />
-              <span className="text-xs font-normal text-[#757575]">Candidate views</span>
+              <span className="text-xs font-normal text-[#757575]">{t('candidateViews')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="size-2 rounded bg-[#6eabff]" />
-              <span className="text-xs font-normal text-[#757575]">Candidate Interviewed</span>
+              <span className="text-xs font-normal text-[#757575]">{t('candidateInterviewed')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="size-2 rounded bg-[#d8e530]" />
-              <span className="text-xs font-normal text-[#757575]">Candidate Declined</span>
+              <span className="text-xs font-normal text-[#757575]">{t('candidateDeclined')}</span>
             </div>
           </div>
 
@@ -198,7 +196,7 @@ export function StatisticsChart({
                 ))
               ) : (
                 <div className="flex flex-1 items-center justify-center text-sm text-[#757575]">
-                  No data available
+                  {t('noDataAvailable')}
                 </div>
               )}
             </div>
@@ -217,13 +215,13 @@ export function StatisticsChart({
                 <Icon className="size-6 text-[#757575]" />
                 <div className="flex items-center justify-between">
                   <div className="flex gap-0.5">
-                    <span className="text-[10px] font-normal text-[#757575]">Candidate</span>
-                    <span className="text-[10px] font-normal text-[#757575]">{stat.label}</span>
+                    <span className="text-[10px] font-normal text-[#757575]">{t('candidate')}</span>
+                    <span className="text-[10px] font-normal text-[#757575]">{t(stat.labelKey)}</span>
                   </div>
                   <span className="text-sm font-semibold text-[#353535]">{stat.value}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-normal text-[#a5a5a5]">This {stat.period}</span>
+                  <span className="text-xs font-normal text-[#a5a5a5]">{t('thisPeriod', { period: t(stat.periodKey) })}</span>
                   <div className="flex items-center gap-0.5">
                     {stat.trend === 'up' ? (
                       <>

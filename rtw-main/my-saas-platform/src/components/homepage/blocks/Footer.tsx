@@ -145,7 +145,7 @@ export const Footer: React.FC = async () => {
                     href={`tel:${t('phoneValue')}`}
                     className="hover:text-[#d8e530] transition-colors"
                   >
-                    {t('phoneValue')}
+                    <span dir="ltr">{t('phoneValue')}</span>
                   </a>
                 </li>
                 <li className="text-sm sm:text-base font-normal font-inter text-white">

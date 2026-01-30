@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Link as LinkIcon, Edit2, Save, X } from 'lucide-react'
 import { useState } from 'react'
 import type { Candidate } from '@/payload-types'
@@ -23,6 +24,8 @@ interface VisaStatusSectionProps {
 }
 
 export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProps) {
+  const t = useTranslations('candidateDashboard.visaStatus')
+  const tCommon = useTranslations('candidateDashboard.common')
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     visaStatus: candidate.visaStatus || 'none',
@@ -45,12 +48,12 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
       if (result.success) {
         onUpdate(result.candidate || {})
         setIsEditing(false)
-        toast.success('Visa status updated successfully')
+        toast.success(t('visaStatusUpdated'))
       } else {
-        toast.error(result.error || 'Failed to update')
+        toast.error(result.error || tCommon('failedToUpdate'))
       }
     } catch (error) {
-      toast.error('An error occurred')
+      toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
     }
@@ -70,13 +73,13 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
   const getVisaStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        return 'Active'
+        return t('active')
       case 'expired':
-        return 'Expired'
+        return t('expired')
       case 'nearly_expired':
-        return 'Nearly Expired'
+        return t('nearlyExpired')
       case 'none':
-        return 'None'
+        return t('none')
       default:
         return status
     }
@@ -88,7 +91,7 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <LinkIcon className="size-5 text-[#282828] sm:size-6" />
-          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">Visa Status</h3>
+          <h3 className="text-base font-semibold text-[#282828] sm:text-lg">{t('title')}</h3>
         </div>
         {!isEditing ? (
           <Button
@@ -98,13 +101,13 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
             className="text-[#4644b8] hover:text-[#4644b8] hover:bg-[#4644b8]/10"
           >
             <Edit2 className="mr-2 size-4" />
-            Edit
+            {tCommon('edit')}
           </Button>
         ) : (
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" onClick={handleCancel}>
               <X className="mr-2 size-4" />
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               size="sm"
@@ -113,7 +116,7 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
               className="bg-[#4644b8] hover:bg-[#3a3aa0]"
             >
               <Save className="mr-2 size-4" />
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? tCommon('saving') : tCommon('save')}
             </Button>
           </div>
         )}
@@ -123,20 +126,20 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         {/* Visa Status */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Visa Status</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('title')}</FieldLabel>
           {isEditing ? (
             <Select
               value={formData.visaStatus}
               onValueChange={(value) => setFormData({ ...formData, visaStatus: value as 'none' | 'active' | 'expired' | 'nearly_expired' })}
             >
               <SelectTrigger className="h-10 rounded-lg border-[#ededed]">
-                <SelectValue placeholder="Select visa status" />
+                <SelectValue placeholder={t('selectVisaStatus')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-                <SelectItem value="nearly_expired">Nearly Expired</SelectItem>
-                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="active">{t('active')}</SelectItem>
+                <SelectItem value="expired">{t('expired')}</SelectItem>
+                <SelectItem value="nearly_expired">{t('nearlyExpired')}</SelectItem>
+                <SelectItem value="none">{t('none')}</SelectItem>
               </SelectContent>
             </Select>
           ) : (
@@ -148,7 +151,7 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
 
         {/* Visa Expiry */}
         <Field>
-          <FieldLabel className="text-xs text-[#757575]">Visa Expiry Date</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('visaExpiry')}</FieldLabel>
           {isEditing ? (
             <Input
               type="date"
@@ -160,24 +163,24 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
             <p className="text-sm font-medium text-[#282828]">
               {(candidate as any).visaExpiry
                 ? new Date((candidate as any).visaExpiry).toLocaleDateString()
-                : 'Not set'}
+                : tCommon('notSet')}
             </p>
           )}
         </Field>
 
         {/* Visa Profession */}
         <Field className="sm:col-span-2">
-          <FieldLabel className="text-xs text-[#757575]">Visa Profession</FieldLabel>
+          <FieldLabel className="text-xs text-[#757575]">{t('visaProfession')}</FieldLabel>
           {isEditing ? (
             <Input
               value={formData.visaProfession}
               onChange={(e) => setFormData({ ...formData, visaProfession: e.target.value })}
               className="h-10 rounded-lg border-[#ededed] text-sm"
-              placeholder="Enter visa profession"
+              placeholder={t('enterVisaProfession')}
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {(candidate as any).visaProfession || 'Not set'}
+              {(candidate as any).visaProfession || tCommon('notSet')}
             </p>
           )}
         </Field>

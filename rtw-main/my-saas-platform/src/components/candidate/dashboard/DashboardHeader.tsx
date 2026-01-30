@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Search } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Input } from '@/components/ui/input'
@@ -15,31 +16,24 @@ interface DashboardHeaderProps {
   notifications?: CandidateNotification[]
 }
 
-const HEADER_BY_PATH: Record<string, { title: string; description: string }> = {
-  activity: { title: 'Activity', description: 'View your recent activity and interview updates' },
-  notifications: { title: 'Notifications', description: 'View and manage your notifications' },
-  resume: { title: 'My Resume', description: 'Updating your information will offer you the most relevant content' },
-  settings: { title: 'Account Settings', description: 'Manage your account security and preferences' },
-  dashboard: { title: 'Dashboard', description: 'Updating your information will offer you the most relevant content' },
-}
-
 export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notifications = [] }: DashboardHeaderProps) {
   const pathname = usePathname() ?? ''
+  const t = useTranslations('candidateDashboard.header')
 
   const getHeaderTitle = () => {
-    if (pathname.includes('/activity')) return HEADER_BY_PATH.activity.title
-    if (pathname.includes('/notifications')) return HEADER_BY_PATH.notifications.title
-    if (pathname.includes('/resume')) return HEADER_BY_PATH.resume.title
-    if (pathname.includes('/settings')) return HEADER_BY_PATH.settings.title
-    return HEADER_BY_PATH.dashboard.title
+    if (pathname.includes('/activity')) return t('activity')
+    if (pathname.includes('/notifications')) return t('notifications')
+    if (pathname.includes('/resume')) return t('myResume')
+    if (pathname.includes('/settings')) return t('accountSettings')
+    return t('dashboard')
   }
 
   const getHeaderDescription = () => {
-    if (pathname.includes('/activity')) return HEADER_BY_PATH.activity.description
-    if (pathname.includes('/notifications')) return HEADER_BY_PATH.notifications.description
-    if (pathname.includes('/resume')) return HEADER_BY_PATH.resume.description
-    if (pathname.includes('/settings')) return HEADER_BY_PATH.settings.description
-    return HEADER_BY_PATH.dashboard.description
+    if (pathname.includes('/activity')) return t('activityDescription')
+    if (pathname.includes('/notifications')) return t('notificationsDescription')
+    if (pathname.includes('/resume')) return t('myResumeDescription')
+    if (pathname.includes('/settings')) return t('accountSettingsDescription')
+    return t('dashboardDescription')
   }
 
   return (
@@ -61,7 +55,7 @@ export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notif
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search..."
+            placeholder={t('searchPlaceholder')}
             className="h-10 w-full rounded-lg border border-[#ededed] bg-white pl-9 text-sm focus-visible:ring-offset-0"
           />
         </div>

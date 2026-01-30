@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   LayoutGrid,
   User,
@@ -36,16 +37,17 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsCount = 0 }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const t = useTranslations('candidateDashboard.sidebar')
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const dashboardBase = pathname?.match(/^\/[^/]+\/dashboard/)?.[0] ?? pathname?.replace(/\/dashboard.*/, '/dashboard') ?? '/dashboard'
   const dashboardPath = dashboardBase.replace(/\?.*$/, '')
   const menuItems = [
-    { icon: LayoutGrid, label: 'Dashboard', href: dashboardPath, view: null },
-    { icon: User, label: 'My Resume', href: `${dashboardPath}/resume`, view: null },
-    { icon: Bell, label: 'Notification', href: `${dashboardPath}/notifications`, view: null, badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : undefined },
-    { icon: Settings, label: 'Account Setting', href: `${dashboardPath}/settings`, view: null },
-    { icon: SlidersHorizontal, label: 'Activity', href: `${dashboardPath}/activity`, view: null },
+    { icon: LayoutGrid, label: t('dashboard'), href: dashboardPath, view: null },
+    { icon: User, label: t('myResume'), href: `${dashboardPath}/resume`, view: null },
+    { icon: Bell, label: t('notification'), href: `${dashboardPath}/notifications`, view: null, badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : undefined },
+    { icon: Settings, label: t('accountSetting'), href: `${dashboardPath}/settings`, view: null },
+    { icon: SlidersHorizontal, label: t('activity'), href: `${dashboardPath}/activity`, view: null },
   ]
 
   const handleLogout = async () => {
@@ -54,20 +56,20 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
       const result = await clearAuthCookies()
 
       if (result.success) {
-        toast.success('Logged out successfully', {
-          description: 'You have been signed out of your account.',
+        toast.success(t('loggedOutSuccess'), {
+          description: t('loggedOutDescription'),
         })
         router.push('/')
         router.refresh()
       } else {
-        toast.error('Logout failed', {
-          description: 'Please try again.',
+        toast.error(t('logoutFailed'), {
+          description: t('pleaseTryAgain'),
         })
         setIsLoggingOut(false)
       }
     } catch (error) {
-      toast.error('Logout failed', {
-        description: 'Please try again.',
+      toast.error(t('logoutFailed'), {
+        description: t('pleaseTryAgain'),
       })
       setIsLoggingOut(false)
     }
@@ -136,11 +138,11 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
         {/* Main Menu Label */}
         {mobile ? (
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Main Menu
+            {t('mainMenu')}
           </h2>
         ) : (
           <p className="mb-4 text-sm font-normal text-[#757575]">
-            Main
+            {t('main')}
           </p>
         )}
 
@@ -217,7 +219,7 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
         {mobile && <Separator className="mb-4 bg-gray-200" />}
         {mobile && (
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">
-            Support
+            {t('support')}
           </h2>
         )}
         <div className="flex flex-col gap-2">
@@ -239,7 +241,7 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
               <LogOut className={cn('flex-shrink-0 text-[#dc0000]', mobile ? 'h-5 w-5' : 'h-4 w-4')} />
             </div>
             <span className={cn('font-medium flex-1 text-left', mobile ? 'text-base' : 'text-sm')}>
-              {isLoggingOut ? 'Logging out...' : 'Log out'}
+              {isLoggingOut ? t('loggingOut') : t('logOut')}
             </span>
             {!mobile && <ChevronLeft className="size-4 text-[#dc0000] ml-auto opacity-50" />}
           </button>
@@ -260,7 +262,7 @@ export function DashboardSidebar({ mobile = false, onClose, unreadNotificationsC
             )}>
               <HelpCircle className={cn('flex-shrink-0 text-[#4644b8]', mobile ? 'h-5 w-5' : 'h-4 w-4')} />
             </div>
-            <span className={cn('font-medium flex-1', mobile ? 'text-base' : 'text-sm')}>Help</span>
+            <span className={cn('font-medium flex-1', mobile ? 'text-base' : 'text-sm')}>{t('help')}</span>
             {!mobile && <ChevronLeft className="size-4 text-[#757575] ml-auto" />}
           </Link>
         </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +14,7 @@ interface RecentCandidatesTableProps {
 export async function RecentCandidatesTable({ employerId }: RecentCandidatesTableProps) {
   const jobPostings = await getJobPostings(employerId, { status: 'active' })
   const recentPostings = jobPostings.slice(0, 3)
+  const t = await getTranslations('employerDashboard.recentCandidates')
 
   // Format salary range
   const formatSalary = (min?: number, max?: number) => {
@@ -36,11 +38,11 @@ export async function RecentCandidatesTable({ employerId }: RecentCandidatesTabl
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-base font-semibold text-[#222] sm:text-lg">
-          Recently Candidate Search
+          {t('recentlyCandidateSearch')}
         </h3>
         <Link href="/employer/dashboard/job-postings">
           <Button variant="ghost" className="h-8 w-fit gap-2 px-4 py-2">
-            <span className="text-sm font-medium text-[#222]">View All</span>
+            <span className="text-sm font-medium text-[#222]">{t('viewAll')}</span>
             <ChevronRight className="size-6 text-[#222]" />
           </Button>
         </Link>
@@ -49,12 +51,12 @@ export async function RecentCandidatesTable({ employerId }: RecentCandidatesTabl
       {/* Table Header - Hidden on mobile */}
       <div className="hidden rounded-lg bg-[#f4f4f4] p-2 sm:block">
         <div className="flex items-center justify-between text-xs font-normal text-[#515151]">
-          <div className="w-[160px]">Jobs</div>
+          <div className="w-[160px]">{t('jobs')}</div>
           <div className="flex flex-1 items-center justify-between">
-            <span className="w-[80px]">Status</span>
-            <span className="w-[100px]">Applications</span>
-            <span className="w-[100px]">Salary</span>
-            <span className="w-[180px] text-right">Actions</span>
+            <span className="w-[80px]">{t('status')}</span>
+            <span className="w-[100px]">{t('applications')}</span>
+            <span className="w-[100px]">{t('salary')}</span>
+            <span className="w-[180px] text-right">{t('actions')}</span>
           </div>
         </div>
       </div>
@@ -75,16 +77,16 @@ export async function RecentCandidatesTable({ employerId }: RecentCandidatesTabl
                   <div className="flex items-center gap-1 text-xs font-normal text-[#757575]">
                     <span>
                       {posting.jobType === 'full_time'
-                        ? 'Full Time'
+                        ? t('fullTime')
                         : posting.jobType === 'part_time'
-                          ? 'Part Time'
-                          : 'Contract'}
+                          ? t('partTime')
+                          : t('contract')}
                     </span>
                     {posting.expiresAt && (
                       <>
                         <span>•</span>
                         <span>
-                          {daysRemaining === 'N/A' ? 'N/A' : `${daysRemaining} days remaining`}
+                          {daysRemaining === 'N/A' ? 'N/A' : t('daysRemaining', { count: Number(daysRemaining) })}
                         </span>
                       </>
                     )}
@@ -107,7 +109,7 @@ export async function RecentCandidatesTable({ employerId }: RecentCandidatesTabl
                   <div className="flex items-center gap-1">
                     <Users className="size-4 text-[#282828]" />
                     <span className="text-xs font-normal text-[#282828]">
-                      {posting.clicksCount} Click
+                      {posting.clicksCount} {posting.clicksCount === 1 ? t('click') : t('clicks')}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -123,7 +125,7 @@ export async function RecentCandidatesTable({ employerId }: RecentCandidatesTabl
                         className="h-8 flex-1 border border-[#282828] px-4 py-2 sm:flex-none"
                       >
                         <span className="text-sm font-medium text-[#282828]">
-                          View Candidates
+                          {t('viewCandidates')}
                         </span>
                       </Button>
                     </Link>
@@ -137,7 +139,7 @@ export async function RecentCandidatesTable({ employerId }: RecentCandidatesTabl
           })
         ) : (
           <div className="flex items-center justify-center py-8 text-sm text-[#757575]">
-            No active job postings
+            {t('noActiveJobPostings')}
           </div>
         )}
       </div>

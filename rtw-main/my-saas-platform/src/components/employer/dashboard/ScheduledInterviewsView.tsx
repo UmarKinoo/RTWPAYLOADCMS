@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { useTranslations } from 'next-intl'
 import { ArrowLeft, Calendar, Clock, MapPin, Briefcase, Video, FileText, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +17,7 @@ interface ScheduledInterviewsViewProps {
 }
 
 export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewProps) {
+  const t = useTranslations('employerDashboard.scheduledInterviews')
   const now = new Date()
 
   const upcomingInterviews = interviews.filter((i) => new Date(i.scheduledAt) > now)
@@ -32,10 +34,12 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
         </Link>
         <div>
           <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">
-            Scheduled Interviews
+            {t('title')}
           </h1>
           <p className="text-sm text-[#757575]">
-            {upcomingInterviews.length} upcoming interview{upcomingInterviews.length === 1 ? '' : 's'}
+            {upcomingInterviews.length === 1
+              ? t('upcomingCount', { count: 1 })
+              : t('upcomingCountPlural', { count: upcomingInterviews.length })}
           </p>
         </div>
       </div>
@@ -43,7 +47,7 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
       {/* Upcoming Interviews */}
       {upcomingInterviews.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-semibold text-[#282828] mb-4">Upcoming</h2>
+          <h2 className="text-lg font-semibold text-[#282828] mb-4">{t('upcoming')}</h2>
           <div className="space-y-4">
             {upcomingInterviews.map((interview) => {
               const scheduledDate = new Date(interview.scheduledAt)
@@ -73,7 +77,7 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
                       </div>
                       <Link href={`/candidates/${interview.candidate.id}`}>
                         <Button variant="ghost" size="sm">
-                          View Profile
+                          {t('viewProfile')}
                         </Button>
                       </Link>
                     </div>
@@ -89,7 +93,7 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
                     <div className="flex items-center gap-2 text-sm">
                       <Clock className="size-4 text-[#4644b8]" />
                       <span className="text-[#515151]">
-                        {format(scheduledDate, 'h:mm a')} ({interview.duration} minutes)
+                        {format(scheduledDate, 'h:mm a')} ({interview.duration} {t('minutes')})
                       </span>
                     </div>
 
@@ -132,7 +136,7 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
                             className="flex items-center gap-2 text-sm text-[#4644b8] hover:underline"
                           >
                             <Video className="size-4" />
-                            <span>Join Meeting</span>
+                            <span>{t('joinMeeting')}</span>
                             <ExternalLink className="size-3" />
                           </a>
                         </div>
@@ -146,7 +150,7 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <FileText className="size-4 text-[#4644b8]" />
-                            <span className="text-sm font-medium text-[#282828]">Notes</span>
+                            <span className="text-sm font-medium text-[#282828]">{t('notes')}</span>
                           </div>
                           <p className="text-sm text-[#515151] whitespace-pre-wrap">{interview.notes}</p>
                         </div>
@@ -163,7 +167,7 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
       {/* Past Interviews */}
       {pastInterviews.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-[#282828] mb-4">Past Interviews</h2>
+          <h2 className="text-lg font-semibold text-[#282828] mb-4">{t('pastInterviews')}</h2>
           <div className="space-y-4">
             {pastInterviews.map((interview) => {
               const scheduledDate = new Date(interview.scheduledAt)
@@ -193,7 +197,7 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
                       </div>
                       <Link href={`/candidates/${interview.candidate.id}`}>
                         <Button variant="ghost" size="sm">
-                          View
+                          {t('view')}
                         </Button>
                       </Link>
                     </div>
@@ -210,13 +214,13 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Calendar className="mb-4 h-12 w-12 text-[#cbcbcb]" />
-            <h3 className="mb-2 text-lg font-semibold text-[#282828]">No scheduled interviews</h3>
+            <h3 className="mb-2 text-lg font-semibold text-[#282828]">{t('noScheduledInterviews')}</h3>
             <p className="text-sm text-[#757575]">
-              You don't have any scheduled interviews yet. Request interviews with candidates to get started.
+              {t('noScheduledDescription')}
             </p>
             <Link href="/candidates" className="mt-4">
               <Button variant="outline" className="border-[#4644b8] text-[#4644b8]">
-                Browse Candidates
+                {t('browseCandidates')}
               </Button>
             </Link>
           </CardContent>
