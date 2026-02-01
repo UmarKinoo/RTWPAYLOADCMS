@@ -17,6 +17,8 @@
     "analyze:veterinarian": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/analyze-veterinarian-candidates.ts",
     "generate:test-candidates": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/generate-test-candidates.ts",
     "update:test-billing-class": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/update-test-candidates-billing-class.ts",
+    "update:page-meta": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/update-page-meta.ts",
+    "update:page-meta:prod": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/update-page-meta.ts -- --prod-only",
     "translate:disciplines": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/translate-disciplines.ts",
     "optimize:images": "tsx scripts/optimize-images.ts",
     "translate:ar": "cross-env NODE_OPTIONS=--no-deprecation tsx scripts/generate-arabic-translations.ts",

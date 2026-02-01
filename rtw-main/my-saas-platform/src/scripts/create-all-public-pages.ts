@@ -70,8 +70,8 @@ const publicPages = [
     slug: 'about',
     title: 'About Us',
     meta: {
-      title: 'About Us | Ready to Work',
-      description: 'Learn about Ready to Work - your trusted partner for connecting talented candidates with the right employers.',
+      title: 'Saudi Recruitment Portal | Talent Hiring & Jobs in KSA',
+      description: 'A Saudi recruitment portal connecting employers with verified talent and supporting candidates with genuine job opportunities across Saudi Arabia.',
     },
   },
   {
@@ -94,8 +94,8 @@ const publicPages = [
     slug: 'candidates',
     title: 'Candidates',
     meta: {
-      title: 'Candidates | Ready to Work',
-      description: 'Browse our talented candidates. Find skilled workers, specialists, and elite professionals for your team.',
+      title: 'Expatriate Jobs in Saudi Arabia – Find Top Opportunities',
+      description: 'Browse expatriate jobs in Saudi Arabia with Ready to Work. Connect with top employers and grow your career with relevant, long-term opportunities.',
     },
   },
   {

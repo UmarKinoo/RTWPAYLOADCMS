@@ -46,11 +46,17 @@ export function StatisticsChart({
     }
   }, [selectedPeriodKey, employerId, initialPeriod])
 
-  // Calculate max value for scaling
+  // Chart area height in px (must match h-40 = 10rem = 160px) for reliable bar heights
+  const CHART_HEIGHT_PX = 160
+  // Calculate max value for scaling (ensure at least 1 so we don't divide by zero)
   const maxValue = Math.max(
     ...chartData.map((d) => Math.max(d.views, d.interviewed, d.declined)),
     1,
   )
+  const hasAnyData = chartData.some((d) => d.views > 0 || d.interviewed > 0 || d.declined > 0)
+  // Convert value to pixel bar height with minimum 4px so bars are always visible
+  const toBarHeight = (value: number) =>
+    maxValue > 0 ? Math.max(4, (value / maxValue) * CHART_HEIGHT_PX) : 4
 
   // Calculate stats for current period
   const totalViews = chartData.reduce((sum, d) => sum + d.views, 0)
@@ -152,48 +158,61 @@ export function StatisticsChart({
 
           {/* Chart */}
           <div className="flex h-40 items-end gap-2">
-            {/* Y-axis labels */}
-            <div className="flex h-full flex-col justify-between text-xs font-normal text-[#515151]">
-              <span>{Math.ceil(maxValue / 1000)}k</span>
-              <span>{Math.ceil((maxValue * 0.75) / 1000)}k</span>
-              <span>{Math.ceil((maxValue * 0.5) / 1000)}k</span>
-              <span>{Math.ceil((maxValue * 0.25) / 1000)}k</span>
+            {/* Y-axis labels - use whole numbers when maxValue < 1000 */}
+            <div className="flex h-full flex-shrink-0 flex-col justify-between text-xs font-normal text-[#515151]">
+              {maxValue >= 1000 ? (
+                <>
+                  <span>{Math.ceil(maxValue / 1000)}k</span>
+                  <span>{Math.ceil((maxValue * 0.75) / 1000)}k</span>
+                  <span>{Math.ceil((maxValue * 0.5) / 1000)}k</span>
+                  <span>{Math.ceil((maxValue * 0.25) / 1000)}k</span>
+                </>
+              ) : (
+                <>
+                  <span>{Math.ceil(maxValue)}</span>
+                  <span>{Math.ceil(maxValue * 0.75)}</span>
+                  <span>{Math.ceil(maxValue * 0.5)}</span>
+                  <span>{Math.ceil(maxValue * 0.25)}</span>
+                </>
+              )}
               <span>0</span>
             </div>
 
             {/* Chart bars */}
-            <div className="flex flex-1 items-end gap-1">
+            <div className="flex flex-1 items-end gap-1 min-w-0">
               {chartData.length > 0 ? (
-                chartData.map((data, index) => (
-                  <div key={index} className="flex flex-1 flex-col items-center gap-1">
-                    <div className="flex h-full w-full items-end justify-center gap-0.5">
-                      {/* Views line */}
+                chartData.map((data, index) => {
+                  const viewsH = toBarHeight(data.views)
+                  const interviewedH = toBarHeight(data.interviewed)
+                  const declinedH = toBarHeight(data.declined)
+                  return (
+                    <div key={index} className="flex min-w-0 flex-1 flex-col items-center gap-1">
                       <div
-                        className="w-1 rounded-t bg-[#4644b8]"
-                        style={{
-                          height: `${maxValue > 0 ? (data.views / maxValue) * 100 : 0}%`,
-                        }}
-                      />
-                      {/* Interviewed line */}
-                      <div
-                        className="w-1 rounded-t bg-[#6eabff]"
-                        style={{
-                          height: `${maxValue > 0 ? (data.interviewed / maxValue) * 100 : 0}%`,
-                        }}
-                      />
-                      {/* Declined line */}
-                      <div
-                        className="w-1 rounded-t bg-[#d8e530]"
-                        style={{
-                          height: `${maxValue > 0 ? (data.declined / maxValue) * 100 : 0}%`,
-                        }}
-                      />
+                        className="flex w-full min-w-0 items-end justify-center gap-1"
+                        style={{ height: CHART_HEIGHT_PX }}
+                      >
+                        {/* Views bar */}
+                        <div
+                          className="min-w-[6px] w-2 flex-shrink-0 rounded-t bg-[#4644b8] transition-all"
+                          style={{ height: viewsH }}
+                        />
+                        {/* Interviewed bar */}
+                        <div
+                          className="min-w-[6px] w-2 flex-shrink-0 rounded-t bg-[#6eabff] transition-all"
+                          style={{ height: interviewedH }}
+                        />
+                        {/* Declined bar */}
+                        <div
+                          className="min-w-[6px] w-2 flex-shrink-0 rounded-t bg-[#d8e530] transition-all"
+                          style={{ height: declinedH }}
+                        />
+                      </div>
+                      <span className="truncate text-xs font-normal text-[#a5a5a5] max-w-full">
+                        {formatDate(data.date)}
+                      </span>
                     </div>
-                    <span className="text-xs font-normal text-[#a5a5a5]">
-                      {formatDate(data.date)}
-                    </span>
-                  </div>
-                ))
+                  )
+                })
               ) : (
                 <div className="flex flex-1 items-center justify-center text-sm text-[#757575]">
                   {t('noDataAvailable')}

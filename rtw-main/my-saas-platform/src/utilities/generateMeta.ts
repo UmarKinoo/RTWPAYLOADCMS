@@ -26,8 +26,12 @@ export const generateMeta = async (args: {
 
   const ogImage = getImageURL(doc?.meta?.image)
 
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Ready to Work'
+  const suffix = ' | Ready to Work'
+  const rawTitle = doc?.meta?.title?.trim()
+  const title = rawTitle
+    ? rawTitle.endsWith(suffix)
+      ? rawTitle
+      : rawTitle + suffix
     : 'Ready to Work'
 
   return {

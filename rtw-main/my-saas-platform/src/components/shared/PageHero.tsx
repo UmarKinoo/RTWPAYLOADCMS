@@ -11,6 +11,8 @@ export interface PageHeroProps {
   imageAlt: string
   /** Hero title (can be string or ReactNode for translations) */
   title: React.ReactNode
+  /** Optional subtitle/description below the title */
+  description?: React.ReactNode
   /** Overlay color and opacity (e.g., "black/30", "black/40", "white/10") */
   overlayOpacity?: string
   /** Title text color */
@@ -44,6 +46,7 @@ export const PageHero: React.FC<PageHeroProps> = ({
   imageSrc,
   imageAlt,
   title,
+  description,
   overlayOpacity = 'black/30',
   titleColor = 'white',
   objectPosition = 'center',
@@ -85,6 +88,16 @@ export const PageHero: React.FC<PageHeroProps> = ({
         >
           {title}
         </h1>
+        {description && (
+          <p
+            className={cn(
+              'mt-4 sm:mt-5 max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed',
+              titleColor === 'white' ? 'text-white/95' : 'text-[#16252d]/90'
+            )}
+          >
+            {description}
+          </p>
+        )}
       </div>
     </section>
   )

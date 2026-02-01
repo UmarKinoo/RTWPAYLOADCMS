@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Link } from '@/i18n/routing'
 import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
-import { CandidatesHero, CandidatesFilter, FindCandidates, CandidateSearchBar } from '@/components/candidates'
+import { CandidatesHero, CandidatesFilter, FindCandidates, CandidateSearchBar, CandidatesPageContent } from '@/components/candidates'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
@@ -296,6 +296,7 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
       </HomepageSection>
 
       <FindCandidates />
+      <CandidatesPageContent />
       <Newsletter />
       <Footer />
     </div>

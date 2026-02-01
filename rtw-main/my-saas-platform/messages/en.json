@@ -192,8 +192,8 @@
       "subtitle": "Our platform connects you with top employers across various industries"
     },
     "uploadResume": {
-      "title": "Put Your CV In Front Of Great Employers",
-      "description": "Take the next step in your career with confidence. Share your CV and let top employers find you based on your skills, experience, and potential.",
+      "title": "Put Yourself Out There",
+      "description": "Want to get hired by the best and top companies in the world? We work with organisations looking for exactly the kind of talent you have. Connect today with them through Ready to Work.",
       "button": "Upload Your Resume"
     },
     "blog": {
@@ -232,7 +232,8 @@
       }
     },
     "newsletter": {
-      "title": "Subscribe to our Newsletter",
+      "title": "Ready to Work With the Right People?",
+      "description": "If you're looking to hire or find your next job, Ready to Work is here to help you step ahead with confidence. Begin shaping your future with a reliable Saudi recruitment agency that understands the modern Saudi workforce.",
       "emailLabel": "Email*",
       "emailPlaceholder": "Enter your email",
       "privacyText": "We care about your data, read our privacy policy.",
@@ -437,9 +438,16 @@
     "hero": {
       "title": "About Us"
     },
+    "aboutIntro": {
+      "title": "About Ready To Work - A Saudi Recruitment Portal",
+      "description": "Ready To Work is a Saudi recruitment portal built to connect ambition with opportunity around the Kingdom. The system is designed for real careers and top companies."
+    },
     "ourWork": {
-      "title": "Our Work",
-      "description": "We know that finding the right candidates is a complex and time-consuming task. Our solution integrates video technology, smart tools, efficient workflows, analytics, and collaborative feedback to streamline and optimize the hiring process.",
+      "title": "Who We Are",
+      "paragraph1": "We are more than just a bridge between employees and employers. It is a partner fulfilling your needs.",
+      "paragraph2": "Ready To Work was developed to make it easier for individuals to find employment in Saudi Arabia and for businesses to find qualified workers. To produce meaningful results, we integrate human insight with intelligent systems.",
+      "paragraph3": "We serve as a digital job search platform for candidates that goes beyond job postings. We serve as a talent-sourcing platform for employers, designed to streamline the hiring process and enhance decision-making.",
+      "paragraph4": "Our role is simple: To improve the fairness, speed, and clarity of the Saudi labour market.",
       "learnMore": "Learn more"
     },
     "howItWorks": {
@@ -465,8 +473,8 @@
     },
     "contact": {
       "label": "Contact us",
-      "title": "Need help? Contact us, and we'll respond soon.",
-      "description": "Reach out to us for any questions, support, or collaboration opportunities, we're always happy to assist!",
+      "title": "Your Next Opportunity Starts Here with Us",
+      "description": "Ready To Work is here to help you move forward. Need a candidate for your new role or switching up the company? The opportunity here is just to prepare.",
       "phone": "+966 53 969 6922",
       "email": "info@readytowork.sa",
       "form": {

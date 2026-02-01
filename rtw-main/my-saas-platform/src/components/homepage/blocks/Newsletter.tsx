@@ -67,11 +67,14 @@ export const Newsletter: React.FC = () => {
       <div className="bg-[rgba(175,183,255,0.5)] -mx-4 sm:-mx-6 md:-mx-8 lg:-mx-12 2xl:-mx-[95px] py-8 sm:py-10 md:py-12 lg:py-14">
         <div className="px-4 sm:px-6 md:px-8 lg:px-12 2xl:px-[95px]">
           <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 lg:gap-10">
-            {/* Heading */}
+            {/* Heading and description */}
             <div className="flex-1">
               <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold font-inter text-[#16252d] leading-tight">
                 {t('title')}
               </h2>
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base text-[#16252d]/85 leading-relaxed max-w-xl">
+                {t('description')}
+              </p>
             </div>
 
             {/* Email Input Section */}

@@ -103,8 +103,8 @@ async function createAboutPage() {
           type: 'none',
         },
         meta: {
-          title: 'About Us | Ready to Work',
-          description: 'Learn about Ready to Work - your trusted partner for connecting talented candidates with the right employers.',
+          title: 'Saudi Recruitment Portal | Talent Hiring & Jobs in KSA',
+          description: 'A Saudi recruitment portal connecting employers with verified talent and supporting candidates with genuine job opportunities across Saudi Arabia.',
         },
         layout: [
           {

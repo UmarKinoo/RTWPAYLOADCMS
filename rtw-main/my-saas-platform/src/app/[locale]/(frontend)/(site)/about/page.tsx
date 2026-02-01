@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
-import { AboutHero, OurWork, HowItWorks, ContactSection } from '@/components/about'
+import { AboutHero, AboutIntro, OurWork, HowItWorks, ContactSection } from '@/components/about'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -16,6 +16,7 @@ export default async function AboutPage() {
     <div className="min-h-screen bg-white overflow-x-hidden">
       <HomepageNavbarWrapper />
       <AboutHero />
+      <AboutIntro />
       <OurWork />
       <HowItWorks />
       <ContactSection />

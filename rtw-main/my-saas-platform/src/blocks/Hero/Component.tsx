@@ -90,7 +90,7 @@ export const HeroBlock: React.FC<HeroBlockProps> = ({
                 </div>
                 <button
                   type="button"
-                  className="bg-white rounded-[20px] p-4 flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="bg-white rounded-[20px] p-4 flex items-center justify-center hover:opacity-90 transition-opacity cursor-pointer"
                   aria-label="Search"
                 >
                   <svg
