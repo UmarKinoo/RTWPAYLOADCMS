@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
-import { ContactHero, ContactIntro, ContactForm } from '@/components/contact'
+import { ContactHero, ContactIntro, ContactInfoAndSocial, ContactForm } from '@/components/contact'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
 import { generateMeta } from '@/utilities/generateMeta'
@@ -17,6 +17,7 @@ export default async function ContactPage() {
       <HomepageNavbarWrapper />
       <ContactHero />
       <ContactIntro />
+      <ContactInfoAndSocial />
       <ContactForm />
       <Newsletter />
       <Footer />

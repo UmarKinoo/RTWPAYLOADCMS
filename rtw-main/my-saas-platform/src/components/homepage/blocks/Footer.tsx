@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from '@/i18n/routing'
 import Image from 'next/image'
 import { HomepageSection } from '../HomepageSection'
-import { Facebook, Instagram } from 'lucide-react'
+import { Facebook, Instagram, Linkedin } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
 // TikTok-only icon (single path, viewBox cropped from combined asset)
@@ -18,7 +18,7 @@ const TikTokIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 )
 
-// Social links – Instagram, TikTok, Facebook only (open in new tab)
+// Social links – Instagram, TikTok, Facebook, LinkedIn (open in new tab)
 const SOCIAL_LINKS = [
   { url: 'https://www.instagram.com/readytowork.sa/', ariaLabel: 'Instagram', Icon: Instagram },
   {
@@ -27,6 +27,7 @@ const SOCIAL_LINKS = [
     Icon: TikTokIcon,
   },
   { url: 'https://www.facebook.com/readytowork.saudi', ariaLabel: 'Facebook', Icon: Facebook },
+  { url: 'https://www.linkedin.com/company/ready-to-work-saudi-arabia', ariaLabel: 'LinkedIn', Icon: Linkedin },
 ] as const
 
 // Logo for dark background (light colored version)
