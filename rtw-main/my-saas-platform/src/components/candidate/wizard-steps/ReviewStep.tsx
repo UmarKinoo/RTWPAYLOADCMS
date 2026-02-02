@@ -19,9 +19,11 @@ interface ReviewStepProps {
 
 export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditStep }: ReviewStepProps) {
   const t = useTranslations('registration.legalStatements')
-  
+  const r = useTranslations('registration.review')
+  const tVisa = useTranslations('registration.locationVisa')
+
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Not provided'
+    if (!dateString) return r('notProvided')
     try {
       return new Date(dateString).toLocaleDateString()
     } catch {
@@ -30,17 +32,12 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
   }
 
   const getVisaStatusLabel = (status?: string) => {
-    const labels: Record<string, string> = {
-      active: 'Active',
-      expired: 'Expired',
-      nearly_expired: 'Nearly Expired',
-      none: 'None',
-    }
-    return labels[status || ''] || status || 'Not provided'
+    const key = status === 'active' ? 'active' : status === 'expired' ? 'expired' : status === 'nearly_expired' ? 'nearlyExpired' : status === 'none' ? 'noVisa' : null
+    return key ? tVisa(key) : (status || r('notProvided'))
   }
 
   const getGenderLabel = (gender?: string) => {
-    return gender === 'male' ? 'Male' : gender === 'female' ? 'Female' : 'Not provided'
+    return gender === 'male' ? r('male') : gender === 'female' ? r('female') : r('notProvided')
   }
 
   return (
@@ -51,9 +48,9 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             <FileCheck className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Please review your information</h3>
+            <h3 className="text-lg font-semibold">{r('reviewTitle')}</h3>
             <p className="text-sm text-muted-foreground">
-              Click Edit to modify any section
+              {r('reviewSubtitle')}
             </p>
           </div>
         </div>
@@ -66,7 +63,7 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
-                <h4 className="font-semibold">Account Information</h4>
+                <h4 className="font-semibold">{r('accountInfo')}</h4>
               </div>
               {onEditStep && (
                 <Button
@@ -77,15 +74,15 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
                   className="h-8"
                 >
                   <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  {r('edit')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Email:</span>
-                <span className="font-medium">{formValues.email || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('email')}</span>
+                <span className="font-medium">{formValues.email || r('notProvided')}</span>
               </div>
             </div>
           </CardContent>
@@ -97,7 +94,7 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-primary" />
-                <h4 className="font-semibold">Personal Information</h4>
+                <h4 className="font-semibold">{r('personalInfo')}</h4>
               </div>
               {onEditStep && (
                 <Button
@@ -108,45 +105,45 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
                   className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
                 >
                   <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  {r('edit')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">First Name:</span>
-                <span className="font-medium">{formValues.firstName || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('firstName')}</span>
+                <span className="font-medium">{formValues.firstName || r('notProvided')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Last Name:</span>
-                <span className="font-medium">{formValues.lastName || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('lastName')}</span>
+                <span className="font-medium">{formValues.lastName || r('notProvided')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Phone:</span>
-                <span dir="ltr" className="font-medium">{formValues.phone || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('phone')}</span>
+                <span dir="ltr" className="font-medium">{formValues.phone || r('notProvided')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">WhatsApp:</span>
+                <span className="text-muted-foreground">{r('whatsapp')}</span>
                 <span className="font-medium">
-                  <span dir="ltr">{sameAsPhone ? formValues.phone || 'Same as phone' : formValues.whatsapp || 'Not provided'}</span>
+                  <span dir="ltr">{sameAsPhone ? formValues.phone || r('sameAsPhone') : formValues.whatsapp || r('notProvided')}</span>
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Gender:</span>
+                <span className="text-muted-foreground">{r('gender')}</span>
                 <span className="font-medium">{getGenderLabel(formValues.gender)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Date of Birth:</span>
+                <span className="text-muted-foreground">{r('dateOfBirth')}</span>
                 <span className="font-medium">{formatDate(formValues.dob)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Nationality:</span>
-                <span className="font-medium">{formValues.nationality || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('nationality')}</span>
+                <span className="font-medium">{formValues.nationality || r('notProvided')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Languages:</span>
-                <span className="font-medium">{formValues.languages || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('languages')}</span>
+                <span className="font-medium">{formValues.languages || r('notProvided')}</span>
               </div>
             </div>
           </CardContent>
@@ -158,7 +155,7 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-primary" />
-                <h4 className="font-semibold">Job Role</h4>
+                <h4 className="font-semibold">{r('jobRole')}</h4>
               </div>
               {onEditStep && (
                 <Button
@@ -169,15 +166,15 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
                   className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
                 >
                   <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  {r('edit')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
             </div>
             <div className="text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Primary Skill:</span>
-                <span className="font-medium">{formValues.primarySkill ? 'Selected' : 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('primarySkill')}</span>
+                <span className="font-medium">{formValues.primarySkill ? r('selected') : r('notProvided')}</span>
               </div>
             </div>
           </CardContent>
@@ -189,7 +186,7 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-primary" />
-                <h4 className="font-semibold">Work Experience</h4>
+                <h4 className="font-semibold">{r('workExperience')}</h4>
               </div>
               {onEditStep && (
                 <Button
@@ -200,36 +197,36 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
                   className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
                 >
                   <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  {r('edit')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Job Title:</span>
-                <span className="font-medium">{formValues.jobTitle || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('jobTitle')}</span>
+                <span className="font-medium">{formValues.jobTitle || r('notProvided')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Experience:</span>
+                <span className="text-muted-foreground">{r('totalExperience')}</span>
                 <span className="font-medium">
-                  {formValues.experienceYears !== undefined ? `${formValues.experienceYears} years` : 'Not provided'}
+                  {formValues.experienceYears !== undefined ? `${formValues.experienceYears} ${r('years')}` : r('notProvided')}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Saudi Experience:</span>
+                <span className="text-muted-foreground">{r('saudiExperience')}</span>
                 <span className="font-medium">
                   {formValues.saudiExperience !== undefined
-                    ? `${formValues.saudiExperience} years`
-                    : 'Not provided'}
+                    ? `${formValues.saudiExperience} ${r('years')}`
+                    : r('notProvided')}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Current Employer:</span>
-                <span className="font-medium">{formValues.currentEmployer || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('currentEmployer')}</span>
+                <span className="font-medium">{formValues.currentEmployer || r('notProvided')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Availability Date:</span>
+                <span className="text-muted-foreground">{r('availabilityDate')}</span>
                 <span className="font-medium">{formatDate(formValues.availabilityDate)}</span>
               </div>
             </div>
@@ -242,7 +239,7 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                <h4 className="font-semibold">Location & Visa</h4>
+                <h4 className="font-semibold">{r('locationVisa')}</h4>
               </div>
               {onEditStep && (
                 <Button
@@ -253,31 +250,31 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
                   className="h-8 hover:bg-[#4644b8]/10 hover:text-[#4644b8] transition-colors duration-200"
                 >
                   <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  {r('edit')}
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Location:</span>
+                <span className="text-muted-foreground">{r('location')}</span>
                 <span className="font-medium">
                   {formValues.location
                     ? `${formValues.location}, Saudi Arabia`
-                    : 'Not provided'}
+                    : r('notProvided')}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Visa Status:</span>
+                <span className="text-muted-foreground">{r('visaStatus')}</span>
                 <span className="font-medium">{getVisaStatusLabel(formValues.visaStatus)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Visa Expiry:</span>
+                <span className="text-muted-foreground">{r('visaExpiry')}</span>
                 <span className="font-medium">{formatDate(formValues.visaExpiry)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Visa Profession:</span>
-                <span className="font-medium">{formValues.visaProfession || 'Not provided'}</span>
+                <span className="text-muted-foreground">{r('visaProfession')}</span>
+                <span className="font-medium">{formValues.visaProfession || r('notProvided')}</span>
               </div>
             </div>
           </CardContent>

@@ -89,6 +89,7 @@ export function PersonalInfoStep({
   const [showOtherLocation, setShowOtherLocation] = useState(false)
   const [locationSearchOpen, setLocationSearchOpen] = useState(false)
   const t = useTranslations('registration.location')
+  const p = useTranslations('registration.personalInfo')
   const [nationalitySearchOpen, setNationalitySearchOpen] = useState(false)
 
   // Get all countries for nationality
@@ -172,21 +173,21 @@ export function PersonalInfoStep({
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Field data-invalid={!!errors.firstName}>
-          <FieldLabel htmlFor="firstName">First Name *</FieldLabel>
+          <FieldLabel htmlFor="firstName">{p('firstName')}</FieldLabel>
           <Input
             id="firstName"
             {...register('firstName')}
-            placeholder="Enter your first name"
+            placeholder={p('placeholderFirstName')}
           />
           {errors.firstName && <FieldError>{errors.firstName.message}</FieldError>}
         </Field>
 
         <Field data-invalid={!!errors.lastName}>
-          <FieldLabel htmlFor="lastName">Last Name *</FieldLabel>
+          <FieldLabel htmlFor="lastName">{p('lastName')}</FieldLabel>
           <Input
             id="lastName"
             {...register('lastName')}
-            placeholder="Enter your last name"
+            placeholder={p('placeholderLastName')}
           />
           {errors.lastName && <FieldError>{errors.lastName.message}</FieldError>}
         </Field>
@@ -195,7 +196,7 @@ export function PersonalInfoStep({
       {/* Phone Number and WhatsApp - Same Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Field data-invalid={!!errors.phone}>
-          <FieldLabel htmlFor="phone">Phone Number *</FieldLabel>
+          <FieldLabel htmlFor="phone">{p('phoneNumber')}</FieldLabel>
           <Controller
             name="phone"
             control={control}
@@ -207,7 +208,7 @@ export function PersonalInfoStep({
                   countries={['SA']}
                   international
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="+966 ..."
+                  placeholder={p('placeholderPhone')}
                   onChange={(value) => {
                     field.onChange(value || '')
                     if (sameAsPhone && value) {
@@ -222,7 +223,7 @@ export function PersonalInfoStep({
         </Field>
 
         <Field data-invalid={!!errors.whatsapp}>
-          <FieldLabel htmlFor="whatsapp">WhatsApp Number</FieldLabel>
+          <FieldLabel htmlFor="whatsapp">{p('whatsappNumber')}</FieldLabel>
           <div className="space-y-2">
             <Controller
               name="whatsapp"
@@ -235,7 +236,7 @@ export function PersonalInfoStep({
                     countries={['SA']}
                     international
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="+966 ... (if different)"
+                    placeholder={p('placeholderWhatsAppDifferent')}
                     disabled={sameAsPhone}
                     onChange={(value) => field.onChange(value || '')}
                   />
@@ -257,7 +258,7 @@ export function PersonalInfoStep({
                 htmlFor="sameAsPhone"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
               >
-                Same as Phone
+                {p('sameAsPhone')}
               </label>
             </div>
           </div>
@@ -267,24 +268,24 @@ export function PersonalInfoStep({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Field data-invalid={!!errors.gender}>
-          <FieldLabel htmlFor="gender">Gender *</FieldLabel>
+          <FieldLabel htmlFor="gender">{p('gender')}</FieldLabel>
           <Controller
             name="gender"
             control={control}
             render={({ field }) => (
               <Select value={field.value} onValueChange={field.onChange}>
                 <SelectTrigger className="w-full h-10">
-                  <SelectValue placeholder="Select Gender" />
+                  <SelectValue placeholder={p('selectGender')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="male">
                     <span className="flex items-center gap-2">
-                      <span>👨</span> Male
+                      <span>👨</span> {p('male')}
                     </span>
                   </SelectItem>
                   <SelectItem value="female">
                     <span className="flex items-center gap-2">
-                      <span>👩</span> Female
+                      <span>👩</span> {p('female')}
                     </span>
                   </SelectItem>
                 </SelectContent>
@@ -295,7 +296,7 @@ export function PersonalInfoStep({
         </Field>
 
         <Field data-invalid={!!errors.dob}>
-          <FieldLabel htmlFor="dob">Date of Birth *</FieldLabel>
+          <FieldLabel htmlFor="dob">{p('dateOfBirth')}</FieldLabel>
           <Input
             id="dob"
             type="date"
@@ -309,7 +310,7 @@ export function PersonalInfoStep({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Field data-invalid={!!errors.nationality}>
-          <FieldLabel htmlFor="nationality">Nationality *</FieldLabel>
+          <FieldLabel htmlFor="nationality">{p('nationality')}</FieldLabel>
           <Controller
             name="nationality"
             control={control}
@@ -335,16 +336,16 @@ export function PersonalInfoStep({
                             <span className="truncate">{selectedCountry.name}</span>
                           </>
                         ) : (
-                          <span className="text-muted-foreground">Select nationality</span>
+                          <span className="text-muted-foreground">{p('selectNationality')}</span>
                         )}
                       </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0" align="start">
                     <Command>
-                      <CommandInput placeholder="Search country..." />
+                      <CommandInput placeholder={p('searchCountry')} />
                       <CommandList>
-                        <CommandEmpty>No country found.</CommandEmpty>
+                        <CommandEmpty>{p('noCountryFound')}</CommandEmpty>
                         <CommandGroup>
                           {countries.map((country) => {
                             const flag = getCountryFlag(country.isoCode)
@@ -378,11 +379,11 @@ export function PersonalInfoStep({
         </Field>
 
         <Field data-invalid={!!errors.languages}>
-          <FieldLabel htmlFor="languages">Languages *</FieldLabel>
+          <FieldLabel htmlFor="languages">{p('languages')}</FieldLabel>
           <Input
             id="languages"
             {...register('languages')}
-            placeholder="Languages speaking/reading and writing"
+            placeholder={p('placeholderLanguages')}
           />
           {errors.languages && <FieldError>{errors.languages.message}</FieldError>}
         </Field>
