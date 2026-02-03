@@ -35,7 +35,7 @@ export const Hero: React.FC<HeroProps> = ({ showSmartSearch = false }) => {
   return (
     <HomepageSection className="pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-8 sm:pb-12 md:pb-16">
       {/* Content container */}
-      <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[550px] flex items-center">
+      <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[550px] min-[1470px]:min-h-[680px] flex items-center">
         {/* Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0">
