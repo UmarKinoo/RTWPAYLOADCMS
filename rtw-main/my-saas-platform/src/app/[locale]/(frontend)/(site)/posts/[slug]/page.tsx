@@ -166,15 +166,15 @@ export default async function PostPage({ params: paramsPromise }: Args) {
       <HomepageNavbar />
 
       {/* Full-Width Hero Image */}
-      <section className="relative w-full h-[50vh] min-h-[400px] max-h-[600px] overflow-hidden">
+      <section className="relative w-full h-[58vh] min-h-[440px] max-h-[680px] overflow-hidden">
         <div className="absolute inset-0">
           <ImageWithSkeleton
             src={heroImage}
             alt={post.title}
             fill
             objectFit="cover"
+            objectPosition="top"
             priority
-            className="object-center"
           />
         </div>
       </section>
