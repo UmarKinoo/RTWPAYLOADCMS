@@ -21,34 +21,42 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
 
 export const generateMeta = async (args: {
   doc: Partial<Page> | Partial<Post> | { meta?: { title?: string; description?: string; image?: Media | Config['db']['defaultIDType'] | null } } | null
+  /** Path including locale for canonical and og:url (e.g. "en/about"). Required for correct SEO with locales. */
+  path?: string
+  /** Fallback title and description when doc is null (e.g. for static pages without CMS page). */
+  fallback?: { title: string; description: string }
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { doc, path: pathWithLocale, fallback } = args
+  const baseUrl = getServerSideURL().replace(/\/$/, '')
+  const canonicalUrl = pathWithLocale ? `${baseUrl}/${pathWithLocale}` : undefined
 
   const ogImage = getImageURL(doc?.meta?.image)
 
   const suffix = ' | Ready to Work'
-  const rawTitle = doc?.meta?.title?.trim()
+  const rawTitle = doc?.meta?.title?.trim() ?? fallback?.title?.trim()
   const title = rawTitle
     ? rawTitle.endsWith(suffix)
       ? rawTitle
       : rawTitle + suffix
     : 'Ready to Work'
 
-  return {
-    metadataBase: new URL(getServerSideURL()),
-    description: doc?.meta?.description,
-    openGraph: mergeOpenGraph({
-      description: doc?.meta?.description || '',
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-            },
-          ]
-        : undefined,
-      title,
-      url: Array.isArray((doc as any)?.slug) ? (doc as any).slug.join('/') : '/',
-    }),
+  const description = doc?.meta?.description?.trim() ?? fallback?.description?.trim() ?? undefined
+
+  // Next.js 15: setting openGraph.url or openGraph.type in page-level metadata can cause
+  // <title> and meta tags to render in the body instead of <head>. We omit both here;
+  // alternates.canonical is enough for SEO when path is provided.
+  const mergedOg = mergeOpenGraph({
+    description: description ?? '',
+    images: ogImage ? [{ url: ogImage }] : undefined,
     title,
+  })
+  const { type: _ogType, url: _ogUrl, ...openGraphSafe } = mergedOg
+
+  return {
+    metadataBase: new URL(baseUrl),
+    description,
+    title,
+    alternates: canonicalUrl ? { canonical: canonicalUrl } : undefined,
+    openGraph: openGraphSafe,
   }
 }
