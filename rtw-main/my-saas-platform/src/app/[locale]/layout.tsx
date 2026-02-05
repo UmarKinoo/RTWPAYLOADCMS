@@ -48,10 +48,9 @@ export const metadata: Metadata = {
       { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '180x180', type: 'image/png' },
     ],
   },
+  // Omit openGraph.url and openGraph.type to avoid Next.js 15 putting <title>/meta in body
   openGraph: {
-    type: 'website',
     locale: 'en_US',
-    url: getServerSideURL(),
     siteName: 'Ready to Work',
     title: 'Ready to Work',
     description: 'Connect with talented candidates and find the right talent for your team.',
