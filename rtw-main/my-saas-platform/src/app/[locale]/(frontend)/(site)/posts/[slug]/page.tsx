@@ -11,6 +11,7 @@ import { Footer } from '@/components/homepage/blocks/Footer'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
 import { ImageWithSkeleton } from '@/components/homepage/ImageWithSkeleton'
 import RichText from '@/components/RichText'
+import { getLocale } from 'next-intl/server'
 import { generateMeta } from '@/utilities/generateMeta'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -90,7 +91,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     }
   }
 
-  return generateMeta({ doc: post })
+  const locale = await getLocale()
+  return generateMeta({ doc: post, path: `${locale}/posts/${slug}` })
 }
 
 // ============================================================================

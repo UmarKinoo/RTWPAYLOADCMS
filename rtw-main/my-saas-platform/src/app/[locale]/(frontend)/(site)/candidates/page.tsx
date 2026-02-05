@@ -23,18 +23,18 @@ import { getCurrentUserType } from '@/lib/currentUserType'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { X } from 'lucide-react'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
+import { generateMeta } from '@/utilities/generateMeta'
+import { getPageBySlug } from '@/utilities/getPageBySlug'
 
 // ============================================================================
 // Metadata
 // ============================================================================
 
-import { generateMeta } from '@/utilities/generateMeta'
-import { getPageBySlug } from '@/utilities/getPageBySlug'
-
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
   const candidatesPage = await getPageBySlug('candidates')
-  return generateMeta({ doc: candidatesPage })
+  return generateMeta({ doc: candidatesPage, path: `${locale}/candidates` })
 }
 
 // ============================================================================

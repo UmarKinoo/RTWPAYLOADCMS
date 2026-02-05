@@ -16,7 +16,7 @@ import { getCurrentUserType } from '@/lib/currentUserType'
 import { cn } from '@/lib/utils'
 import { getServerSideURL } from '@/utilities/getURL'
 import { Button } from '@/components/ui/button'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 
 // ============================================================================
 // Types
@@ -54,11 +54,14 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   }
 
   const fullName = `${candidate.firstName} ${candidate.lastName}`
+  const locale = await getLocale()
+  const baseUrl = getServerSideURL().replace(/\/$/, '')
 
   return {
-    metadataBase: new URL(getServerSideURL()),
+    metadataBase: new URL(baseUrl),
     title: `${fullName} – ${candidate.jobTitle} | Ready to Work`,
     description: `View ${fullName}'s profile. ${candidate.jobTitle} with ${formatExperience(candidate.experienceYears)} experience in ${candidate.location}.`,
+    alternates: { canonical: `${baseUrl}/${locale}/candidates/${id}` },
   }
 }
 

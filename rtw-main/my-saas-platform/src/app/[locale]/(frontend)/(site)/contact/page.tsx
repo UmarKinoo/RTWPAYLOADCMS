@@ -3,12 +3,14 @@ import { HomepageNavbarWrapper } from '@/components/homepage/NavbarWrapper'
 import { ContactHero, ContactIntro, ContactInfoAndSocial, ContactForm } from '@/components/contact'
 import { Newsletter } from '@/components/homepage/blocks/Newsletter'
 import { Footer } from '@/components/homepage/blocks/Footer'
+import { getLocale } from 'next-intl/server'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPageBySlug } from '@/utilities/getPageBySlug'
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
   const contactPage = await getPageBySlug('contact')
-  return generateMeta({ doc: contactPage })
+  return generateMeta({ doc: contactPage, path: `${locale}/contact` })
 }
 
 export default async function ContactPage() {

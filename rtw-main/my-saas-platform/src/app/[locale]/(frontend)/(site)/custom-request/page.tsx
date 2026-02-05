@@ -4,12 +4,14 @@ import { Footer } from '@/components/homepage/blocks/Footer'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
+import { getLocale } from 'next-intl/server'
 import { generateMeta } from '@/utilities/generateMeta'
 import { getPageBySlug } from '@/utilities/getPageBySlug'
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
   const customRequestPage = await getPageBySlug('custom-request')
-  return generateMeta({ doc: customRequestPage })
+  return generateMeta({ doc: customRequestPage, path: `${locale}/custom-request` })
 }
 
 export default async function CustomRequestPage() {

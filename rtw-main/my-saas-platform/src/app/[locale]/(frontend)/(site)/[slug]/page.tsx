@@ -8,6 +8,7 @@ import React, { cache } from 'react'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
+import { getLocale } from 'next-intl/server'
 import { generateMeta } from '@/utilities/generateMeta'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -92,7 +93,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     slug: decodedSlug,
   })
 
-  return generateMeta({ doc: page })
+  const locale = await getLocale()
+  return generateMeta({ doc: page, path: `${locale}/${decodedSlug}` })
 }
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
