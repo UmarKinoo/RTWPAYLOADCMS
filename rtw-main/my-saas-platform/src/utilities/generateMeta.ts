@@ -50,7 +50,13 @@ export const generateMeta = async (args: {
     images: ogImage ? [{ url: ogImage }] : undefined,
     title,
   })
-  const { type: _ogType, url: _ogUrl, ...openGraphSafe } = mergedOg
+  let openGraphSafe: Metadata['openGraph'] = mergedOg ?? undefined
+  if (mergedOg != null && typeof mergedOg === 'object' && !Array.isArray(mergedOg)) {
+    const copy = { ...mergedOg }
+    delete (copy as Record<string, unknown>).type
+    delete (copy as Record<string, unknown>).url
+    openGraphSafe = copy as Metadata['openGraph']
+  }
 
   return {
     metadataBase: new URL(baseUrl),
