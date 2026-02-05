@@ -25,6 +25,10 @@ const nextConfig = {
   // Your Next.js config here
   output: 'standalone', // Required for Docker deployment
 
+  // Treat all user agents as HTML-limited so metadata (title, canonical) is always in <head>,
+  // not streamed into <body>. Fixes inconsistent title/canonical placement (Next.js 15 streaming metadata).
+  htmlLimitedBots: /.*/,
+
   images: {
     remotePatterns,
     // Enable image optimization and caching
