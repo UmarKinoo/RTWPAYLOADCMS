@@ -28,8 +28,8 @@ const cairo = Cairo({
 })
 
 export const metadata: Metadata = {
-  title: 'Ready to Work',
-  description: 'Connect with talented candidates and find the right talent for your team. Ready to Work - Your trusted partner for hiring.',
+  // Do not set title/description here. Each page sets them via generateMetadata so
+  // Next.js puts <title> and <link rel="canonical"> in <head> reliably.
   metadataBase: new URL(getServerSideURL()),
   verification: {
     google: 'google80006dce542d45d5',
@@ -48,18 +48,8 @@ export const metadata: Metadata = {
       { url: '/assets/RTW-Logo-VF-Icon-01.png', sizes: '180x180', type: 'image/png' },
     ],
   },
-  // Omit openGraph.url and openGraph.type to avoid Next.js 15 putting <title>/meta in body
-  openGraph: {
-    locale: 'en_US',
-    siteName: 'Ready to Work',
-    title: 'Ready to Work',
-    description: 'Connect with talented candidates and find the right talent for your team.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Ready to Work',
-    description: 'Connect with talented candidates and find the right talent for your team.',
-  },
+  // No openGraph/twitter here: Next.js 15 can put <title> and <link canonical> in body when
+  // layout + page metadata are merged with og/twitter. Each page sets its own via generateMetadata.
 }
 
 export function generateStaticParams() {
