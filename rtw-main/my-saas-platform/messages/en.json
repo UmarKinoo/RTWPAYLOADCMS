@@ -450,6 +450,8 @@
       "toasts": {
         "creditsAdded": "Credits Added!",
         "creditsAddedDescription": "You now have {interviewCredits} interview credits and {contactCredits} contact unlock credits.",
+        "paymentSuccessDescription": "Your payment was successful. Credits have been added to your account.",
+        "paymentFailedDescription": "Payment could not be completed. Please try again.",
         "purchaseFailed": "Purchase Failed",
         "purchaseFailedDescription": "Please try again.",
         "purchaseFailedError": "An unexpected error occurred. Please try again."

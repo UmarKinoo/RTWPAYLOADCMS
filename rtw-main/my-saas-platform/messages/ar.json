@@ -450,6 +450,8 @@
       "toasts": {
         "creditsAdded": "تمت إضافة الرصيد!",
         "creditsAddedDescription": "لديك الآن {interviewCredits} رصيد مقابلة و {contactCredits} رصيد فتح جهة الاتصال.",
+        "paymentSuccessDescription": "تم الدفع بنجاح. تمت إضافة الرصيد إلى حسابك.",
+        "paymentFailedDescription": "تعذر إتمام الدفع. يرجى المحاولة مرة أخرى.",
         "purchaseFailed": "فشل الشراء",
         "purchaseFailedDescription": "يرجى المحاولة مرة أخرى.",
         "purchaseFailedError": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."

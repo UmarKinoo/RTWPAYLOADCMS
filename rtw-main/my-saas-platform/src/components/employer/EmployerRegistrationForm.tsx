@@ -280,9 +280,9 @@ export const EmployerRegistrationForm: React.FC = () => {
 
       {/* Title and Description */}
       <div className="text-center mb-6 sm:mb-8">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#16252d] mb-3 sm:mb-4 leading-tight">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#16252d] mb-3 sm:mb-4 leading-tight">
           {t('title')}
-        </h2>
+        </h1>
         <p className="text-sm sm:text-base text-[#a5a5a5] leading-relaxed px-2">
           {t('description')}
         </p>

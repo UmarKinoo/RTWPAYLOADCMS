@@ -62,6 +62,14 @@ const nextConfig = {
     return config
   },
 
+  // 301 redirects (permanent)
+  async redirects() {
+    return [
+      { source: '/en/learn-more', destination: '/en', permanent: true },
+      { source: '/ar/learn-more', destination: '/ar', permanent: true },
+    ]
+  },
+
   // Security headers
   async headers() {
     return [

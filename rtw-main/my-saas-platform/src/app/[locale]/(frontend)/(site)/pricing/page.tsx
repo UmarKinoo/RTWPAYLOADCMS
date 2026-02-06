@@ -15,16 +15,24 @@ export async function generateMetadata(): Promise<Metadata> {
   return generateMeta({ doc: pricingPage, path: `${locale}/pricing` })
 }
 
-export default async function PricingPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function PricingPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ payment?: string }>
+}) {
   const { locale } = await params
+  const { payment: paymentResult } = await searchParams
   const plans = await getPlans(locale)
+  const usePaymentGateway = !!(process.env.MYFATOORAH_TOKEN?.trim?.())
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       <HomepageNavbarWrapper />
       <PricingHero />
       <PricingIntro />
-      <PricingCards plans={plans} />
+      <PricingCards plans={plans} usePaymentGateway={usePaymentGateway} paymentResult={paymentResult} />
       <FAQ />
       <Newsletter />
       <Footer />

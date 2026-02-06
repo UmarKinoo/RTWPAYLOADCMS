@@ -21,24 +21,13 @@ export default function EmployerRegisterPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 md:gap-8 lg:gap-12 items-start">
             {/* Left Side - Image (hidden on mobile, shown on desktop) */}
             <div className="hidden lg:block relative w-full">
-              <div className="relative w-full aspect-[3/4] lg:aspect-[4/5] rounded-2xl overflow-hidden shadow-xl">
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    maskImage: `url('/assets/9067d496e1f10f37d480e3dc99e0dd3a6af0fb6c.svg')`,
-                    WebkitMaskImage: `url('/assets/9067d496e1f10f37d480e3dc99e0dd3a6af0fb6c.svg')`,
-                    maskSize: 'contain',
-                    maskPosition: 'center',
-                    maskRepeat: 'no-repeat',
-                  }}
-                >
-                  <ImageWithSkeleton
-                    src="/assets/1c9081eb8a1bf7184d09a0304d1ffbda9a8d0678.webp"
-                    alt="Professional business person"
-                    fill
-                    objectFit="cover"
-                  />
-                </div>
+              <div className="relative w-full aspect-[3/4] lg:aspect-[4/5] overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5">
+                <ImageWithSkeleton
+                  src="/assets/1c9081eb8a1bf7184d09a0304d1ffbda9a8d0678.webp"
+                  alt="Professional business person"
+                  fill
+                  objectFit="cover"
+                />
               </div>
             </div>
 

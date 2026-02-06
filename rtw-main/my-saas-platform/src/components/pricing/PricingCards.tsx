@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from '@/i18n/routing'
 import { HomepageSection } from '../homepage/HomepageSection'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -9,12 +9,14 @@ import { Badge } from '@/components/ui/badge'
 import { CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { mockPurchase } from '@/lib/purchases'
+import { mockPurchase, startPayment } from '@/lib/purchases'
 import { useTranslations } from 'next-intl'
 import type { Plan } from '@/lib/payload/plans'
 
 interface PricingCardsProps {
   plans: Plan[]
+  usePaymentGateway?: boolean
+  paymentResult?: string | null
 }
 
 const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Promise<void> }> = ({
@@ -138,14 +140,41 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
   )
 }
 
-export const PricingCards: React.FC<PricingCardsProps> = ({ plans }) => {
+export const PricingCards: React.FC<PricingCardsProps> = ({
+  plans,
+  usePaymentGateway = false,
+  paymentResult,
+}) => {
   const router = useRouter()
   const t = useTranslations('pricing.cards')
 
+  useEffect(() => {
+    if (paymentResult === 'success') {
+      toast.success(t('toasts.creditsAdded'), {
+        description: t('toasts.paymentSuccessDescription'),
+      })
+    } else if (paymentResult === 'failed' || paymentResult === 'error') {
+      toast.error(t('toasts.purchaseFailed'), {
+        description: t('toasts.paymentFailedDescription'),
+      })
+    }
+  }, [paymentResult, t])
+
   const handlePurchase = async (planSlug: string) => {
     try {
-      const result = await mockPurchase(planSlug)
+      if (usePaymentGateway) {
+        const result = await startPayment(planSlug)
+        if (result.success && result.paymentUrl) {
+          window.location.href = result.paymentUrl
+          return
+        }
+        toast.error(t('toasts.purchaseFailed'), {
+          description: result.error || t('toasts.purchaseFailedDescription'),
+        })
+        return
+      }
 
+      const result = await mockPurchase(planSlug)
       if (result.success) {
         toast.success(t('toasts.creditsAdded'), {
           description: t('toasts.creditsAddedDescription', {
@@ -153,7 +182,6 @@ export const PricingCards: React.FC<PricingCardsProps> = ({ plans }) => {
             contactCredits: result.wallet?.contactUnlockCredits || 0,
           }),
         })
-        // Redirect to candidates page
         router.push('/candidates')
       } else {
         toast.error(t('toasts.purchaseFailed'), {

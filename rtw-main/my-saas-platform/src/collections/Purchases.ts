@@ -36,13 +36,22 @@ export const Purchases: CollectionConfig = {
       name: 'status',
       type: 'select',
       options: [
+        { label: 'Pending', value: 'pending' },
         { label: 'Active', value: 'active' },
         { label: 'Cancelled', value: 'cancelled' },
+        { label: 'Failed', value: 'failed' },
       ],
       defaultValue: 'active',
       required: true,
       admin: {
         description: 'Purchase status',
+      },
+    },
+    {
+      name: 'paymentGatewayId',
+      type: 'text',
+      admin: {
+        description: 'MyFatoorah InvoiceId or payment reference for callback matching',
       },
     },
     {
@@ -70,6 +79,7 @@ export const Purchases: CollectionConfig = {
       name: 'source',
       type: 'select',
       options: [
+        { label: 'MyFatoorah', value: 'myfatoorah' },
         { label: 'Mock Checkout', value: 'mock_checkout' },
         { label: 'Admin', value: 'admin' },
       ],
