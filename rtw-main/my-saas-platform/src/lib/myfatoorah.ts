@@ -50,15 +50,8 @@ export async function sendPayment(
     NotificationOption: 'LNK',
     ...payload,
   }
-  // Log request (no token/PII) to debug prod 500s
-  console.error('[MyFatoorah SendPayment] request', {
-    apiBase: baseUrl,
-    CallBackUrl: payload.CallBackUrl,
-    ErrorUrl: payload.ErrorUrl,
-    InvoiceValue: payload.InvoiceValue,
-    DisplayCurrencyIso: payload.DisplayCurrencyIso,
-    CustomerReference: payload.CustomerReference,
-  })
+  // Log full payload we send (no token) so runtime log shows exactly what MyFatoorah receives
+  console.error('[MyFatoorah SendPayment] request body', JSON.stringify(body, null, 2))
   const res = await fetch(url, {
     method: 'POST',
     headers: {
