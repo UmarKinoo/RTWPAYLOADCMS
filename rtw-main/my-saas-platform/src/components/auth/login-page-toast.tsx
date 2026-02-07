@@ -34,6 +34,11 @@ export function LoginPageToast({ success, error }: LoginPageToastProps) {
             description: t('loggedOutDescription'),
           })
           break
+        case 'inactive':
+          toast.info(t('loggedOutInactive'), {
+            description: t('loggedOutInactiveDescription'),
+          })
+          break
         case 'invalid-verification-link':
           toast.error('Invalid Verification Link', {
             description: 'The verification link is invalid. Please try again.',

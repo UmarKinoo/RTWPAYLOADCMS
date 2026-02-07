@@ -34,7 +34,9 @@
     "pleaseTryAgainLater": "يرجى المحاولة مرة أخرى لاحقًا",
     "somethingWentWrong": "حدث خطأ ما",
     "loggedOut": "تم تسجيل خروجك",
-    "loggedOutDescription": "يرجى تسجيل الدخول مرة أخرى للمتابعة."
+    "loggedOutDescription": "يرجى تسجيل الدخول مرة أخرى للمتابعة.",
+    "loggedOutInactive": "تم تسجيل الخروج بسبب عدم النشاط",
+    "loggedOutInactiveDescription": "تم تسجيل خروجك بعد فترة من عدم النشاط. يرجى تسجيل الدخول مرة أخرى."
   },
   "registration": {
     "title": "تسجيل المرشح",

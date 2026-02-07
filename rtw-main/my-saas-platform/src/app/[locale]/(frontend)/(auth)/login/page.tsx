@@ -1,9 +1,7 @@
 import { LoginPageClient } from '@/components/auth/login-page-client'
 
-import { getUser } from '@/lib/auth'
+import { getCurrentUserType } from '@/lib/currentUserType'
 import { redirect } from 'next/navigation'
-
-import type { User } from '@/payload-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,10 +13,13 @@ export default async function LoginPage({
   searchParams: Promise<{ success?: string; error?: string; collection?: string }>
 }) {
   const { locale } = await params
-  const user: User | null = await getUser({ onLoginPage: true })
+  // Use same gate as (admin) layout so we only redirect when user would pass dashboard auth (avoids redirect loop)
+  const userType = await getCurrentUserType({ onLoginPage: true })
 
-  if (user) {
-    redirect(`/${locale}/dashboard`)
+  if (userType) {
+    const dashboardPath =
+      userType.kind === 'employer' ? `/${locale}/employer/dashboard` : `/${locale}/dashboard`
+    redirect(dashboardPath)
   }
 
   const searchParamsResolved = await searchParams

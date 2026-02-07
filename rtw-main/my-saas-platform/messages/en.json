@@ -34,7 +34,9 @@
     "pleaseTryAgainLater": "Please try again later",
     "somethingWentWrong": "Something went wrong",
     "loggedOut": "You've been logged out",
-    "loggedOutDescription": "Please log in again to continue."
+    "loggedOutDescription": "Please log in again to continue.",
+    "loggedOutInactive": "Logged out due to inactivity",
+    "loggedOutInactiveDescription": "You were signed out after a period of inactivity. Please log in again."
   },
   "registration": {
     "title": "Candidate Registration",

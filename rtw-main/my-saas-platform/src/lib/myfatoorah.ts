@@ -63,11 +63,17 @@ export async function sendPayment(
     const validationMsg =
       data.ValidationErrors?.map((e) => `${e.Name}: ${e.Error}`).join('; ') || ''
     const message = [data.Message, validationMsg].filter(Boolean).join(' ') || `MyFatoorah SendPayment failed: ${res.status}`
+    console.error('[MyFatoorah SendPayment]', res.status, { Message: data.Message, ValidationErrors: data.ValidationErrors })
     throw new Error(message)
   }
   if (!data.IsSuccess && data.ValidationErrors?.length) {
     const validationMsg = data.ValidationErrors.map((e) => `${e.Name}: ${e.Error}`).join('; ')
+    console.error('[MyFatoorah SendPayment] IsSuccess=false', { Message: data.Message, ValidationErrors: data.ValidationErrors })
     throw new Error(data.Message ? `${data.Message} ${validationMsg}` : validationMsg)
+  }
+  if (!data.IsSuccess) {
+    console.error('[MyFatoorah SendPayment] IsSuccess=false, no ValidationErrors', { Message: data.Message, data })
+    throw new Error(data.Message || 'MyFatoorah SendPayment failed.')
   }
   return data
 }

@@ -14,11 +14,18 @@ export type CurrentUserType =
   | { kind: 'employer'; user: User; employer: Employer }
   | { kind: 'unknown'; user: User }
 
+export type GetCurrentUserTypeOptions = {
+  /** When true, invalid session returns null instead of redirecting (use on login page to avoid redirect loop) */
+  onLoginPage?: boolean
+}
+
 /**
  * Get the current user type by checking if user is admin, or has candidate/employer profile
- * @returns CurrentUserType or null if no user is authenticated
+ * @param options.onLoginPage - When true, invalid session returns null instead of redirecting to clear-session
+ * @returns CurrentUserType or null if no user is authenticated (or session invalid when onLoginPage)
  */
-export async function getCurrentUserType(): Promise<CurrentUserType | null> {
+export async function getCurrentUserType(options?: GetCurrentUserTypeOptions): Promise<CurrentUserType | null> {
+  const onLoginPage = options?.onLoginPage === true
   try {
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
@@ -66,6 +73,7 @@ export async function getCurrentUserType(): Promise<CurrentUserType | null> {
       }
     }
     if (!sessionValid) {
+      if (onLoginPage) return null
       if (process.env.NODE_ENV === 'development') {
         console.log('[getCurrentUserType] Session invalid (rtw-sid !== DB.sessionId), redirecting to clear-session')
       }
