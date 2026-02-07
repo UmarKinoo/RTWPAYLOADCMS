@@ -44,11 +44,21 @@ export async function sendPayment(
     throw new Error('MYFATOORAH_TOKEN is not set')
   }
   const token = rawToken.trim()
-  const url = `${getBaseUrl().replace(/\/$/, '')}/v2/SendPayment`
+  const baseUrl = getBaseUrl().replace(/\/$/, '')
+  const url = `${baseUrl}/v2/SendPayment`
   const body = {
     NotificationOption: 'LNK',
     ...payload,
   }
+  // Log request (no token/PII) to debug prod 500s
+  console.error('[MyFatoorah SendPayment] request', {
+    apiBase: baseUrl,
+    CallBackUrl: payload.CallBackUrl,
+    ErrorUrl: payload.ErrorUrl,
+    InvoiceValue: payload.InvoiceValue,
+    DisplayCurrencyIso: payload.DisplayCurrencyIso,
+    CustomerReference: payload.CustomerReference,
+  })
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -58,12 +68,22 @@ export async function sendPayment(
     },
     body: JSON.stringify(body),
   })
-  const data = (await res.json()) as SendPaymentResponse
+  const rawText = await res.text()
+  let data: SendPaymentResponse
+  try {
+    data = JSON.parse(rawText) as SendPaymentResponse
+  } catch {
+    console.error('[MyFatoorah SendPayment] non-JSON response', res.status, rawText?.slice(0, 500))
+    throw new Error(`MyFatoorah returned invalid response: ${res.status}`)
+  }
   if (!res.ok) {
     const validationMsg =
       data.ValidationErrors?.map((e) => `${e.Name}: ${e.Error}`).join('; ') || ''
     const message = [data.Message, validationMsg].filter(Boolean).join(' ') || `MyFatoorah SendPayment failed: ${res.status}`
-    console.error('[MyFatoorah SendPayment]', res.status, { Message: data.Message, ValidationErrors: data.ValidationErrors })
+    console.error('[MyFatoorah SendPayment]', res.status, { Message: data.Message, ValidationErrors: data.ValidationErrors, fullBody: data })
+    if (res.status === 500) {
+      console.error('[MyFatoorah SendPayment] 500 tip: use MYFATOORAH_API_URL=https://api.myfatoorah.com for live token; whitelist CallBackUrl/ErrorUrl in MyFatoorah dashboard')
+    }
     throw new Error(message)
   }
   if (!data.IsSuccess && data.ValidationErrors?.length) {
