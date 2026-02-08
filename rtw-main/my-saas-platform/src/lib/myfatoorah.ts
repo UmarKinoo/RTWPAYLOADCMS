@@ -92,13 +92,14 @@ export async function sendPayment(
 }
 
 export interface GetPaymentStatusRequest {
-  KeyType: 'PaymentId' | 'InvoiceId'
+  KeyType: 'PaymentId' | 'InvoiceId' | 'CustomerReference'
   Key: string
 }
 
 export interface GetPaymentStatusResponse {
   IsSuccess: boolean
   Message?: string
+  ValidationErrors?: Array<{ Name: string; Error: string }> | null
   Data?: {
     InvoiceId: number
     InvoiceStatus: string
@@ -114,22 +115,27 @@ export interface GetPaymentStatusResponse {
 export async function getPaymentStatus(
   params: GetPaymentStatusRequest,
 ): Promise<GetPaymentStatusResponse> {
-  const token = getToken()
-  if (!token) {
+  const rawToken = getToken()
+  if (!rawToken) {
     throw new Error('MYFATOORAH_TOKEN is not set')
   }
-  const url = `${getBaseUrl().replace(/\/$/, '')}/v2/getPaymentStatus`
+  const token = rawToken.trim()
+  const url = `${getBaseUrl().replace(/\/$/, '')}/v2/GetPaymentStatus`
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify(params),
   })
   const data = (await res.json()) as GetPaymentStatusResponse
   if (!res.ok) {
-    throw new Error(data.Message || `MyFatoorah getPaymentStatus failed: ${res.status}`)
+    const validationMsg =
+      data.ValidationErrors?.map((e) => `${e.Name}: ${e.Error}`).join('; ') || ''
+    const message = [data.Message, validationMsg].filter(Boolean).join(' ') || `MyFatoorah GetPaymentStatus failed: ${res.status}`
+    throw new Error(message)
   }
   return data
 }
