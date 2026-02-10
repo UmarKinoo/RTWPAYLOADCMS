@@ -152,7 +152,7 @@ function EmployerNavActions({ employer, ctx }: Readonly<{ employer: Employer; ct
   const theme = NAV_THEMES.employer
   const header = (
     <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-200">
-      <AvatarCircle name={name} size="md" />
+      <AvatarCircle name={name} initialsFrom={employer.responsiblePerson || name} size="md" />
       <div className="flex flex-col min-w-0 flex-1">
         <p className="text-base font-semibold text-[#16252d] truncate">{name}</p>
         {employer.email && <p className="text-xs text-gray-500 truncate mt-0.5">{employer.email}</p>}

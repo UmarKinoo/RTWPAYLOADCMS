@@ -31,6 +31,20 @@ export interface DeleteAccountResponse {
   error?: string
 }
 
+export interface UpdateEmployerProfileData {
+  responsiblePerson?: string
+  companyName?: string
+  website?: string | null
+  address?: string | null
+  industry?: string | null
+  companySize?: '1-10' | '11-50' | '51-200' | '201-500' | '500+' | null
+}
+
+export interface UpdateEmployerProfileResponse {
+  success: boolean
+  error?: string
+}
+
 /**
  * Change password with current password verification
  */
@@ -309,6 +323,66 @@ export async function resendEmailVerification(): Promise<ChangeEmailResponse> {
     return {
       success: false,
       error: error?.message || 'Failed to resend verification email',
+    }
+  }
+}
+
+/**
+ * Update employer profile (name, company details, etc.)
+ */
+export async function updateEmployerProfile(
+  data: UpdateEmployerProfileData,
+): Promise<UpdateEmployerProfileResponse> {
+  try {
+    const payload = await getPayload({ config })
+    const headersList = await headers()
+    const { user } = await payload.auth({ headers: headersList })
+
+    if (!user || user.collection !== 'employers') {
+      return {
+        success: false,
+        error: 'Not authenticated as employer',
+      }
+    }
+
+    const updateData: Record<string, unknown> = {}
+    if (data.responsiblePerson !== undefined) {
+      const trimmed = data.responsiblePerson?.trim()
+      if (!trimmed) {
+        return { success: false, error: 'Responsible person name is required' }
+      }
+      updateData.responsiblePerson = trimmed
+    }
+    if (data.companyName !== undefined) {
+      const trimmed = data.companyName?.trim()
+      if (!trimmed) {
+        return { success: false, error: 'Company name is required' }
+      }
+      updateData.companyName = trimmed
+    }
+    if (data.website !== undefined) updateData.website = data.website?.trim() || null
+    if (data.address !== undefined) updateData.address = data.address?.trim() || null
+    if (data.industry !== undefined) updateData.industry = data.industry?.trim() || null
+    if (data.companySize !== undefined) updateData.companySize = data.companySize || null
+
+    if (Object.keys(updateData).length === 0) {
+      return { success: true }
+    }
+
+    await payload.update({
+      collection: 'employers',
+      id: user.id,
+      data: updateData,
+    })
+
+    revalidatePath('/employer/dashboard', 'page')
+
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error updating employer profile:', error)
+    return {
+      success: false,
+      error: error?.message || 'Failed to update profile',
     }
   }
 }

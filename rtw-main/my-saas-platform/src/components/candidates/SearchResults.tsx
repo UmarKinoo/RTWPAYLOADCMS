@@ -9,8 +9,6 @@ import { Link } from '@/i18n/routing'
 import type { CandidateListItem } from '@/lib/payload/candidates'
 import { searchCandidates } from '@/lib/employer/search'
 
-const DEFAULT_PROFILE = '/assets/aa541dc65d58ecc58590a815ca3bf2c27c889667.webp'
-
 interface SearchResultsProps {
   searchQuery: string
   locale: string
@@ -106,7 +104,9 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
                 nationality={candidate.nationality}
                 nationalityFlag={getNationalityFlag(candidate.nationality)}
                 location={candidate.location}
-                profileImage={candidate.profilePictureUrl || DEFAULT_PROFILE}
+                profileImage={candidate.profilePictureUrl ?? null}
+                firstName={candidate.firstName}
+                lastName={candidate.lastName}
                 billingClass={candidate.billingClass}
               />
             </Link>

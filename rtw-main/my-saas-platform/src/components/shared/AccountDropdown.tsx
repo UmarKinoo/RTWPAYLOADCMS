@@ -22,6 +22,8 @@ export type UserRole = 'employer' | 'candidate'
 
 interface AccountDropdownProps {
   displayName: string
+  /** When set, avatar shows initials from this (e.g. responsible person for employer). */
+  initialsFrom?: string | null
   email?: string
   role: UserRole
   avatarSize?: 'sm' | 'md' | 'lg'
@@ -35,6 +37,7 @@ interface AccountDropdownProps {
 
 export function AccountDropdown({
   displayName,
+  initialsFrom,
   email,
   role,
   avatarSize = 'sm',
@@ -78,7 +81,7 @@ export function AccountDropdown({
           )}
           aria-label={t('accountMenu')}
         >
-          <AvatarCircle name={displayName} size={avatarSize} />
+          <AvatarCircle name={displayName} initialsFrom={initialsFrom} size={avatarSize} />
           <span className="hidden sm:block text-sm font-semibold text-[#16252d] max-w-[120px] sm:max-w-[150px] truncate">
             {displayName}
           </span>

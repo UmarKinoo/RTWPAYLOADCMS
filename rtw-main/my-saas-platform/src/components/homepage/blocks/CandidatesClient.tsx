@@ -7,6 +7,7 @@ import type { CandidateCardProps } from './Candidates'
 import { getCandidateCardAssets } from '@/lib/utils/candidate-card-assets'
 import type { BillingClass } from '@/lib/billing'
 import { cn } from '@/lib/utils'
+import { getInitialsFromFirstLast, getColorFromName } from '@/components/navbar/AvatarCircle'
 
 export const CandidateCard: React.FC<CandidateCardProps> = ({
   name,
@@ -16,12 +17,20 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
   nationalityFlag,
   location,
   profileImage,
+  firstName,
+  lastName,
   billingClass,
   locked = false,
   displayLabel,
 }) => {
   const t = useTranslations('homepage.candidates')
   const displayName = locked && displayLabel != null ? displayLabel : name
+  const showInitials = !profileImage
+  const initials = getInitialsFromFirstLast(
+    firstName ?? name.split(' ')[0],
+    lastName ?? (name.split(' ').slice(1).join(' ') || null),
+  )
+  const initialsBgColor = getColorFromName(name)
 
   // Get assets based on billing class
   const assets = getCandidateCardAssets(billingClass as BillingClass | null)
@@ -54,16 +63,25 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
           <ImageWithSkeleton src={assets.layer3} alt="" fill objectFit="contain" />
         </div>
 
-        {/* Profile Image */}
+        {/* Profile Image or initials */}
         <div className="absolute top-[15%] left-1/2 -translate-x-1/2 z-20 w-[56.9%] aspect-square">
           <div className="relative w-full h-full" style={MASK_STYLE}>
-            <ImageWithSkeleton
-              src={profileImage}
-              alt={name}
-              fill
-              objectFit="cover"
-              objectPosition="center"
-            />
+            {showInitials ? (
+              <div
+                className="absolute inset-0 flex items-center justify-center text-white font-semibold text-lg sm:text-xl md:text-2xl"
+                style={{ backgroundColor: initialsBgColor }}
+              >
+                {initials}
+              </div>
+            ) : (
+              <ImageWithSkeleton
+                src={profileImage!}
+                alt={name}
+                fill
+                objectFit="cover"
+                objectPosition="center"
+              />
+            )}
           </div>
         </div>
 

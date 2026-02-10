@@ -68,7 +68,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ employer }) => {
           )}
           aria-label="User menu"
         >
-          <AvatarCircle name={displayName} size="sm" />
+          <AvatarCircle name={displayName} initialsFrom={employer.responsiblePerson || displayName} size="sm" />
           <span className="hidden sm:block text-sm font-semibold text-[#16252d] max-w-[120px] sm:max-w-[150px] truncate">
             {displayName}
           </span>

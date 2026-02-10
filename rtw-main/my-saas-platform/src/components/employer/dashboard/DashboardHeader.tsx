@@ -97,6 +97,7 @@ export function DashboardHeader({ employer, unreadNotificationsCount, notificati
         {/* Account Dropdown */}
         <AccountDropdown
           displayName={displayName}
+          initialsFrom={employer.responsiblePerson ?? undefined}
           email={employer.email}
           role="employer"
           avatarSize="md"

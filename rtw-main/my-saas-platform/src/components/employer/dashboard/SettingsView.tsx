@@ -2,13 +2,21 @@
 
 import React, { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Settings, ArrowLeft, Lock, Mail, Phone, Trash2, CheckCircle2, XCircle, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Settings, ArrowLeft, Lock, Mail, Phone, Trash2, CheckCircle2, XCircle, Loader2, Eye, EyeOff, Building2 } from 'lucide-react'
 import Link from 'next/link'
 import type { Employer } from '@/payload-types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +35,7 @@ import {
   changePassword,
   changeEmail,
   updatePhone,
+  updateEmployerProfile,
   resendEmailVerification,
   deleteAccount,
 } from '@/lib/employer/account-settings'
@@ -63,6 +72,9 @@ export function SettingsView({ employer: initialEmployer }: SettingsViewProps) {
 
       {/* Settings Sections */}
       <div className="space-y-6">
+        {/* Profile / Company details Section */}
+        <ProfileSection employer={employer} onUpdate={handleUpdate} />
+
         {/* Change Password Section */}
         <ChangePasswordSection />
 
@@ -76,6 +88,164 @@ export function SettingsView({ employer: initialEmployer }: SettingsViewProps) {
         <DeleteAccountSection />
       </div>
     </div>
+  )
+}
+
+// Profile / Company details Section
+const COMPANY_SIZE_OPTIONS = [
+  { value: '1-10', labelKey: 'companySize1_10' },
+  { value: '11-50', labelKey: 'companySize11_50' },
+  { value: '51-200', labelKey: 'companySize51_200' },
+  { value: '201-500', labelKey: 'companySize201_500' },
+  { value: '500+', labelKey: 'companySize500' },
+] as const
+
+function ProfileSection({ employer, onUpdate }: { employer: Employer; onUpdate: (data: Partial<Employer>) => void }) {
+  const t = useTranslations('employerDashboard.settings')
+  const [responsiblePerson, setResponsiblePerson] = useState(employer.responsiblePerson ?? '')
+  const [companyName, setCompanyName] = useState(employer.companyName ?? '')
+  const [website, setWebsite] = useState(employer.website ?? '')
+  const [address, setAddress] = useState(employer.address ?? '')
+  const [industry, setIndustry] = useState(employer.industry ?? '')
+  const [companySize, setCompanySize] = useState<Employer['companySize']>(employer.companySize ?? null)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!responsiblePerson.trim()) {
+      toast.error(t('responsiblePersonRequired'))
+      return
+    }
+    if (!companyName.trim()) {
+      toast.error(t('companyNameRequired'))
+      return
+    }
+    setIsSaving(true)
+    try {
+      const result = await updateEmployerProfile({
+        responsiblePerson: responsiblePerson.trim(),
+        companyName: companyName.trim(),
+        website: website.trim() || null,
+        address: address.trim() || null,
+        industry: industry.trim() || null,
+        companySize: companySize ?? null,
+      })
+      if (result.success) {
+        toast.success(t('profileSaved'))
+        onUpdate({
+          responsiblePerson: responsiblePerson.trim(),
+          companyName: companyName.trim(),
+          website: website.trim() || null,
+          address: address.trim() || null,
+          industry: industry.trim() || null,
+          companySize: companySize ?? null,
+        })
+      } else {
+        toast.error(result.error || t('failedToSaveProfile'))
+      }
+    } catch {
+      toast.error(t('anErrorOccurred'))
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Building2 className="size-5 text-[#282828]" />
+          <CardTitle>{t('profileDetails')}</CardTitle>
+        </div>
+        <CardDescription>{t('profileDescription')}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="responsible-person" className="text-sm font-medium">{t('responsiblePerson')}</Label>
+              <Input
+                id="responsible-person"
+                value={responsiblePerson}
+                onChange={(e) => setResponsiblePerson(e.target.value)}
+                placeholder={t('responsiblePersonPlaceholder')}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company-name" className="text-sm font-medium">{t('companyName')}</Label>
+              <Input
+                id="company-name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder={t('companyNamePlaceholder')}
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="website" className="text-sm font-medium">{t('website')}</Label>
+            <Input
+              id="website"
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder={t('websitePlaceholder')}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="address" className="text-sm font-medium">{t('companyAddress')}</Label>
+            <Textarea
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder={t('companyAddressPlaceholder')}
+              rows={3}
+              className="resize-none"
+            />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="industry" className="text-sm font-medium">{t('industry')}</Label>
+              <Input
+                id="industry"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                placeholder={t('industryPlaceholder')}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company-size" className="text-sm font-medium">{t('companySize')}</Label>
+              <Select
+                value={companySize ?? ''}
+                onValueChange={(v) => setCompanySize((v || null) as Employer['companySize'])}
+              >
+                <SelectTrigger id="company-size">
+                  <SelectValue placeholder={t('companySizePlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {COMPANY_SIZE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {t(opt.labelKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Button type="submit" disabled={isSaving} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+            {isSaving ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                {t('saving')}
+              </>
+            ) : (
+              t('saveProfile')
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
 

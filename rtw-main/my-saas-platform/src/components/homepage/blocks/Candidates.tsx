@@ -11,7 +11,12 @@ export interface CandidateCardProps {
   nationality: string
   nationalityFlag: string
   location: string
-  profileImage: string
+  /** Profile image URL; when missing, initials (first letter of name + surname) are shown */
+  profileImage?: string | null
+  /** First name for initials when profileImage is missing */
+  firstName?: string | null
+  /** Last name for initials when profileImage is missing */
+  lastName?: string | null
   billingClass?: 'A' | 'B' | 'C' | 'D' | 'S' | null
   /** When true, show blurred/locked view: displayLabel as name, blur applied, for non-employers */
   locked?: boolean

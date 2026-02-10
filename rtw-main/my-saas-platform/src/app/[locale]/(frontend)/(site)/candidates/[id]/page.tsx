@@ -98,8 +98,6 @@ function InfoCard({ title, children, className }: InfoCardProps) {
 // Page Component
 // ============================================================================
 
-const DEFAULT_PROFILE = '/assets/aa541dc65d58ecc58590a815ca3bf2c27c889667.webp'
-
 export default async function CandidateDetailPage({ params: paramsPromise }: Args) {
   const { id } = await paramsPromise
   const candidateId = parseInt(id, 10)
@@ -124,7 +122,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
     : []
 
   const fullName = `${candidate.firstName} ${candidate.lastName}`
-  const profileImage = candidate.profilePictureUrl || DEFAULT_PROFILE
+  const profileImage = candidate.profilePictureUrl ?? null
   const flagImage = getNationalityFlag(candidate.nationality)
   const t = await getTranslations('candidateDetail')
 
@@ -158,6 +156,8 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
               nationalityFlag={flagImage}
               location={candidate.location}
               profileImage={profileImage}
+              firstName={candidate.firstName}
+              lastName={candidate.lastName}
               billingClass={candidate.billingClass}
               locked
               displayLabel={candidate.jobTitle}
@@ -198,6 +198,8 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
               nationalityFlag={flagImage}
               location={candidate.location}
               profileImage={profileImage}
+              firstName={candidate.firstName}
+              lastName={candidate.lastName}
               billingClass={candidate.billingClass}
             />
 
@@ -325,7 +327,9 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
                   nationality={similar.nationality}
                   nationalityFlag={getNationalityFlag(similar.nationality)}
                   location={similar.location}
-                  profileImage={similar.profilePictureUrl || DEFAULT_PROFILE}
+                  profileImage={similar.profilePictureUrl ?? null}
+                  firstName={similar.firstName}
+                  lastName={similar.lastName}
                   billingClass={similar.billingClass}
                 />
               </a>

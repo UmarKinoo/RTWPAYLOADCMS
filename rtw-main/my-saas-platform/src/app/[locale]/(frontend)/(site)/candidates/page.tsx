@@ -79,9 +79,6 @@ function getResultsCountMessage(params: {
   return t('resultsCount', { count: totalDocs, plural })
 }
 
-// Default profile image
-const DEFAULT_PROFILE = '/assets/aa541dc65d58ecc58590a815ca3bf2c27c889667.webp'
-
 // ============================================================================
 // Sub-components (keep page.tsx complexity low)
 // ============================================================================
@@ -133,7 +130,9 @@ function CandidateGridCard(props: Readonly<{
       nationality={candidate.nationality}
       nationalityFlag={getNationalityFlag(candidate.nationality)}
       location={candidate.location}
-      profileImage={candidate.profilePictureUrl || DEFAULT_PROFILE}
+      profileImage={candidate.profilePictureUrl ?? null}
+      firstName={candidate.firstName}
+      lastName={candidate.lastName}
       billingClass={candidate.billingClass}
       locked={!hasEmployerAccess}
       displayLabel={hasEmployerAccess ? undefined : candidate.jobTitle}
