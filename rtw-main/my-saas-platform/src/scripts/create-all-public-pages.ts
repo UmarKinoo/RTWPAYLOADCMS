@@ -62,8 +62,9 @@ const publicPages = [
     slug: 'home',
     title: 'Home',
     meta: {
-      title: 'Ready to Work | Connect with Talented Candidates',
-      description: 'Explore thousands of openings and talented profiles all in one place. Access a wide pool of qualified candidates across all roles and industries.',
+      title: 'Saudi Talent Sourcing Agency & Portal | Ready to Work',
+      description:
+        'Connect with verified talent and top employers in Saudi Arabia. Ready to Work is your trusted talent sourcing agency for hiring and career opportunities.',
     },
   },
   {

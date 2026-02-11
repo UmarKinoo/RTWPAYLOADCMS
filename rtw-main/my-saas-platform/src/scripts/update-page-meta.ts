@@ -44,6 +44,14 @@ const configPromise = import('@payload-config')
 
 const pageMetaUpdates: { slug: string; meta: { title: string; description: string } }[] = [
   {
+    slug: 'home',
+    meta: {
+      title: 'Saudi Talent Sourcing Agency & Portal | Ready to Work',
+      description:
+        'Connect with verified talent and top employers in Saudi Arabia. Ready to Work is your trusted talent sourcing agency for hiring and career opportunities.',
+    },
+  },
+  {
     slug: 'about',
     meta: {
       title: 'Saudi Recruitment Portal | Talent Hiring & Jobs in KSA',

@@ -67,7 +67,7 @@ const PLANS = [
   },
   {
     slug: 'top-picks',
-    title: 'Top Picks',
+    title: 'Saudi Nationals',
     price: 700,
     currency: 'SAR',
     entitlements: {
