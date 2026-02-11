@@ -817,11 +817,11 @@ export async function acceptInvitation(
     return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
   }
 
-  const passwordValidation = validatePassword(newPassword)
-  if (!passwordValidation.valid) {
+  // Invitation flow: only require 8+ chars so Google/strong passwords work (no complexity rules)
+  if (!newPassword || newPassword.length < 8) {
     return {
       success: false,
-      error: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
+      error: 'Password must be at least 8 characters',
       errorCode: 'INVALID_PASSWORD',
     }
   }
@@ -832,13 +832,15 @@ export async function acceptInvitation(
 
   try {
     const payload = await getPayload({ config: await configPromise })
+    const emailLower = email.trim().toLowerCase()
+    const tokenTrimmed = token.trim()
 
     const result = await payload.find({
       collection: 'users',
       where: {
         and: [
-          { email: { equals: email } },
-          { invitationToken: { equals: token } },
+          { email: { equals: emailLower } },
+          { invitationToken: { equals: tokenTrimmed } },
           { invitationExpires: { greater_than: new Date().toISOString() } },
         ],
       },

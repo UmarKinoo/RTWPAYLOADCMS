@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useLocale } from 'next-intl'
 import { Link, useRouter } from '@/i18n/routing'
 import { acceptInvitation, getUser } from '@/lib/auth'
 import { Section, Container } from '@/components/ds'
@@ -23,7 +22,6 @@ function AcceptInvitationForm() {
 
   const searchParams = useSearchParams()
   const router = useRouter()
-  const locale = useLocale()
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -35,21 +33,26 @@ function AcceptInvitationForm() {
           toast.info('Already Signed In', {
             description: isPayloadStaff ? 'Redirecting to admin...' : 'Redirecting...',
           })
-          router.push(isPayloadStaff ? '/admin' : `/${locale}/login`)
+          router.push(isPayloadStaff ? '/admin' : '/login')
         }
       } catch {
         // Not authenticated, continue
       }
     }
     checkAuth()
-  }, [router, locale])
+  }, [router])
 
   useEffect(() => {
     const tokenParam = searchParams.get('token')
     const emailParam = searchParams.get('email')
     if (tokenParam && emailParam) {
-      setToken(tokenParam)
-      setEmail(decodeURIComponent(emailParam))
+      try {
+        setToken(decodeURIComponent(tokenParam).trim())
+        setEmail(decodeURIComponent(emailParam).trim())
+      } catch {
+        setToken(tokenParam.trim())
+        setEmail(emailParam.trim())
+      }
     }
   }, [searchParams])
 
@@ -83,7 +86,7 @@ function AcceptInvitationForm() {
           description: 'Redirecting you to sign in...',
         })
         const isPayloadStaff = result.role === 'admin' || result.role === 'blog-editor'
-        const destination = isPayloadStaff ? '/admin' : `/${locale}/login`
+        const destination = isPayloadStaff ? '/admin' : '/login'
         setTimeout(() => router.push(destination), 1200)
       } else {
         switch (result.errorCode) {
