@@ -33,7 +33,8 @@
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
     "db:reset": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/db/reset.ts",
     "ci": "pnpm db:migrate && pnpm build",
-    "verify:myfatoorah": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-myfatoorah-token.ts"
+    "verify:myfatoorah": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-myfatoorah-token.ts",
+    "email:logo": "tsx scripts/svg-to-png-email-logo.ts"
   },
   "pnpm": {
     "overrides": {

@@ -11,8 +11,11 @@
 import { getServerSideURL } from '@/utilities/getURL'
 import { defaultLocale } from '@/i18n/config'
 
-// Logo URL - adjust path as needed
-const logoUrl = 'https://readytowork.sa/assets/03bdd9d6f0fa9e8b68944b910c59a8474fc37999.svg'
+// Logo for emails: PNG so it displays in all clients (Gmail, Outlook, etc. often block SVG).
+// Served from app URL so links work in dev and production. See scripts/svg-to-png-email-logo.ts
+function getEmailLogoUrl(): string {
+  return `${getServerSideURL()}/assets/logo-email.png`
+}
 const supportEmail = process.env.SUPPORT_EMAIL || 'support@readytowork.sa'
 
 /**
@@ -39,7 +42,8 @@ function getAppUrl(): string {
  */
 function baseEmailTemplate(content: string, title: string): string {
   const appUrl = getAppUrl()
-  
+  const logoUrl = getEmailLogoUrl()
+
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -176,7 +180,7 @@ function baseEmailTemplate(content: string, title: string): string {
 <body>
   <div class="email-container">
     <div class="email-header">
-      <img src="${logoUrl}" alt="Ready to Work" class="logo" />
+      <img src="${logoUrl}" alt="Ready to Work" width="200" height="31" class="logo" style="max-width:200px;height:auto;" />
     </div>
     <div class="email-body">
       ${content}
