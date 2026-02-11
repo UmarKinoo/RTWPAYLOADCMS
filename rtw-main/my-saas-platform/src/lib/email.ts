@@ -4,6 +4,7 @@ import {
   welcomeEmailTemplate,
   passwordResetEmailTemplate,
   passwordChangedEmailTemplate,
+  invitationEmailTemplate,
   employerWelcomeEmailTemplate,
 } from './email-templates'
 
@@ -55,5 +56,6 @@ export {
   welcomeEmailTemplate,
   passwordResetEmailTemplate,
   passwordChangedEmailTemplate,
+  invitationEmailTemplate,
   employerWelcomeEmailTemplate,
 } from './email-templates'

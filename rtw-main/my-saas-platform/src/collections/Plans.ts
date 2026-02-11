@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { authenticated } from '../access/authenticated'
 import { anyone } from '../access/anyone'
 import {
@@ -15,6 +16,7 @@ export const Plans: CollectionConfig = {
     delete: authenticated,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'title',
     defaultColumns: ['slug', 'title', 'price', 'currency', 'updatedAt'],
   },

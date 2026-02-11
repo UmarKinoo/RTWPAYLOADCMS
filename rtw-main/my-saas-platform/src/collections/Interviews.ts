@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { authenticated } from '../access/authenticated'
 import {
   revalidateInterview,
@@ -38,6 +39,7 @@ export const Interviews: CollectionConfig = {
     delete: ownInterviews,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'id',
     defaultColumns: ['employer', 'candidate', 'scheduledAt', 'status', 'createdAt'],
   },

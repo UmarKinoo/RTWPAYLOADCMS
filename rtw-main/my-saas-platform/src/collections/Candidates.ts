@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import type { CollectionBeforeChangeHook } from 'payload'
 
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { authenticated } from '../access/authenticated'
 import {
   revalidateCandidate,
@@ -125,6 +126,7 @@ export const Candidates: CollectionConfig = {
     delete: authenticated,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'email',
     defaultColumns: ['firstName', 'lastName', 'email', 'primarySkill', 'billingClass', 'updatedAt'],
   },

@@ -351,6 +351,42 @@ export function passwordChangedEmailTemplate(): string {
 }
 
 /**
+ * User invitation email (Payload admin users) – set your password via link
+ */
+export function invitationEmailTemplate(email: string, token: string): string {
+  const appUrl = getAppUrl()
+  const acceptUrl = `${appUrl}/${defaultLocale}/accept-invitation?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`
+
+  const content = `
+    <h1 class="email-title">You're Invited</h1>
+    <p class="email-content">
+      An administrator has created an account for you on Ready to Work.
+    </p>
+    <p class="email-content">
+      Click the button below to set your password and activate your account:
+    </p>
+    <div style="text-align: center;">
+      <a href="${acceptUrl}" class="button">Set Your Password</a>
+    </div>
+    <div class="divider"></div>
+    <p class="email-content" style="font-size: 14px; color: #757575;">
+      Or copy and paste this link into your browser:
+    </p>
+    <p class="email-content" style="font-size: 14px;">
+      <a href="${acceptUrl}" class="link">${acceptUrl}</a>
+    </p>
+    <div class="alert">
+      <strong>⏰ This link expires in 7 days.</strong>
+      <p style="margin-top: 8px; font-size: 14px;">
+        If you didn't expect this invitation, you can safely ignore this email.
+      </p>
+    </div>
+  `
+
+  return baseEmailTemplate(content, 'Set Your Password - Ready to Work')
+}
+
+/**
  * Employer-specific welcome email
  */
 export function employerWelcomeEmailTemplate(companyName: string, responsiblePerson: string): string {

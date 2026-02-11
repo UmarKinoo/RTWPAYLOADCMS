@@ -23,9 +23,9 @@ export default async function EmployerDashboardPage({ params }: EmployerDashboar
 
     // Only allow employers to access this page
     if (userType.kind !== 'employer') {
-      // Redirect based on user type
+      // Redirect based on user type (moderator and admin only have access to moderator panel)
       console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User is not employer (kind:`, userType.kind, '), redirecting appropriately')
-      if (userType.kind === 'admin') {
+      if (userType.kind === 'admin' || userType.kind === 'moderator') {
         redirect(`/${locale}/admin/interviews/pending`)
       } else if (userType.kind === 'candidate') {
         redirect(`/${locale}/dashboard`)

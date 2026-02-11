@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
+import { hiddenFromBlogEditor } from '../../access/hiddenFromBlogEditor'
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Archive } from '../../blocks/ArchiveBlock/config'
@@ -38,6 +39,7 @@ export const Pages: CollectionConfig<'pages'> = {
     slug: true,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>

@@ -68,7 +68,8 @@ async function handleAuth(request: NextRequest) {
     !isLoggedOutFlow &&
     (pathname === `/${locale}/login` ||
       pathname === `/${locale}/forgot-password` ||
-      pathname === `/${locale}/reset-password`)
+      pathname === `/${locale}/reset-password` ||
+      pathname === `/${locale}/accept-invitation`)
   ) {
     return NextResponse.redirect(new URL(`/${locale}/dashboard${queryString}`, request.url))
   }

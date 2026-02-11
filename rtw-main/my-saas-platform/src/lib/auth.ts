@@ -13,6 +13,7 @@ import {
   verificationEmailTemplate,
   passwordResetEmailTemplate,
   passwordChangedEmailTemplate,
+  invitationEmailTemplate,
 } from './email'
 import { randomBytes } from 'crypto'
 
@@ -646,6 +647,158 @@ export async function resetPassword(
     return {
       success: false,
       error: 'We encountered an error. Please try again later.',
+      errorCode: 'SYSTEM_ERROR',
+    }
+  }
+}
+
+export type SendUserInvitationResponse = {
+  success: boolean
+  error?: string
+  errorCode?: string
+}
+
+/**
+ * Send invitation email to a Payload user (admin-created). Generates token and link to set password.
+ * Call from Payload admin or API; caller must be authenticated as admin.
+ */
+export async function sendUserInvitation(userId: number): Promise<SendUserInvitationResponse> {
+  try {
+    const payload = await getPayload({ config: await configPromise })
+
+    const user = await payload.findByID({
+      collection: 'users',
+      id: userId,
+    })
+
+    if (!user || !user.email) {
+      return { success: false, error: 'User not found or has no email', errorCode: 'USER_NOT_FOUND' }
+    }
+
+    const token = randomBytes(32).toString('hex')
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+
+    await payload.update({
+      collection: 'users',
+      id: userId,
+      data: {
+        invitationToken: token,
+        invitationExpires: expires.toISOString(),
+        invitationSentAt: new Date().toISOString(),
+      },
+      overrideAccess: true,
+    })
+
+    const emailResult = await sendEmail({
+      to: user.email,
+      subject: 'Set your password - Ready to Work',
+      html: invitationEmailTemplate(user.email, token),
+    })
+
+    if (!emailResult.success) {
+      return {
+        success: false,
+        error: emailResult.error || 'Failed to send invitation email',
+        errorCode: 'EMAIL_FAILED',
+      }
+    }
+
+    return { success: true }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[sendUserInvitation]', msg)
+    return {
+      success: false,
+      error: 'Failed to send invitation',
+      errorCode: 'SYSTEM_ERROR',
+    }
+  }
+}
+
+export type AcceptInvitationResponse = {
+  success: boolean
+  error?: string
+  errorCode?: string
+}
+
+/**
+ * Accept invitation: set password using invitation token (Payload users only).
+ */
+export async function acceptInvitation(
+  token: string,
+  email: string,
+  newPassword: string,
+): Promise<AcceptInvitationResponse> {
+  const emailValidation = validateEmail(email)
+  if (!emailValidation.valid) {
+    return { success: false, error: 'Invalid email address', errorCode: 'INVALID_EMAIL' }
+  }
+
+  const passwordValidation = validatePassword(newPassword)
+  if (!passwordValidation.valid) {
+    return {
+      success: false,
+      error: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
+      errorCode: 'INVALID_PASSWORD',
+    }
+  }
+
+  if (!token) {
+    return { success: false, error: 'Invalid invitation link', errorCode: 'INVALID_TOKEN' }
+  }
+
+  try {
+    const payload = await getPayload({ config: await configPromise })
+
+    const result = await payload.find({
+      collection: 'users',
+      where: {
+        and: [
+          { email: { equals: email } },
+          { invitationToken: { equals: token } },
+          { invitationExpires: { greater_than: new Date().toISOString() } },
+        ],
+      },
+      limit: 1,
+    })
+
+    if (result.docs.length === 0) {
+      return {
+        success: false,
+        error: 'Invalid or expired invitation link',
+        errorCode: 'INVALID_OR_EXPIRED_TOKEN',
+      }
+    }
+
+    const user = result.docs[0]
+
+    await payload.update({
+      collection: 'users',
+      id: user.id,
+      data: {
+        password: newPassword,
+        invitationToken: null,
+        invitationExpires: null,
+      },
+      overrideAccess: true,
+    })
+
+    const emailResult = await sendEmail({
+      to: email,
+      subject: 'Your password was set',
+      html: passwordChangedEmailTemplate(),
+    })
+    if (!emailResult.success) {
+      console.error('Failed to send password-set confirmation:', emailResult.error)
+    }
+
+    return { success: true }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[acceptInvitation]', msg)
+    return {
+      success: false,
+      error: 'Something went wrong. Please try again.',
       errorCode: 'SYSTEM_ERROR',
     }
   }

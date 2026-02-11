@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { authenticated } from '../access/authenticated'
 import {
   revalidateJobPosting,
@@ -21,6 +22,7 @@ export const JobPostings: CollectionConfig = {
     delete: ownJobPostings,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'title',
     defaultColumns: ['employer', 'title', 'jobType', 'status', 'applicationsCount', 'createdAt'],
   },

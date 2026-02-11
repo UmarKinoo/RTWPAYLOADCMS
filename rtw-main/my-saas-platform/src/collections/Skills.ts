@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import type { CollectionBeforeChangeHook } from 'payload'
 
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
@@ -179,6 +180,7 @@ export const Skills: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'name',
     defaultColumns: ['name', 'subCategory', 'billingClass', 'updatedAt'],
   },

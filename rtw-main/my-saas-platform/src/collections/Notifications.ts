@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { authenticated } from '../access/authenticated'
 import {
   revalidateNotification,
@@ -21,6 +22,7 @@ export const Notifications: CollectionConfig = {
     delete: ownNotifications,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'title',
     defaultColumns: ['employer', 'candidate', 'type', 'title', 'read', 'createdAt'],
   },

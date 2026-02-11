@@ -1,8 +1,10 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 
 export const PhoneVerifications: CollectionConfig = {
   slug: 'phone-verifications',
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'phone',
     defaultColumns: ['phone', 'userCollection', 'verifiedAt', 'expiresAt', 'attempts', 'createdAt'],
   },

@@ -1,4 +1,5 @@
 import type { CollectionConfig, PayloadRequest } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { deleteRelatedBeforeEmployerDelete } from './Employers/hooks/deleteRelatedBeforeEmployerDelete'
 
 const authenticated = ({ req }: { req: PayloadRequest }) => {
@@ -18,6 +19,7 @@ export const Employers: CollectionConfig = {
     delete: authenticated,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'companyName',
     defaultColumns: ['companyName', 'responsiblePerson', 'email', 'updatedAt'],
   },

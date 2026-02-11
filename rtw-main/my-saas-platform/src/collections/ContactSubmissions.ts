@@ -1,8 +1,10 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 
 export const ContactSubmissions: CollectionConfig = {
   slug: 'contact-submissions',
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'phone', 'title', 'createdAt'],
   },

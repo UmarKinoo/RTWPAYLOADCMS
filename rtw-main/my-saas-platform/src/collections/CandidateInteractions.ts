@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { authenticated } from '../access/authenticated'
 import {
   revalidateCandidateInteraction,
@@ -23,6 +24,7 @@ export const CandidateInteractions: CollectionConfig = {
     delete: ownInteractions,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'id',
     defaultColumns: ['employer', 'candidate', 'interactionType', 'createdAt'],
   },

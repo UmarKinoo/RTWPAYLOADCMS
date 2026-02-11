@@ -2,20 +2,33 @@ import type { CollectionConfig } from 'payload'
 import type { User } from '@/payload-types'
 import type { PayloadRequest } from 'payload'
 
-const isAdmin = ({ req }: { req: PayloadRequest }): boolean => {
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import { sendInvitationForNewModerator } from './Users/hooks/sendInvitationForNewModerator'
+
+/** Users who can access the Payload admin panel (admin = full access, blog-editor = blog-only) */
+const canAccessAdmin = ({ req }: { req: PayloadRequest }): boolean => {
   const user = req.user as User | null
-  return user?.role === 'admin'
+  return user?.role === 'admin' || user?.role === 'blog-editor'
 }
 
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'email',
+    components: {
+      edit: {
+        beforeDocumentControls: ['@/components/payload/SendInvitationButton#SendInvitationButton'],
+      },
+    },
   },
   auth: true,
   versions: false, // Disable versioning for users collection to avoid versioning errors
   access: {
-    admin: isAdmin,
+    admin: canAccessAdmin,
+  },
+  hooks: {
+    afterChange: [sendInvitationForNewModerator],
   },
   fields: [
     {
@@ -23,14 +36,17 @@ export const Users: CollectionConfig = {
       type: 'select',
       options: [
         { label: 'Admin', value: 'admin' },
+        { label: 'Blog Editor', value: 'blog-editor' },
         { label: 'Moderator', value: 'moderator' },
         { label: 'User', value: 'user' },
       ],
       required: true,
       defaultValue: 'user',
       admin: {
-        description: 'Admin: full Payload access. Moderator: can approve/reject interview requests only (no Payload admin).',
+        description:
+          'Admin: full Payload access. Blog Editor: can access Payload admin but only blog posts, categories, and media. Moderator: can approve/reject interview requests only (no Payload admin).',
       },
+      saveToJWT: true, // Required for admin.hidden role checks in other collections
     },
     {
       name: 'emailVerified',
@@ -66,6 +82,28 @@ export const Users: CollectionConfig = {
       type: 'date',
       admin: {
         hidden: true,
+      },
+    },
+    {
+      name: 'invitationToken',
+      type: 'text',
+      admin: {
+        hidden: true,
+      },
+    },
+    {
+      name: 'invitationExpires',
+      type: 'date',
+      admin: {
+        hidden: true,
+      },
+    },
+    {
+      name: 'invitationSentAt',
+      type: 'date',
+      admin: {
+        description: 'When the last invitation email was sent. Shown for reference.',
+        readOnly: true,
       },
     },
     {

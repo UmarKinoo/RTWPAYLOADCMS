@@ -1,8 +1,10 @@
 import type { CollectionConfig } from 'payload'
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 
 export const NewsletterSubscriptions: CollectionConfig = {
   slug: 'newsletter-subscriptions',
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'email',
     defaultColumns: ['email', 'subscribed', 'subscribedAt', 'unsubscribedAt', 'createdAt'],
   },

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
+import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
@@ -12,6 +13,7 @@ export const SubCategories: CollectionConfig = {
     update: authenticated,
   },
   admin: {
+    hidden: hiddenFromBlogEditor,
     useAsTitle: 'name',
     defaultColumns: ['name', 'category', 'updatedAt'],
   },
