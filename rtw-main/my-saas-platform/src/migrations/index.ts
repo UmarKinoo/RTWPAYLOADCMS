@@ -4,6 +4,7 @@ import * as migration_20260129_100000_add_session_id from './20260129_100000_add
 import * as migration_20260202_000000_purchases_myfatoorah from './20260202_000000_purchases_myfatoorah'
 import * as migration_20260211_000000_add_blog_editor_role from './20260211_000000_add_blog_editor_role'
 import * as migration_20260211_100000_add_user_invitation_fields from './20260211_100000_add_user_invitation_fields'
+import * as migration_20260211_200000_add_moderator_role from './20260211_200000_add_moderator_role'
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20260211_100000_add_user_invitation_fields.up,
     down: migration_20260211_100000_add_user_invitation_fields.down,
     name: '20260211_100000_add_user_invitation_fields'
+  },
+  {
+    up: migration_20260211_200000_add_moderator_role.up,
+    down: migration_20260211_200000_add_moderator_role.down,
+    name: '20260211_200000_add_moderator_role'
   },
 ]
