@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { getServerSideURL } from '@/utilities/getURL'
+import { headers } from 'next/headers'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
 import { sendUserInvitation } from '@/lib/auth'
 import type { User } from '@/payload-types'
 
@@ -9,25 +10,19 @@ import type { User } from '@/payload-types'
  * Body: { userId: number }
  * Sends an invitation email to the user so they can set their password.
  * Caller must be authenticated as a Payload admin user (admin or blog-editor).
+ * Uses Payload auth with incoming request headers so the payload-token cookie is validated server-side (fixes 401 on prod).
  */
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('payload-token')?.value
-    if (!token) {
+    const headersList = await headers()
+    const payload = await getPayload({ config: await configPromise })
+    const { user } = await payload.auth({ headers: headersList })
+    if (!user) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
-    const baseUrl = getServerSideURL()
-    const meRes = await fetch(`${baseUrl}/api/users/me`, {
-      headers: { Authorization: `JWT ${token}` },
-    })
-    if (!meRes.ok) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { user } = (await meRes.json()) as { user: User }
-    if (!user || (user.role !== 'admin' && user.role !== 'blog-editor')) {
+    const typedUser = user as User
+    if (typedUser.role !== 'admin' && typedUser.role !== 'blog-editor') {
       return NextResponse.json(
         { success: false, error: 'Only admins can send invitations' },
         { status: 403 },
