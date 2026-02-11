@@ -5,8 +5,12 @@ import {
   passwordResetEmailTemplate,
   passwordChangedEmailTemplate,
   invitationEmailTemplate,
+  invitationEmailTemplatePayloadReset,
+  invitationEmailTemplateAcceptInvitation,
   employerWelcomeEmailTemplate,
 } from './email-templates'
+
+export { invitationEmailTemplatePayloadReset, invitationEmailTemplateAcceptInvitation }
 
 const resendApiKey = process.env.RESEND_API_KEY
 const resend = resendApiKey ? new Resend(resendApiKey) : null

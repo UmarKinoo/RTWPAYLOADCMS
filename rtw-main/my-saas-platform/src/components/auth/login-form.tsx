@@ -112,8 +112,10 @@ export const LoginForm = ({ collection }: LoginFormProps = {}) => {
       } else if (successfulCollection === 'candidates') {
         router.push(`/${locale}/dashboard`)
       } else if (successfulCollection === 'users') {
-        // Staff (admin, blog-editor, moderator) → Payload admin
-        router.push('/admin')
+        // Staff: full page nav so cookies from login response are sent on next request (avoids middleware/auth loop).
+        // Dashboard page then redirects by role (admin → /admin, moderator → /moderator/...).
+        window.location.href = `/${locale}/dashboard`
+        return
       } else {
         router.push(`/${locale}/dashboard`)
       }

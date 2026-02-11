@@ -175,11 +175,15 @@ Each calls **`getCurrentUserType()`**; if no user or not candidate, redirects to
 - If user is not unknown (e.g. landed here by mistake), redirects to the correct home (admin, moderator panel, employer dashboard, dashboard).
 - Renders “No access”, “Contact support”, and “Back to sign in” (i18n **noAccess** keys in messages).
 
-### 3.11 Accept-invitation page
+### 3.11 Invitations and set-password
 
-**File:** `src/app/[locale]/(frontend)/(auth)/accept-invitation/page.tsx`
+**New invitations** use Payload’s native flow: `createUserAndSendInvitation` and `sendUserInvitation` call `payload.forgotPassword(..., disableEmail: true)` and send an email linking to **`/admin/reset/:token`**. The user sets their password on Payload’s built-in admin reset page, not a custom form.
 
-- After success, **role** comes from **`acceptInvitation()`** response:
+**Moderators do not have Payload admin access** (`canAccessAdmin` is only for admin/blog-editor), so they are not sent through `/admin`. **Admin/blog-editor** invitations use Payload's native flow (link to `/admin/reset/:token`); **moderator/user** use the accept-invitation flow (link to `/:locale/accept-invitation?token=...&email=...`) so they never touch `/admin`.
+
+**Accept-invitation page:** `src/app/[locale]/(frontend)/(auth)/accept-invitation/page.tsx` is used for moderator/user invitations and for any old admin links that used `invitationToken`.
+
+- After success on accept-invitation, **role** comes from **`acceptInvitation()`** response:
   - **Admin or blog-editor** → “Sign in to admin” → **`/admin`**
   - **Moderator (or user)** → “Sign in” → **`/login`** (i18n Link).
 - “Back to sign in” and invalid-link link → **`/login`**.

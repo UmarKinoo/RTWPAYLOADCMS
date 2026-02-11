@@ -33,7 +33,8 @@ function AcceptInvitationForm() {
           toast.info('Already Signed In', {
             description: isPayloadStaff ? 'Redirecting to admin...' : 'Redirecting...',
           })
-          router.push(isPayloadStaff ? '/admin' : '/login')
+          if (isPayloadStaff) window.location.href = '/admin'
+          else router.push('/login')
         }
       } catch {
         // Not authenticated, continue
@@ -86,8 +87,10 @@ function AcceptInvitationForm() {
           description: 'Redirecting you to sign in...',
         })
         const isPayloadStaff = result.role === 'admin' || result.role === 'blog-editor'
-        const destination = isPayloadStaff ? '/admin' : '/login'
-        setTimeout(() => router.push(destination), 1200)
+        setTimeout(() => {
+          if (isPayloadStaff) window.location.href = '/admin'
+          else router.push('/login')
+        }, 1200)
       } else {
         switch (result.errorCode) {
           case 'INVALID_OR_EXPIRED_TOKEN':
@@ -150,7 +153,7 @@ function AcceptInvitationForm() {
               <p className="text-muted-foreground text-sm">Redirecting you to sign in…</p>
               <Button asChild>
                 {acceptedRole === 'admin' || acceptedRole === 'blog-editor' ? (
-                  <Link href="/admin">Sign in to admin</Link>
+                  <a href="/admin">Sign in to admin</a>
                 ) : (
                   <Link href="/login">Sign in</Link>
                 )}

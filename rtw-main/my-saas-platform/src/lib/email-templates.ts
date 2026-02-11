@@ -355,9 +355,47 @@ export function passwordChangedEmailTemplate(): string {
 }
 
 /**
- * User invitation email (Payload admin users) – set your password via link
+ * User invitation email for Payload admin/blog-editor – set password on Payload's native reset page.
+ * Link: /admin/reset/:token (they have canAccessAdmin so they land in admin after reset).
  */
-export function invitationEmailTemplate(email: string, token: string): string {
+export function invitationEmailTemplatePayloadReset(email: string, resetToken: string): string {
+  const appUrl = getAppUrl()
+  const resetUrl = `${appUrl}/admin/reset/${encodeURIComponent(resetToken)}`
+
+  const content = `
+    <h1 class="email-title">You're Invited</h1>
+    <p class="email-content">
+      An administrator has created an account for you on Ready to Work.
+    </p>
+    <p class="email-content">
+      Click the button below to set your password and activate your account:
+    </p>
+    <div style="text-align: center;">
+      <a href="${resetUrl}" class="button">Set Your Password</a>
+    </div>
+    <div class="divider"></div>
+    <p class="email-content" style="font-size: 14px; color: #757575;">
+      Or copy and paste this link into your browser:
+    </p>
+    <p class="email-content" style="font-size: 14px;">
+      <a href="${resetUrl}" class="link">${resetUrl}</a>
+    </p>
+    <div class="alert">
+      <strong>⏰ This link expires in 1 hour.</strong>
+      <p style="margin-top: 8px; font-size: 14px;">
+        If you didn't expect this invitation, you can safely ignore this email.
+      </p>
+    </div>
+  `
+
+  return baseEmailTemplate(content, 'Set Your Password - Ready to Work')
+}
+
+/**
+ * User invitation email for moderator (and user role) – set password on our accept-invitation page.
+ * Link: /:locale/accept-invitation?token=...&email=... so they never touch /admin (no canAccessAdmin).
+ */
+export function invitationEmailTemplateAcceptInvitation(email: string, token: string): string {
   const appUrl = getAppUrl()
   const acceptUrl = `${appUrl}/${defaultLocale}/accept-invitation?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`
 
@@ -388,6 +426,11 @@ export function invitationEmailTemplate(email: string, token: string): string {
   `
 
   return baseEmailTemplate(content, 'Set Your Password - Ready to Work')
+}
+
+/** @deprecated Use invitationEmailTemplatePayloadReset or invitationEmailTemplateAcceptInvitation by role. */
+export function invitationEmailTemplate(email: string, resetToken: string): string {
+  return invitationEmailTemplatePayloadReset(email, resetToken)
 }
 
 /**

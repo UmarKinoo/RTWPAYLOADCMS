@@ -13,7 +13,8 @@ import {
   verificationEmailTemplate,
   passwordResetEmailTemplate,
   passwordChangedEmailTemplate,
-  invitationEmailTemplate,
+  invitationEmailTemplatePayloadReset,
+  invitationEmailTemplateAcceptInvitation,
 } from './email'
 import { randomBytes } from 'crypto'
 
@@ -669,7 +670,8 @@ const INVITATION_EXPIRY_DAYS = 7
 
 /**
  * Create a Payload user and send invitation email in one step (no need to save first).
- * Used from Payload admin Create User view: enter email (and role), click "Send invitation".
+ * - Admin/blog-editor: Payload's native forgotPassword + link to /admin/reset/:token (they have canAccessAdmin).
+ * - Moderator/user: custom invitationToken + link to accept-invitation page (no /admin access).
  */
 export async function createUserAndSendInvitation(params: {
   email: string
@@ -695,27 +697,44 @@ export async function createUserAndSendInvitation(params: {
       return { success: false, error: 'A user with this email already exists', errorCode: 'EMAIL_IN_USE' }
     }
 
-    const token = randomBytes(32).toString('hex')
-    const expires = new Date(Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
     const tempPassword = randomBytes(24).toString('hex')
+    const usePayloadReset = role === 'admin' || role === 'blog-editor'
 
+    const invitationToken = usePayloadReset ? undefined : randomBytes(32).toString('hex')
     const created = await payload.create({
       collection: 'users',
       data: {
         email,
         password: tempPassword,
         role,
-        invitationToken: token,
-        invitationExpires: expires.toISOString(),
-        invitationSentAt: new Date().toISOString(),
+        ...(usePayloadReset
+          ? { invitationSentAt: new Date().toISOString() }
+          : {
+              invitationToken,
+              invitationExpires: new Date(
+                Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+              ).toISOString(),
+              invitationSentAt: new Date().toISOString(),
+            }),
       },
       overrideAccess: true,
     })
 
+    const html = usePayloadReset
+      ? invitationEmailTemplatePayloadReset(
+          email,
+          await payload.forgotPassword({
+            collection: 'users',
+            data: { email },
+            disableEmail: true,
+          }),
+        )
+      : invitationEmailTemplateAcceptInvitation(email, invitationToken!)
+
     const emailResult = await sendEmail({
       to: email,
       subject: 'Set your password - Ready to Work',
-      html: invitationEmailTemplate(email, token),
+      html,
     })
 
     if (!emailResult.success) {
@@ -740,8 +759,9 @@ export async function createUserAndSendInvitation(params: {
 }
 
 /**
- * Send invitation email to a Payload user (admin-created). Generates token and link to set password.
- * Call from Payload admin or API; caller must be authenticated as admin.
+ * Send invitation email to a Payload user (admin-created).
+ * - Admin/blog-editor: Payload forgotPassword + link to /admin/reset/:token.
+ * - Moderator/user: invitationToken + link to accept-invitation page (no /admin).
  */
 export async function sendUserInvitation(userId: number): Promise<SendUserInvitationResponse> {
   try {
@@ -756,24 +776,43 @@ export async function sendUserInvitation(userId: number): Promise<SendUserInvita
       return { success: false, error: 'User not found or has no email', errorCode: 'USER_NOT_FOUND' }
     }
 
-    const token = randomBytes(32).toString('hex')
-    const expires = new Date(Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
+    const role = (user as { role?: string }).role
+    const usePayloadReset = role === 'admin' || role === 'blog-editor'
 
-    await payload.update({
-      collection: 'users',
-      id: userId,
-      data: {
-        invitationToken: token,
-        invitationExpires: expires.toISOString(),
-        invitationSentAt: new Date().toISOString(),
-      },
-      overrideAccess: true,
-    })
+    let html: string
+    if (usePayloadReset) {
+      const resetToken = await payload.forgotPassword({
+        collection: 'users',
+        data: { email: user.email },
+        disableEmail: true,
+      })
+      await payload.update({
+        collection: 'users',
+        id: userId,
+        data: { invitationSentAt: new Date().toISOString() },
+        overrideAccess: true,
+      })
+      html = invitationEmailTemplatePayloadReset(user.email, resetToken)
+    } else {
+      const token = randomBytes(32).toString('hex')
+      const expires = new Date(Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
+      await payload.update({
+        collection: 'users',
+        id: userId,
+        data: {
+          invitationToken: token,
+          invitationExpires: expires.toISOString(),
+          invitationSentAt: new Date().toISOString(),
+        },
+        overrideAccess: true,
+      })
+      html = invitationEmailTemplateAcceptInvitation(user.email, token)
+    }
 
     const emailResult = await sendEmail({
       to: user.email,
       subject: 'Set your password - Ready to Work',
-      html: invitationEmailTemplate(user.email, token),
+      html,
     })
 
     if (!emailResult.success) {
