@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Link, useRouter } from '@/i18n/routing'
 import { acceptInvitation, getUser } from '@/lib/auth'
 import { Section, Container } from '@/components/ds'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,7 @@ function AcceptInvitationForm() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [acceptedRole, setAcceptedRole] = useState<'admin' | 'blog-editor' | 'moderator' | 'user' | undefined>()
   const [token, setToken] = useState('')
   const [email, setEmail] = useState('')
 
@@ -27,10 +28,12 @@ function AcceptInvitationForm() {
       try {
         const user = await getUser()
         if (user) {
+          const role = (user as { role?: string }).role
+          const isPayloadStaff = role === 'admin' || role === 'blog-editor'
           toast.info('Already Signed In', {
-            description: 'You are already signed in. Redirecting...',
+            description: isPayloadStaff ? 'Redirecting to admin...' : 'Redirecting...',
           })
-          router.push('/dashboard')
+          router.push(isPayloadStaff ? '/admin' : '/login')
         }
       } catch {
         // Not authenticated, continue
@@ -73,6 +76,7 @@ function AcceptInvitationForm() {
 
       if (result.success) {
         setIsSuccess(true)
+        setAcceptedRole(result.role)
         toast.success('Password set successfully', {
           description: 'You can now sign in with your new password.',
         })
@@ -136,7 +140,11 @@ function AcceptInvitationForm() {
             <div className="space-y-4 text-center">
               <p className="text-muted-foreground">Your password has been set successfully.</p>
               <Button asChild>
-                <Link href="/login">Sign in</Link>
+                {acceptedRole === 'admin' || acceptedRole === 'blog-editor' ? (
+                  <Link href="/admin">Sign in to admin</Link>
+                ) : (
+                  <Link href="/login">Sign in</Link>
+                )}
               </Button>
             </div>
           ) : (

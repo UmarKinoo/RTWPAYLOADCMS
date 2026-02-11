@@ -1,7 +1,13 @@
-import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { getTranslations } from 'next-intl/server'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import {
+  redirectToLogin,
+  redirectToAdmin,
+  redirectToModeratorPanel,
+  redirectToEmployerDashboard,
+  redirectToNoAccess,
+} from '@/lib/redirects'
 import { CandidateDashboardContent } from '@/components/candidate/CandidateDashboardContent'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
 
@@ -25,9 +31,10 @@ export default async function Dashboard({ params }: DashboardProps) {
 
     if (!userType) {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[DASHBOARD ${timestamp}] No user type, redirecting to /login`)
+        console.log(`[DASHBOARD ${timestamp}] No user type, redirecting to login`)
       }
-      redirect(`/${locale}/login`)
+      await redirectToLogin(locale)
+      throw new Error('Redirect')
     }
 
     // Route based on user type
@@ -66,34 +73,35 @@ export default async function Dashboard({ params }: DashboardProps) {
     }
 
   if (userType.kind === 'employer') {
-    // Redirect to employer dashboard
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[DASHBOARD ${timestamp}] Employer detected, redirecting to /employer/dashboard`)
+      console.log(`[DASHBOARD ${timestamp}] Employer detected, redirecting to employer dashboard`)
     }
-    redirect(`/${locale}/employer/dashboard`)
+    await redirectToEmployerDashboard(locale)
   }
 
-  if (userType.kind === 'admin' || userType.kind === 'moderator') {
-    // Admin and moderator users: redirect to moderator panel (pending interview requests)
-    // Moderators use this frontend-only panel; they do not need Payload admin access
+  if (userType.kind === 'admin') {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[DASHBOARD ${timestamp}] ${userType.kind} detected, redirecting to /admin/interviews/pending`)
+      console.log(`[DASHBOARD ${timestamp}] Admin/blog-editor detected, redirecting to Payload /admin`)
     }
-    redirect(`/${locale}/admin/interviews/pending`)
+    await redirectToAdmin()
+  }
+  if (userType.kind === 'moderator') {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[DASHBOARD ${timestamp}] Moderator detected, redirecting to moderator panel`)
+    }
+    await redirectToModeratorPanel(locale)
   }
 
-    // Unknown user type, redirect to login
+    // Unknown: authenticated but unauthorized — send to no-access (no login ↔ dashboard loop)
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[DASHBOARD ${timestamp}] Unknown user type:`, userType.kind, 'redirecting to /login')
+      console.warn(`[DASHBOARD ${timestamp}] Unknown user type:`, userType.kind, 'redirecting to no-access')
     }
-    redirect(`/${locale}/login`)
-  } catch (error: any) {
-    // Next.js redirects work by throwing a special error - re-throw it
-    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+    await redirectToNoAccess(locale)
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'digest' in error && String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')) {
       throw error
     }
-    // Only log actual errors, not redirects
     console.error(`[DASHBOARD ${timestamp}] Error:`, error)
-    redirect(`/${locale}/login`)
+    await redirectToLogin(locale)
   }
 }

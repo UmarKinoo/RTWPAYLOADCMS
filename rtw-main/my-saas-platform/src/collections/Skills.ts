@@ -2,8 +2,8 @@ import type { CollectionConfig } from 'payload'
 import type { CollectionBeforeChangeHook } from 'payload'
 
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
 
 // Helper function to normalize text
 function normalizeText(text: string): string {
@@ -174,10 +174,10 @@ const generateEmbedding: CollectionBeforeChangeHook = async ({ data, req }) => {
 export const Skills: CollectionConfig = {
   slug: 'skills',
   access: {
-    create: authenticated,
-    delete: authenticated,
     read: anyone,
-    update: authenticated,
+    create: allowOnlyAdmin,
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

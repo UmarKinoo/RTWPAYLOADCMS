@@ -82,12 +82,13 @@ export async function getCurrentUserType(options?: GetCurrentUserTypeOptions): P
       redirect(`/api/auth/clear-session?next=${encodeURIComponent(loginUrl)}`)
     }
 
-    // Check if user is admin or moderator (from Users collection)
+    // Check if user is admin, blog-editor, or moderator (from Users collection)
     // Only Users have a 'role' property; candidates/employers do not
+    // Admin and blog-editor both use Payload admin; moderator uses frontend moderator panel only
     const userWithRole = user as { role?: string }
-    if (userWithRole.role === 'admin') {
+    if (userWithRole.role === 'admin' || userWithRole.role === 'blog-editor') {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[getCurrentUserType] User is admin')
+        console.log('[getCurrentUserType] User is admin/blog-editor (Payload staff)')
       }
       return { kind: 'admin', user: user as User }
     }

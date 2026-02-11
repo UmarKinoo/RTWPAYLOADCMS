@@ -3,6 +3,7 @@ import type { User } from '@/payload-types'
 import type { PayloadRequest } from 'payload'
 
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import { sendInvitationForNewModerator } from './Users/hooks/sendInvitationForNewModerator'
 
 /** Users who can access the Payload admin panel (admin = full access, blog-editor = blog-only) */
@@ -26,6 +27,10 @@ export const Users: CollectionConfig = {
   versions: false, // Disable versioning for users collection to avoid versioning errors
   access: {
     admin: canAccessAdmin,
+    read: allowOnlyAdmin,
+    create: allowOnlyAdmin,
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   hooks: {
     afterChange: [sendInvitationForNewModerator],

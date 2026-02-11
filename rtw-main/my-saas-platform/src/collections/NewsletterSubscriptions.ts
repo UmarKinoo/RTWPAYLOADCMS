@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 
 export const NewsletterSubscriptions: CollectionConfig = {
   slug: 'newsletter-subscriptions',
@@ -9,10 +10,10 @@ export const NewsletterSubscriptions: CollectionConfig = {
     defaultColumns: ['email', 'subscribed', 'subscribedAt', 'unsubscribedAt', 'createdAt'],
   },
   access: {
-    read: () => true, // Allow reading for admin
-    create: () => true, // Allow public creation via API
-    update: () => false, // Only via API endpoints
-    delete: () => false, // Only via API endpoints
+    read: allowOnlyAdmin,
+    create: () => true, // Public subscribe
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   fields: [
     {

@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import { redirectToLogin, redirectToDashboard } from '@/lib/redirects'
 import { ResumeView } from '@/components/candidate/dashboard/ResumeView'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
 
@@ -16,11 +16,13 @@ export default async function ResumePage({ params }: ResumePageProps) {
     const userType = await getCurrentUserType()
 
     if (!userType) {
-      redirect(`/${locale}/login`)
+      await redirectToLogin(locale)
+      throw new Error('Redirect')
     }
 
     if (userType.kind !== 'candidate') {
-      redirect(`/${locale}/dashboard`)
+      await redirectToDashboard(locale)
+      throw new Error('Redirect')
     }
 
     const candidate = userType.candidate
@@ -47,11 +49,12 @@ export default async function ResumePage({ params }: ResumePageProps) {
         />
       </Suspense>
     )
-  } catch (error: any) {
-    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+  } catch (error: unknown) {
+    const err = error as { digest?: string }
+    if (err?.digest?.startsWith('NEXT_REDIRECT')) {
       throw error
     }
     console.error('Resume page error:', error)
-    redirect(`/${locale}/login`)
+    await redirectToLogin(locale)
   }
 }

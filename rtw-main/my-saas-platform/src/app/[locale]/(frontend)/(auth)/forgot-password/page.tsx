@@ -1,9 +1,10 @@
+import { getLocale } from 'next-intl/server'
 import { Section, Container } from '@/components/ds'
 import { AuthBox } from '@/components/auth/auth-box'
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form'
 import { getUser } from '@/lib/auth'
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
+import { redirectToDashboard } from '@/lib/redirects'
+import { Link } from '@/i18n/routing'
 
 import type { User } from '@/payload-types'
 
@@ -11,10 +12,9 @@ export const dynamic = 'force-dynamic'
 
 export default async function ForgotPasswordPage() {
   const user: User | null = await getUser()
+  const locale = await getLocale()
 
-  if (user) {
-    redirect('/dashboard')
-  }
+  if (user) await redirectToDashboard(locale)
 
   return (
     <Section>

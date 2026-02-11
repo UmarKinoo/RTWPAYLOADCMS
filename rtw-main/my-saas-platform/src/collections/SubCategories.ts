@@ -1,16 +1,16 @@
 import type { CollectionConfig } from 'payload'
 
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
 
 export const SubCategories: CollectionConfig = {
   slug: 'subcategories',
   access: {
-    create: authenticated,
-    delete: authenticated,
     read: anyone,
-    update: authenticated,
+    create: allowOnlyAdmin,
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

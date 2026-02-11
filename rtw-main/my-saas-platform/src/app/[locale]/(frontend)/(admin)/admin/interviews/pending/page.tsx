@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import { redirectToLogin, redirectToDashboard } from '@/lib/redirects'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { PendingInterviewsPage } from '@/components/admin/PendingInterviewsPage'
@@ -8,15 +9,14 @@ export const dynamic = 'force-dynamic'
 
 export default async function PendingInterviewsAdminPage() {
   const userType = await getCurrentUserType()
+  const locale = await getLocale()
 
   if (!userType) {
-    redirect('/login')
+    await redirectToLogin(locale)
+    throw new Error('Redirect')
   }
 
-  // Allow admin and moderator (moderators use this panel only; no Payload admin)
-  if (userType.kind !== 'admin' && userType.kind !== 'moderator') {
-    redirect('/dashboard')
-  }
+  if (userType.kind !== 'admin' && userType.kind !== 'moderator') await redirectToDashboard(locale)
 
   const payload = await getPayload({ config: configPromise })
 

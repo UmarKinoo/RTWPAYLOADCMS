@@ -1,12 +1,12 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
-import { authenticated } from '../access/authenticated'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import {
   revalidateCandidateInteraction,
   revalidateCandidateInteractionDelete,
 } from './CandidateInteractions/hooks/revalidateCandidateInteraction'
 
-// Access control: Employers can access their own interactions, candidates can access interactions where they are the candidate
+// Access control: Admin can manage all; employers/candidates can access their own interactions
 // Note: Server actions use overrideAccess: true with proper filtering
 const ownInteractions = ({ req: { user } }: { req: any }) => {
   if (!user) return false
@@ -15,13 +15,15 @@ const ownInteractions = ({ req: { user } }: { req: any }) => {
   return false
 }
 
+const adminOrOwnInteractions = (args: any) => allowOnlyAdmin(args) || ownInteractions(args)
+
 export const CandidateInteractions: CollectionConfig = {
   slug: 'candidate-interactions',
   access: {
-    create: authenticated,
-    read: ownInteractions,
-    update: ownInteractions,
-    delete: ownInteractions,
+    create: adminOrOwnInteractions,
+    read: adminOrOwnInteractions,
+    update: adminOrOwnInteractions,
+    delete: adminOrOwnInteractions,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

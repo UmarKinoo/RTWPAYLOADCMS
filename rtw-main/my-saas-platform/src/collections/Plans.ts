@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
-import { authenticated } from '../access/authenticated'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import { anyone } from '../access/anyone'
 import {
   revalidatePlan,
@@ -10,10 +10,10 @@ import {
 export const Plans: CollectionConfig = {
   slug: 'plans',
   access: {
-    create: authenticated,
     read: anyone, // Public read for pricing page
-    update: authenticated,
-    delete: authenticated,
+    create: allowOnlyAdmin,
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import { redirectToLogin, redirectToDashboard } from '@/lib/redirects'
 import { NotificationsPageView } from '@/components/candidate/dashboard/NotificationsPageView'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
 
@@ -16,11 +16,13 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
     const userType = await getCurrentUserType()
 
     if (!userType) {
-      redirect(`/${locale}/login`)
+      await redirectToLogin(locale)
+      throw new Error('Redirect')
     }
 
     if (userType.kind !== 'candidate') {
-      redirect(`/${locale}/dashboard`)
+      await redirectToDashboard(locale)
+      throw new Error('Redirect')
     }
 
     const candidate = userType.candidate
@@ -53,6 +55,6 @@ export default async function NotificationsPage({ params }: NotificationsPagePro
       throw error
     }
     console.error('Notifications page error:', error)
-    redirect(`/${locale}/login`)
+    await redirectToLogin(locale)
   }
 }

@@ -111,8 +111,10 @@ export const LoginForm = ({ collection }: LoginFormProps = {}) => {
         router.push(`/${locale}/candidates`)
       } else if (successfulCollection === 'candidates') {
         router.push(`/${locale}/dashboard`)
+      } else if (successfulCollection === 'users') {
+        // Staff (admin, blog-editor, moderator) → Payload admin
+        router.push('/admin')
       } else {
-        // Fallback to general dashboard
         router.push(`/${locale}/dashboard`)
       }
     }

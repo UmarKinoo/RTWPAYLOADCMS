@@ -1,25 +1,27 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
-import { authenticated } from '../access/authenticated'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import {
   revalidateNotification,
   revalidateNotificationDelete,
 } from './Notifications/hooks/revalidateNotification'
 
-// Access control: Employers and candidates can access their own notifications
+// Access control: Admin can manage all; employers and candidates can access their own notifications
 const ownNotifications = ({ req: { user } }: { req: any }) => {
   if (!user) return false
   if (user.collection === 'employers' || user.collection === 'candidates') return true
   return false
 }
 
+const adminOrOwnNotifications = (args: any) => allowOnlyAdmin(args) || ownNotifications(args)
+
 export const Notifications: CollectionConfig = {
   slug: 'notifications',
   access: {
-    create: authenticated,
-    read: ownNotifications,
-    update: ownNotifications,
-    delete: ownNotifications,
+    create: adminOrOwnNotifications,
+    read: adminOrOwnNotifications,
+    update: adminOrOwnNotifications,
+    delete: adminOrOwnNotifications,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

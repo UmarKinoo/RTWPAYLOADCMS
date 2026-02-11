@@ -1,14 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
-import { authenticated } from '../access/authenticated'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 
 export const Purchases: CollectionConfig = {
   slug: 'purchases',
   access: {
-    create: authenticated,
-    read: authenticated, // Users can only read their own purchases
-    update: authenticated,
-    delete: authenticated,
+    read: allowOnlyAdmin,
+    create: allowOnlyAdmin,
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

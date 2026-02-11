@@ -3,6 +3,7 @@ import type { CollectionBeforeChangeHook } from 'payload'
 
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { authenticated } from '../access/authenticated'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import {
   revalidateCandidate,
   revalidateCandidateDelete,
@@ -120,10 +121,10 @@ export const Candidates: CollectionConfig = {
   slug: 'candidates',
   auth: true,
   access: {
-    create: () => true, // Allow public registration
-    read: authenticated,
-    update: authenticated,
-    delete: authenticated,
+    create: () => true, // Allow public registration (frontend)
+    read: allowOnlyAdmin,
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

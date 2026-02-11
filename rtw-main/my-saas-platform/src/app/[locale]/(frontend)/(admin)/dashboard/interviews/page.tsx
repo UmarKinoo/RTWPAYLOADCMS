@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import { redirectToLogin, redirectToDashboard } from '@/lib/redirects'
 import { getCandidateInterviews } from '@/lib/payload/interviews'
 import { CandidateInterviewsPage } from '@/components/candidate/interviews/CandidateInterviewsPage'
 
@@ -7,20 +8,21 @@ export const dynamic = 'force-dynamic'
 
 export default async function InterviewsPage() {
   const userType = await getCurrentUserType()
+  const locale = await getLocale()
 
   if (!userType) {
-    redirect('/login')
+    await redirectToLogin(locale)
+    throw new Error('Redirect')
   }
 
-  // Allow candidates and admins (admin can view candidate pages)
   if (userType.kind !== 'candidate' && userType.kind !== 'admin') {
-    redirect('/dashboard')
+    await redirectToDashboard(locale)
+    throw new Error('Redirect')
   }
 
-  // If admin, we need to handle differently - for now, redirect to dashboard
-  // In the future, you might want to allow admin to view specific candidate interviews
   if (userType.kind === 'admin') {
-    redirect('/dashboard')
+    await redirectToDashboard(locale)
+    throw new Error('Redirect')
   }
 
   const candidate = userType.candidate

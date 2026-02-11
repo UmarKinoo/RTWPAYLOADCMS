@@ -1,25 +1,27 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
-import { authenticated } from '../access/authenticated'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import {
   revalidateJobPosting,
   revalidateJobPostingDelete,
 } from './JobPostings/hooks/revalidateJobPosting'
 
-// Access control: Employers can only access their own job postings
+// Access control: Admin can manage all; employers can only access their own job postings
 const ownJobPostings = ({ req: { user } }: { req: any }) => {
   if (!user) return false
   if (user.collection === 'employers') return true
   return false
 }
 
+const adminOrOwnJobPostings = (args: any) => allowOnlyAdmin(args) || ownJobPostings(args)
+
 export const JobPostings: CollectionConfig = {
   slug: 'job-postings',
   access: {
-    create: authenticated,
-    read: ownJobPostings,
-    update: ownJobPostings,
-    delete: ownJobPostings,
+    create: adminOrOwnJobPostings,
+    read: adminOrOwnJobPostings,
+    update: adminOrOwnJobPostings,
+    delete: adminOrOwnJobPostings,
   },
   admin: {
     hidden: hiddenFromBlogEditor,

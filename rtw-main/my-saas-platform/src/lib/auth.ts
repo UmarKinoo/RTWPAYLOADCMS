@@ -658,6 +658,87 @@ export type SendUserInvitationResponse = {
   errorCode?: string
 }
 
+export type CreateUserAndSendInvitationResponse = {
+  success: boolean
+  userId?: number
+  error?: string
+  errorCode?: string
+}
+
+const INVITATION_EXPIRY_DAYS = 7
+
+/**
+ * Create a Payload user and send invitation email in one step (no need to save first).
+ * Used from Payload admin Create User view: enter email (and role), click "Send invitation".
+ */
+export async function createUserAndSendInvitation(params: {
+  email: string
+  role?: 'admin' | 'blog-editor' | 'moderator' | 'user'
+}): Promise<CreateUserAndSendInvitationResponse> {
+  try {
+    const emailValidation = validateEmail(params.email.trim())
+    if (!emailValidation.valid) {
+      return { success: false, error: emailValidation.errorKey || 'Invalid email', errorCode: 'INVALID_EMAIL' }
+    }
+
+    const email = params.email.trim().toLowerCase()
+    const role = params.role ?? 'moderator'
+
+    const payload = await getPayload({ config: await configPromise })
+
+    const existing = await payload.find({
+      collection: 'users',
+      where: { email: { equals: email } },
+      limit: 1,
+    })
+    if (existing.docs.length > 0) {
+      return { success: false, error: 'A user with this email already exists', errorCode: 'EMAIL_IN_USE' }
+    }
+
+    const token = randomBytes(32).toString('hex')
+    const expires = new Date(Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
+    const tempPassword = randomBytes(24).toString('hex')
+
+    const created = await payload.create({
+      collection: 'users',
+      data: {
+        email,
+        password: tempPassword,
+        role,
+        invitationToken: token,
+        invitationExpires: expires.toISOString(),
+        invitationSentAt: new Date().toISOString(),
+      },
+      overrideAccess: true,
+    })
+
+    const emailResult = await sendEmail({
+      to: email,
+      subject: 'Set your password - Ready to Work',
+      html: invitationEmailTemplate(email, token),
+    })
+
+    if (!emailResult.success) {
+      return {
+        success: false,
+        error: emailResult.error || 'Failed to send invitation email',
+        errorCode: 'EMAIL_FAILED',
+        userId: created.id as number,
+      }
+    }
+
+    return { success: true, userId: created.id as number }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[createUserAndSendInvitation]', msg)
+    return {
+      success: false,
+      error: 'Failed to create user and send invitation',
+      errorCode: 'SYSTEM_ERROR',
+    }
+  }
+}
+
 /**
  * Send invitation email to a Payload user (admin-created). Generates token and link to set password.
  * Call from Payload admin or API; caller must be authenticated as admin.
@@ -676,7 +757,7 @@ export async function sendUserInvitation(userId: number): Promise<SendUserInvita
     }
 
     const token = randomBytes(32).toString('hex')
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    const expires = new Date(Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000)
 
     await payload.update({
       collection: 'users',
@@ -717,6 +798,8 @@ export async function sendUserInvitation(userId: number): Promise<SendUserInvita
 
 export type AcceptInvitationResponse = {
   success: boolean
+  /** Set when success: admin and blog-editor use Payload admin; moderator uses site login */
+  role?: 'admin' | 'blog-editor' | 'moderator' | 'user'
   error?: string
   errorCode?: string
 }
@@ -792,7 +875,8 @@ export async function acceptInvitation(
       console.error('Failed to send password-set confirmation:', emailResult.error)
     }
 
-    return { success: true }
+    const role = (user as { role?: string }).role
+    return { success: true, role: role as AcceptInvitationResponse['role'] }
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
     console.error('[acceptInvitation]', msg)

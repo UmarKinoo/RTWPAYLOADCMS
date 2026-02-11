@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 
 export const PhoneVerifications: CollectionConfig = {
   slug: 'phone-verifications',
@@ -9,10 +10,10 @@ export const PhoneVerifications: CollectionConfig = {
     defaultColumns: ['phone', 'userCollection', 'verifiedAt', 'expiresAt', 'attempts', 'createdAt'],
   },
   access: {
-    read: () => false, // Only accessible via API, not admin panel
-    create: () => false,
-    update: () => false,
-    delete: () => false,
+    read: allowOnlyAdmin,
+    create: allowOnlyAdmin,
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   fields: [
     {

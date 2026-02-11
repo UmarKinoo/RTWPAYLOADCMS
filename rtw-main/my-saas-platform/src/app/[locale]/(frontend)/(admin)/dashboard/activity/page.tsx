@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import { redirectToLogin, redirectToDashboard } from '@/lib/redirects'
 import { ActivityPageView } from '@/components/candidate/dashboard/ActivityPageView'
 import { getUnreadNotificationCount, getCandidateNotifications } from '@/lib/payload/candidate-notifications'
 import { getCandidateActivity } from '@/lib/payload/candidate-activity'
@@ -17,11 +17,13 @@ export default async function ActivityPage({ params }: ActivityPageProps) {
     const userType = await getCurrentUserType()
 
     if (!userType) {
-      redirect(`/${locale}/login`)
+      await redirectToLogin(locale)
+      throw new Error('Redirect')
     }
 
     if (userType.kind !== 'candidate') {
-      redirect(`/${locale}/dashboard`)
+      await redirectToDashboard(locale)
+      throw new Error('Redirect')
     }
 
     const candidate = userType.candidate
@@ -56,6 +58,6 @@ export default async function ActivityPage({ params }: ActivityPageProps) {
       throw error
     }
     console.error('Activity page error:', error)
-    redirect(`/${locale}/login`)
+    await redirectToLogin(locale)
   }
 }

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 
 export const ContactSubmissions: CollectionConfig = {
   slug: 'contact-submissions',
@@ -9,10 +10,10 @@ export const ContactSubmissions: CollectionConfig = {
     defaultColumns: ['name', 'email', 'phone', 'title', 'createdAt'],
   },
   access: {
-    read: () => true, // Allow reading for admin
-    create: () => true, // Allow public creation via API
-    update: () => false, // Only via API endpoints
-    delete: () => false, // Only via API endpoints
+    read: allowOnlyAdmin,
+    create: () => true, // Allow public creation (contact form)
+    update: allowOnlyAdmin,
+    delete: allowOnlyAdmin,
   },
   fields: [
     {

@@ -1,5 +1,11 @@
-import { redirect } from 'next/navigation'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import {
+  redirectToLogin,
+  redirectToAdmin,
+  redirectToModeratorPanel,
+  redirectToDashboard,
+  redirectToNoAccess,
+} from '@/lib/redirects'
 import { EmployerDashboard } from '@/components/employer/dashboard/EmployerDashboard'
 
 export const dynamic = 'force-dynamic'
@@ -17,22 +23,19 @@ export default async function EmployerDashboardPage({ params }: EmployerDashboar
     console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User type:`, userType ? userType.kind : 'null', userType ? { id: userType.user?.id, email: userType.user?.email } : 'no user')
 
     if (!userType) {
-      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] No user type, redirecting to /login`)
-      redirect(`/${locale}/login`)
+      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] No user type, redirecting to login`)
+      await redirectToLogin(locale)
+      throw new Error('Redirect')
     }
 
-    // Only allow employers to access this page
     if (userType.kind !== 'employer') {
-      // Redirect based on user type (moderator and admin only have access to moderator panel)
-      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User is not employer (kind:`, userType.kind, '), redirecting appropriately')
-      if (userType.kind === 'admin' || userType.kind === 'moderator') {
-        redirect(`/${locale}/admin/interviews/pending`)
-      } else if (userType.kind === 'candidate') {
-        redirect(`/${locale}/dashboard`)
-      } else {
-        // Unknown type, go to main dashboard which will handle routing
-        redirect(`/${locale}/dashboard`)
-      }
+      console.log(`[EMPLOYER_DASHBOARD ${timestamp}] User is not employer (kind: ${userType.kind}), redirecting appropriately`)
+      if (userType.kind === 'admin') await redirectToAdmin()
+      if (userType.kind === 'moderator') await redirectToModeratorPanel(locale)
+      if (userType.kind === 'candidate') await redirectToDashboard(locale)
+      if (userType.kind === 'unknown') await redirectToNoAccess(locale)
+      await redirectToDashboard(locale)
+      throw new Error('Redirect')
     }
 
     // TypeScript type narrowing: at this point, userType.kind is 'employer'
@@ -44,15 +47,13 @@ export default async function EmployerDashboardPage({ params }: EmployerDashboar
         <EmployerDashboard employer={employer} />
       </div>
     )
-  } catch (error: any) {
-    // Next.js redirects work by throwing a special error - re-throw it
-    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'digest' in error && String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')) {
       throw error
     }
-    // Only log actual errors, not redirects
     const timestamp = new Date().toISOString()
     console.error(`[EMPLOYER_DASHBOARD ${timestamp}] Error:`, error)
-    redirect(`/${locale}/login`)
+    await redirectToLogin(locale)
   }
 }
 

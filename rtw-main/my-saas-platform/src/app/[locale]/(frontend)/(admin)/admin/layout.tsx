@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import { redirectToLogin, redirectToAdmin, redirectToDashboard } from '@/lib/redirects'
 import { ModeratorHeader } from '@/components/admin/ModeratorHeader'
 
 export const dynamic = 'force-dynamic'
@@ -11,18 +12,20 @@ type AdminLayoutProps = Readonly<{
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
   const userType = await getCurrentUserType()
+  const locale = await getLocale()
 
   if (!userType) {
-    redirect('/login')
+    await redirectToLogin(locale)
+    throw new Error('Redirect')
   }
 
-  if (userType.kind !== 'admin' && userType.kind !== 'moderator') {
-    redirect('/dashboard')
-  }
+  if (userType.kind === 'admin') await redirectToAdmin()
+
+  if (userType.kind !== 'moderator') await redirectToDashboard(locale)
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
-      <ModeratorHeader kind={userType.kind} />
+      <ModeratorHeader kind={userType.kind as 'admin' | 'moderator'} />
       <main className="mx-auto max-w-6xl">{children}</main>
     </div>
   )

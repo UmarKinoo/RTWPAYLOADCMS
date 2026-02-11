@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
 import { getCurrentUserType } from '@/lib/currentUserType'
+import { redirectToLogin } from '@/lib/redirects'
 import { InactivityLogout } from '@/components/auth/InactivityLogout'
 
 export const dynamic = 'force-dynamic'
@@ -15,9 +15,10 @@ export default async function AuthLayout({ children, params }: AuthLayoutProps) 
 
   if (!userType) {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[AUTH_LAYOUT] No user type, redirecting to /login')
+      console.log('[AUTH_LAYOUT] No user type, redirecting to login')
     }
-    redirect(`/${locale}/login`)
+    await redirectToLogin(locale)
+    throw new Error('Redirect')
   }
 
   if (process.env.NODE_ENV === 'development') {
