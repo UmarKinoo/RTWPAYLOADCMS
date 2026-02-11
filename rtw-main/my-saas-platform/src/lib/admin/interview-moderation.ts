@@ -184,7 +184,7 @@ export async function approveInterviewRequest(
     // Revalidate cache
     revalidatePath('/employer/dashboard', 'page')
     revalidatePath('/candidate/dashboard', 'page')
-    revalidatePath('/admin/interviews', 'page')
+    revalidatePath('/moderator/interviews', 'page')
     revalidateTag(`employer:${employerId}`, 'max')
     revalidateTag(`candidate:${candidateId}`, 'max')
     revalidateTag(`interview:${interviewId}`, 'max')
@@ -288,7 +288,7 @@ export async function rejectInterviewRequest(
     // Revalidate cache
     revalidatePath('/employer/dashboard', 'page')
     revalidatePath('/candidate/dashboard', 'page')
-    revalidatePath('/admin/interviews', 'page')
+    revalidatePath('/moderator/interviews', 'page')
     revalidateTag(`employer:${employerId}`, 'max')
     revalidateTag(`candidate:${candidateId}`, 'max')
     revalidateTag(`interview:${interviewId}`, 'max')

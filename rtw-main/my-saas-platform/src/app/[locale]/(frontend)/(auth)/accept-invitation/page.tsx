@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { Link, useRouter } from '@/i18n/routing'
 import { acceptInvitation, getUser } from '@/lib/auth'
 import { Section, Container } from '@/components/ds'
@@ -22,6 +23,7 @@ function AcceptInvitationForm() {
 
   const searchParams = useSearchParams()
   const router = useRouter()
+  const locale = useLocale()
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -33,14 +35,14 @@ function AcceptInvitationForm() {
           toast.info('Already Signed In', {
             description: isPayloadStaff ? 'Redirecting to admin...' : 'Redirecting...',
           })
-          router.push(isPayloadStaff ? '/admin' : '/login')
+          router.push(isPayloadStaff ? '/admin' : `/${locale}/login`)
         }
       } catch {
         // Not authenticated, continue
       }
     }
     checkAuth()
-  }, [router])
+  }, [router, locale])
 
   useEffect(() => {
     const tokenParam = searchParams.get('token')
@@ -78,8 +80,11 @@ function AcceptInvitationForm() {
         setIsSuccess(true)
         setAcceptedRole(result.role)
         toast.success('Password set successfully', {
-          description: 'You can now sign in with your new password.',
+          description: 'Redirecting you to sign in...',
         })
+        const isPayloadStaff = result.role === 'admin' || result.role === 'blog-editor'
+        const destination = isPayloadStaff ? '/admin' : `/${locale}/login`
+        setTimeout(() => router.push(destination), 1200)
       } else {
         switch (result.errorCode) {
           case 'INVALID_OR_EXPIRED_TOKEN':
@@ -139,6 +144,7 @@ function AcceptInvitationForm() {
           {isSuccess ? (
             <div className="space-y-4 text-center">
               <p className="text-muted-foreground">Your password has been set successfully.</p>
+              <p className="text-muted-foreground text-sm">Redirecting you to sign in…</p>
               <Button asChild>
                 {acceptedRole === 'admin' || acceptedRole === 'blog-editor' ? (
                   <Link href="/admin">Sign in to admin</Link>

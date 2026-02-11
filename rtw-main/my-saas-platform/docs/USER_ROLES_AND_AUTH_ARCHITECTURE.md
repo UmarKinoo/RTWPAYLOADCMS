@@ -87,7 +87,7 @@ It:
 - Calls **`getCurrentUserType({ onLoginPage: true })`**.
 - If **any** user type is present:
   - `admin` → **`redirect('/admin')`** (Payload)
-  - `moderator` → **`redirect(\`/${locale}/admin/interviews/pending\`)`**
+  - `moderator` → **`redirect(\`/${locale}/moderator/interviews/pending\`)`**
   - `employer` → **`redirect(\`/${locale}/employer/dashboard\`)`**
   - `candidate` → **`redirect(\`/${locale}/dashboard\`)`**
   - else → **`redirect(\`/${locale}/dashboard\`)`**
@@ -117,7 +117,7 @@ So every route under `(admin)` (dashboard, employer dashboard, moderator panel) 
 **File:** `src/app/[locale]/(frontend)/(admin)/dashboard/layout.tsx`
 
 - **`kind === 'admin'`** → **`redirect('/admin')`**
-- **`kind === 'moderator'`** → **`redirect(\`/${locale}/admin/interviews/pending\`)`**
+- **`kind === 'moderator'`** → **`redirect(\`/${locale}/moderator/interviews/pending\`)`**
 - Else: render children (candidate dashboard).
 
 So admins/blog-editors and moderators never see the candidate dashboard; they are bounced to Payload or moderator panel.
@@ -130,7 +130,7 @@ So admins/blog-editors and moderators never see the candidate dashboard; they ar
 - **Candidate** → render candidate dashboard.
 - **Employer** → **`redirect(\`/${locale}/employer/dashboard\`)`**
 - **Admin** → **`redirect('/admin')`**
-- **Moderator** → **`redirect(\`/${locale}/admin/interviews/pending\`)`**
+- **Moderator** → **`redirect(\`/${locale}/moderator/interviews/pending\`)`**
 - **Unknown** → **`redirect(\`/${locale}/login\`)`**
 
 ### 3.6 Employer dashboard page
@@ -139,23 +139,25 @@ So admins/blog-editors and moderators never see the candidate dashboard; they ar
 
 - No user → login.
 - **Admin** → **`/admin`**
-- **Moderator** → **`/${locale}/admin/interviews/pending`**
+- **Moderator** → **`/${locale}/moderator/interviews/pending`**
 - **Candidate** → **`/${locale}/dashboard`**
 - **Unknown** → **`/${locale}/dashboard`**
 - **Employer** → render employer dashboard.
 
-### 3.7 Moderator panel layout (`/[locale]/admin/...`)
+### 3.7 Moderator panel layout (`/[locale]/moderator/...`)
 
-**File:** `src/app/[locale]/(frontend)/(admin)/admin/layout.tsx`
+**File:** `src/app/[locale]/(frontend)/(admin)/moderator/layout.tsx`
 
 - No user → **`redirect(\`/${locale}/login\`)`**
 - **Admin** → **`redirect('/admin')`** (Payload; they don’t use this frontend panel)
 - Not moderator → **`redirect(\`/${locale}/dashboard\`)`**
 - **Moderator** → render moderator panel (e.g. pending interviews).
 
+Note: Payload admin is **`/admin`** only (no locale). The moderator panel lives at **`/${locale}/moderator/...`** so `/en/admin` and `/ar/admin` do not exist.
+
 ### 3.8 Moderator panel – pending interviews page
 
-**File:** `src/app/[locale]/(frontend)/(admin)/admin/interviews/pending/page.tsx`
+**File:** `src/app/[locale]/(frontend)/(admin)/moderator/interviews/pending/page.tsx`
 
 - No user → **`redirect('/login')`** (no locale in path – see “Redirect loop risks”).
 - **Admin or moderator** → allow; else **`redirect('/dashboard')`**.

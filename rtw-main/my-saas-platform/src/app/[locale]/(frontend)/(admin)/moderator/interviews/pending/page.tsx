@@ -7,7 +7,7 @@ import { PendingInterviewsPage } from '@/components/admin/PendingInterviewsPage'
 
 export const dynamic = 'force-dynamic'
 
-export default async function PendingInterviewsAdminPage() {
+export default async function PendingInterviewsModeratorPage() {
   const userType = await getCurrentUserType()
   const locale = await getLocale()
 
@@ -35,4 +35,3 @@ export default async function PendingInterviewsAdminPage() {
 
   return <PendingInterviewsPage interviews={result.docs} />
 }
-

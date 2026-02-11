@@ -42,7 +42,7 @@ export function ModeratorHeader({ kind }: Readonly<ModeratorHeaderProps>) {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <Link
-            href={`/${locale}/admin/interviews/pending`}
+            href={`/${locale}/moderator/interviews/pending`}
             className="flex items-center gap-2 text-[#16252d] hover:opacity-90"
           >
             <LayoutDashboard className="h-6 w-6 text-[#4644b8]" aria-hidden />
