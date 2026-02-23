@@ -8,6 +8,7 @@ import {
   revalidateCandidate,
   revalidateCandidateDelete,
 } from './Candidates/hooks/revalidateCandidate'
+import { deleteRelatedBeforeCandidateDelete } from './Candidates/hooks/deleteRelatedBeforeCandidateDelete'
 import { updateBioEmbeddingVector } from './Candidates/hooks/updateBioEmbeddingVector'
 
 // Hook to set billing class from primary skill and generate bio embedding
@@ -493,6 +494,7 @@ export const Candidates: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeDelete: [deleteRelatedBeforeCandidateDelete],
     beforeChange: [setBillingClassAndGenerateEmbedding],
     afterChange: [updateBioEmbeddingVector, revalidateCandidate],
     afterDelete: [revalidateCandidateDelete],
