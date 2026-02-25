@@ -6,6 +6,7 @@ import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { randomBytes } from 'crypto'
 import { sendEmail, verificationEmailTemplate } from './email'
+import { adminSignUpNotificationTemplate } from './email-templates'
 import type { Employer } from '@/payload-types'
 
 export interface RegisterEmployerData {
@@ -110,6 +111,22 @@ export async function registerEmployer(
       console.error('Failed to send verification email:', emailResult.error)
       // Don't fail registration if email fails, but log it
       // User can request resend later
+    }
+
+    // Notify admin of new employer sign-up (fire-and-forget)
+    const adminEmail = process.env.CONTACT_EMAIL || process.env.EMAIL_FROM || 'noreply@readytowork.sa'
+    const adminResult = await sendEmail({
+      to: adminEmail,
+      subject: 'New employer sign-up - Ready to Work',
+      html: adminSignUpNotificationTemplate('employer', {
+        responsiblePerson: data.responsiblePerson.trim(),
+        companyName: data.companyName.trim(),
+        email: data.email.toLowerCase().trim(),
+        phone: data.phone?.trim() || null,
+      }),
+    })
+    if (!adminResult.success) {
+      console.error('[Employer sign-up] Failed to send admin notification:', adminResult.error)
     }
 
     revalidatePath('/employer/register', 'page')

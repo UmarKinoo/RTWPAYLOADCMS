@@ -66,9 +66,11 @@ export const Candidates: React.FC = async () => {
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold font-inter text-[#16252d] mb-2 sm:mb-3">
               {t('title')}
             </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl font-normal font-inter text-gray-600">
-              {t('subtitle')}
-            </p>
+            {t('subtitle') ? (
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl font-normal font-inter text-gray-600">
+                {t('subtitle')}
+              </p>
+            ) : null}
           </div>
 
           {candidates.length > 0 ? (

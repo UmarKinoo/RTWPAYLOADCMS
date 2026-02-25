@@ -473,6 +473,95 @@ export function employerWelcomeEmailTemplate(companyName: string, responsiblePer
   return baseEmailTemplate(content, 'Welcome to Ready to Work')
 }
 
+/** Admin sign-up notification: candidate data */
+export interface AdminSignUpCandidateData {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  jobTitle: string
+  nationality: string
+  location: string
+}
+
+/** Admin sign-up notification: employer data */
+export interface AdminSignUpEmployerData {
+  responsiblePerson: string
+  companyName: string
+  email: string
+  phone?: string | null
+}
+
+/**
+ * Branded email sent to CONTACT_EMAIL when a candidate or employer signs up.
+ * Matches contact form notification style (gradient header, table of fields).
+ */
+export function adminSignUpNotificationTemplate(
+  type: 'candidate' | 'employer',
+  data: AdminSignUpCandidateData | AdminSignUpEmployerData,
+): string {
+  const title = type === 'candidate' ? 'New Candidate Sign-Up' : 'New Employer Sign-Up'
+  const subTitle =
+    type === 'candidate'
+      ? 'A new candidate has registered on Ready to Work.'
+      : 'A new employer has registered on Ready to Work.'
+
+  const rows =
+    type === 'candidate'
+      ? [
+          { label: 'Name', value: `${(data as AdminSignUpCandidateData).firstName} ${(data as AdminSignUpCandidateData).lastName}` },
+          { label: 'Email', value: (data as AdminSignUpCandidateData).email },
+          { label: 'Phone', value: (data as AdminSignUpCandidateData).phone },
+          { label: 'Job title', value: (data as AdminSignUpCandidateData).jobTitle },
+          { label: 'Nationality', value: (data as AdminSignUpCandidateData).nationality },
+          { label: 'Location', value: (data as AdminSignUpCandidateData).location },
+        ]
+      : [
+          { label: 'Responsible person', value: (data as AdminSignUpEmployerData).responsiblePerson },
+          { label: 'Company', value: (data as AdminSignUpEmployerData).companyName },
+          { label: 'Email', value: (data as AdminSignUpEmployerData).email },
+          ...((data as AdminSignUpEmployerData).phone
+            ? [{ label: 'Phone', value: (data as AdminSignUpEmployerData).phone! }]
+            : []),
+        ]
+
+  const tableRows = rows
+    .map(
+      (r) =>
+        `<tr>
+          <td style="padding: 8px 0; color: #666; font-weight: bold; width: 140px;">${r.label}:</td>
+          <td style="padding: 8px 0; color: #16252d;">${r.value}</td>
+        </tr>`,
+    )
+    .join('')
+
+  return `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #4644b8 0%, #6366f1 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+      <h1 style="color: white; margin: 0; font-size: 28px;">${title}</h1>
+      <p style="color: rgba(255,255,255,0.95); margin: 12px 0 0; font-size: 16px;">${subTitle}</p>
+    </div>
+    <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
+      <div style="background: white; padding: 20px; border-radius: 8px;">
+        <h2 style="color: #16252d; margin-top: 0; font-size: 20px;">Details</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+          ${tableRows}
+        </table>
+      </div>
+      <p style="font-size: 14px; color: #757575; margin-top: 20px;">You can view and manage this ${type} in the Payload CMS admin panel.</p>
+      <p style="font-size: 12px; color: #999; margin-top: 24px;">Ready to Work · This is an automated notification.</p>
+    </div>
+  </body>
+</html>
+  `
+}
+
 export interface InterviewInvitationEmailParams {
   candidateFirstName: string
   employerName: string

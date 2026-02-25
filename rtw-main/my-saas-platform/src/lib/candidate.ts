@@ -8,6 +8,7 @@ import { randomBytes } from 'crypto'
 import type { Candidate } from '@/payload-types'
 import { normalizePhone } from '@/server/sms/taqnyat'
 import { sendEmail, verificationEmailTemplate } from './email'
+import { adminSignUpNotificationTemplate } from './email-templates'
 
 export interface RegisterCandidateData {
   // Identity
@@ -182,6 +183,25 @@ export async function registerCandidate(
       console.error('Failed to send verification email:', emailResult.error)
       // Don't fail registration if email fails, but log it
       // User can request resend later
+    }
+
+    // Notify admin of new candidate sign-up (fire-and-forget)
+    const adminEmail = process.env.CONTACT_EMAIL || process.env.EMAIL_FROM || 'noreply@readytowork.sa'
+    const adminResult = await sendEmail({
+      to: adminEmail,
+      subject: 'New candidate sign-up - Ready to Work',
+      html: adminSignUpNotificationTemplate('candidate', {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email.toLowerCase().trim(),
+        phone: normalizedPhone,
+        jobTitle: data.jobTitle,
+        nationality: data.nationality,
+        location: data.location,
+      }),
+    })
+    if (!adminResult.success) {
+      console.error('[Candidate sign-up] Failed to send admin notification:', adminResult.error)
     }
 
     // Note: We don't log in automatically after registration
