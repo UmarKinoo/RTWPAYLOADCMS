@@ -15,7 +15,7 @@ import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'
 import { CandidateProfileCard } from './CandidateProfileCard'
 import { InterviewRequestForm } from './InterviewRequestForm'
-import type { CandidateDetail, CandidateListItem } from '@/lib/payload/candidates'
+import type { CandidateDetail, CandidateListItem } from '@/types/candidate'
 import { CheckCircle2, AlertCircle, User, CalendarClock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

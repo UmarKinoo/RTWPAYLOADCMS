@@ -2,7 +2,11 @@ import React from 'react'
 import { HomepageSection } from '../HomepageSection'
 import { Button } from '@/components/ui/button'
 import { Link } from '@/i18n/routing'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
+import { getCandidates } from '@/lib/payload/candidates'
+import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
+import { getCurrentUserType } from '@/lib/currentUserType'
+import { CandidateCard } from './CandidatesClient'
 
 export interface CandidateCardProps {
   name: string
@@ -29,7 +33,28 @@ export { CandidateCard } from './CandidatesClient'
 
 export const Candidates: React.FC = async () => {
   const t = await getTranslations('homepage.candidates')
-  const count = 0
+  const locale = await getLocale()
+  const userType = await getCurrentUserType()
+  const hasEmployerAccess = userType?.kind === 'employer'
+
+  const result = await getCandidates({ limit: 4, page: 1 })
+  const candidates = result.candidates
+  const count = result.totalDocs
+
+  const cardProps = candidates.map((c) => ({
+    name: `${c.firstName} ${c.lastName}`,
+    jobTitle: c.jobTitle,
+    experience: formatExperience(c.experienceYears),
+    nationality: c.nationality,
+    nationalityFlag: getNationalityFlag(c.nationality),
+    location: c.location,
+    profileImage: c.profilePictureUrl ?? null,
+    firstName: c.firstName,
+    lastName: c.lastName,
+    billingClass: c.billingClass,
+    locked: !hasEmployerAccess,
+    displayLabel: hasEmployerAccess ? undefined : c.jobTitle,
+  }))
 
   return (
     <HomepageSection className="pb-12 sm:pb-16 md:pb-20">
@@ -46,23 +71,47 @@ export const Candidates: React.FC = async () => {
             </p>
           </div>
 
-          {/* Empty state: 0 candidates */}
-          <div className="flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 px-4 rounded-2xl bg-white/60 border border-[#e5e5e5]">
-            <p className="text-4xl sm:text-5xl md:text-6xl font-bold font-inter text-[#4644b8] mb-2">
-              {count}
-            </p>
-            <p className="text-base sm:text-lg font-medium font-inter text-[#16252d] mb-1">
-              {t('candidatesCount', { count })}
-            </p>
-            <p className="text-sm sm:text-base font-normal font-inter text-[#757575] text-center max-w-md mb-6">
-              {t('zeroCandidatesMessage')}
-            </p>
-            <Link href="/candidates">
-              <Button className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold uppercase tracking-wide cursor-pointer">
-                {t('findMore')}
-              </Button>
-            </Link>
-          </div>
+          {candidates.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-8">
+                {cardProps.map((props, index) => (
+                  <Link
+                    key={candidates[index].id}
+                    href={hasEmployerAccess ? `/candidates/${candidates[index].id}` : '/employer/register'}
+                    locale={locale}
+                    className="flex justify-center"
+                  >
+                    <CandidateCard {...props} />
+                  </Link>
+                ))}
+              </div>
+              <div className="flex justify-center">
+                <Link href="/candidates" locale={locale}>
+                  <Button className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold uppercase tracking-wide cursor-pointer">
+                    {t('findMore')}
+                  </Button>
+                </Link>
+              </div>
+            </>
+          ) : (
+            /* Empty state: 0 candidates */
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16 md:py-20 px-4 rounded-2xl bg-white/60 border border-[#e5e5e5]">
+              <p className="text-4xl sm:text-5xl md:text-6xl font-bold font-inter text-[#4644b8] mb-2">
+                {count}
+              </p>
+              <p className="text-base sm:text-lg font-medium font-inter text-[#16252d] mb-1">
+                {t('candidatesCount', { count })}
+              </p>
+              <p className="text-sm sm:text-base font-normal font-inter text-[#757575] text-center max-w-md mb-6">
+                {t('zeroCandidatesMessage')}
+              </p>
+              <Link href="/candidates" locale={locale}>
+                <Button className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold uppercase tracking-wide cursor-pointer">
+                  {t('findMore')}
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </HomepageSection>

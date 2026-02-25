@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import type { CandidateDetail, CandidateListItem } from '@/lib/payload/candidates'
+import type { CandidateDetail, CandidateListItem } from '@/types/candidate'
 import { formatExperience } from '@/lib/utils/candidate-utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { getInitialsFromFirstLast, getColorFromName } from '@/components/navbar/AvatarCircle'

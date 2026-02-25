@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { InterviewRequestModal } from './InterviewRequestModal'
-import type { CandidateDetail, CandidateListItem } from '@/lib/payload/candidates'
+import type { CandidateDetail, CandidateListItem } from '@/types/candidate'
 
 interface AddToInterviewButtonProps {
   candidate: CandidateDetail | CandidateListItem

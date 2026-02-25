@@ -3,40 +3,10 @@ import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import type { Candidate, Media } from '@/payload-types'
 import type { BillingClass } from '@/lib/billing'
+import type { CandidateListItem, CandidateDetail } from '@/types/candidate'
 
-// ============================================================================
-// Types
-// ============================================================================
-
-export interface CandidateListItem {
-  id: number
-  firstName: string
-  lastName: string
-  jobTitle: string
-  location: string
-  nationality: string
-  experienceYears: number
-  saudiExperience: number
-  profilePictureUrl: string | null
-  billingClass: BillingClass | null
-  email?: string // Temporarily added
-}
-
-export interface CandidateDetail extends CandidateListItem {
-  phone: string
-  whatsapp: string | null
-  gender: 'male' | 'female'
-  dob: string
-  languages: string
-  currentEmployer: string | null
-  availabilityDate: string
-  visaStatus: 'active' | 'expired' | 'nearly_expired' | 'none'
-  visaExpiry: string | null
-  visaProfession: string | null
-  resumeUrl: string | null
-  createdAt: string
-  updatedAt: string
-}
+// Re-export for server code that imports from this file
+export type { CandidateListItem, CandidateDetail }
 
 // ============================================================================
 // Helper Functions

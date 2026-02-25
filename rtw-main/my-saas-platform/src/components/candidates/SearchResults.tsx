@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { CandidateCard } from '@/components/homepage/blocks/Candidates'
+import { CandidateCard } from '@/components/homepage/blocks/CandidatesClient'
 import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
 import { Link } from '@/i18n/routing'
-import type { CandidateListItem } from '@/lib/payload/candidates'
+import type { CandidateListItem } from '@/types/candidate'
 import { searchCandidates } from '@/lib/employer/search'
 
 interface SearchResultsProps {

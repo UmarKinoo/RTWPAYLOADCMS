@@ -43,6 +43,15 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
     maskRepeat: 'no-repeat',
   } as const
 
+  // Clip overlay to the same badge shape as the card (vector SVG)
+  const BADGE_MASK_STYLE = {
+    maskImage: `url('${assets.vector}')`,
+    WebkitMaskImage: `url('${assets.vector}')`,
+    maskSize: '100% 100%',
+    maskPosition: 'center',
+    maskRepeat: 'no-repeat',
+  } as const
+
   return (
     <div className={cn('relative w-full aspect-[341/530] max-w-[180px] sm:max-w-[200px] md:max-w-[220px] lg:max-w-[240px] xl:max-w-[280px] 2xl:max-w-[320px] mx-auto', locked && 'select-none')}>
       {/* Outer Vector Border */}
@@ -118,9 +127,12 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
         </div>
       </div>
 
-      {/* Locked overlay: role + CTA (employers only) */}
+      {/* Locked overlay: clipped to badge shape, role + CTA (employers only) */}
       {locked && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center px-3 py-4 bg-white/60 rounded-lg">
+        <div
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center px-3 py-4 bg-white/60"
+          style={BADGE_MASK_STYLE}
+        >
           <p className="text-sm sm:text-base font-bold text-[#16252d] font-inter text-center leading-tight mb-1">
             {displayName}
           </p>

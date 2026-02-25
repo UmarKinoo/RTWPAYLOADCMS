@@ -25,6 +25,9 @@ const nextConfig = {
   // Your Next.js config here
   output: 'standalone', // Required for Docker deployment
 
+  // Keep these server-only; they use Node built-ins (dns, etc.) not available in client bundle
+  serverExternalPackages: ['nodemailer', '@payloadcms/payload-cloud'],
+
   // Treat all user agents as HTML-limited so metadata (title, canonical) is always in <head>,
   // not streamed into <body>. Fixes inconsistent title/canonical placement (Next.js 15 streaming metadata).
   htmlLimitedBots: /.*/,
@@ -45,6 +48,7 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
+        dns: false,
         fs: false,
         net: false,
         tls: false,
