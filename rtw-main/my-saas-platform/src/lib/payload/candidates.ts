@@ -345,10 +345,10 @@ async function fetchCandidates(options?: {
       }
     }
   } else if (disciplineSlug) {
-    // Legacy disciplineSlug filter
+    // Discipline filter: URL param can be slug (e.g. "construction") or name (e.g. "Construction")
+    // Filter options send discipline name, so we resolve by slug first, then by name/name_en
     try {
-      // 1. Find discipline by slug
-      const disciplineResult = await payload.find({
+      let disciplineResult = await payload.find({
         collection: 'disciplines',
         where: {
           slug: {
@@ -357,6 +357,19 @@ async function fetchCandidates(options?: {
         },
         limit: 1,
       })
+
+      if (disciplineResult.docs.length === 0) {
+        disciplineResult = await payload.find({
+          collection: 'disciplines',
+          where: {
+            or: [
+              { name: { equals: disciplineSlug } },
+              { name_en: { equals: disciplineSlug } },
+            ],
+          },
+          limit: 1,
+        })
+      }
 
       if (disciplineResult.docs.length > 0) {
         const disciplineId = disciplineResult.docs[0].id
