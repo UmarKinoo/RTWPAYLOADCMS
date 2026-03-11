@@ -85,3 +85,7 @@ scripts/prevent-secrets.sh
 # Configuration files with potential secrets
 config.local.*
 *.local.*
+
+# Local-only system architecture visualizer (not for production)
+src/app/*/\(frontend\)/\(admin\)/system-map/
+src/components/admin/SystemArchitectureMap.tsx
