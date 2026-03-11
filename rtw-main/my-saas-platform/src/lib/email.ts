@@ -19,9 +19,21 @@ const resend = resendApiKey ? new Resend(resendApiKey) : null
 const emailFrom = process.env.EMAIL_FROM || 'noreply@readytowork.sa'
 
 export interface EmailOptions {
-  to: string
+  /** Single email, comma-separated string, or array of addresses. */
+  to: string | string[]
   subject: string
   html: string
+}
+
+/** Normalize to an array of trimmed email addresses (supports comma-separated string). */
+function normalizeToAddresses(to: string | string[]): string[] {
+  if (Array.isArray(to)) {
+    return to.map((e) => String(e).trim()).filter(Boolean)
+  }
+  return String(to)
+    .split(',')
+    .map((e) => e.trim())
+    .filter(Boolean)
 }
 
 export async function sendEmail({ to, subject, html }: EmailOptions) {
@@ -30,10 +42,16 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
     return { success: false, error: 'Email service not configured' }
   }
 
+  const toList = normalizeToAddresses(to)
+  if (toList.length === 0) {
+    console.warn('sendEmail: no valid recipient addresses')
+    return { success: false, error: 'No valid recipient addresses' }
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: emailFrom,
-      to,
+      to: toList,
       subject,
       html,
     })
