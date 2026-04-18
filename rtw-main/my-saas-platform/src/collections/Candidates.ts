@@ -1,7 +1,10 @@
 import type { CollectionConfig } from 'payload'
 import type { CollectionBeforeChangeHook } from 'payload'
 
-import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
+import {
+  allowAdminOrCandidatesViewerRead,
+  hiddenFromBlogEditorUnlessCandidatesViewer,
+} from '../access/candidatesViewer'
 import { authenticated } from '../access/authenticated'
 import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import {
@@ -123,12 +126,12 @@ export const Candidates: CollectionConfig = {
   auth: true,
   access: {
     create: () => true, // Allow public registration (frontend)
-    read: allowOnlyAdmin,
+    read: allowAdminOrCandidatesViewerRead,
     update: allowOnlyAdmin,
     delete: allowOnlyAdmin,
   },
   admin: {
-    hidden: hiddenFromBlogEditor,
+    hidden: hiddenFromBlogEditorUnlessCandidatesViewer,
     useAsTitle: 'email',
     defaultColumns: ['firstName', 'lastName', 'email', 'primarySkill', 'billingClass', 'updatedAt'],
   },
