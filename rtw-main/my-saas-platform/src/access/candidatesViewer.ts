@@ -38,8 +38,10 @@ export function allowAdminOrCandidatesViewerRead(args: AccessArgs<User>): boolea
 /**
  * Like hiddenFromBlogEditor, but keep Candidates visible for allowlisted blog-editors.
  */
-export function hiddenFromBlogEditorUnlessCandidatesViewer(args: { user: ClientUser }): boolean {
-  const u = args.user as { role?: string; email?: string }
-  if (u.role === 'blog-editor' && isCandidatesViewerEmail(u.email)) return false
-  return hiddenFromBlogEditor(args)
+export function hiddenFromBlogEditorUnlessCandidatesViewer(args: {
+  user: ClientUser | null | undefined
+}): boolean {
+  const u = args.user as { role?: string; email?: string } | null | undefined
+  if (u?.role === 'blog-editor' && isCandidatesViewerEmail(u.email)) return false
+  return hiddenFromBlogEditor({ user: args.user as ClientUser })
 }
