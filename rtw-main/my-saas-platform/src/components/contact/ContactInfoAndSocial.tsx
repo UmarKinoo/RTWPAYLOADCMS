@@ -19,7 +19,7 @@ const TikTokIcon: React.FC<{ className?: string }> = ({ className }) => (
 
 const SOCIAL_LINKS = [
   { url: 'https://www.instagram.com/readytowork.sa/', ariaLabel: 'Instagram', Icon: Instagram },
-  { url: 'https://www.tiktok.com/@readytoworksa', ariaLabel: 'TikTok', Icon: TikTokIcon },
+  { url: 'https://www.tiktok.com/@readytowork17', ariaLabel: 'TikTok', Icon: TikTokIcon },
   { url: 'https://www.facebook.com/readytowork.saudi', ariaLabel: 'Facebook', Icon: Facebook },
   { url: 'https://www.linkedin.com/company/ready-to-work-saudi-arabia', ariaLabel: 'LinkedIn', Icon: Linkedin },
 ] as const

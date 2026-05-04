@@ -22,7 +22,7 @@ const TikTokIcon: React.FC<{ className?: string }> = ({ className }) => (
 const SOCIAL_LINKS = [
   { url: 'https://www.instagram.com/readytowork.sa/', ariaLabel: 'Instagram', Icon: Instagram },
   {
-    url: 'https://www.tiktok.com/@readytoworksa',
+    url: 'https://www.tiktok.com/@readytowork17',
     ariaLabel: 'TikTok',
     Icon: TikTokIcon,
   },
@@ -162,7 +162,7 @@ export const Footer: React.FC = async () => {
           {/* Bottom Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
             <p className="text-xs sm:text-sm font-normal font-inter text-white">
-              {t('copyright')}
+              {t('copyright', { year: new Date().getFullYear() })}
             </p>
           </div>
         </div>

@@ -25,6 +25,8 @@ export interface CandidateDetail extends CandidateListItem {
   gender: 'male' | 'female'
   dob: string
   languages: string
+  /** Full job-matrix path at signup: discipline, category, subcategory, skill (comma-separated, localized). */
+  jobMatrixSelection: string | null
   currentEmployer: string | null
   availabilityDate: string
   visaStatus: 'active' | 'expired' | 'nearly_expired' | 'none'

@@ -12,6 +12,7 @@ import {
   revalidateCandidateDelete,
 } from './Candidates/hooks/revalidateCandidate'
 import { deleteRelatedBeforeCandidateDelete } from './Candidates/hooks/deleteRelatedBeforeCandidateDelete'
+import { ensureUniqueCandidatePhone } from './Candidates/hooks/ensureUniqueCandidatePhone'
 import { updateBioEmbeddingVector } from './Candidates/hooks/updateBioEmbeddingVector'
 
 // Hook to set billing class from primary skill and generate bio embedding
@@ -167,6 +168,10 @@ export const Candidates: CollectionConfig = {
       name: 'phone',
       type: 'text',
       required: true,
+      admin: {
+        description:
+          'E.164 after normalization. Must be unique — one candidate account per phone (enforced in beforeChange hook).',
+      },
     },
     {
       name: 'phoneVerified',
@@ -498,7 +503,7 @@ export const Candidates: CollectionConfig = {
   ],
   hooks: {
     beforeDelete: [deleteRelatedBeforeCandidateDelete],
-    beforeChange: [setBillingClassAndGenerateEmbedding],
+    beforeChange: [ensureUniqueCandidatePhone, setBillingClassAndGenerateEmbedding],
     afterChange: [updateBioEmbeddingVector, revalidateCandidate],
     afterDelete: [revalidateCandidateDelete],
   },

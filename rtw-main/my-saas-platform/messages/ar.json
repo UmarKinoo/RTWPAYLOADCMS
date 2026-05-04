@@ -337,7 +337,7 @@
       "emailValue": "hello@readytowork.sa",
       "phoneValue": "+966 53 969 6922",
       "hoursValue": "الأحد – الخميس / 9:00 صباحًا – 6:00 مساءً",
-      "copyright": "حقوق الطبع والنشر 2025 ©ReadyToWork. جميع الحقوق محفوظة.",
+      "copyright": "حقوق الطبع والنشر {year} ©ReadyToWork. جميع الحقوق محفوظة.",
       "designedBy": "مصمم ومطور بواسطة",
       "links": {
         "aboutUs": "من نحن",
@@ -806,6 +806,8 @@
     "yearsInSaudi": "سنوات الخبرة في السعودية",
     "yearsSuffix": "سنوات",
     "jobName": "المسمى الوظيفي",
+    "careerPathway": "المسار المهني",
+    "careerPathwayNotSpecified": "غير محدد",
     "languages": "اللغات",
     "toolsAndSkills": "الأدوات والمهارات",
     "specializedIn": "متخصص في",

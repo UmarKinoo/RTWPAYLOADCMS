@@ -123,6 +123,20 @@ export async function registerCandidate(
       }
     }
 
+    const existingPhone = await payload.find({
+      collection: 'candidates',
+      where: { phone: { equals: normalizedPhone } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+    if (existingPhone.docs.length > 0) {
+      return {
+        success: false,
+        error: 'An account with this phone number already exists',
+      }
+    }
+
     // Normalize WhatsApp if provided
     let normalizedWhatsApp: string | undefined
     if (data.whatsapp && data.whatsapp !== data.phone) {
@@ -224,6 +238,18 @@ export async function registerCandidate(
       return {
         success: false,
         error: 'An account with this email already exists',
+      }
+    }
+
+    if (
+      errorMessage.includes('phone number is already registered') ||
+      errorMessage.includes('An account with this phone number already exists') ||
+      (errorMessage.toLowerCase().includes('duplicate') &&
+        errorMessage.toLowerCase().includes('phone'))
+    ) {
+      return {
+        success: false,
+        error: 'An account with this phone number already exists',
       }
     }
 
@@ -350,7 +376,20 @@ export async function updateCandidate(
     const updateData: any = {}
     if (data.firstName !== undefined) updateData.firstName = data.firstName
     if (data.lastName !== undefined) updateData.lastName = data.lastName
-    if (data.phone !== undefined) updateData.phone = data.phone
+    if (data.phone !== undefined) {
+      if (data.phone === null || String(data.phone).trim() === '') {
+        return {
+          success: false,
+          error: 'Phone number is required',
+        }
+      }
+      try {
+        updateData.phone = normalizePhone(data.phone)
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Invalid phone number'
+        return { success: false, error: msg }
+      }
+    }
     if (data.whatsapp !== undefined) updateData.whatsapp = data.whatsapp
     if (data.primarySkill !== undefined)
       updateData.primarySkill = parseInt(data.primarySkill, 10)
@@ -420,11 +459,18 @@ export async function updateCandidate(
       success: true,
       candidate: candidate as Candidate,
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating candidate:', error)
+    const message = error instanceof Error ? error.message : 'Failed to update candidate'
+    if (message.includes('already registered to another account')) {
+      return {
+        success: false,
+        error: 'An account with this phone number already exists',
+      }
+    }
     return {
       success: false,
-      error: error?.message || 'Failed to update candidate',
+      error: message,
     }
   }
 }

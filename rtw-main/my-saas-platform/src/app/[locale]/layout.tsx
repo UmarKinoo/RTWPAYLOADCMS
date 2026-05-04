@@ -14,6 +14,9 @@ import type { Metadata } from 'next'
 import Script from 'next/script'
 import '@/globals.css'
 
+/** Set to `true` to load Google Tag Manager (GTM-KCL74CX7). */
+const ENABLE_GTM = true
+
 const fontSans = FontSans({
   subsets: ['latin'],
 })
@@ -86,30 +89,32 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Google Tag Manager */}
-        <Script
-          id="google-tag-manager"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        {ENABLE_GTM && (
+          <Script
+            id="google-tag-manager"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-KCL74CX7');`,
-          }}
-        />
+            }}
+          />
+        )}
       </head>
       <body className={cn('flex flex-col min-h-screen', isArabic ? cairo.className : fontSans.className)}>
-        {/* Google Tag Manager (noscript) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-KCL74CX7"
-            title="Google Tag Manager"
-            height="0"
-            width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          />
-        </noscript>
+        {ENABLE_GTM && (
+          <noscript>
+            <iframe
+              src="https://www.googletagmanager.com/ns.html?id=GTM-KCL74CX7"
+              title="Google Tag Manager"
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+        )}
         <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
         <Toaster richColors expand={true} closeButton />
         <Analytics />

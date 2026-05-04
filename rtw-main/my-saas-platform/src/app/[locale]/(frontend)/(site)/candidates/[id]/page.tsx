@@ -7,10 +7,8 @@ import { Footer } from '@/components/homepage/blocks/Footer'
 import { HomepageSection } from '@/components/homepage/HomepageSection'
 import { CandidateCard } from '@/components/homepage/blocks/Candidates'
 import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton'
-import {
-  getCandidateById,
-  getCandidates,
-} from '@/lib/payload/candidates'
+import { getCandidateDetail } from '@/lib/candidates/candidate-detail'
+import { getCandidates } from '@/lib/payload/candidates'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
 import { getCurrentUserType } from '@/lib/currentUserType'
 import { cn } from '@/lib/utils'
@@ -36,6 +34,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { id } = await paramsPromise
   const candidateId = parseInt(id, 10)
   const t = await getTranslations('candidateDetail')
+  const locale = await getLocale()
 
   if (isNaN(candidateId)) {
     return {
@@ -44,7 +43,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     }
   }
 
-  const candidate = await getCandidateById(candidateId)
+  const candidate = await getCandidateDetail(candidateId, locale)
 
   if (!candidate) {
     return {
@@ -54,7 +53,6 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   }
 
   const fullName = `${candidate.firstName} ${candidate.lastName}`
-  const locale = await getLocale()
   const baseUrl = getServerSideURL().replace(/\/$/, '')
 
   return {
@@ -101,12 +99,13 @@ function InfoCard({ title, children, className }: InfoCardProps) {
 export default async function CandidateDetailPage({ params: paramsPromise }: Args) {
   const { id } = await paramsPromise
   const candidateId = parseInt(id, 10)
+  const locale = await getLocale()
 
   if (isNaN(candidateId)) {
     notFound()
   }
 
-  const candidate = await getCandidateById(candidateId)
+  const candidate = await getCandidateDetail(candidateId, locale)
 
   if (!candidate) {
     notFound()
@@ -218,7 +217,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
               {candidate.saudiExperience} {t('yearsSuffix')}
             </InfoCard>
 
-            {/* Row 2: Job Name + Languages */}
+            {/* Row 2: Job name + languages */}
             <InfoCard title={t('jobName')}>{candidate.jobTitle}</InfoCard>
 
             <InfoCard title={t('languages')}>
@@ -227,6 +226,13 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
                   <li key={idx}>{lang}</li>
                 ))}
               </ul>
+            </InfoCard>
+
+            {/* Full job matrix path (discipline, category, subcategory, skill) at signup */}
+            <InfoCard title={t('careerPathway')} className="sm:col-span-2">
+              <p className="break-words leading-relaxed">
+                {candidate.jobMatrixSelection ?? t('careerPathwayNotSpecified')}
+              </p>
             </InfoCard>
 
             {/* Row 3: Tools & Skills (Full width) */}

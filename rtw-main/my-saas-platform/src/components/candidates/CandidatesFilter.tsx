@@ -222,7 +222,7 @@ const MobileFilterSheet: React.FC<{
                   {t('clearAll')}
                 </Button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 min-w-0">
                 {Object.entries(filters).map(([key, value]) => {
                   if (!value) return null
                   const config = filterConfigs.find((f) => f.param === key)
@@ -233,11 +233,13 @@ const MobileFilterSheet: React.FC<{
                     <Badge
                       key={key}
                       variant="outline"
-                      className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-3.5 py-2 text-sm font-medium flex items-center gap-2"
+                      className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-3.5 py-2 text-sm font-medium inline-flex max-w-full min-w-0 items-start justify-start gap-2 whitespace-normal text-left"
                     >
-                      {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
+                      <span className="min-w-0 flex-1 break-words leading-snug">
+                        {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
+                      </span>
                       <X
-                        className="w-3 h-3 cursor-pointer"
+                        className="w-3 h-3 shrink-0 cursor-pointer self-start mt-0.5"
                         onClick={() => onFilterChange(key, '')}
                       />
                     </Badge>
@@ -569,7 +571,7 @@ export const CandidatesFilter: React.FC = () => {
       </div>
 
       {/* Desktop: Full Sidebar */}
-      <div className="hidden lg:block bg-gradient-to-b from-[#f0f0f0] to-[#e8e7e7] rounded-2xl p-5 w-full shadow-sm">
+      <div className="hidden lg:block min-w-0 bg-gradient-to-b from-[#f0f0f0] to-[#e8e7e7] rounded-2xl p-5 w-full shadow-sm">
         {/* Search by Filter Button */}
         <Button
           variant="default"
@@ -616,7 +618,7 @@ export const CandidatesFilter: React.FC = () => {
                 {t('clearAll')}
               </Button>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 min-w-0">
               {Object.entries(filters).map(([key, value]) => {
                 if (!value) return null
                 const config = filterConfigs.find((f) => f.param === key)
@@ -627,11 +629,13 @@ export const CandidatesFilter: React.FC = () => {
                   <Badge
                     key={key}
                     variant="outline"
-                    className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-2.5 py-1 text-xs font-medium flex items-center gap-1.5"
+                    className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-2.5 py-1 text-xs font-medium inline-flex max-w-full min-w-0 items-start justify-start gap-1.5 whitespace-normal text-left"
                   >
-                    {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
+                    <span className="min-w-0 flex-1 break-words leading-snug">
+                      {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
+                    </span>
                     <X
-                      className="w-3 h-3 cursor-pointer hover:text-[#3a3aa0]"
+                      className="w-3 h-3 shrink-0 cursor-pointer self-start mt-0.5 hover:text-[#3a3aa0]"
                       onClick={() => updateFilters(key, '')}
                     />
                   </Badge>

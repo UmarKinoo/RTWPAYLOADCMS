@@ -40,10 +40,71 @@ function toListItem(doc: Candidate): CandidateListItem {
   }
 }
 
+type NamedTaxonomy = {
+  name?: string
+  name_en?: string | null
+  name_ar?: string | null
+}
+
+function localizedTaxonomyName(doc: NamedTaxonomy | null | undefined, locale: string): string | null {
+  if (!doc) return null
+  const ar = doc.name_ar?.trim()
+  const en = doc.name_en?.trim()
+  const fallback = doc.name?.trim()
+  if (locale === 'ar') {
+    if (ar) return ar
+    if (fallback) return fallback
+    if (en) return en
+    return null
+  }
+  if (en) return en
+  if (fallback) return fallback
+  if (ar) return ar
+  return null
+}
+
+/**
+ * Full path chosen on the job matrix: discipline → category → subcategory → primary skill.
+ * Comma-separated for display (e.g. "Agriculture…, Veterinarian, Livestock…, Agricultural Logistics…").
+ */
+function jobMatrixSelectionFromPrimarySkill(
+  primarySkill: Candidate['primarySkill'],
+  locale: string,
+): string | null {
+  if (!primarySkill || typeof primarySkill === 'number') return null
+
+  const skillName = localizedTaxonomyName(primarySkill, locale)
+  const sub = primarySkill.subCategory
+
+  if (!sub || typeof sub === 'number') {
+    return skillName
+  }
+
+  const subName = localizedTaxonomyName(sub, locale)
+  const cat = sub.category
+
+  if (!cat || typeof cat === 'number') {
+    const parts = [subName, skillName].filter(Boolean) as string[]
+    return parts.length ? parts.join(', ') : null
+  }
+
+  const catName = localizedTaxonomyName(cat, locale)
+  const disc = cat.discipline
+
+  if (!disc || typeof disc === 'number') {
+    const parts = [catName, subName, skillName].filter(Boolean) as string[]
+    return parts.length ? parts.join(', ') : null
+  }
+
+  const discName = localizedTaxonomyName(disc, locale)
+  const parts = [discName, catName, subName, skillName].filter(Boolean) as string[]
+  return parts.length ? parts.join(', ') : null
+}
+
 /**
  * Transform raw Candidate doc to CandidateDetail
  */
-function toDetail(doc: Candidate): CandidateDetail {
+function toDetail(doc: Candidate, locale: string): CandidateDetail {
   return {
     ...toListItem(doc),
     phone: doc.phone,
@@ -51,6 +112,7 @@ function toDetail(doc: Candidate): CandidateDetail {
     gender: doc.gender,
     dob: doc.dob,
     languages: doc.languages,
+    jobMatrixSelection: jobMatrixSelectionFromPrimarySkill(doc.primarySkill, locale),
     currentEmployer: doc.currentEmployer || null,
     availabilityDate: doc.availabilityDate,
     visaStatus: doc.visaStatus,
@@ -470,14 +532,15 @@ async function fetchCandidates(options?: {
   }
 }
 
-async function fetchCandidateById(id: number): Promise<CandidateDetail | null> {
+async function fetchCandidateById(id: number, locale: string): Promise<CandidateDetail | null> {
   const payload = await getPayload({ config: configPromise })
 
   try {
     const doc = await payload.findByID({
       collection: 'candidates',
       id,
-      depth: 1, // Populate media fields
+      // Populate profilePicture + primarySkill → subCategory → category → discipline
+      depth: 4,
       overrideAccess: true, // Public access for detail view
     })
 
@@ -485,7 +548,7 @@ async function fetchCandidateById(id: number): Promise<CandidateDetail | null> {
       return null
     }
 
-    return toDetail(doc)
+    return toDetail(doc, locale)
   } catch {
     return null
   }
@@ -540,9 +603,10 @@ export const getCandidates = (options?: {
 
 /**
  * Get single candidate by ID (cached with 'candidate:${id}' tag)
+ * @param locale Used for localized job matrix path (discipline → category → subcategory → skill).
  */
-export const getCandidateById = (id: number) =>
-  unstable_cache(async () => fetchCandidateById(id), ['candidate', String(id)], {
+export const getCandidateById = (id: number, locale: string) =>
+  unstable_cache(async () => fetchCandidateById(id, locale), ['candidate', String(id), locale], {
     tags: [`candidate:${id}`, 'candidates'],
     revalidate: 60,
   })()
