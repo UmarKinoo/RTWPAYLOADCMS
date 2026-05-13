@@ -1,7 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
 import { ArrowLeft, Calendar, Clock, MapPin, Briefcase, Video, FileText, ExternalLink } from 'lucide-react'
@@ -11,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import type { ScheduledInterview } from '@/lib/payload/employer-views'
+import { cn } from '@/lib/utils'
 
 interface ScheduledInterviewsViewProps {
   interviews: ScheduledInterview[]
@@ -18,10 +20,29 @@ interface ScheduledInterviewsViewProps {
 
 export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewProps) {
   const t = useTranslations('employerDashboard.scheduledInterviews')
+  const searchParams = useSearchParams()
   const now = new Date()
+
+  const highlightInterviewId = useMemo(() => {
+    const raw = searchParams.get('interviewId')
+    return raw && /^\d+$/.test(raw) ? raw : null
+  }, [searchParams])
+
+  useEffect(() => {
+    if (!highlightInterviewId) return
+    const el = document.getElementById(`employer-interview-${highlightInterviewId}`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [highlightInterviewId, interviews])
 
   const upcomingInterviews = interviews.filter((i) => new Date(i.scheduledAt) > now)
   const pastInterviews = interviews.filter((i) => new Date(i.scheduledAt) <= now)
+
+  const cardHighlightClass = (interviewId: number) =>
+    highlightInterviewId === String(interviewId)
+      ? 'ring-2 ring-[#4644b8] ring-offset-2 ring-offset-[#f5f5f5]'
+      : ''
 
   return (
     <div className="mt-6">
@@ -47,29 +68,40 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
       {/* Upcoming Interviews */}
       {upcomingInterviews.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-semibold text-[#282828] mb-4">{t('upcoming')}</h2>
+          <h2 className="mb-4 text-lg font-semibold text-[#282828]">{t('upcoming')}</h2>
           <div className="space-y-4">
             {upcomingInterviews.map((interview) => {
               const scheduledDate = new Date(interview.scheduledAt)
               const initials = `${interview.candidate.firstName?.[0] || ''}${interview.candidate.lastName?.[0] || ''}`.toUpperCase()
 
               return (
-                <Card key={interview.id} className="overflow-hidden">
+                <Card
+                  key={interview.id}
+                  id={`employer-interview-${interview.id}`}
+                  className={cn('overflow-hidden scroll-mt-24', cardHighlightClass(interview.id))}
+                >
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-4 flex-1">
+                      <div className="flex flex-1 items-start gap-4">
                         <Avatar className="size-12 shrink-0 border-2 border-[#ededed]">
                           {interview.candidate.profilePictureUrl ? (
                             <AvatarImage src={interview.candidate.profilePictureUrl} alt={`${interview.candidate.firstName} ${interview.candidate.lastName}`} />
                           ) : null}
-                          <AvatarFallback className="bg-[#ededed] text-[#282828] font-semibold">
+                          <AvatarFallback className="bg-[#ededed] font-semibold text-[#282828]">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg mb-1">
-                            {interview.candidate.firstName} {interview.candidate.lastName}
-                          </CardTitle>
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <CardTitle className="text-lg">
+                              {interview.candidate.firstName} {interview.candidate.lastName}
+                            </CardTitle>
+                            {interview.candidateAcceptedAt && (
+                              <Badge className="bg-green-100 text-xs font-medium text-green-800">
+                                {t('candidateConfirmed')}
+                              </Badge>
+                            )}
+                          </div>
                           {interview.candidate.jobTitle && (
                             <p className="text-sm text-[#757575]">{interview.candidate.jobTitle}</p>
                           )}
@@ -148,11 +180,11 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
                       <>
                         <Separator />
                         <div>
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="mb-2 flex items-center gap-2">
                             <FileText className="size-4 text-[#4644b8]" />
                             <span className="text-sm font-medium text-[#282828]">{t('notes')}</span>
                           </div>
-                          <p className="text-sm text-[#515151] whitespace-pre-wrap">{interview.notes}</p>
+                          <p className="whitespace-pre-wrap text-sm text-[#515151]">{interview.notes}</p>
                         </div>
                       </>
                     )}
@@ -167,14 +199,18 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
       {/* Past Interviews */}
       {pastInterviews.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-[#282828] mb-4">{t('pastInterviews')}</h2>
+          <h2 className="mb-4 text-lg font-semibold text-[#282828]">{t('pastInterviews')}</h2>
           <div className="space-y-4">
             {pastInterviews.map((interview) => {
               const scheduledDate = new Date(interview.scheduledAt)
               const initials = `${interview.candidate.firstName?.[0] || ''}${interview.candidate.lastName?.[0] || ''}`.toUpperCase()
 
               return (
-                <Card key={interview.id} className="overflow-hidden opacity-75">
+                <Card
+                  key={interview.id}
+                  id={`employer-interview-${interview.id}`}
+                  className={cn('overflow-hidden opacity-75 scroll-mt-24', cardHighlightClass(interview.id))}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -182,14 +218,21 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
                           {interview.candidate.profilePictureUrl ? (
                             <AvatarImage src={interview.candidate.profilePictureUrl} />
                           ) : null}
-                          <AvatarFallback className="bg-[#ededed] text-[#282828] text-sm font-semibold">
+                          <AvatarFallback className="bg-[#ededed] text-sm font-semibold text-[#282828]">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-[#282828]">
-                            {interview.candidate.firstName} {interview.candidate.lastName}
-                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-medium text-[#282828]">
+                              {interview.candidate.firstName} {interview.candidate.lastName}
+                            </p>
+                            {interview.candidateAcceptedAt && (
+                              <Badge className="bg-green-100 text-xs font-medium text-green-800">
+                                {t('candidateConfirmed')}
+                              </Badge>
+                            )}
+                          </div>
                           <p className="text-xs text-[#757575]">
                             {format(scheduledDate, 'MMM d, yyyy • h:mm a')}
                           </p>
@@ -229,4 +272,3 @@ export function ScheduledInterviewsView({ interviews }: ScheduledInterviewsViewP
     </div>
   )
 }
-

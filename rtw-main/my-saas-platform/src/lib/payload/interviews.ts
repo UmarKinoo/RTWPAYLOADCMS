@@ -18,6 +18,8 @@ export interface InterviewListItem {
   scheduledAt: string
   duration: number
   status: string
+  /** Set when the candidate accepts the scheduled slot */
+  candidateAcceptedAt?: string | null
   meetingLink?: string
   notes?: string
   jobPosition?: string
@@ -103,6 +105,7 @@ async function fetchInterviews(
       scheduledAt: interview.scheduledAt,
       duration: interview.duration,
       status: interview.status,
+      candidateAcceptedAt: interview.candidateAcceptedAt || undefined,
       meetingLink: interview.meetingLink || undefined,
       notes: interview.notes || undefined,
       createdAt: interview.createdAt,
@@ -154,6 +157,7 @@ async function fetchInterviewById(id: number): Promise<InterviewListItem | null>
       scheduledAt: interview.scheduledAt,
       duration: interview.duration,
       status: interview.status,
+      candidateAcceptedAt: interview.candidateAcceptedAt || undefined,
       meetingLink: interview.meetingLink || undefined,
       notes: interview.notes || undefined,
       createdAt: interview.createdAt,
@@ -236,6 +240,7 @@ async function fetchTodaysInterviews(employerId: number): Promise<InterviewListI
       scheduledAt: interview.scheduledAt,
       duration: interview.duration,
       status: interview.status,
+      candidateAcceptedAt: interview.candidateAcceptedAt || undefined,
       meetingLink: interview.meetingLink || undefined,
       notes: interview.notes || undefined,
       createdAt: interview.createdAt,
@@ -356,6 +361,7 @@ async function fetchCandidateInterviews(
       scheduledAt: interview.scheduledAt,
       duration: interview.duration,
       status: interview.status,
+      candidateAcceptedAt: interview.candidateAcceptedAt || undefined,
       meetingLink: interview.meetingLink || undefined,
       notes: interview.notes || undefined,
       jobPosition: interview.jobPosition || undefined,

@@ -120,7 +120,7 @@ export async function scheduleInterview(
         title: 'Interview Scheduled',
         message: `Interview scheduled with ${candidate.firstName} ${candidate.lastName} on ${new Date(data.scheduledAt).toLocaleString()}`,
         read: false,
-        actionUrl: `/employer/dashboard/interviews/${interview.id}`,
+        actionUrl: `/employer/dashboard?view=interviews&interviewId=${interview.id}`,
       },
     })
 

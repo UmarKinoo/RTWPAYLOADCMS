@@ -129,6 +129,16 @@ export const Interviews: CollectionConfig = {
       },
     },
     {
+      name: 'candidateAcceptedAt',
+      type: 'date',
+      admin: {
+        description: 'Set when the candidate accepts the interview request (moderator-approved scheduled slot)',
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+      },
+    },
+    {
       name: 'rejectionReason',
       type: 'textarea',
       admin: {

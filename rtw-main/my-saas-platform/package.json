@@ -34,7 +34,9 @@
     "db:reset": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/db/reset.ts",
     "ci": "pnpm db:migrate && pnpm build",
     "verify:myfatoorah": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-myfatoorah-token.ts",
-    "email:logo": "tsx scripts/svg-to-png-email-logo.ts"
+    "email:logo": "tsx scripts/svg-to-png-email-logo.ts",
+    "verify:interview-flow": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-interview-candidate-flow.ts",
+    "create:test-candidate": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/create-test-candidate.ts"
   },
   "pnpm": {
     "overrides": {

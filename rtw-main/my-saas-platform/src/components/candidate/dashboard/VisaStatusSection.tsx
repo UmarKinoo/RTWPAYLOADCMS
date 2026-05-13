@@ -113,7 +113,7 @@ export function VisaStatusSection({ candidate, onUpdate }: VisaStatusSectionProp
               size="sm"
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-[#4644b8] hover:bg-[#3a3aa0]"
+              className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white"
             >
               <Save className="mr-2 size-4" />
               {isSaving ? tCommon('saving') : tCommon('save')}

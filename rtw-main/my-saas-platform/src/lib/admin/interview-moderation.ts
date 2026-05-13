@@ -137,7 +137,7 @@ export async function approveInterviewRequest(
       data: {
         candidate: candidateId,
         type: 'interview_request_approved', // Keep type for filtering, but message is about invitation
-        title: 'New Interview Invitation',
+        title: `Interview invitation from ${employer.companyName || employer.email || 'Employer'}`,
         message: `You have received a new interview invitation from ${employer.companyName || employer.email}. Please review and respond.`,
         read: false,
         actionUrl: `/dashboard/interviews`,
@@ -177,7 +177,7 @@ export async function approveInterviewRequest(
         title: 'Interview Approved',
         message: `Your interview request with ${candidate.firstName} ${candidate.lastName} has been approved.`,
         read: false,
-        actionUrl: `/employer/dashboard/interviews/${interviewId}`,
+        actionUrl: `/employer/dashboard?view=interviews&interviewId=${interviewId}`,
       },
     })
 

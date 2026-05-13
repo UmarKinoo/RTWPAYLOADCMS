@@ -740,6 +740,7 @@
       "minutes": "دقيقة",
       "joinMeeting": "انضم للمقابلة",
       "notes": "ملاحظات",
+      "candidateConfirmed": "تأكيد المرشح",
       "noScheduledInterviews": "لا توجد مقابلات مجدولة",
       "noScheduledDescription": "ليس لديك مقابلات مجدولة بعد. اطلب مقابلات مع المرشحين للبدء.",
       "browseCandidates": "تصفح المرشحين"
@@ -909,6 +910,8 @@
       "accountSettingsDescription": "إدارة أمان حسابك وتفضيلاتك",
       "dashboard": "لوحة التحكم",
       "dashboardDescription": "تحديث معلوماتك يقدم لك المحتوى الأكثر صلة",
+      "interviews": "مقابلاتي",
+      "interviewsDescription": "راجع الدعوات وأكد المواعيد وروابط الاجتماعات",
       "searchPlaceholder": "بحث..."
     },
     "common": {
@@ -919,7 +922,8 @@
       "add": "إضافة",
       "notSet": "غير محدد",
       "failedToUpdate": "فشل التحديث",
-      "anErrorOccurred": "حدث خطأ"
+      "anErrorOccurred": "حدث خطأ",
+      "notification": "إشعار"
     },
     "profile": {
       "noJobTitle": "لا يوجد مسمى وظيفي",
@@ -1132,6 +1136,7 @@
       "viewDetails": "عرض التفاصيل ←",
       "noNotifications": "لا توجد إشعارات",
       "noNotificationsDescription": "أنت محدث! ستظهر الإشعارات الجديدة هنا.",
+      "fallbackEmployerName": "صاحب عمل",
       "types": {
         "interview_request_approved": {
           "title": "مقابلة مجدولة مع {company}",
@@ -1224,6 +1229,7 @@
   },
   "notificationDropdown": {
     "title": "الإشعارات",
+    "genericNotification": "إشعار",
     "markAllRead": "تحديد الكل كمقروء",
     "viewDetails": "عرض التفاصيل",
     "noNotifications": "لا توجد إشعارات",

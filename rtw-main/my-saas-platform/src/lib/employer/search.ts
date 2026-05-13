@@ -231,69 +231,28 @@ export async function searchCandidates(
       }
     }
 
-    // 3. Keyword search (name, job title) - only if no vector results found
-    // Only run keyword search if vector search didn't return enough results
+    // 3. Keyword search (name, job title) — always merge with vector results.
+    // Previously keyword ran only when vector paths returned zero IDs; with OPENAI_API_KEY set,
+    // skill-vector matches often filled primarySkillCandidateIds so keyword never ran and name
+    // searches (e.g. "Test") could not find candidates like "Test Candidate".
+    // Use ILIKE in SQL so matching is case-insensitive (contains/LIKE in PG is case-sensitive).
     let keywordCandidateIds: number[] = []
-    if (primarySkillCandidateIds.length === 0 && skillVectorCandidateIds.length === 0) {
-      const nameSearchResults = await payload.find({
-        collection: 'candidates',
-        where: {
-          and: [
-            {
-              termsAccepted: {
-                equals: true,
-              },
-            },
-            {
-              or: [
-                {
-                  firstName: {
-                    contains: searchQuery,
-                  },
-                },
-                {
-                  lastName: {
-                    contains: searchQuery,
-                  },
-                },
-                {
-                  jobTitle: {
-                    contains: searchQuery,
-                  },
-                },
-              ],
-            },
-          ],
-        },
-        limit: 50,
-        overrideAccess: true,
-      })
-
-      keywordCandidateIds = nameSearchResults.docs.map((c) => c.id)
-      console.log(`[Search] Keyword search found ${keywordCandidateIds.length} candidates for query: "${searchQuery}"`)
-      
-      // Check if keyword search is matching Veterinarian candidates
-      const veterinarianKeywordMatches = nameSearchResults.docs.filter(c => {
-        if (c.primarySkill && typeof c.primarySkill === 'object') {
-          const skillName = c.primarySkill.name || ''
-          return skillName.toLowerCase().includes('veterinarian')
-        }
-        return false
-      })
-      if (veterinarianKeywordMatches.length > 0) {
-        console.log(`[Search] ⚠️ WARNING: Keyword search matched ${veterinarianKeywordMatches.length} "Veterinarian" candidates for query "${searchQuery}":`, 
-          veterinarianKeywordMatches.map(c => ({
-            id: c.id,
-            name: `${c.firstName} ${c.lastName}`,
-            jobTitle: c.jobTitle,
-            primarySkill: typeof c.primarySkill === 'object' ? c.primarySkill.name : 'unknown',
-            matchReason: c.jobTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ? 'jobTitle' : 
-                        c.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ? 'firstName' :
-                        c.lastName?.toLowerCase().includes(searchQuery.toLowerCase()) ? 'lastName' : 'unknown'
-          }))
+    const nameRows = await dbQuery<{ id: string }>(
+      `
+      SELECT id FROM candidates
+      WHERE terms_accepted = true
+        AND (
+          first_name ILIKE $1
+          OR last_name ILIKE $1
+          OR job_title ILIKE $1
         )
-      }
-    }
+      ORDER BY id DESC
+      LIMIT 50
+    `,
+      [`%${searchQuery}%`],
+    )
+    keywordCandidateIds = nameRows.rows.map((row) => parseInt(row.id, 10))
+    console.log(`[Search] Keyword (ILIKE) search found ${keywordCandidateIds.length} candidates for query: "${searchQuery}"`)
 
     // Combine candidate IDs from all three search methods
     // Priority: primary skill vector (job role) > skill vector > keyword

@@ -35,6 +35,7 @@ export interface ScheduledInterview {
   jobPosition?: string
   jobLocation?: string
   salary?: string
+  candidateAcceptedAt?: string | null
 }
 
 export interface PendingInterviewRequest {
@@ -125,7 +126,6 @@ async function fetchCandidatesToReview(employerId: number): Promise<CandidateToR
 
 async function fetchScheduledInterviews(employerId: number): Promise<ScheduledInterview[]> {
   const payload = await getPayload({ config: configPromise })
-  const now = new Date()
 
   const interviews = await payload.find({
     collection: 'interviews',
@@ -139,11 +139,6 @@ async function fetchScheduledInterviews(employerId: number): Promise<ScheduledIn
         {
           status: {
             equals: 'scheduled',
-          },
-        },
-        {
-          scheduledAt: {
-            greater_than: now.toISOString(),
           },
         },
       ],
@@ -187,6 +182,7 @@ async function fetchScheduledInterviews(employerId: number): Promise<ScheduledIn
       jobPosition: interview.jobPosition || undefined,
       jobLocation: interview.jobLocation || undefined,
       salary: interview.salary || undefined,
+      candidateAcceptedAt: interview.candidateAcceptedAt || null,
     }
   })
 }

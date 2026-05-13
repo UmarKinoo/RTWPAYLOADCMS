@@ -124,7 +124,7 @@ export async function ScheduleSidebar({ employerId }: ScheduleSidebarProps) {
         </div>
         {interviews.length > 0 && (
           <Link
-            href="/employer/dashboard/interviews"
+            href="/employer/dashboard?view=interviews"
             className="text-xs font-medium text-[#4644b8] hover:underline text-center mt-2"
           >
             {t('viewAll')}

@@ -254,7 +254,7 @@ function ChangePasswordSection() {
               </Button>
             </div>
           </div>
-          <Button type="submit" disabled={isSaving} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+          <Button type="submit" disabled={isSaving} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
@@ -386,7 +386,7 @@ function EmailSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
               required
             />
           </div>
-          <Button type="submit" disabled={isChanging} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+          <Button type="submit" disabled={isChanging} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
             {isChanging ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
@@ -493,7 +493,7 @@ function PhoneSection({ candidate, onUpdate }: { candidate: Candidate; onUpdate:
                   required
                 />
               </div>
-              <Button type="submit" disabled={isUpdating} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+              <Button type="submit" disabled={isUpdating} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
                 {isUpdating ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
@@ -569,7 +569,7 @@ function WhatsAppSection({ candidate, onUpdate }: { candidate: Candidate; onUpda
               placeholder={t('placeholder')}
             />
           </div>
-          <Button type="submit" disabled={isUpdating} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+          <Button type="submit" disabled={isUpdating} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
             {isUpdating ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />

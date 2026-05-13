@@ -89,24 +89,28 @@ export function NotificationsView({
 
   const KNOWN_TYPES = ['interview_request_approved', 'interview_scheduled', 'interview_request', 'message'] as const
   const getDisplayTitle = (notification: typeof notifications[0]): string => {
-    if (KNOWN_TYPES.includes(notification.type as typeof KNOWN_TYPES[number])) {
+    const stored = notification.title?.trim()
+    if (stored) return stored
+    if (KNOWN_TYPES.includes(notification.type as (typeof KNOWN_TYPES)[number])) {
       const key = `types.${notification.type}.title`
-      const translated = t(key, { company: '' })
-      return translated !== key ? translated : notification.title
+      const translated = t(key, { company: t('fallbackEmployerName') })
+      return translated !== key ? translated : notification.title || tCommon('notification')
     }
-    return notification.title
+    return notification.title || tCommon('notification')
   }
   const getDisplayMessage = (notification: typeof notifications[0]): string => {
-    if (KNOWN_TYPES.includes(notification.type as typeof KNOWN_TYPES[number])) {
+    const stored = notification.message?.trim()
+    if (stored) return stored
+    if (KNOWN_TYPES.includes(notification.type as (typeof KNOWN_TYPES)[number])) {
       const key = `types.${notification.type}.message`
       const translated = t(key)
-      return translated !== key ? translated : notification.message
+      return translated !== key ? translated : notification.message || ''
     }
-    return notification.message
+    return notification.message || ''
   }
 
   return (
-    <div className="mt-6">
+    <div className="mx-auto mt-6 max-w-3xl">
       {/* Actions — title lives in DashboardHeader above */}
       {unreadCount > 0 && (
         <div className="mb-6 flex justify-end">

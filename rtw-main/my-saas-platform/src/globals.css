@@ -107,8 +107,9 @@
     --popover-foreground: oklch(0.141 0.005 285.823); /* Dark Text */
     --primary: oklch(0.44 0.14 278); /* Primary Purple #4644b8 */
     --primary-foreground: oklch(0.98 0 0); /* White */
-    --secondary: oklch(0.42 0.19 252); /* Primary Blue #005DDC */
-    --secondary-foreground: oklch(0.98 0 0); /* White */
+    /* Neutral secondary surfaces (grey bg + dark text — not brand blue) */
+    --secondary: oklch(0.93 0.002 150); /* Neutral ~ #EDEDED */
+    --secondary-foreground: oklch(0.141 0.005 285.823); /* Dark text #16252d */
     --muted: oklch(0.93 0.002 150); /* Neutral 200 #EDEDED */
     --muted-foreground: oklch(0.35 0.01 200); /* Neutral 500 #757575 */
     --accent: oklch(0.42 0.19 252); /* Primary Blue #005DDC */
@@ -219,8 +220,8 @@
   --popover-foreground: oklch(0.141 0.005 285.823); /* Dark Text */
   --primary: oklch(0.45 0.15 280); /* Primary Purple #4644b8 */
   --primary-foreground: oklch(0.98 0 0); /* White */
-  --secondary: oklch(0.45 0.20 250); /* Primary Blue #005DDC */
-  --secondary-foreground: oklch(0.98 0 0); /* White */
+  --secondary: oklch(0.93 0.002 150); /* Neutral grey — pairs with dark foreground */
+  --secondary-foreground: oklch(0.141 0.005 285.823); /* Dark text */
   --muted: oklch(0.93 0.002 150); /* Neutral 200 #EDEDED */
   --muted-foreground: oklch(0.35 0.01 200); /* Neutral 500 #757575 */
   --accent: oklch(0.45 0.20 250); /* Primary Blue #005DDC */

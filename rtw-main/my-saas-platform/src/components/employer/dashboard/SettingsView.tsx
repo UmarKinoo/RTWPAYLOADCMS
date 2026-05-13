@@ -233,7 +233,7 @@ function ProfileSection({ employer, onUpdate }: { employer: Employer; onUpdate: 
               </Select>
             </div>
           </div>
-          <Button type="submit" disabled={isSaving} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+          <Button type="submit" disabled={isSaving} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
@@ -382,7 +382,7 @@ function ChangePasswordSection() {
               </Button>
             </div>
           </div>
-          <Button type="submit" disabled={isSaving} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+          <Button type="submit" disabled={isSaving} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
@@ -513,7 +513,7 @@ function EmailSection({ employer, onUpdate }: { employer: Employer; onUpdate: (d
               required
             />
           </div>
-          <Button type="submit" disabled={isChanging} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+          <Button type="submit" disabled={isChanging} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
             {isChanging ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
@@ -618,7 +618,7 @@ function PhoneSection({ employer, onUpdate }: { employer: Employer; onUpdate: (d
                   required
                 />
               </div>
-              <Button type="submit" disabled={isUpdating} className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+              <Button type="submit" disabled={isUpdating} className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
                 {isUpdating ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />

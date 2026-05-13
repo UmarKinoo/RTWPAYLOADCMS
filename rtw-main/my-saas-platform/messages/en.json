@@ -740,6 +740,7 @@
       "minutes": "minutes",
       "joinMeeting": "Join Meeting",
       "notes": "Notes",
+      "candidateConfirmed": "Candidate confirmed",
       "noScheduledInterviews": "No scheduled interviews",
       "noScheduledDescription": "You don't have any scheduled interviews yet. Request interviews with candidates to get started.",
       "browseCandidates": "Browse Candidates"
@@ -909,6 +910,8 @@
       "accountSettingsDescription": "Manage your account security and preferences",
       "dashboard": "Dashboard",
       "dashboardDescription": "Updating your information will offer you the most relevant content",
+      "interviews": "My Interviews",
+      "interviewsDescription": "Review invitations, confirm times, and join meeting links",
       "searchPlaceholder": "Search..."
     },
     "common": {
@@ -919,7 +922,8 @@
       "add": "Add",
       "notSet": "Not set",
       "failedToUpdate": "Failed to update",
-      "anErrorOccurred": "An error occurred"
+      "anErrorOccurred": "An error occurred",
+      "notification": "Notification"
     },
     "profile": {
       "noJobTitle": "No job title",
@@ -1132,6 +1136,7 @@
       "viewDetails": "View details →",
       "noNotifications": "No notifications",
       "noNotificationsDescription": "You're all caught up! New notifications will appear here.",
+      "fallbackEmployerName": "an employer",
       "types": {
         "interview_request_approved": {
           "title": "Interview scheduled with {company}",
@@ -1224,6 +1229,7 @@
   },
   "notificationDropdown": {
     "title": "Notifications",
+    "genericNotification": "Notification",
     "markAllRead": "Mark all read",
     "viewDetails": "View details",
     "noNotifications": "No notifications",

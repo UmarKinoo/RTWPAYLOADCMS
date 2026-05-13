@@ -61,12 +61,16 @@ export async function acceptInterview(
       }
     }
 
-    // Update interview - keep status as scheduled, interview is confirmed
+    if (interview.candidateAcceptedAt) {
+      return { success: true, interview: interview as Interview }
+    }
+
+    // Persist candidate acceptance (must change data — previously status-only no-op could stall clients)
     const updatedInterview = await payload.update({
       collection: 'interviews',
       id: interviewId,
       data: {
-        status: 'scheduled', // Keep as scheduled, candidate has accepted
+        candidateAcceptedAt: new Date().toISOString(),
       },
     }) as Interview
 
@@ -88,12 +92,12 @@ export async function acceptInterview(
         title: 'Interview Accepted',
         message: `The candidate has accepted your interview request.`,
         read: false,
-        actionUrl: `/employer/dashboard/interviews/${interviewId}`,
+        actionUrl: `/employer/dashboard?view=interviews&interviewId=${interviewId}`,
       },
     })
 
     // Revalidate cache
-    revalidatePath('/candidate/dashboard/interviews', 'page')
+    revalidatePath('/dashboard/interviews', 'page')
     revalidatePath('/employer/dashboard', 'page')
     revalidateTag(`candidate:${user.id}`, 'max')
     revalidateTag(`employer:${employerId}`, 'max')
@@ -153,6 +157,13 @@ export async function rejectInterview(
       }
     }
 
+    if (interview.candidateAcceptedAt) {
+      return {
+        success: false,
+        error: 'You already accepted this interview.',
+      }
+    }
+
     // Update interview status to cancelled
     await payload.update({
       collection: 'interviews',
@@ -187,12 +198,12 @@ export async function rejectInterview(
         title: 'Interview Rejected',
         message: `The candidate has rejected your interview request.${reason ? ` Reason: ${reason}` : ''}`,
         read: false,
-        actionUrl: `/employer/dashboard/interviews/${interviewId}`,
+        actionUrl: `/employer/dashboard`,
       },
     })
 
     // Revalidate cache
-    revalidatePath('/candidate/dashboard/interviews', 'page')
+    revalidatePath('/dashboard/interviews', 'page')
     revalidatePath('/employer/dashboard', 'page')
     revalidateTag(`candidate:${user.id}`, 'max')
     revalidateTag(`employer:${employerId}`, 'max')

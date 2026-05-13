@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { format } from 'date-fns'
 import { Calendar, Clock, MapPin, Briefcase, DollarSign, Home, Car, ArrowLeft, Video, Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -18,40 +18,50 @@ import { cn } from '@/lib/utils'
 interface CandidateInterviewsPageProps {
   candidate: Candidate
   interviews: InterviewListItem[]
+  /** Use inside dashboard shell (sidebar + header); omit full-page chrome */
+  embedded?: boolean
 }
 
 export function CandidateInterviewsPage({
   candidate,
   interviews: initialInterviews,
+  embedded = false,
 }: CandidateInterviewsPageProps) {
   const router = useRouter()
   const [interviews, setInterviews] = useState(initialInterviews)
   const [processingId, setProcessingId] = useState<number | null>(null)
 
   const handleAccept = async (interviewId: number) => {
+    if (processingId !== null) return
     setProcessingId(interviewId)
     try {
       const result = await acceptInterview(interviewId)
+      setProcessingId(null)
       if (result.success) {
         toast.success('Interview accepted successfully!')
         setInterviews((prev) =>
-          prev.map((i) => (i.id === interviewId ? { ...i, status: 'scheduled' } : i)),
+          prev.map((i) =>
+            i.id === interviewId
+              ? { ...i, candidateAcceptedAt: new Date().toISOString() }
+              : i,
+          ),
         )
         router.refresh()
       } else {
         toast.error(result.error || 'Failed to accept interview')
       }
     } catch (error: any) {
-      toast.error(error.message || 'An error occurred')
-    } finally {
       setProcessingId(null)
+      toast.error(error.message || 'An error occurred')
     }
   }
 
   const handleReject = async (interviewId: number) => {
+    if (processingId !== null) return
     setProcessingId(interviewId)
     try {
       const result = await rejectInterview(interviewId)
+      setProcessingId(null)
       if (result.success) {
         toast.success('Interview rejected')
         setInterviews((prev) => prev.filter((i) => i.id !== interviewId))
@@ -60,13 +70,17 @@ export function CandidateInterviewsPage({
         toast.error(result.error || 'Failed to reject interview')
       }
     } catch (error: any) {
-      toast.error(error.message || 'An error occurred')
-    } finally {
       setProcessingId(null)
+      toast.error(error.message || 'An error occurred')
     }
   }
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (interview: InterviewListItem) => {
+    if (interview.status === 'scheduled' && interview.candidateAcceptedAt) {
+      return (
+        <Badge className="bg-green-100 text-xs font-medium text-green-800">Confirmed</Badge>
+      )
+    }
     const statusConfig: Record<string, { label: string; className: string }> = {
       scheduled: { label: 'Awaiting Your Response', className: 'bg-blue-100 text-blue-800' },
       completed: { label: 'Completed', className: 'bg-green-100 text-green-800' },
@@ -75,15 +89,23 @@ export function CandidateInterviewsPage({
       no_show: { label: 'No Show', className: 'bg-orange-100 text-orange-800' },
     }
 
-    const config = statusConfig[status] || { label: status, className: 'bg-gray-100 text-gray-800' }
+    const config =
+      statusConfig[interview.status] || {
+        label: interview.status,
+        className: 'bg-gray-100 text-gray-800',
+      }
 
     return (
       <Badge className={cn('text-xs font-medium', config.className)}>{config.label}</Badge>
     )
   }
 
-  const scheduledInterviews = interviews.filter((i) => i.status === 'scheduled')
-  const otherInterviews = interviews.filter((i) => i.status !== 'scheduled')
+  const awaitingResponseInterviews = interviews.filter(
+    (i) => i.status === 'scheduled' && !i.candidateAcceptedAt,
+  )
+  const historyInterviews = interviews.filter(
+    (i) => i.status !== 'scheduled' || !!i.candidateAcceptedAt,
+  )
 
   const renderInterviewCard = (interview: InterviewListItem) => {
     const interviewDate = new Date(interview.scheduledAt)
@@ -97,7 +119,7 @@ export function CandidateInterviewsPage({
                 {interview.employer.companyName}
               </CardTitle>
               <CardDescription className="mt-1">
-                {getStatusBadge(interview.status)}
+                {getStatusBadge(interview)}
               </CardDescription>
             </div>
           </div>
@@ -151,8 +173,8 @@ export function CandidateInterviewsPage({
             </>
           )}
 
-          {/* Action Buttons for Scheduled Interviews */}
-          {interview.status === 'scheduled' && (
+          {/* Action Buttons until candidate accepts */}
+          {interview.status === 'scheduled' && !interview.candidateAcceptedAt && (
             <div className="flex gap-3 pt-2">
               <Button
                 onClick={() => handleAccept(interview.id)}
@@ -198,37 +220,19 @@ export function CandidateInterviewsPage({
     )
   }
 
-  return (
-    <div className="min-h-screen bg-[#f5f5f5] p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-4xl">
-        {/* Header */}
-        <div className="mb-6 flex items-center gap-4">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="h-10 w-10">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">My Interviews</h1>
-            <p className="text-sm text-[#757575]">
-              {interviews.length} interview{interviews.length !== 1 ? 's' : ''} total
-            </p>
-          </div>
-        </div>
-
-        {/* Tabs */}
+  const tabsSection = (
         <Tabs defaultValue="scheduled" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="scheduled">
-              Awaiting Response ({scheduledInterviews.length})
+              Awaiting Response ({awaitingResponseInterviews.length})
             </TabsTrigger>
             <TabsTrigger value="all">All ({interviews.length})</TabsTrigger>
-            <TabsTrigger value="other">History ({otherInterviews.length})</TabsTrigger>
+            <TabsTrigger value="other">History ({historyInterviews.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="scheduled" className="space-y-4">
-            {scheduledInterviews.length > 0 ? (
-              scheduledInterviews.map(renderInterviewCard)
+            {awaitingResponseInterviews.length > 0 ? (
+              awaitingResponseInterviews.map(renderInterviewCard)
             ) : (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -259,8 +263,8 @@ export function CandidateInterviewsPage({
           </TabsContent>
 
           <TabsContent value="other" className="space-y-4">
-            {otherInterviews.length > 0 ? (
-              otherInterviews.map(renderInterviewCard)
+            {historyInterviews.length > 0 ? (
+              historyInterviews.map(renderInterviewCard)
             ) : (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -274,6 +278,33 @@ export function CandidateInterviewsPage({
             )}
           </TabsContent>
         </Tabs>
+  )
+
+  if (embedded) {
+    return (
+      <div className="mx-auto mt-6 w-full max-w-3xl rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+        {tabsSection}
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f5f5f5] p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-6 flex items-center gap-4">
+          <Link href="/dashboard">
+            <Button variant="ghost" size="icon" className="h-10 w-10">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-semibold text-[#282828] sm:text-3xl">My Interviews</h1>
+            <p className="text-sm text-[#757575]">
+              {interviews.length} interview{interviews.length !== 1 ? 's' : ''} total
+            </p>
+          </div>
+        </div>
+        {tabsSection}
       </div>
     </div>
   )

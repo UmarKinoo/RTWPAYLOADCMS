@@ -21,6 +21,7 @@ export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notif
   const t = useTranslations('candidateDashboard.header')
 
   const getHeaderTitle = () => {
+    if (pathname.includes('/interviews')) return t('interviews')
     if (pathname.includes('/activity')) return t('activity')
     if (pathname.includes('/notifications')) return t('notifications')
     if (pathname.includes('/resume')) return t('myResume')
@@ -29,6 +30,7 @@ export function DashboardHeader({ candidate, unreadNotificationsCount = 0, notif
   }
 
   const getHeaderDescription = () => {
+    if (pathname.includes('/interviews')) return t('interviewsDescription')
     if (pathname.includes('/activity')) return t('activityDescription')
     if (pathname.includes('/notifications')) return t('notificationsDescription')
     if (pathname.includes('/resume')) return t('myResumeDescription')

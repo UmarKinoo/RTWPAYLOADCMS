@@ -33,5 +33,5 @@ export default async function PendingInterviewsModeratorPage() {
     depth: 2, // Populate employer and candidate
   })
 
-  return <PendingInterviewsPage interviews={result.docs} />
+  return <PendingInterviewsPage interviews={result.docs} locale={locale} />
 }

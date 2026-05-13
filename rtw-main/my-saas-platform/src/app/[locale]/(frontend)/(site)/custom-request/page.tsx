@@ -33,7 +33,7 @@ export default async function CustomRequestPage() {
                 For custom plans, please reach out to our sales team to discuss your specific needs.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button asChild className="bg-[#4644b8] hover:bg-[#3a3aa0]">
+                <Button asChild className="bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white">
                   <a href="mailto:sales@readytowork.sa">Contact Sales</a>
                 </Button>
                 <Button variant="outline" asChild>

@@ -32,7 +32,7 @@ export async function redirectToAdmin(): Promise<never> {
 }
 
 export async function redirectToModeratorPanel(locale: string): Promise<never> {
-  redirect(`/${locale}/moderator/interviews/pending`)
+  redirect(`/${locale}/moderator`)
 }
 
 export async function redirectToEmployerDashboard(locale: string): Promise<never> {

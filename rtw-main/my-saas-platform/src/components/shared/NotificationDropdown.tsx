@@ -113,21 +113,25 @@ export function NotificationDropdown({
   }
 
   const getDisplayTitle = (notification: NotificationItem): string => {
-    if (KNOWN_NOTIFICATION_TYPES.includes(notification.type as typeof KNOWN_NOTIFICATION_TYPES[number])) {
+    const stored = notification.title?.trim()
+    if (stored) return stored
+    if (KNOWN_NOTIFICATION_TYPES.includes(notification.type as (typeof KNOWN_NOTIFICATION_TYPES)[number])) {
       const key = `types.${notification.type}.title`
-      const translated = tTypes(key, { company: '' })
-      return translated !== key ? translated : notification.title
+      const translated = tTypes(key, { company: tTypes('fallbackEmployerName') })
+      return translated !== key ? translated : notification.title || t('genericNotification')
     }
-    return notification.title
+    return notification.title || t('genericNotification')
   }
 
   const getDisplayMessage = (notification: NotificationItem): string => {
-    if (KNOWN_NOTIFICATION_TYPES.includes(notification.type as typeof KNOWN_NOTIFICATION_TYPES[number])) {
+    const stored = notification.message?.trim()
+    if (stored) return stored
+    if (KNOWN_NOTIFICATION_TYPES.includes(notification.type as (typeof KNOWN_NOTIFICATION_TYPES)[number])) {
       const key = `types.${notification.type}.message`
       const translated = tTypes(key)
-      return translated !== key ? translated : notification.message
+      return translated !== key ? translated : notification.message || ''
     }
-    return notification.message
+    return notification.message || ''
   }
 
   return (

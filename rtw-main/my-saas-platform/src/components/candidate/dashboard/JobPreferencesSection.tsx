@@ -161,7 +161,7 @@ export function JobPreferencesSection({ candidate, onUpdate }: JobPreferencesSec
               size="sm"
               onClick={handleSave}
               disabled={isSaving}
-              className="h-9 bg-[#4644b8] hover:bg-[#3a3aa0]"
+              className="h-9 bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white"
             >
               {isSaving ? (
                 <>
