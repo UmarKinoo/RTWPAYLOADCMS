@@ -209,7 +209,7 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
           {/* Right: Info Cards Grid */}
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 content-start">
             {/* Row 1: Visa Status + Saudi Experience */}
-            <InfoCard title={t('visaStatutes')}>
+            <InfoCard title={t('visaStatus')}>
               {visaStatusLabels[candidate.visaStatus]}
             </InfoCard>
 

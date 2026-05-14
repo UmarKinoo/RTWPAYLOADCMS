@@ -1,5 +1,19 @@
 import type { CollectionAfterReadHook } from 'payload'
-import { User } from 'src/payload-types'
+import type { User } from '@/payload-types'
+
+function authorNameForPublic(user: User): string {
+  const display = user.displayName?.trim()
+  if (display) return display
+  const email = user.email?.trim() || ''
+  if (!email) return 'Author'
+  const local = email.split('@')[0] || email
+  const withoutTrailingDigits = local.replace(/\d+$/, '')
+  const words = withoutTrailingDigits.split(/[._-]+/).filter(Boolean)
+  if (words.length > 0) {
+    return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+  }
+  return email
+}
 
 // The `user` collection has access control locked so that users are not publicly accessible
 // This means that we need to populate the authors manually here to protect user privacy
@@ -24,7 +38,7 @@ export const populateAuthors: CollectionAfterReadHook = async ({ doc, req, req: 
         if (authorDocs.length > 0) {
           doc.populatedAuthors = authorDocs.map((authorDoc) => ({
             id: authorDoc.id,
-            name: authorDoc.email, // User doesn't have name, use email instead
+            name: authorNameForPublic(authorDoc),
           }))
         }
       } catch {

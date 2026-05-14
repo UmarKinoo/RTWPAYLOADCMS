@@ -54,6 +54,14 @@ export const Users: CollectionConfig = {
       saveToJWT: true, // Required for admin.hidden role checks in other collections
     },
     {
+      name: 'displayName',
+      type: 'text',
+      admin: {
+        description:
+          'Public name on blog posts (e.g. Wajiha Salman). If set, this is shown instead of your email as the author.',
+      },
+    },
+    {
       name: 'emailVerified',
       type: 'checkbox',
       defaultValue: false,

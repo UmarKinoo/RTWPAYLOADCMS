@@ -6,6 +6,7 @@ import * as migration_20260211_000000_add_blog_editor_role from './20260211_0000
 import * as migration_20260211_100000_add_user_invitation_fields from './20260211_100000_add_user_invitation_fields'
 import * as migration_20260211_200000_add_moderator_role from './20260211_200000_add_moderator_role'
 import * as migration_20260512_000000_add_interviews_candidate_accepted_at from './20260512_000000_add_interviews_candidate_accepted_at'
+import * as migration_20260513_000000_add_users_display_name from './20260513_000000_add_users_display_name'
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20260512_000000_add_interviews_candidate_accepted_at.up,
     down: migration_20260512_000000_add_interviews_candidate_accepted_at.down,
     name: '20260512_000000_add_interviews_candidate_accepted_at'
+  },
+  {
+    up: migration_20260513_000000_add_users_display_name.up,
+    down: migration_20260513_000000_add_users_display_name.down,
+    name: '20260513_000000_add_users_display_name'
   },
 ]

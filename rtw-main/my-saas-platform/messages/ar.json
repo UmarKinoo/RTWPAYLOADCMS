@@ -799,7 +799,7 @@
   "candidateDetail": {
     "notFoundTitle": "المرشح غير موجود | Ready to Work",
     "notFoundDescription": "تعذر العثور على ملف المرشح المطلوب.",
-    "visaStatutes": "حالة التأشيرة",
+    "visaStatus": "حالة التأشيرة",
     "visaActive": "تأشيرة نشطة",
     "visaExpired": "منتهية",
     "visaNearlyExpired": "قريبة من الانتهاء",

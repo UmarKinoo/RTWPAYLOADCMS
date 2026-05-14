@@ -799,7 +799,7 @@
   "candidateDetail": {
     "notFoundTitle": "Candidate Not Found | Ready to Work",
     "notFoundDescription": "The requested candidate profile could not be found.",
-    "visaStatutes": "Visa Statutes",
+    "visaStatus": "Visa Status",
     "visaActive": "Active Visa",
     "visaExpired": "Expired",
     "visaNearlyExpired": "Nearly Expired",
