@@ -9,14 +9,14 @@ import {
   invitationEmailTemplateAcceptInvitation,
   employerWelcomeEmailTemplate,
 } from './email-templates'
+import { getResendFromHeader } from './email-from'
 
 export { invitationEmailTemplatePayloadReset, invitationEmailTemplateAcceptInvitation }
 
 const resendApiKey = process.env.RESEND_API_KEY
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
-// Email configuration
-const emailFrom = process.env.EMAIL_FROM || 'noreply@readytowork.sa'
+const emailFrom = getResendFromHeader()
 
 export interface EmailOptions {
   /** Single email, comma-separated string, or array of addresses. */

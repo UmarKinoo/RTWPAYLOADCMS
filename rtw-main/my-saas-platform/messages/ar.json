@@ -396,6 +396,7 @@
       "filterCandidates": "تصفية المرشحين",
       "filters": "المرشحات",
       "clearAll": "مسح الكل",
+      "removeFilter": "إزالة هذا المرشح",
       "activeFilters": "المرشحات النشطة",
       "searchByFilter": "البحث بالمرشح",
       "applyFilters": "تطبيق المرشحات",

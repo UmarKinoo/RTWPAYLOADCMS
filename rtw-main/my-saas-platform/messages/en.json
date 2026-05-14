@@ -396,6 +396,7 @@
       "filterCandidates": "Filter Candidates",
       "filters": "Filters",
       "clearAll": "Clear All",
+      "removeFilter": "Remove this filter",
       "activeFilters": "Active Filters",
       "searchByFilter": "Search by Filter",
       "applyFilters": "Apply Filters",

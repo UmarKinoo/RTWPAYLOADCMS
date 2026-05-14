@@ -9,6 +9,7 @@
 
 import { Resend } from 'resend'
 import { verificationEmailTemplate, passwordResetEmailTemplate, welcomeEmailTemplate } from '../src/lib/email-templates'
+import { getResendFromHeader } from '../src/lib/email-from'
 
 const resendApiKey = process.env.RESEND_API_KEY
 const recipientEmail = process.env.TEST_EMAIL || 'test@example.com'
@@ -19,7 +20,7 @@ if (!resendApiKey) {
 }
 
 const resend = new Resend(resendApiKey)
-const emailFrom = process.env.EMAIL_FROM || 'noreply@readytowork.sa'
+const emailFrom = getResendFromHeader()
 
 async function testEmail() {
   console.log('📧 Testing email sending...\n')

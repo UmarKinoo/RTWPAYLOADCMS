@@ -233,15 +233,22 @@ const MobileFilterSheet: React.FC<{
                     <Badge
                       key={key}
                       variant="outline"
-                      className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-3.5 py-2 text-sm font-medium inline-flex max-w-full min-w-0 items-start justify-start gap-2 whitespace-normal text-left"
+                      className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-3.5 py-2 text-sm font-medium inline-flex max-w-full min-w-0 items-start justify-start gap-2 whitespace-normal text-left"
                     >
                       <span className="min-w-0 flex-1 break-words leading-snug">
                         {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
                       </span>
-                      <X
-                        className="w-3 h-3 shrink-0 cursor-pointer self-start mt-0.5"
-                        onClick={() => onFilterChange(key, '')}
-                      />
+                      <button
+                        type="button"
+                        className="inline-flex shrink-0 self-start mt-0.5 rounded p-0.5 text-[#4644b8] transition-colors hover:bg-[#4644b8]/20 hover:text-[#3a3aa0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4644b8]/50"
+                        aria-label={t('removeFilter')}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onFilterChange(key, '')
+                        }}
+                      >
+                        <X className="w-3 h-3" aria-hidden />
+                      </button>
                     </Badge>
                   )
                 })}
@@ -629,15 +636,22 @@ export const CandidatesFilter: React.FC = () => {
                   <Badge
                     key={key}
                     variant="outline"
-                    className="cursor-pointer border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-2.5 py-1 text-xs font-medium inline-flex max-w-full min-w-0 items-start justify-start gap-1.5 whitespace-normal text-left"
+                    className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-2.5 py-1 text-xs font-medium inline-flex max-w-full min-w-0 items-start justify-start gap-1.5 whitespace-normal text-left"
                   >
                     <span className="min-w-0 flex-1 break-words leading-snug">
                       {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
                     </span>
-                    <X
-                      className="w-3 h-3 shrink-0 cursor-pointer self-start mt-0.5 hover:text-[#3a3aa0]"
-                      onClick={() => updateFilters(key, '')}
-                    />
+                    <button
+                      type="button"
+                      className="inline-flex shrink-0 self-start mt-0.5 rounded p-0.5 text-[#4644b8] transition-colors hover:bg-[#4644b8]/20 hover:text-[#3a3aa0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4644b8]/50"
+                      aria-label={t('removeFilter')}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        updateFilters(key, '')
+                      }}
+                    >
+                      <X className="w-3 h-3" aria-hidden />
+                    </button>
                   </Badge>
                 )
               })}

@@ -34,13 +34,15 @@ import { plugins } from '@/plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from '@/utilities/getURL'
 import { resendAdapter } from '@payloadcms/email-resend'
+import { getEmailFromAddressOnly, getEmailFromDisplayName } from '@/lib/email-from'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 // Email adapter configuration - only initialize if RESEND_API_KEY is set
 const resendApiKey = process.env.RESEND_API_KEY
-const emailFrom = process.env.EMAIL_FROM || 'noreply@readytowork.sa'
+const emailFromAddress = getEmailFromAddressOnly()
+const emailFromDisplayName = getEmailFromDisplayName()
 
 // Log email adapter status
 if (resendApiKey && resendApiKey.trim()) {
@@ -109,8 +111,8 @@ export default buildConfig({
   // Only set email adapter if API key is present and not empty
   email: resendApiKey && resendApiKey.trim()
     ? resendAdapter({
-        defaultFromAddress: emailFrom,
-        defaultFromName: 'Ready to Work',
+        defaultFromAddress: emailFromAddress,
+        defaultFromName: emailFromDisplayName,
         apiKey: resendApiKey,
       })
     : undefined,
