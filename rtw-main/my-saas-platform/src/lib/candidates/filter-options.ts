@@ -2,6 +2,7 @@
 
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import { disciplineSlugFromName } from '@/lib/candidates/discipline-filter'
 
 export interface FilterOptions {
   locations: string[]
@@ -9,6 +10,7 @@ export interface FilterOptions {
   states: string[]
   nationalities: string[]
   languages: string[]
+  jobTypes: string[]
   disciplines: string[]
   categories: string[]
   subCategories: string[]
@@ -54,6 +56,7 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
     const disciplines = new Set<string>()
     const categories = new Set<string>()
     const subCategories = new Set<string>()
+    const jobTypes = new Set<string>()
 
     candidates.docs.forEach((candidate) => {
       if (candidate.location) {
@@ -68,6 +71,11 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
           const trimmed = lang.trim()
           if (trimmed) languages.add(trimmed)
         })
+      }
+
+      const workType = (candidate as { jobPreferences?: { workType?: string } }).jobPreferences?.workType
+      if (workType && workType !== 'any') {
+        jobTypes.add(workType)
       }
 
       // Extract taxonomy from primarySkill
@@ -87,9 +95,10 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
 
             if (category.discipline && typeof category.discipline === 'object') {
               const discipline = category.discipline
-              if (discipline.name) {
-                disciplines.add(discipline.name)
-              }
+              const slug =
+                discipline.slug ||
+                (discipline.name ? disciplineSlugFromName(discipline.name) : '')
+              if (slug) disciplines.add(slug)
             }
           }
         }
@@ -117,8 +126,15 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
       }),
     ])
 
+    const disciplineSlugByName = new Map<string, string>()
     allDisciplines.docs.forEach((d) => {
-      disciplines.add(d.name)
+      const slug =
+        d.slug ||
+        disciplineSlugFromName(d.name || d.name_en || '')
+      if (slug) {
+        disciplines.add(slug)
+        if (d.name) disciplineSlugByName.set(d.name, slug)
+      }
     })
 
     allCategories.docs.forEach((c) => {
@@ -134,11 +150,15 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
     const subCategoriesByCategory: Record<string, string[]> = {}
 
     allCategories.docs.forEach((c) => {
-      const disc = c.discipline as { id?: string; name?: string } | null | undefined
+      const disc = c.discipline as { id?: string; name?: string; slug?: string } | null | undefined
       const discName = disc && typeof disc === 'object' && disc.name ? disc.name : ''
-      if (discName && c.name) {
-        if (!categoriesByDiscipline[discName]) categoriesByDiscipline[discName] = []
-        categoriesByDiscipline[discName].push(c.name)
+      const discSlug =
+        disc && typeof disc === 'object'
+          ? disc.slug || disciplineSlugByName.get(discName) || disciplineSlugFromName(discName)
+          : ''
+      if (discSlug && c.name) {
+        if (!categoriesByDiscipline[discSlug]) categoriesByDiscipline[discSlug] = []
+        categoriesByDiscipline[discSlug].push(c.name)
       }
     })
     Object.keys(categoriesByDiscipline).forEach((k) => {
@@ -177,7 +197,9 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
       const subCategoryMap: Record<string, string> = {}
       // Keys must match option values (we use .name in the options arrays)
       allDisciplines.docs.forEach((d: any) => {
-        const key = d.name ?? ''
+        const key =
+          d.slug ||
+          disciplineSlugFromName(d.name || d.name_en || '')
         if (key) disciplineMap[key] = getLocalizedName(d, locale)
       })
       allCategories.docs.forEach((c: any) => {
@@ -197,6 +219,7 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
       states: Array.from(states).sort(localeSort),
       nationalities: Array.from(nationalities).sort(localeSort),
       languages: Array.from(languages).sort(localeSort),
+      jobTypes: Array.from(jobTypes).sort(localeSort),
       disciplines: Array.from(disciplines).sort(localeSort),
       categories: Array.from(categories).sort(localeSort),
       subCategories: Array.from(subCategories).sort(localeSort),

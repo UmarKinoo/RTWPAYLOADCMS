@@ -193,10 +193,11 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
   let candidates: any[] = []
   let totalDocs = 0
   if (!isSearchMode) {
+    const hasTaxonomy = Boolean(q.category?.trim() || q.subCategory?.trim())
     const result = await getCandidates({
       limit: 1000,
       page: 1,
-      disciplineSlug: q.discipline,
+      disciplineSlug: hasTaxonomy ? undefined : q.discipline,
       location: q.location,
       nationality: q.nationality,
       billingClass: q.billingClass,

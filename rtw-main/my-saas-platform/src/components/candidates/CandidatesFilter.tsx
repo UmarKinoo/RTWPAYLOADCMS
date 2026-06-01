@@ -41,6 +41,13 @@ interface FilterConfig {
 }
 
 // Param to translation key for filter labels (so filters display in current locale)
+const JOB_TYPE_LABELS: Record<string, string> = {
+  'full-time': 'Full-time',
+  'part-time': 'Part-time',
+  contract: 'Contract',
+  freelance: 'Freelance',
+}
+
 const paramToLabelKey: Record<string, string> = {
   country: 'country',
   state: 'stateCity',
@@ -59,7 +66,7 @@ const paramToLabelKey: Record<string, string> = {
 const baseFilterConfigs: FilterConfig[] = [
   { label: 'Country', param: 'country', options: [] },
   { label: 'State', param: 'state', options: [] },
-  { label: 'Job Type', param: 'jobType', options: ['Full-time', 'Part-time', 'Contract'] },
+  { label: 'Job Type', param: 'jobType', options: [] },
   { label: 'Major Discipline', param: 'discipline', options: [] },
   { label: 'Category', param: 'category', options: [] },
   { label: 'Sub Category', param: 'subCategory', options: [] },
@@ -457,6 +464,7 @@ export const CandidatesFilter: React.FC = () => {
     discipline: [],
     category: [],
     subCategory: [],
+    jobType: [],
   })
 
   // Hierarchy maps for cascading discipline -> category -> subCategory
@@ -489,6 +497,9 @@ export const CandidatesFilter: React.FC = () => {
           discipline: data.disciplines || [],
           category: data.categories || [],
           subCategory: data.subCategories || [],
+          jobType: data.jobTypes?.length
+            ? data.jobTypes
+            : ['full-time', 'part-time', 'contract'],
         })
         setHierarchyMaps({
           categoriesByDiscipline: data.categoriesByDiscipline ?? {},
@@ -662,11 +673,27 @@ export const CandidatesFilter: React.FC = () => {
         {/* Filter Dropdowns */}
         <div className="space-y-4">
           {filterConfigs.map((filter) => {
-            const needsLoading = ['country', 'state', 'nationality', 'language', 'discipline', 'category', 'subCategory'].includes(filter.param)
+            const needsLoading = [
+              'country',
+              'state',
+              'nationality',
+              'language',
+              'discipline',
+              'category',
+              'subCategory',
+              'jobType',
+            ].includes(filter.param)
             const labelKey = paramToLabelKey[filter.param] ?? filter.param
-            const getOptionLabel = labelMaps && (filter.param === 'discipline' || filter.param === 'category' || filter.param === 'subCategory')
-              ? (val: string) => labelMaps[filter.param as keyof typeof labelMaps][val] ?? val
-              : undefined
+            const getOptionLabel =
+              filter.param === 'jobType'
+                ? (val: string) => JOB_TYPE_LABELS[val] ?? val
+                : labelMaps &&
+                    (filter.param === 'discipline' ||
+                      filter.param === 'category' ||
+                      filter.param === 'subCategory')
+                  ? (val: string) =>
+                      labelMaps[filter.param as keyof typeof labelMaps][val] ?? val
+                  : undefined
             return (
               <FilterSelect
                 key={filter.param}

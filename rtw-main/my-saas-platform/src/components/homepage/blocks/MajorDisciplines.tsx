@@ -3,16 +3,7 @@ import { HomepageSection } from '../HomepageSection'
 import { MajorDisciplinesClient } from './MajorDisciplinesClient'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { getDisciplines } from '@/lib/disciplines'
-
-/**
- * Generate slug from name (fallback if discipline doesn't have slug)
- */
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
+import { disciplineSlugFromName } from '@/lib/candidates/discipline-filter'
 
 // Figma images mapped by discipline name (from database)
 // Includes both corrected names and actual database names for matching
@@ -72,7 +63,9 @@ export async function MajorDisciplines() {
       return {
         title,
         image,
-        slug: discipline.slug || generateSlug(discipline.name || discipline.name_en || ''), // Use actual slug from database, fallback to generated
+        slug:
+          discipline.slug ||
+          disciplineSlugFromName(discipline.name || discipline.name_en || ''),
       }
     })
     .filter((d): d is { title: string; image: string; slug: string } => d !== null)

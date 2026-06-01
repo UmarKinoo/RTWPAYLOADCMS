@@ -4,6 +4,16 @@ import { unstable_cache } from 'next/cache'
 import type { Candidate, Media } from '@/payload-types'
 import type { BillingClass } from '@/lib/billing'
 import type { CandidateListItem, CandidateDetail } from '@/types/candidate'
+import {
+  getCandidateIdsForDiscipline,
+  getCandidateIdsForJobType,
+  getCandidateIdsForTaxonomy,
+  resolveDisciplineId,
+} from '@/lib/candidates/discipline-filter'
+import {
+  normalizeJobTypeFilter,
+  skillLevelToBillingClass,
+} from '@/lib/candidates/filter-params'
 
 // Re-export for server code that imports from this file
 export type { CandidateListItem, CandidateDetail }
@@ -216,14 +226,13 @@ async function fetchCandidates(options?: {
     }
   }
 
-  // Apply billing class filter (or skillLevel if it maps to billing class)
-  if (billingClass) {
+  // Apply billing class filter (explicit param or skill-level dropdown)
+  const billingFromSkillLevel = skillLevel ? skillLevelToBillingClass(skillLevel) : null
+  const effectiveBillingClass = billingClass || billingFromSkillLevel
+  if (effectiveBillingClass) {
     where.billingClass = {
-      equals: billingClass,
+      equals: effectiveBillingClass,
     }
-  } else if (skillLevel) {
-    // Map skill level to billing class if needed
-    // For now, we'll skip this as skillLevel might not directly map
   }
 
   // Apply experience filter (range) - handle both old format and new format
@@ -284,231 +293,65 @@ async function fetchCandidates(options?: {
     }
   }
 
-  // Apply taxonomy filters (discipline, category, subCategory)
-  // These filter through primarySkill relationship
-  // NOTE: If disciplineSlug is provided, skip taxonomy filters (disciplineSlug takes precedence)
-  let skillIdsToFilter: number[] | null = null
+  // Narrow by candidate id sets (discipline, taxonomy, job type) — intersect when multiple apply
+  let constrainedIds: number[] | undefined
 
-  if ((discipline || category || subCategory) && !disciplineSlug) {
-    try {
-      let disciplineIds: number[] = []
-      let categoryIds: number[] = []
-      let subCategoryIds: number[] = []
-
-      // 1. Filter by discipline if provided
-      if (discipline) {
-        const disciplineResult = await payload.find({
-          collection: 'disciplines',
-          where: {
-            name: {
-              equals: discipline,
-            },
-          },
-          limit: 1000,
-        })
-        disciplineIds = disciplineResult.docs.map((d) => d.id)
-      }
-
-      // 2. Filter by category if provided
-      if (category) {
-        const categoryWhere: any = {
-          name: {
-            equals: category,
-          },
-        }
-        if (disciplineIds.length > 0) {
-          categoryWhere.discipline = {
-            in: disciplineIds,
-          }
-        }
-        const categoryResult = await payload.find({
-          collection: 'categories',
-          where: categoryWhere,
-          limit: 1000,
-        })
-        categoryIds = categoryResult.docs.map((c) => c.id)
-      } else if (disciplineIds.length > 0) {
-        // If only discipline is provided, get all categories for that discipline
-        const categoryResult = await payload.find({
-          collection: 'categories',
-          where: {
-            discipline: {
-              in: disciplineIds,
-            },
-          },
-          limit: 1000,
-        })
-        categoryIds = categoryResult.docs.map((c) => c.id)
-      }
-
-      // 3. Filter by subCategory if provided
-      if (subCategory) {
-        const subCategoryWhere: any = {
-          name: {
-            equals: subCategory,
-          },
-        }
-        if (categoryIds.length > 0) {
-          subCategoryWhere.category = {
-            in: categoryIds,
-          }
-        }
-        const subCategoryResult = await payload.find({
-          collection: 'subcategories',
-          where: subCategoryWhere,
-          limit: 1000,
-        })
-        subCategoryIds = subCategoryResult.docs.map((sc) => sc.id)
-      } else if (categoryIds.length > 0) {
-        // If category is provided, get all subcategories for that category
-        const subCategoryResult = await payload.find({
-          collection: 'subcategories',
-          where: {
-            category: {
-              in: categoryIds,
-            },
-          },
-          limit: 1000,
-        })
-        subCategoryIds = subCategoryResult.docs.map((sc) => sc.id)
-      }
-
-      // 4. Get all skills for the filtered subcategories
-      if (subCategoryIds.length > 0) {
-        const skillsResult = await payload.find({
-          collection: 'skills',
-          where: {
-            subCategory: {
-              in: subCategoryIds,
-            },
-          },
-          limit: 1000,
-        })
-        skillIdsToFilter = skillsResult.docs.map((s) => s.id)
-      } else if (discipline || category || subCategory) {
-        // If filters were provided but no results, return empty
-        skillIdsToFilter = []
-      }
-    } catch (error) {
-      console.error('Error filtering by taxonomy:', error)
+  const intersectCandidateIds = (next: number[]): void => {
+    if (constrainedIds !== undefined && constrainedIds.length === 0) return
+    if (next.length === 0) {
+      constrainedIds = []
+      return
     }
+    if (constrainedIds === undefined) {
+      constrainedIds = next
+      return
+    }
+    const allowed = new Set(next)
+    constrainedIds = constrainedIds.filter((id) => allowed.has(id))
   }
 
-  // Apply primarySkill filter (from taxonomy filters or disciplineSlug)
-  if (skillIdsToFilter !== null) {
-    if (skillIdsToFilter.length > 0) {
-      where.primarySkill = {
-        in: skillIdsToFilter,
+  const hasTaxonomy = Boolean(category?.trim() || subCategory?.trim())
+  const disciplineOnlyParam =
+    !hasTaxonomy ? (disciplineSlug || discipline) : undefined
+
+  try {
+    if (disciplineOnlyParam) {
+      const disciplineId = await resolveDisciplineId(disciplineOnlyParam)
+      if (!disciplineId) {
+        intersectCandidateIds([])
+      } else {
+        intersectCandidateIds(await getCandidateIdsForDiscipline(disciplineId))
       }
-    } else {
-      // No skills found, return empty result
-      where.primarySkill = {
-        equals: -1, // Non-existent ID to return no results
+    } else if (discipline || category || subCategory) {
+      const disciplineId = discipline ? await resolveDisciplineId(discipline) : null
+      if (discipline && !disciplineId) {
+        intersectCandidateIds([])
+      } else {
+        intersectCandidateIds(
+          await getCandidateIdsForTaxonomy({
+            disciplineId,
+            categoryName: category,
+            subCategoryName: subCategory,
+          }),
+        )
       }
     }
-  } else if (disciplineSlug) {
-    // Discipline filter: URL param can be slug (e.g. "construction") or name (e.g. "Construction")
-    // Filter options send discipline name, so we resolve by slug first, then by name/name_en
-    try {
-      let disciplineResult = await payload.find({
-        collection: 'disciplines',
-        where: {
-          slug: {
-            equals: disciplineSlug,
-          },
-        },
-        limit: 1,
-      })
 
-      if (disciplineResult.docs.length === 0) {
-        disciplineResult = await payload.find({
-          collection: 'disciplines',
-          where: {
-            or: [
-              { name: { equals: disciplineSlug } },
-              { name_en: { equals: disciplineSlug } },
-            ],
-          },
-          limit: 1,
-        })
+    if (jobType) {
+      const workType = normalizeJobTypeFilter(jobType)
+      if (workType) {
+        intersectCandidateIds(await getCandidateIdsForJobType(workType))
       }
+    }
+  } catch (error) {
+    console.error('Error applying candidate id filters:', error)
+  }
 
-      if (disciplineResult.docs.length > 0) {
-        const disciplineId = disciplineResult.docs[0].id
-
-        // 2. Find all categories for this discipline
-        const categoriesResult = await payload.find({
-          collection: 'categories',
-          where: {
-            discipline: {
-              equals: disciplineId,
-            },
-          },
-          limit: 1000,
-        })
-
-        const categoryIds = categoriesResult.docs.map((cat) => cat.id)
-
-        if (categoryIds.length > 0) {
-          // 3. Find all subcategories for these categories
-          const subCategoriesResult = await payload.find({
-            collection: 'subcategories',
-            where: {
-              category: {
-                in: categoryIds,
-              },
-            },
-            limit: 1000,
-          })
-
-          const subCategoryIds = subCategoriesResult.docs.map((sub) => sub.id)
-
-          if (subCategoryIds.length > 0) {
-            // 4. Find all skills for these subcategories
-            const skillsResult = await payload.find({
-              collection: 'skills',
-              where: {
-                subCategory: {
-                  in: subCategoryIds,
-                },
-              },
-              limit: 1000,
-            })
-
-            const skillIds = skillsResult.docs.map((skill) => skill.id)
-
-            if (skillIds.length > 0) {
-              // 5. Filter candidates by primarySkill
-              where.primarySkill = {
-                in: skillIds,
-              }
-            } else {
-              // No skills found, return empty result
-              where.primarySkill = {
-                equals: -1, // Non-existent ID to return no results
-              }
-            }
-          } else {
-            // No subcategories found, return empty result
-            where.primarySkill = {
-              equals: -1,
-            }
-          }
-        } else {
-          // No categories found, return empty result
-          where.primarySkill = {
-            equals: -1,
-          }
-        }
-      } else {
-        // Discipline not found, return empty result
-        where.primarySkill = {
-          equals: -1,
-        }
-      }
-    } catch (error) {
-      console.error('Error filtering by discipline:', error)
-      // On error, don't filter (show all candidates)
+  if (constrainedIds !== undefined) {
+    if (constrainedIds.length === 0) {
+      where.id = { equals: -1 }
+    } else {
+      where.id = { in: constrainedIds }
     }
   }
 
@@ -594,6 +437,8 @@ export const getCandidates = (options?: {
       `subCategory-${options?.subCategory || 'all'}`,
       `availability-${options?.availability || 'all'}`,
       `language-${options?.language || 'all'}`,
+      `jobType-${options?.jobType || 'all'}`,
+      `skillLevel-${options?.skillLevel || 'all'}`,
     ],
     {
       tags: ['candidates'],
