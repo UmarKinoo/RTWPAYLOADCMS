@@ -284,7 +284,8 @@
       "title": "Our Blog: Your Path to Career Success",
       "subtitle": "Stay updated with the latest trends in hiring and career success",
       "viewAll": "View All Blog Posts",
-      "by": "By"
+      "by": "By",
+      "noPosts": "No blog posts available yet."
     },
     "trustedBy": {
       "title": "Trusted by"

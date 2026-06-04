@@ -52,6 +52,7 @@ supabase/.temp
 # Allow migration files in supabase/migrations/ and src/scripts/db/ but exclude dumps
 *.sql
 !supabase/migrations/*.sql
+!supabase/schemas/*.sql
 !src/scripts/db/*.sql
 *.dump
 *.backup

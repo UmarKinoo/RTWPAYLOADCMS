@@ -52,6 +52,13 @@ if (resendApiKey && resendApiKey.trim()) {
   console.warn('[Payload Config] ⚠️  Custom forgot password (candidates/employers) uses separate email system and may still work if configured.')
 }
 
+const r2StorageEnabled = !!(
+  process.env.R2_ACCOUNT_ID &&
+  process.env.R2_ACCESS_KEY_ID &&
+  process.env.R2_SECRET_ACCESS_KEY &&
+  process.env.R2_BUCKET_NAME
+)
+
 export default buildConfig({
   admin: {
     components: {
@@ -124,6 +131,10 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
+      // Local Supabase has limited connections; avoid pool exhaustion during dev + schema push
+      max: 10,
+      connectionTimeoutMillis: 10_000,
+      idleTimeoutMillis: 30_000,
     },
     // Only allow push in local/dev; production and Vercel use migrations. Scripts (e.g. update-page-meta against prod) disable push via PAYLOAD_DISABLE_PUSH.
     push:
@@ -170,15 +181,9 @@ export default buildConfig({
   plugins: [
     ...plugins,
     payloadCloudPlugin(),
-    // Cloudflare R2 Storage (S3-compatible)
-    // Only enabled when R2 environment variables are present
+    // Cloudflare R2 — primary media storage (images, CVs/resumes, and other Payload media)
     s3Storage({
-      enabled: !!(
-        process.env.R2_ACCOUNT_ID &&
-        process.env.R2_ACCESS_KEY_ID &&
-        process.env.R2_SECRET_ACCESS_KEY &&
-        process.env.R2_BUCKET_NAME
-      ),
+      enabled: r2StorageEnabled,
       bucket: process.env.R2_BUCKET_NAME || '',
       collections: {
         media: {
@@ -204,15 +209,16 @@ export default buildConfig({
         forcePathStyle: true,
       },
     }),
-    // Supabase S3 Storage (for CV uploads and other file uploads)
-    // Only enabled when S3 environment variables are present
+    // Supabase S3 — fallback only when R2 is not configured (do not run both on `media`)
     s3Storage({
-      enabled: !!(
-        process.env.S3_BUCKET &&
-        process.env.S3_ACCESS_KEY_ID &&
-        process.env.S3_SECRET_ACCESS_KEY &&
-        process.env.S3_ENDPOINT
-      ),
+      enabled:
+        !r2StorageEnabled &&
+        !!(
+          process.env.S3_BUCKET &&
+          process.env.S3_ACCESS_KEY_ID &&
+          process.env.S3_SECRET_ACCESS_KEY &&
+          process.env.S3_ENDPOINT
+        ),
       bucket: process.env.S3_BUCKET || '',
       collections: {
         media: {
@@ -229,14 +235,10 @@ export default buildConfig({
         forcePathStyle: true, // Important for local Supabase S3 compatibility
       },
     }),
-    // Vercel Blob Storage (fallback when R2 is not configured)
-    // Disabled when R2 environment variables are present
+    // Vercel Blob — fallback when neither R2 nor Supabase S3 is configured
     vercelBlobStorage({
       enabled: !!(
-        !process.env.R2_ACCOUNT_ID &&
-        !process.env.R2_ACCESS_KEY_ID &&
-        !process.env.R2_SECRET_ACCESS_KEY &&
-        !process.env.R2_BUCKET_NAME &&
+        !r2StorageEnabled &&
         !process.env.S3_BUCKET &&
         process.env.BLOB_READ_WRITE_TOKEN
       ),
