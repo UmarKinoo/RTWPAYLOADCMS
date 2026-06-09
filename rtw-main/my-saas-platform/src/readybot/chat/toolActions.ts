@@ -1,4 +1,4 @@
-import type { Payload } from 'payload'
+import type { Payload, Where } from 'payload'
 import { scanIncompleteCandidates } from '@/trigger/scanIncompleteCandidates'
 import { loadReadyBotSettings } from '@/lib/readybot/settings'
 import { candidateLabelFromDoc } from '@/lib/readybot/dashboard-helpers'
@@ -93,8 +93,8 @@ export async function executeGetPipelineStats(payload: Payload) {
   }
 }
 
-function buildFindCandidateWhere(trimmed: string) {
-  const or: Record<string, unknown>[] = [
+function buildFindCandidateWhere(trimmed: string): Where {
+  const or: Where[] = [
     { email: { contains: trimmed } },
     { firstName: { contains: trimmed } },
     { lastName: { contains: trimmed } },
@@ -172,7 +172,7 @@ export async function executeListCandidates(
   const page = Math.max(1, Math.floor(input.page ?? 1))
   const limit = Math.min(CHAT_LIST_MAX_ROWS, Math.max(1, Math.floor(input.limit ?? 5)))
 
-  const and: Record<string, unknown>[] = []
+  const and: Where[] = []
   if (input.pipelineOnly !== false) {
     and.push(readyBotActiveWhere())
   }
@@ -180,7 +180,8 @@ export async function executeListCandidates(
     and.push({ 'readyBot.screeningStatus': { equals: input.screeningStatus.trim() } })
   }
 
-  const where = and.length > 0 ? (and.length === 1 ? and[0] : { and }) : {}
+  const where: Where =
+    and.length > 0 ? (and.length === 1 ? and[0]! : { and }) : {}
 
   const res = await payload.find({
     collection: 'candidates',

@@ -184,7 +184,7 @@ export async function runFullScreeningWorkflow(
       void agentEventService.recordEvent('score_update', { fitScore: fit.result!.fitScore, modelUsed: getModelUsedLabel() ?? 'unknown' }, { candidateId: String(candidateId) })
       state.auditTrail.push({
         step: 'screening_result',
-        id: resultDoc.id,
+        id: resultDoc?.id,
         fitScore: fit.result.fitScore,
       })
 

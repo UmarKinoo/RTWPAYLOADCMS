@@ -34,13 +34,14 @@ function userMsg(text: string): UIMessage {
   }
 }
 
-async function runChatTurn(args: {
+type ChatTurnCtx = {
   payload: Awaited<ReturnType<typeof import('../readybot/lib/getReadyBotPayload').getReadyBotPayload>>
   adminUserId: string | number
   locale: string
-  messages: UIMessage[]
   skipBrainScan?: boolean
-}) {
+}
+
+async function runChatTurn(args: ChatTurnCtx & { messages: UIMessage[] }) {
   const { payload, adminUserId, locale, messages } = args
   const { loadReadyBotSettings } = await import('../lib/readybot/settings')
   const { executeGetPipelineStats } = await import('../readybot/chat/toolActions')
@@ -119,11 +120,18 @@ Locale: ${locale}`
     temperature: 0.35,
     onStepFinish: (step) => {
       for (const tc of step.toolCalls ?? []) {
-        toolLog.push(tc.toolName)
+        if (tc?.toolName) toolLog.push(tc.toolName)
       }
       for (const tr of step.toolResults ?? []) {
-        if (tr.result && typeof tr.result === 'object' && 'error' in (tr.result as object)) {
-          toolErrors.push(`${tr.toolName}: ${(tr.result as { error: string }).error}`)
+        if (!tr?.toolName) continue
+        const output =
+          'output' in tr && tr.output !== undefined
+            ? tr.output
+            : 'result' in tr
+              ? (tr as { result: unknown }).result
+              : undefined
+        if (output && typeof output === 'object' && 'error' in output) {
+          toolErrors.push(`${tr.toolName}: ${(output as { error: string }).error}`)
         }
       }
     },
@@ -141,7 +149,7 @@ async function runCase(
   name: string,
   userMessage: string,
   evaluate: (r: Awaited<ReturnType<typeof runChatTurn>>) => { status: CaseResult['status']; notes: string[] },
-  ctx: Parameters<typeof runChatTurn>[0],
+  ctx: ChatTurnCtx,
 ) {
   console.log(`\n--- ${name} ---`)
   console.log(`User: ${userMessage}`)

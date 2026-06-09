@@ -24,7 +24,7 @@ toolRegistry.register<{ candidateId: number; fields: Record<string, unknown> }>(
       })
     },
   },
-  z.object({ candidateId: z.number(), fields: z.record(z.unknown()) }),
+  z.object({ candidateId: z.number(), fields: z.record(z.string(), z.unknown()) }),
 )
 
 toolRegistry.register<{
@@ -46,7 +46,10 @@ toolRegistry.register<{
         id: input.taskId,
         overrideAccess: true,
       })
-      const extractedData = ((task as Record<string, unknown>).extractedData ?? {}) as Record<string, unknown>
+      const extractedData = ((task as unknown as Record<string, unknown>).extractedData ?? {}) as Record<
+        string,
+        unknown
+      >
       extractedData[input.field] = input.answer
       return payload.update({
         collection: 'candidate-screening-tasks',
@@ -166,7 +169,7 @@ toolRegistry.register<{ candidateId: number; memoryPatch: Record<string, unknown
       })
     },
   },
-  z.object({ candidateId: z.number(), memoryPatch: z.record(z.unknown()) }),
+  z.object({ candidateId: z.number(), memoryPatch: z.record(z.string(), z.unknown()) }),
 )
 
 toolRegistry.register<{
@@ -231,6 +234,6 @@ toolRegistry.register<{
   z.object({
     taskId: z.number(),
     status: z.string().optional(),
-    extractedData: z.record(z.unknown()).optional(),
+    extractedData: z.record(z.string(), z.unknown()).optional(),
   }),
 )
