@@ -1,4 +1,4 @@
-import { generateText, tool } from 'ai'
+import { generateText, stepCountIs, tool } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { z } from 'zod'
 import { contextManager } from './contextManager'
@@ -157,7 +157,7 @@ export async function runInboundReplyAgent(args: {
         },
       }),
     },
-    maxSteps: 3,
+    stopWhen: stepCountIs(3),
     temperature: 0.45,
   })
 
