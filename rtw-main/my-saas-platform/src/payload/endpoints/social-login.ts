@@ -205,30 +205,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    // Single-session: rotate sessionId so other devices' rtw-sid no longer matches
-    const sessionId = randomBytes(32).toString('hex')
     try {
       await payload.update({
         collection: 'users',
         id: user.id,
-        data: { sessionId },
+        data: { lastLoginAt: new Date().toISOString() },
         overrideAccess: true,
       })
     } catch (updateErr) {
-      console.warn('[social-login] sessionId update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
+      console.warn('[social-login] lastLoginAt update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
     }
 
     const cookieStore = await cookies()
     const expiresDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days (matching token expiration)
 
     cookieStore.set('payload-token', payloadToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      expires: expiresDate,
-    })
-    cookieStore.set('rtw-sid', sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

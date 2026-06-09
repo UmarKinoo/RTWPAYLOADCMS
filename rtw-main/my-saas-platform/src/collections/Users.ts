@@ -124,7 +124,7 @@ export const Users: CollectionConfig = {
       type: 'date',
       admin: {
         hidden: true,
-        description: 'Deprecated for single-session; use sessionId + rtw-sid cookie instead.',
+        description: 'Set on each login; JWTs issued before this time are treated as stale (single session per email).',
       },
     },
     {
@@ -132,7 +132,7 @@ export const Users: CollectionConfig = {
       type: 'text',
       admin: {
         hidden: true,
-        description: 'Single session per account: DB.sessionId === cookie rtw-sid; rotate on login to log out other devices.',
+        description: 'Legacy field (unused); single-session uses lastLoginAt vs JWT iat.',
       },
     },
     // If you want to add a username field, uncomment the following lines

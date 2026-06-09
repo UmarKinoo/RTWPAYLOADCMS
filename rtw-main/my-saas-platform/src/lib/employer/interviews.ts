@@ -2,7 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { Interview } from '@/payload-types'
 
@@ -59,10 +59,7 @@ export async function scheduleInterview(
 ): Promise<ScheduleInterviewResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    // Authenticate employer
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return { success: false, error: 'Authentication required as an employer.' }
@@ -145,10 +142,7 @@ export async function updateInterview(
 ): Promise<UpdateInterviewResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    // Authenticate employer
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return { success: false, error: 'Authentication required as an employer.' }
@@ -208,10 +202,7 @@ export async function requestInterview(
 ): Promise<RequestInterviewResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    // Authenticate employer
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return { success: false, error: 'Authentication required as an employer.' }

@@ -3,7 +3,7 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { revalidatePath } from 'next/cache'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { randomBytes } from 'crypto'
 import type { Candidate } from '@/payload-types'
 import { normalizePhone } from '@/server/sms/taqnyat'
@@ -268,10 +268,7 @@ export async function registerCandidate(
 export async function getCurrentCandidate(): Promise<Candidate | null> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    
-    // Get authenticated user (could be from Users or Candidates collection)
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       console.warn('getCurrentCandidate: No authenticated user found')
@@ -362,8 +359,7 @@ export async function updateCandidate(
 ): Promise<{ success: boolean; error?: string; candidate?: Candidate }> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {

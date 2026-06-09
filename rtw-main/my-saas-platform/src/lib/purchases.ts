@@ -2,7 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath } from 'next/cache'
 import { sendPayment } from '@/lib/myfatoorah'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -29,8 +29,7 @@ export interface StartPaymentResponse {
 export async function startPayment(planSlug: string): Promise<StartPaymentResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return { success: false, error: 'Not authenticated as an employer.' }
@@ -136,10 +135,7 @@ export async function startPayment(planSlug: string): Promise<StartPaymentRespon
 export async function mockPurchase(planSlug: string): Promise<MockPurchaseResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    // Get authenticated employer
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {

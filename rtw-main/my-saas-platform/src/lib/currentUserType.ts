@@ -6,6 +6,7 @@ import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { User, Candidate, Employer } from '@/payload-types'
 import { getLocaleFromRequest } from '@/lib/auth'
+import { isAuthSessionStale, getTokenFromCookies } from '@/lib/single-session'
 
 export type CurrentUserType =
   | { kind: 'admin'; user: User }
@@ -47,39 +48,19 @@ export async function getCurrentUserType(options?: GetCurrentUserTypeOptions): P
       return null
     }
 
-    // Single-session: DB.sessionId must match cookie rtw-sid; legacy: if DB.sessionId null, allow
-    type AuthCollection = 'users' | 'candidates' | 'employers'
-    const userCollection = (user as { collection?: AuthCollection }).collection
-    const collectionsToCheck: AuthCollection[] = userCollection
-      ? [userCollection]
-      : (['candidates', 'employers', 'users'] as const)
-    let sessionValid = false
-    for (const coll of collectionsToCheck) {
-      try {
-        const doc = await payload.findByID({ collection: coll, id: user.id, depth: 0 })
-        const sessionId = (doc as { sessionId?: string } | null)?.sessionId
-        if (sessionId == null) {
-          sessionValid = true
-          break
-        }
-        const cookieStore = await cookies()
-        const rtwSid = cookieStore.get('rtw-sid')?.value
-        if (rtwSid != null && sessionId === rtwSid) {
-          sessionValid = true
-          break
-        }
-      } catch {
-        /* not in this collection */
-      }
-    }
-    if (!sessionValid) {
+    const cookieStore = await cookies()
+    const token = getTokenFromCookies(
+      cookieStore,
+      (user as { collection?: 'users' | 'candidates' | 'employers' }).collection,
+    )
+    if (await isAuthSessionStale(payload, user, token)) {
       if (onLoginPage) return null
       if (process.env.NODE_ENV === 'development') {
-        console.log('[getCurrentUserType] Session invalid (rtw-sid !== DB.sessionId), redirecting to clear-session')
+        console.log('[getCurrentUserType] Stale session (newer login elsewhere), clearing cookies')
       }
       const locale = await getLocaleFromRequest()
       const loginUrl = `/${locale}/login?error=logged-out`
-      redirect(`/api/auth/clear-session?next=${encodeURIComponent(loginUrl)}`)
+      redirect(`/api/auth/clear-stale?next=${encodeURIComponent(loginUrl)}`)
     }
 
     // Check if user is admin, blog-editor, or moderator (from Users collection)

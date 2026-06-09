@@ -17,6 +17,15 @@ export const deleteRelatedBeforeCandidateDelete: CollectionBeforeDeleteHook = as
   const collectionsWithRequiredCandidateRelation = [
     'interviews',
     'candidate-interactions',
+    'candidate-screening-tasks',
+    'candidate-messages',
+    'human-review-tasks',
+  ] as const
+
+  const collectionsWithOptionalCandidateRelation = [
+    'candidate-memory',
+    'agent-audit-logs',
+    'screening-results',
   ] as const
 
   for (const slug of collectionsWithRequiredCandidateRelation) {
@@ -46,6 +55,30 @@ export const deleteRelatedBeforeCandidateDelete: CollectionBeforeDeleteHook = as
         `[Candidates beforeDelete] Error cleaning ${slug} for candidate ${candidateId}: ${msg}`,
       )
       // Continue with other collections
+    }
+  }
+
+  for (const slug of collectionsWithOptionalCandidateRelation) {
+    try {
+      const result = await payload.find({
+        collection: slug,
+        where: { candidate: { equals: candidateId } },
+        limit: 500,
+        depth: 0,
+        overrideAccess: true,
+      })
+      for (const doc of result.docs) {
+        await payload.delete({
+          collection: slug,
+          id: doc.id,
+          overrideAccess: true,
+        })
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      payload.logger.warn(
+        `[Candidates beforeDelete] Error cleaning ${slug} for candidate ${candidateId}: ${msg}`,
+      )
     }
   }
 }

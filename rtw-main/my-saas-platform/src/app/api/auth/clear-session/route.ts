@@ -19,5 +19,7 @@ export async function GET(request: NextRequest) {
   const res = NextResponse.redirect(new URL(next, request.url))
   res.cookies.set('payload-token', '', opts)
   res.cookies.set('rtw-sid', '', opts)
+  res.cookies.set('payload-token-candidates', '', opts)
+  res.cookies.set('payload-token-employers', '', opts)
   return res
 }

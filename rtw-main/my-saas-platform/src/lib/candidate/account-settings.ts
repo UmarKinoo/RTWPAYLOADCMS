@@ -2,7 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath } from 'next/cache'
 import { validateEmail, validatePassword } from '../validation'
 import { sendEmail, passwordChangedEmailTemplate, verificationEmailTemplate } from '../email'
@@ -41,8 +41,7 @@ export async function changePassword(
 ): Promise<ChangePasswordResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {
@@ -119,8 +118,7 @@ export async function changePassword(
 export async function changeEmail(newEmail: string): Promise<ChangeEmailResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {
@@ -208,8 +206,7 @@ export async function changeEmail(newEmail: string): Promise<ChangeEmailResponse
 export async function updatePhone(phone: string): Promise<UpdatePhoneResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {
@@ -256,8 +253,7 @@ export async function updatePhone(phone: string): Promise<UpdatePhoneResponse> {
 export async function updateWhatsApp(whatsapp: string): Promise<UpdatePhoneResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {
@@ -296,8 +292,7 @@ export async function updateWhatsApp(whatsapp: string): Promise<UpdatePhoneRespo
 export async function resendEmailVerification(): Promise<{ success: boolean; error?: string }> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {
@@ -365,8 +360,7 @@ export async function deleteAccount(
 ): Promise<DeleteAccountResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return {

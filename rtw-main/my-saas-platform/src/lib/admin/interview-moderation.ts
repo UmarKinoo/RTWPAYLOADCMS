@@ -2,7 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { Interview } from '@/payload-types'
 import { sendEmail } from '@/lib/email'
@@ -41,9 +41,7 @@ export async function approveInterviewRequest(
 ): Promise<ApproveInterviewRequestResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return { success: false, error: 'Authentication required.' }
@@ -207,9 +205,7 @@ export async function rejectInterviewRequest(
 ): Promise<RejectInterviewRequestResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       return { success: false, error: 'Authentication required.' }

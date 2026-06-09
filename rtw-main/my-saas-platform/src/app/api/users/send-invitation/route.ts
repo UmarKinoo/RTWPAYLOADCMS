@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { headers } from 'next/headers'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { sendUserInvitation } from '@/lib/auth'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import type { User } from '@/payload-types'
 
 /**
@@ -14,9 +14,8 @@ import type { User } from '@/payload-types'
  */
 export async function POST(request: NextRequest) {
   try {
-    const headersList = await headers()
     const payload = await getPayload({ config: await configPromise })
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
     if (!user) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }

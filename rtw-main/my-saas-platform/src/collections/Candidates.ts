@@ -26,7 +26,9 @@ const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({
       !('bio_embedding' in data) && // Make sure bio_embedding is not being updated
       dataKeys.every(key => 
         ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
-         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified', 'lastLoginAt', 'sessionId'].includes(key)
+         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified', 'lastLoginAt', 'sessionId',
+         'readyBot', 'screeningStatus', 'missingFields', 'whatsappOptIn', 'whatsappOptInAt', 'preferredContactChannel',
+         'lastScreenedAt', 'lastContactedAt', 'lastReplyAt', 'screeningSummary', 'screeningConfidence', 'readyBotEnabled', 'whatsappNumber'].includes(key)
       )
 
     if (isPasswordOnlyUpdate) {
@@ -142,7 +144,7 @@ export const Candidates: CollectionConfig = {
       type: 'date',
       admin: {
         hidden: true,
-        description: 'Deprecated for single-session; use sessionId + rtw-sid cookie instead.',
+        description: 'Set on each login; JWTs issued before this time are treated as stale (single session per email).',
       },
     },
     {
@@ -150,7 +152,7 @@ export const Candidates: CollectionConfig = {
       type: 'text',
       admin: {
         hidden: true,
-        description: 'Single session per account: DB.sessionId === cookie rtw-sid; rotate on login to log out other devices.',
+        description: 'Legacy field (unused); single-session uses lastLoginAt vs JWT iat.',
       },
     },
     // Identity
@@ -499,6 +501,108 @@ export const Candidates: CollectionConfig = {
       label: 'Accept the terms and conditions / Agreement Accepted',
       required: true,
       defaultValue: false,
+    },
+    // ReadyBot — AI screening (WhatsApp / email)
+    {
+      name: 'readyBot',
+      type: 'group',
+      label: 'ReadyBot Screening',
+      admin: {
+        description: 'AI-assisted profile completion via WhatsApp. Managed by ReadyBot workflows.',
+      },
+      fields: [
+        {
+          name: 'readyBotEnabled',
+          type: 'checkbox',
+          label: 'ReadyBot Enabled',
+          defaultValue: true,
+          admin: {
+            hidden: true,
+            description:
+              'Deprecated — not used. All candidates are in the ReadyBot pipeline unless screening status is Opted Out.',
+          },
+        },
+        {
+          name: 'screeningStatus',
+          type: 'select',
+          label: 'Screening Status',
+          defaultValue: 'new',
+          options: [
+            { label: 'New', value: 'new' },
+            { label: 'Incomplete', value: 'incomplete' },
+            { label: 'Contacted', value: 'contacted' },
+            { label: 'Awaiting Reply', value: 'awaiting_reply' },
+            { label: 'Info Received', value: 'info_received' },
+            { label: 'Needs Human Review', value: 'needs_human_review' },
+            { label: 'Verified', value: 'verified' },
+            { label: 'Unresponsive', value: 'unresponsive' },
+            { label: 'Opted Out', value: 'opted_out' },
+          ],
+        },
+        {
+          name: 'missingFields',
+          type: 'array',
+          label: 'Missing Fields',
+          fields: [{ name: 'field', type: 'text', required: true }],
+        },
+        {
+          name: 'whatsappNumber',
+          type: 'text',
+          label: 'WhatsApp Number (E.164)',
+          admin: {
+            description: 'Defaults to phone/whatsapp if empty. Used by ReadyBot Cloud API.',
+          },
+        },
+        {
+          name: 'whatsappOptIn',
+          type: 'checkbox',
+          label: 'WhatsApp Opt-In',
+          defaultValue: false,
+        },
+        {
+          name: 'whatsappOptInAt',
+          type: 'date',
+          label: 'WhatsApp Opt-In At',
+        },
+        {
+          name: 'preferredContactChannel',
+          type: 'select',
+          label: 'Preferred Contact Channel',
+          defaultValue: 'whatsapp',
+          options: [
+            { label: 'WhatsApp', value: 'whatsapp' },
+            { label: 'Email', value: 'email' },
+            { label: 'None', value: 'none' },
+          ],
+        },
+        {
+          name: 'lastScreenedAt',
+          type: 'date',
+          label: 'Last Screened At',
+        },
+        {
+          name: 'lastContactedAt',
+          type: 'date',
+          label: 'Last Contacted At',
+        },
+        {
+          name: 'lastReplyAt',
+          type: 'date',
+          label: 'Last Reply At',
+        },
+        {
+          name: 'screeningSummary',
+          type: 'textarea',
+          label: 'Screening Summary',
+        },
+        {
+          name: 'screeningConfidence',
+          type: 'number',
+          label: 'Screening Confidence',
+          min: 0,
+          max: 1,
+        },
+      ],
     },
   ],
   hooks: {

@@ -2,7 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath } from 'next/cache'
 import { randomBytes } from 'crypto'
 import { sendEmail, verificationEmailTemplate } from './email'
@@ -153,10 +153,7 @@ export async function registerEmployer(
 export async function getCurrentEmployer(): Promise<Employer | null> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    // Get authenticated user
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user) {
       console.warn('getCurrentEmployer: No authenticated user found')

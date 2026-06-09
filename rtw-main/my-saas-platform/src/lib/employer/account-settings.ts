@@ -2,7 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath } from 'next/cache'
 import { validateEmail, validatePassword } from '../validation'
 import { sendEmail, passwordChangedEmailTemplate, verificationEmailTemplate } from '../email'
@@ -54,8 +54,7 @@ export async function changePassword(
 ): Promise<ChangePasswordResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return {
@@ -132,8 +131,7 @@ export async function changePassword(
 export async function changeEmail(newEmail: string): Promise<ChangeEmailResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return {
@@ -221,8 +219,7 @@ export async function changeEmail(newEmail: string): Promise<ChangeEmailResponse
 export async function updatePhone(phone: string): Promise<UpdatePhoneResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return {
@@ -267,8 +264,7 @@ export async function updatePhone(phone: string): Promise<UpdatePhoneResponse> {
 export async function resendEmailVerification(): Promise<ChangeEmailResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return {
@@ -335,8 +331,7 @@ export async function updateEmployerProfile(
 ): Promise<UpdateEmployerProfileResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return {
@@ -393,8 +388,7 @@ export async function updateEmployerProfile(
 export async function deleteAccount(password: string): Promise<DeleteAccountResponse> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
       return {

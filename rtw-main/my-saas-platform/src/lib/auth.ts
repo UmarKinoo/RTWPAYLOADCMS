@@ -17,6 +17,7 @@ import {
   invitationEmailTemplateAcceptInvitation,
 } from './email'
 import { randomBytes } from 'crypto'
+import { isAuthSessionStale, getTokenFromCookies } from '@/lib/single-session'
 
 // Auth Types
 
@@ -75,29 +76,21 @@ async function attemptLogin(
     if (!result.token) {
       return { success: false, error: 'Invalid email or password', errorCode: 'INVALID_CREDENTIALS' }
     }
-    // Single-session: rotate sessionId so other devices' rtw-sid no longer matches → instant logout on next request
-    const sessionId = randomBytes(32).toString('hex')
+    // Single-session: bump lastLoginAt after token is issued — older JWTs fail on next request
     try {
       await payload.update({
         collection,
         id: result.user.id,
-        data: { sessionId },
+        data: { lastLoginAt: new Date().toISOString() },
         overrideAccess: true,
-        context: { skipVectorUpdate: true, disableRevalidate: true }, // skip candidate hooks for login-only update
+        context: { skipVectorUpdate: true, disableRevalidate: true },
       })
     } catch (updateErr) {
-      console.warn('[auth] sessionId update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
+      console.warn('[auth] lastLoginAt update failed:', updateErr instanceof Error ? updateErr.message : updateErr)
     }
     const cookieStore = await cookies()
     const expiresIn = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000
     cookieStore.set('payload-token', result.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      expires: new Date(Date.now() + expiresIn),
-    })
-    cookieStore.set('rtw-sid', sessionId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -169,28 +162,6 @@ export async function clearSessionCookies() {
   cookieStore.set('rtw-sid', '', opts)
 }
 
-/**
- * Verify DB.sessionId === cookie rtw-sid for the given user; clear session and return false if invalid.
- * Legacy: if DB.sessionId is null (user never logged in after deploy), allow so we don't mass-logout.
- */
-async function verifySessionId(
-  payload: Payload,
-  user: { id: string | number },
-  collection: 'users' | 'candidates' | 'employers',
-): Promise<boolean> {
-  const cookieStore = await cookies()
-  try {
-    const doc = await payload.findByID({ collection, id: user.id, depth: 0 })
-    const sessionId = (doc as { sessionId?: string } | null)?.sessionId
-    if (sessionId == null) return true // legacy: no sessionId in DB yet, allow
-    const rtwSid = cookieStore.get('rtw-sid')?.value
-    if (rtwSid == null || sessionId !== rtwSid) return false
-    return true
-  } catch {
-    return false
-  }
-}
-
 // Auth Actions
 
 /**
@@ -201,38 +172,26 @@ async function verifySessionId(
 export async function getUser(options?: { onLoginPage?: boolean }): Promise<User | null> {
   try {
     const headers = await getHeaders()
+    const cookieStore = await cookies()
     const payload: Payload = await getPayload({ config: await configPromise })
 
     const { user } = await payload.auth({ headers })
     if (!user) return null
 
-    // Single-session: DB.sessionId must match cookie rtw-sid
-    type AuthCollection = 'users' | 'candidates' | 'employers'
-    const userCollection = (user as { collection?: AuthCollection }).collection
-    const collectionsToCheck: AuthCollection[] = userCollection
-      ? [userCollection]
-      : (['candidates', 'employers', 'users'] as const)
-    let verified = false
-    for (const coll of collectionsToCheck) {
-      try {
-        if (await verifySessionId(payload, user, coll)) {
-          verified = true
-          break
-        }
-      } catch {
-        /* try next collection */
-      }
-    }
-    if (!verified) {
+    const token = getTokenFromCookies(cookieStore, (user as { collection?: 'users' | 'candidates' | 'employers' }).collection)
+    if (await isAuthSessionStale(payload, user, token)) {
       if (options?.onLoginPage) return null
       const locale = await getLocaleFromRequest()
       const loginUrl = `/${locale}/login?error=logged-out`
-      redirect(`/api/auth/clear-session?next=${encodeURIComponent(loginUrl)}`)
+      redirect(`/api/auth/clear-stale?next=${encodeURIComponent(loginUrl)}`)
     }
 
     if ('role' in user) return user as User
     return null
   } catch (error) {
+    if (error && typeof error === 'object' && 'digest' in error && String((error as { digest?: string }).digest).startsWith('NEXT_REDIRECT')) {
+      throw error
+    }
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Error getting user:', errorMessage)
     return null
@@ -625,6 +584,7 @@ export async function resetPassword(
         password: newPassword,
         passwordResetToken: null,
         passwordResetExpires: null,
+        lastLoginAt: new Date().toISOString(),
       },
     })
 

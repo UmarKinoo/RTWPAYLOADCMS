@@ -2,7 +2,7 @@
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { headers } from 'next/headers'
+import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 
 // Re-export types for convenience
@@ -16,10 +16,7 @@ export async function markNotificationAsRead(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const payload = await getPayload({ config })
-    const headersList = await headers()
-
-    // Authenticate candidate
-    const { user } = await payload.auth({ headers: headersList })
+    const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'candidates') {
       return { success: false, error: 'Authentication required as a candidate.' }

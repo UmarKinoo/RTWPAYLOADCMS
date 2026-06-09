@@ -28,8 +28,17 @@ import { JobPostings } from '@/collections/JobPostings'
 import { PhoneVerifications } from '@/collections/PhoneVerifications'
 import { NewsletterSubscriptions } from '@/collections/NewsletterSubscriptions'
 import { ContactSubmissions } from '@/collections/ContactSubmissions'
+import { CandidateScreeningTasks } from '@/collections/CandidateScreeningTasks'
+import { CandidateMessages } from '@/collections/CandidateMessages'
+import { CandidateMemory } from '@/collections/CandidateMemory'
+import { HumanReviewTasks } from '@/collections/HumanReviewTasks'
+import { AgentAuditLogs } from '@/collections/AgentAuditLogs'
+import { ScreeningResults } from '@/collections/ScreeningResults'
+import { ReadyBotOpsChatSessions } from '@/collections/ReadyBotOpsChatSessions'
+import { AgentEvents } from '@/collections/AgentEvents'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
+import { ReadyBotSettings } from '@/globals/ReadyBotSettings'
 import { plugins } from '@/plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -113,6 +122,14 @@ export default buildConfig({
     PhoneVerifications,
     NewsletterSubscriptions,
     ContactSubmissions,
+    CandidateScreeningTasks,
+    CandidateMessages,
+    CandidateMemory,
+    HumanReviewTasks,
+    AgentAuditLogs,
+    ScreeningResults,
+    ReadyBotOpsChatSessions,
+    AgentEvents,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   // Only set email adapter if API key is present and not empty
@@ -123,7 +140,7 @@ export default buildConfig({
         apiKey: resendApiKey,
       })
     : undefined,
-  globals: [Header, Footer],
+  globals: [Header, Footer, ReadyBotSettings],
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
