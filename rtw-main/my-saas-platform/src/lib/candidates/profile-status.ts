@@ -1,3 +1,5 @@
+import type { Where } from 'payload'
+
 /**
  * Candidate profile moderation — visibility on the public website.
  * Separate from ReadyBot screeningStatus (AI data completion).
@@ -22,15 +24,15 @@ export const DEFAULT_PROFILE_STATUS: CandidateProfileStatus = 'pending_review'
 export const CANDIDATES_PER_PAGE = 9
 
 /** Payload `where` for public candidate listings */
-export function publicCandidateWhere() {
+export function publicCandidateWhere(): Where {
   return {
-    termsAccepted: { equals: true as const },
-    profileStatus: { equals: 'approved' as const },
+    termsAccepted: { equals: true },
+    profileStatus: { equals: 'approved' },
   }
 }
 
 /** Merge extra clauses with public visibility rules */
-export function publicCandidateAndWhere(clauses: Record<string, unknown>[]) {
+export function publicCandidateAndWhere(clauses: Where[]): Where {
   return {
     and: [
       { termsAccepted: { equals: true } },
@@ -41,12 +43,12 @@ export function publicCandidateAndWhere(clauses: Record<string, unknown>[]) {
 }
 
 /** Candidates ready for moderator review */
-export function moderationQueueWhere() {
+export function moderationQueueWhere(): Where {
   return {
     and: [
       { termsAccepted: { equals: true } },
       { phoneVerified: { equals: true } },
-      { profileStatus: { in: MODERATION_QUEUE_STATUSES } },
+      { profileStatus: { in: [...MODERATION_QUEUE_STATUSES] } },
     ],
   }
 }
