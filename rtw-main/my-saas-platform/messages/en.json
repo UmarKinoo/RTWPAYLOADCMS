@@ -359,7 +359,17 @@
     "locationRiyadh": "Candidates in Riyadh",
     "locationJeddah": "Candidates in Jeddah",
     "locationDammam": "Candidates in Dammam",
-    "locationMakkah": "Candidates in Makkah"
+    "locationMakkah": "Candidates in Makkah",
+    "locationMadinah": "Candidates in Madinah",
+    "locationKhobar": "Candidates in Khobar",
+    "locationTabuk": "Candidates in Tabuk",
+    "locationAbha": "Candidates in Abha",
+    "locationTaif": "Candidates in Taif",
+    "locationYanbu": "Candidates in Yanbu",
+    "locationJubail": "Candidates in Jubail",
+    "locationHail": "Candidates in Hail",
+    "locationNajran": "Candidates in Najran",
+    "locationAlAhsa": "Candidates in Al Ahsa"
   },
   "candidatesPage": {
     "heroTitle": "Candidates",
@@ -388,6 +398,8 @@
     "employerOnlySearchDescription": "Sign in or register as an employer to search and view candidate profiles.",
     "signInAsEmployer": "Sign in as employer",
     "employerOnlyViewCandidates": "Sign in as an employer to view candidate profiles and contact details.",
+    "paginationPrevious": "Previous",
+    "paginationNext": "Next",
     "searchErrors": {
       "unauthorized": "Please log in as an employer to search candidates",
       "notSupported": "You do not have permission to search",

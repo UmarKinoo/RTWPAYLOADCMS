@@ -1,6 +1,6 @@
 import { getLocale } from 'next-intl/server'
 import { getCurrentUserType } from '@/lib/currentUserType'
-import { redirectToLogin, redirectToAdmin, redirectToDashboard } from '@/lib/redirects'
+import { redirectToLogin, redirectToDashboard } from '@/lib/redirects'
 import { ModeratorHeader } from '@/components/admin/ModeratorHeader'
 
 export const dynamic = 'force-dynamic'
@@ -19,9 +19,9 @@ export default async function ModeratorLayout({ children }: ModeratorLayoutProps
     throw new Error('Redirect')
   }
 
-  if (userType.kind === 'admin') await redirectToAdmin()
-
-  if (userType.kind !== 'moderator') await redirectToDashboard(locale)
+  if (userType.kind !== 'moderator' && userType.kind !== 'admin') {
+    await redirectToDashboard(locale)
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">

@@ -49,6 +49,7 @@ supabase/.branches
 supabase/.temp
 
 # Database dumps and backups (may contain sensitive data)
+/exports
 # Allow migration files in supabase/migrations/ and src/scripts/db/ but exclude dumps
 *.sql
 !supabase/migrations/*.sql

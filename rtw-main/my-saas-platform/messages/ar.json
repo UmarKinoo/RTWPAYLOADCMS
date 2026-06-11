@@ -359,7 +359,17 @@
     "locationRiyadh": "مرشحون في الرياض",
     "locationJeddah": "مرشحون في جدة",
     "locationDammam": "مرشحون في الدمام",
-    "locationMakkah": "مرشحون في مكة"
+    "locationMakkah": "مرشحون في مكة",
+    "locationMadinah": "مرشحون في المدينة",
+    "locationKhobar": "مرشحون في الخبر",
+    "locationTabuk": "مرشحون في تبوك",
+    "locationAbha": "مرشحون في أبها",
+    "locationTaif": "مرشحون في الطائف",
+    "locationYanbu": "مرشحون في ينبع",
+    "locationJubail": "مرشحون في الجبيل",
+    "locationHail": "مرشحون في حائل",
+    "locationNajran": "مرشحون في نجران",
+    "locationAlAhsa": "مرشحون في الأحساء"
   },
   "candidatesPage": {
     "heroTitle": "المرشحون",
@@ -388,6 +398,8 @@
     "employerOnlySearchDescription": "سجّل الدخول أو أنشئ حسابًا كصاحب عمل للبحث وعرض ملفات المرشحين.",
     "signInAsEmployer": "تسجيل الدخول كصاحب عمل",
     "employerOnlyViewCandidates": "سجّل الدخول كصاحب عمل لعرض ملفات المرشحين وبيانات التواصل.",
+    "paginationPrevious": "السابق",
+    "paginationNext": "التالي",
     "searchErrors": {
       "unauthorized": "يرجى تسجيل الدخول كصاحب عمل للبحث عن المرشحين",
       "notSupported": "ليس لديك إذن للبحث",

@@ -8,49 +8,80 @@ import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-util
 import { Link } from '@/i18n/routing'
 import type { CandidateListItem } from '@/types/candidate'
 import { searchCandidates } from '@/lib/employer/search'
+import { CandidatesPagination } from '@/components/candidates/CandidatesPagination'
+import { CANDIDATES_PER_PAGE } from '@/lib/candidates/profile-status'
 
 interface SearchResultsProps {
   searchQuery: string
   locale: string
+  currentPage: number
+  searchParams: Record<string, string | undefined>
 }
 
-export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
+export function SearchResults({
+  searchQuery,
+  locale,
+  currentPage,
+  searchParams,
+}: SearchResultsProps) {
   const t = useTranslations('candidatesPage')
   const [candidates, setCandidates] = useState<CandidateListItem[]>([])
+  const [total, setTotal] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!searchQuery.trim()) {
       setIsLoading(false)
+      setCandidates([])
+      setTotal(0)
+      setTotalPages(0)
       return
     }
+
+    let cancelled = false
 
     const performSearch = async () => {
       setIsLoading(true)
       setError(null)
-      
+      setCandidates([])
+
       try {
-        const result = await searchCandidates(searchQuery.trim(), 20)
+        const result = await searchCandidates(searchQuery.trim(), {
+          page: currentPage,
+          limit: CANDIDATES_PER_PAGE,
+        })
+        if (cancelled) return
         setCandidates(result.candidates || [])
-      } catch (err: any) {
+        setTotal(result.total)
+        setTotalPages(result.totalPages)
+      } catch (err: unknown) {
+        if (cancelled) return
         console.error('Search error:', err)
-        const errorMessage = err.message || t('searchErrors.failed')
+        const errorMessage = err instanceof Error ? err.message : 'Failed to search candidates'
         setError(
           errorMessage.includes('Unauthorized')
-            ? t('searchErrors.unauthorized')
+            ? 'Please log in as an employer to search candidates'
             : errorMessage.includes('not yet supported')
-            ? t('searchErrors.notSupported')
-            : errorMessage
+              ? 'You do not have permission to search'
+              : errorMessage,
         )
         setCandidates([])
+        setTotal(0)
+        setTotalPages(0)
       } finally {
-        setIsLoading(false)
+        if (!cancelled) setIsLoading(false)
       }
     }
 
     performSearch()
-  }, [searchQuery])
+
+    return () => {
+      cancelled = true
+    }
+    // searchQuery + currentPage only — do not add `t` (unstable reference causes infinite re-fetch)
+  }, [searchQuery, currentPage])
 
   if (isLoading) {
     return (
@@ -63,25 +94,17 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-lg font-semibold text-[#16252d] mb-2">
-          {t('searchError')}
-        </p>
-        <p className="text-sm text-[#757575]">
-          {t('searchErrorDescription', { error })}
-        </p>
+        <p className="text-lg font-semibold text-[#16252d] mb-2">{t('searchError')}</p>
+        <p className="text-sm text-[#757575]">{t('searchErrorDescription', { error })}</p>
       </div>
     )
   }
 
-  if (candidates.length === 0) {
+  if (total === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-lg font-semibold text-[#16252d] mb-2">
-          {t('noCandidatesFoundSearch')}
-        </p>
-        <p className="text-sm text-[#757575]">
-          {t('noCandidatesDescriptionSearch')}
-        </p>
+        <p className="text-lg font-semibold text-[#16252d] mb-2">{t('noCandidatesFoundSearch')}</p>
+        <p className="text-sm text-[#757575]">{t('noCandidatesDescriptionSearch')}</p>
       </div>
     )
   }
@@ -90,7 +113,11 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
     <>
       <div className="mb-4 sm:mb-6">
         <p className="text-sm sm:text-base font-medium text-[#16252d]">
-          {t('candidatesFound', { count: candidates.length, plural: candidates.length === 1 ? '' : 's', search: searchQuery })}
+          {t('candidatesFound', {
+            count: total,
+            plural: total === 1 ? '' : 's',
+            search: searchQuery,
+          })}
         </p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
@@ -114,7 +141,14 @@ export function SearchResults({ searchQuery, locale }: SearchResultsProps) {
           </div>
         ))}
       </div>
+      <CandidatesPagination
+        page={currentPage}
+        totalPages={totalPages}
+        searchParams={searchParams}
+        locale={locale}
+        previousLabel={t('paginationPrevious')}
+        nextLabel={t('paginationNext')}
+      />
     </>
   )
 }
-

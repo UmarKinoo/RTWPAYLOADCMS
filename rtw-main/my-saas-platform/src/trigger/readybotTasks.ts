@@ -64,3 +64,5 @@ export const processInboundWhatsAppReplyTask = task({
 
 // Re-export for webhook dynamic import
 export { processInboundWhatsAppReplyTask as processInboundWhatsAppReply }
+
+export { candidateModerationRemindersTask } from './candidateModerationReminders'

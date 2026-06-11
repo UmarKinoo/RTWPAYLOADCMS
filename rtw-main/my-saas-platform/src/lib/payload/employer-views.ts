@@ -62,9 +62,8 @@ async function fetchCandidatesToReview(employerId: number): Promise<CandidateToR
   const allCandidates = await payload.find({
     collection: 'candidates',
     where: {
-      termsAccepted: {
-        equals: true,
-      },
+      termsAccepted: { equals: true },
+      profileStatus: { equals: 'approved' },
     },
     limit: 1000,
     depth: 1, // Populate profilePicture and primarySkill

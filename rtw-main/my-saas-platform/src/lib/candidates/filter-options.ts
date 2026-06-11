@@ -3,6 +3,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { disciplineSlugFromName } from '@/lib/candidates/discipline-filter'
+import { publicCandidateWhere } from '@/lib/candidates/profile-status'
 
 export interface FilterOptions {
   locations: string[]
@@ -36,14 +37,9 @@ export async function getFilterOptions(locale?: string): Promise<FilterOptions> 
   try {
     const payload = await getPayload({ config: await configPromise })
 
-    // Fetch all candidates with termsAccepted = true
     const candidates = await payload.find({
       collection: 'candidates',
-      where: {
-        termsAccepted: {
-          equals: true,
-        },
-      },
+      where: publicCandidateWhere(),
       limit: 10000,
       depth: 2, // Populate primarySkill and its relationships
       overrideAccess: true,

@@ -8,6 +8,7 @@ import * as migration_20260211_200000_add_moderator_role from './20260211_200000
 import * as migration_20260512_000000_add_interviews_candidate_accepted_at from './20260512_000000_add_interviews_candidate_accepted_at';
 import * as migration_20260513_000000_add_users_display_name from './20260513_000000_add_users_display_name';
 import * as migration_20260609_205734_readybot_schema from './20260609_205734_readybot_schema';
+import * as migration_20260611_120000_candidate_profile_moderation from './20260611_120000_candidate_profile_moderation';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20260609_205734_readybot_schema.up,
     down: migration_20260609_205734_readybot_schema.down,
     name: '20260609_205734_readybot_schema'
+  },
+  {
+    up: migration_20260611_120000_candidate_profile_moderation.up,
+    down: migration_20260611_120000_candidate_profile_moderation.down,
+    name: '20260611_120000_candidate_profile_moderation',
   },
 ];

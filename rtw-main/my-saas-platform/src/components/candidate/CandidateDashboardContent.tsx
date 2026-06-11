@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import { BottomNav } from '@/components/homepage/BottomNav'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
+import { ProfileModerationBanner } from './dashboard/ProfileModerationBanner'
 
 interface CandidateDashboardContentProps {
   candidate: Candidate
@@ -76,6 +77,8 @@ export function CandidateDashboardContent({ candidate: initialCandidate, unreadN
           unreadNotificationsCount={unreadNotificationsCount}
           notifications={notifications}
         />
+
+        <ProfileModerationBanner candidate={candidate} />
 
         {/* Content Area - Dashboard overview (Activity & Notifications are separate routes) */}
         <div className="mt-4 sm:mt-6 flex flex-col gap-4 xl:flex-row">

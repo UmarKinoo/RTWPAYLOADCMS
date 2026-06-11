@@ -183,6 +183,7 @@ export async function registerCandidate(
         visaExpiry: cleanDate(data.visaExpiry), // Optional field, clean empty strings
         visaProfession: data.visaProfession || undefined,
         termsAccepted: data.termsAccepted,
+        profileStatus: 'pending_review',
       },
     })
 
@@ -443,9 +444,31 @@ export async function updateCandidate(
     if ((data as any).jobPreferences !== undefined) updateData.jobPreferences = (data as any).jobPreferences
     if ((data as any).preferredBenefits !== undefined) updateData.preferredBenefits = (data as any).preferredBenefits
 
+    const id = typeof candidateId === 'string' ? parseInt(candidateId, 10) : candidateId
+    const existing = await payload.findByID({
+      collection: 'candidates',
+      id,
+      depth: 0,
+      overrideAccess: true,
+    })
+
+    if (
+      existing &&
+      (existing.profileStatus === 'needs_changes' || existing.profileStatus === 'rejected')
+    ) {
+      const now = new Date().toISOString()
+      updateData.profileStatus = 'pending_review'
+      updateData.moderation = {
+        ...(existing.moderation || {}),
+        submittedAt: now,
+        moderatorNotifiedAt: undefined,
+        rejectionReason: undefined,
+      }
+    }
+
     const candidate = await payload.update({
       collection: 'candidates',
-      id: typeof candidateId === 'string' ? parseInt(candidateId, 10) : candidateId,
+      id,
       data: updateData,
     })
 

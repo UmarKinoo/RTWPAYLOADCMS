@@ -39,9 +39,8 @@ async function fetchEmployerStats(employerId: number): Promise<EmployerStats> {
     collection: 'candidates',
     limit: 1000,
     where: {
-      termsAccepted: {
-        equals: true,
-      },
+      termsAccepted: { equals: true },
+      profileStatus: { equals: 'approved' },
     },
     overrideAccess: true,
   })

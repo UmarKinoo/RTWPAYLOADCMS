@@ -42,7 +42,9 @@
     "readybot:scan": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/readybot-scan.ts",
     "readybot:followup": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/readybot-followup.ts",
     "readybot:smoke": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/readybot-smoke-test.ts",
-    "readybot:chat-test": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/readybot-chat-test.ts"
+    "readybot:chat-test": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/readybot-chat-test.ts",
+    "export:candidates-employers": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/export-candidates-employers.ts",
+    "verify:candidate-moderation": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-candidate-moderation.ts"
   },
   "pnpm": {
     "overrides": {

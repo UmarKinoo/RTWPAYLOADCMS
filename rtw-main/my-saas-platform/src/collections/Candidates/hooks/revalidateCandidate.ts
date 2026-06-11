@@ -10,8 +10,8 @@ export const revalidateCandidate: CollectionAfterChangeHook<Candidate> = ({
   req: { payload, context },
 }) => {
   if (!context.disableRevalidate) {
-    // Only revalidate if terms accepted (visible candidate)
-    if (doc.termsAccepted) {
+    // Only revalidate public pages when profile is live
+    if (doc.termsAccepted && doc.profileStatus === 'approved') {
       try {
         if (typeof window === 'undefined') {
           const path = `/candidates/${doc.id}`

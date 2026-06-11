@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select'
 import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton'
 import { SearchResults } from '@/components/candidates/SearchResults'
+import { CandidatesPagination, CANDIDATES_PER_PAGE } from '@/components/candidates/CandidatesPagination'
 import { cn } from '@/lib/utils'
 import { getCandidates } from '@/lib/payload/candidates'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
@@ -70,11 +71,12 @@ function getResultsCountMessage(params: {
   disciplineName: string | null
   t: (key: string, vars?: Record<string, string | number>) => string
   tEmpty: (key: string) => string
-}): string {
+}): string | null {
   const { totalDocs, searchQuery, disciplineName, t, tEmpty } = params
+  // Search results load client-side — avoid showing "no candidates" while fetching
+  if (searchQuery) return null
   if (totalDocs === 0) return tEmpty('noCandidates')
   const plural = totalDocs === 1 ? '' : 's'
-  if (searchQuery) return t('resultsCountWithSearch', { count: totalDocs, plural, search: searchQuery })
   if (disciplineName) return t('resultsCountWithDiscipline', { count: totalDocs, plural, discipline: disciplineName })
   return t('resultsCount', { count: totalDocs, plural })
 }
@@ -192,11 +194,13 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
 
   let candidates: any[] = []
   let totalDocs = 0
+  let totalPages = 0
+  const currentPage = Math.max(1, Number.parseInt(q.page || '1', 10) || 1)
   if (!isSearchMode) {
     const hasTaxonomy = Boolean(q.category?.trim() || q.subCategory?.trim())
     const result = await getCandidates({
-      limit: 1000,
-      page: 1,
+      limit: CANDIDATES_PER_PAGE,
+      page: currentPage,
       disciplineSlug: hasTaxonomy ? undefined : q.discipline,
       location: q.location,
       nationality: q.nationality,
@@ -214,6 +218,7 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
     })
     candidates = result.candidates
     totalDocs = result.totalDocs
+    totalPages = result.totalPages
   }
 
   const showBadges = Boolean(
@@ -249,26 +254,31 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
               t={t}
             />
 
-            <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
-              <p className="text-sm sm:text-base font-medium text-[#16252d]">{resultsMessage}</p>
-              <Select defaultValue="newest">
-                <SelectTrigger
-                  className={cn(
-                    'bg-[#f5f5f5] border-0 rounded-lg',
-                    'w-auto min-w-[120px] sm:min-w-[150px] h-9 sm:h-10 px-3 sm:px-4',
-                    'text-sm font-medium text-[#16252d] focus:ring-2 focus:ring-[#4644b8]'
-                  )}
-                >
-                  <SelectValue placeholder={t('sortBy')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">{t('sortOptions.newest')}</SelectItem>
-                  <SelectItem value="oldest">{t('sortOptions.oldest')}</SelectItem>
-                  <SelectItem value="experience-high">{t('sortOptions.experienceHigh')}</SelectItem>
-                  <SelectItem value="experience-low">{t('sortOptions.experienceLow')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {!isSearchMode && (
+              <div className="flex items-center justify-between gap-3 mb-4 sm:mb-6">
+                {resultsMessage && (
+                  <p className="text-sm sm:text-base font-medium text-[#16252d]">{resultsMessage}</p>
+                )}
+                <Select defaultValue="newest">
+                  <SelectTrigger
+                    className={cn(
+                      'bg-[#f5f5f5] border-0 rounded-lg',
+                      'w-auto min-w-[120px] sm:min-w-[150px] h-9 sm:h-10 px-3 sm:px-4',
+                      'text-sm font-medium text-[#16252d] focus:ring-2 focus:ring-[#4644b8]',
+                      !resultsMessage && 'ml-auto',
+                    )}
+                  >
+                    <SelectValue placeholder={t('sortBy')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">{t('sortOptions.newest')}</SelectItem>
+                    <SelectItem value="oldest">{t('sortOptions.oldest')}</SelectItem>
+                    <SelectItem value="experience-high">{t('sortOptions.experienceHigh')}</SelectItem>
+                    <SelectItem value="experience-low">{t('sortOptions.experienceLow')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <CandidatesBody
               isSearchMode={isSearchMode}
@@ -277,6 +287,9 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
               hasEmployerAccess={hasEmployerAccess}
               locale={locale}
               t={t}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              searchParams={q}
             />
 
             {!hasEmployerAccess && (
@@ -309,12 +322,32 @@ function CandidatesBody(props: Readonly<{
   candidates: any[]
   hasEmployerAccess: boolean
   locale: string
-  t: (key: string) => string
+  t: (key: string, vars?: Record<string, string | number>) => string
+  currentPage: number
+  totalPages: number
+  searchParams: Record<string, string | undefined>
 }>) {
-  const { isSearchMode, searchQuery, candidates, hasEmployerAccess, locale, t } = props
+  const {
+    isSearchMode,
+    searchQuery,
+    candidates,
+    hasEmployerAccess,
+    locale,
+    t,
+    currentPage,
+    totalPages,
+    searchParams,
+  } = props
   if (isSearchMode) {
     if (hasEmployerAccess) {
-      return <SearchResults searchQuery={searchQuery} locale={locale} />
+      return (
+        <SearchResults
+          searchQuery={searchQuery}
+          locale={locale}
+          currentPage={currentPage}
+          searchParams={searchParams}
+        />
+      )
     }
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center max-w-md mx-auto">
@@ -330,16 +363,26 @@ function CandidatesBody(props: Readonly<{
   }
   if (candidates.length > 0) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-        {candidates.map((c) => (
-          <CandidateGridCard
-            key={c.id}
-            candidate={c}
-            hasEmployerAccess={hasEmployerAccess}
-            locale={locale}
-          />
-        ))}
-      </div>
+      <>
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+          {candidates.map((c) => (
+            <CandidateGridCard
+              key={c.id}
+              candidate={c}
+              hasEmployerAccess={hasEmployerAccess}
+              locale={locale}
+            />
+          ))}
+        </div>
+        <CandidatesPagination
+          page={currentPage}
+          totalPages={totalPages}
+          searchParams={searchParams}
+          locale={locale}
+          previousLabel={t('paginationPrevious')}
+          nextLabel={t('paginationNext')}
+        />
+      </>
     )
   }
   return (

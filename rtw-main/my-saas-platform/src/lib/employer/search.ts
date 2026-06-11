@@ -5,6 +5,9 @@ import configPromise from '@payload-config'
 import { getCurrentUserType } from '@/lib/currentUserType'
 import { query as dbQuery } from '@/lib/db'
 import type { BillingClass } from '@/lib/billing'
+import { CANDIDATES_PER_PAGE } from '@/lib/candidates/profile-status'
+
+const MAX_SEARCH_RESULTS = 500
 
 export interface SearchCandidatesResult {
   candidates: Array<{
@@ -21,12 +24,16 @@ export interface SearchCandidatesResult {
     email?: string // Temporarily added
   }>
   total: number
+  totalPages: number
+  page: number
 }
 
 export async function searchCandidates(
   query: string,
-  limit: number = 20
+  options?: { page?: number; limit?: number },
 ): Promise<SearchCandidatesResult> {
+  const page = Math.max(1, options?.page ?? 1)
+  const limit = options?.limit ?? CANDIDATES_PER_PAGE
   try {
     const payload = await getPayload({ config: await configPromise })
 
@@ -60,6 +67,8 @@ export async function searchCandidates(
       return {
         candidates: [],
         total: 0,
+        totalPages: 0,
+        page: 1,
       }
     }
 
@@ -174,13 +183,18 @@ export async function searchCandidates(
                           },
                         },
                         {
+                          profileStatus: {
+                            equals: 'approved',
+                          },
+                        },
+                        {
                           primarySkill: {
                             in: skillIds,
                           },
                         },
                       ],
                     },
-                    limit: 50,
+                    limit: MAX_SEARCH_RESULTS,
                     overrideAccess: true,
                   })
 
@@ -241,13 +255,14 @@ export async function searchCandidates(
       `
       SELECT id FROM candidates
       WHERE terms_accepted = true
+        AND profile_status = 'approved'
         AND (
           first_name ILIKE $1
           OR last_name ILIKE $1
           OR job_title ILIKE $1
         )
       ORDER BY id DESC
-      LIMIT 50
+      LIMIT ${MAX_SEARCH_RESULTS}
     `,
       [`%${searchQuery}%`],
     )
@@ -262,17 +277,21 @@ export async function searchCandidates(
       ...primarySkillCandidateIds,
       ...skillVectorCandidateIds.filter((id) => !primarySkillCandidateIds.includes(id)),
       ...keywordCandidateIds.filter(
-        (id) => !primarySkillCandidateIds.includes(id) && !skillVectorCandidateIds.includes(id)
+        (id) => !primarySkillCandidateIds.includes(id) && !skillVectorCandidateIds.includes(id),
       ),
-    ].slice(0, limit)
+    ].slice(0, MAX_SEARCH_RESULTS)
+
+    const total = allCandidateIds.length
+    const totalPages = total > 0 ? Math.ceil(total / limit) : 0
+    const safePage = totalPages > 0 ? Math.min(page, totalPages) : 1
+    const pageIds = allCandidateIds.slice((safePage - 1) * limit, safePage * limit)
 
     console.log(
-      `[Search] Total candidates after combining: ${allCandidateIds.length} (primarySkill: ${primarySkillCandidateIds.length}, skill: ${skillVectorCandidateIds.length}, keyword: ${keywordCandidateIds.length})`
+      `[Search] Total candidates after combining: ${total} (page ${safePage}/${totalPages || 1}, primarySkill: ${primarySkillCandidateIds.length}, skill: ${skillVectorCandidateIds.length}, keyword: ${keywordCandidateIds.length})`,
     )
 
-    // Fetch final candidates (limit and deduplicate)
     const finalCandidates =
-      allCandidateIds.length > 0
+      pageIds.length > 0
         ? await payload.find({
             collection: 'candidates',
             where: {
@@ -283,8 +302,13 @@ export async function searchCandidates(
                   },
                 },
                 {
+                  profileStatus: {
+                    equals: 'approved',
+                  },
+                },
+                {
                   id: {
-                    in: allCandidateIds.slice(0, limit),
+                    in: pageIds,
                   },
                 },
               ],
@@ -295,24 +319,52 @@ export async function searchCandidates(
           })
         : { docs: [] }
 
-    // Track view interaction for each candidate
-    for (const candidate of finalCandidates.docs) {
-      try {
-        await payload.create({
-          collection: 'candidate-interactions',
-          data: {
-            employer: employerId,
-            candidate: candidate.id,
-            interactionType: 'view',
-            metadata: {
-              source: 'dashboard_search',
-              query: searchQuery,
+    // Preserve search ranking order from pageIds
+    const orderMap = new Map(pageIds.map((id, index) => [id, index]))
+    finalCandidates.docs.sort(
+      (a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0),
+    )
+
+    // Track first view per employer+candidate (skip if already viewed — avoids write storm on re-search)
+    if (pageIds.length > 0) {
+      const existingViews = await payload.find({
+        collection: 'candidate-interactions',
+        where: {
+          and: [
+            { employer: { equals: employerId } },
+            { candidate: { in: pageIds } },
+            { interactionType: { equals: 'view' } },
+          ],
+        },
+        limit: pageIds.length,
+        depth: 0,
+        overrideAccess: true,
+      })
+
+      const alreadyViewed = new Set(
+        existingViews.docs.map((row) =>
+          typeof row.candidate === 'object' ? row.candidate.id : row.candidate,
+        ),
+      )
+
+      for (const candidate of finalCandidates.docs) {
+        if (alreadyViewed.has(candidate.id)) continue
+        try {
+          await payload.create({
+            collection: 'candidate-interactions',
+            data: {
+              employer: employerId,
+              candidate: candidate.id,
+              interactionType: 'view',
+              metadata: {
+                source: 'dashboard_search',
+                query: searchQuery,
+              },
             },
-          },
-        })
-      } catch (error) {
-        // Ignore duplicate interaction errors
-        console.warn('Failed to track interaction:', error)
+          })
+        } catch (error) {
+          console.warn('Failed to track interaction:', error)
+        }
       }
     }
 
@@ -333,7 +385,9 @@ export async function searchCandidates(
         billingClass: (candidate.billingClass as BillingClass) || null,
         email: candidate.email || undefined, // Temporarily added
       })),
-      total: finalCandidates.docs.length,
+      total,
+      totalPages,
+      page: safePage,
     }
   } catch (error: any) {
     console.error('Search error:', error)

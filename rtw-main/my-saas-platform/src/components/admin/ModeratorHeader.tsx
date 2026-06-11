@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { LogOut, ShieldCheck, LayoutDashboard, Inbox } from 'lucide-react'
+import { LogOut, ShieldCheck, LayoutDashboard, Inbox, Users } from 'lucide-react'
 import { clearAuthCookies } from '@/lib/auth'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -38,8 +38,12 @@ export function ModeratorHeader({ kind }: Readonly<ModeratorHeaderProps>) {
 
   const label = kind === 'admin' ? 'Admin' : 'Moderator'
 
-  const dashboardActive = pathname.includes('/moderator') && !pathname.includes('/interviews')
-  const pendingActive = pathname.includes('/moderator/interviews')
+  const dashboardActive =
+    pathname.includes('/moderator') &&
+    !pathname.includes('/interviews') &&
+    !pathname.includes('/candidates')
+  const interviewsPendingActive = pathname.includes('/moderator/interviews')
+  const candidatesPendingActive = pathname.includes('/moderator/candidates')
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#e5e5e5] bg-white shadow-sm">
@@ -76,18 +80,32 @@ export function ModeratorHeader({ kind }: Readonly<ModeratorHeaderProps>) {
               Dashboard
             </Button>
           </Link>
+          <Link href={`/${locale}/moderator/candidates/pending`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                candidatesPendingActive
+                  ? 'bg-[#ecf2ff] text-[#4644b8] hover:bg-[#dce8ff] hover:text-[#4644b8]'
+                  : 'text-[#757575] hover:bg-[#f5f5f5] hover:text-[#16252d]',
+              )}
+            >
+              <Users className="mr-1.5 h-4 w-4" aria-hidden />
+              Profiles
+            </Button>
+          </Link>
           <Link href={`/${locale}/moderator/interviews/pending`}>
             <Button
               variant="ghost"
               size="sm"
               className={cn(
-                pendingActive
+                interviewsPendingActive
                   ? 'bg-[#ecf2ff] text-[#4644b8] hover:bg-[#dce8ff] hover:text-[#4644b8]'
                   : 'text-[#757575] hover:bg-[#f5f5f5] hover:text-[#16252d]',
               )}
             >
               <Inbox className="mr-1.5 h-4 w-4" aria-hidden />
-              Pending
+              Interviews
             </Button>
           </Link>
         </nav>

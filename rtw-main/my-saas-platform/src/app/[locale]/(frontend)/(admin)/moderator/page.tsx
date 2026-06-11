@@ -12,8 +12,10 @@ import {
   Inbox,
   LayoutList,
   Shield,
+  UserCheck,
   Users,
 } from 'lucide-react'
+import { moderationQueueWhere } from '@/lib/candidates/profile-status'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -28,18 +30,30 @@ export default async function ModeratorDashboardPage() {
     throw new Error('Redirect')
   }
 
-  if (userType.kind !== 'moderator') await redirectToDashboard(locale)
+  if (userType.kind !== 'moderator' && userType.kind !== 'admin') {
+    await redirectToDashboard(locale)
+  }
 
   const payload = await getPayload({ config: configPromise })
 
-  const pendingResult = await payload.find({
-    collection: 'interviews',
-    where: { status: { equals: 'pending' } },
-    limit: 1,
-    depth: 0,
-  })
+  const [pendingInterviewsResult, pendingCandidatesResult] = await Promise.all([
+    payload.find({
+      collection: 'interviews',
+      where: { status: { equals: 'pending' } },
+      limit: 1,
+      depth: 0,
+    }),
+    payload.find({
+      collection: 'candidates',
+      where: moderationQueueWhere(),
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    }),
+  ])
 
-  const pendingCount = pendingResult.totalDocs ?? 0
+  const pendingInterviewCount = pendingInterviewsResult.totalDocs ?? 0
+  const pendingCandidateCount = pendingCandidatesResult.totalDocs ?? 0
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -53,24 +67,31 @@ export default async function ModeratorDashboardPage() {
               Welcome back
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#515151]">
-              Review interview requests before candidates are notified. Use the links below to jump to
-              the queue, read employer messages, and open employer or candidate profiles.
+              Approve new candidate profiles before they appear on the website, and review interview
+              requests before candidates are notified.
             </p>
           </div>
-          <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center sm:text-right">
-              <p className="text-xs font-medium uppercase tracking-wide text-amber-900/80">
-                Awaiting review
-              </p>
-              <p className="text-3xl font-semibold tabular-nums text-[#16252d]">{pendingCount}</p>
-              <p className="text-xs text-amber-900/70">pending request{pendingCount !== 1 ? 's' : ''}</p>
+          <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-lg border border-[#4644b8]/20 bg-[#ecf2ff] px-4 py-3 text-center">
+                <p className="text-xs font-medium uppercase tracking-wide text-[#4644b8]/80">
+                  Profiles
+                </p>
+                <p className="text-3xl font-semibold tabular-nums text-[#16252d]">{pendingCandidateCount}</p>
+              </div>
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center">
+                <p className="text-xs font-medium uppercase tracking-wide text-amber-900/80">
+                  Interviews
+                </p>
+                <p className="text-3xl font-semibold tabular-nums text-[#16252d]">{pendingInterviewCount}</p>
+              </div>
             </div>
             <Button
               asChild
               className="w-full bg-[#4644b8] text-white hover:bg-[#3a3aa0] hover:text-white sm:w-auto [&_svg]:text-white"
             >
-              <Link href={`/${locale}/moderator/interviews/pending`}>
-                Open queue
+              <Link href={`/${locale}/moderator/candidates/pending`}>
+                Review profiles
                 <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
               </Link>
             </Button>
@@ -79,22 +100,41 @@ export default async function ModeratorDashboardPage() {
       </div>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card id="profiles-queue" className="border-[#e5e5e5] shadow-sm scroll-mt-24">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2 text-[#4644b8]">
+              <UserCheck className="h-5 w-5" aria-hidden />
+              <CardTitle className="text-base">Candidate profiles</CardTitle>
+            </div>
+            <CardDescription>
+              New registrations stay hidden until you approve them for the public candidates page.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline" className="w-full border-[#e5e5e5]">
+              <Link href={`/${locale}/moderator/candidates/pending#moderator-candidates-pending-list`}>
+                <LayoutList className="mr-2 h-4 w-4" aria-hidden />
+                Review profiles ({pendingCandidateCount})
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card id="queue" className="border-[#e5e5e5] shadow-sm scroll-mt-24">
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2 text-[#4644b8]">
               <Inbox className="h-5 w-5" aria-hidden />
-              <CardTitle className="text-base">Pending queue</CardTitle>
+              <CardTitle className="text-base">Interview requests</CardTitle>
             </div>
             <CardDescription>
-              Approve or reject requests. Each card shows employer and candidate with the employer&apos;s
-              message.
+              Approve or reject employer interview requests before candidates are notified.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full border-[#e5e5e5]">
               <Link href={`/${locale}/moderator/interviews/pending#moderator-pending-list`}>
                 <LayoutList className="mr-2 h-4 w-4" aria-hidden />
-                Go to pending list
+                Review interviews ({pendingInterviewCount})
               </Link>
             </Button>
           </CardContent>

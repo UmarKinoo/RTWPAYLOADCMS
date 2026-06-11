@@ -17,8 +17,10 @@ import {
   User,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { profileStatusLabel } from '@/lib/candidates/profile-status'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +35,9 @@ export default async function ModeratorCandidateProfilePage({ params }: PageProp
     throw new Error('Redirect')
   }
 
-  if (userType.kind !== 'moderator') await redirectToDashboard(locale)
+  if (userType.kind !== 'moderator' && userType.kind !== 'admin') {
+    await redirectToDashboard(locale)
+  }
 
   const { id: rawId } = await params
   const id = Number.parseInt(rawId, 10)
@@ -64,9 +68,9 @@ export default async function ModeratorCandidateProfilePage({ params }: PageProp
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <Button variant="ghost" size="sm" className="-ml-2 text-[#515151]" asChild>
-          <Link href={`/${locale}/moderator/interviews/pending`}>
+          <Link href={`/${locale}/moderator/candidates/pending`}>
             <ArrowLeft className="mr-1.5 h-4 w-4" aria-hidden />
-            Back to pending queue
+            Back to profile queue
           </Link>
         </Button>
         <Button variant="outline" size="sm" className="border-[#e5e5e5]" asChild>
@@ -83,6 +87,9 @@ export default async function ModeratorCandidateProfilePage({ params }: PageProp
             {candidate.firstName} {candidate.lastName}
           </h1>
           <p className="mt-1 text-sm text-[#757575]">Candidate profile · ID {candidate.id}</p>
+          <Badge className="mt-2 border-[#4644b8]/25 bg-[#ecf2ff] text-[#4644b8]">
+            {profileStatusLabel(candidate.profileStatus)}
+          </Badge>
         </div>
       </div>
 

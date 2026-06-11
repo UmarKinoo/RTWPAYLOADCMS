@@ -14,6 +14,7 @@ import {
   normalizeJobTypeFilter,
   skillLevelToBillingClass,
 } from '@/lib/candidates/filter-params'
+import { publicCandidateWhere } from '@/lib/candidates/profile-status'
 
 // Re-export for server code that imports from this file
 export type { CandidateListItem, CandidateDetail }
@@ -184,12 +185,9 @@ async function fetchCandidates(options?: {
     language,
   } = options || {}
 
-  // Build where clause
+  // Build where clause — only approved profiles on the public site
   const where: any = {
-    // Only show candidates who accepted terms (valid registrations)
-    termsAccepted: {
-      equals: true,
-    },
+    ...publicCandidateWhere(),
   }
 
   // Apply location filter (city/state)
@@ -387,7 +385,7 @@ async function fetchCandidateById(id: number, locale: string): Promise<Candidate
       overrideAccess: true, // Public access for detail view
     })
 
-    if (!doc || !doc.termsAccepted) {
+    if (!doc || !doc.termsAccepted || doc.profileStatus !== 'approved') {
       return null
     }
 

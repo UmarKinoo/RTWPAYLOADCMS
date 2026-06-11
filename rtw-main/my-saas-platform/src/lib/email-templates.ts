@@ -634,3 +634,118 @@ export function interviewInvitationEmailTemplate(params: InterviewInvitationEmai
 
   return baseEmailTemplate(content, 'New Interview Invitation - Ready to Work')
 }
+
+export interface CandidateModerationReviewEmailParams {
+  candidateName: string
+  jobTitle: string
+  location: string
+  nationality: string
+  reviewUrl: string
+  queueUrl: string
+}
+
+export function candidateModerationReviewEmailTemplate(
+  params: CandidateModerationReviewEmailParams,
+): string {
+  const content = `
+    <p class="email-content">A candidate profile is ready for your review on Ready to Work.</p>
+    <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 16px 0;">
+      <p style="margin: 0 0 8px;"><strong>${params.candidateName}</strong></p>
+      <p style="margin: 0 0 4px; color: #515151;">${params.jobTitle}</p>
+      <p style="margin: 0 0 4px; color: #515151;">${params.location} · ${params.nationality}</p>
+    </div>
+    <div style="text-align: center;">
+      <a href="${params.reviewUrl}" class="button">Review profile</a>
+    </div>
+    <p class="email-content" style="font-size: 14px; color: #757575; margin-top: 20px;">
+      <a href="${params.queueUrl}" style="color: #4644b8;">View all pending profiles</a>
+    </p>
+  `
+  return baseEmailTemplate(content, 'Candidate profile awaiting review')
+}
+
+export interface CandidateModerationReminderEmailParams {
+  pendingCount: number
+  oldestHours: number
+  queueUrl: string
+}
+
+export function candidateModerationReminderEmailTemplate(
+  params: CandidateModerationReminderEmailParams,
+): string {
+  const content = `
+    <p class="email-content">
+      You have <strong>${params.pendingCount}</strong> candidate profile${params.pendingCount === 1 ? '' : 's'}
+      still waiting for review.
+    </p>
+    ${
+      params.oldestHours >= 24
+        ? `<p class="email-content">The oldest item has been waiting for over <strong>${params.oldestHours} hours</strong>.</p>`
+        : ''
+    }
+    <div style="text-align: center;">
+      <a href="${params.queueUrl}" class="button">Open moderation queue</a>
+    </div>
+  `
+  return baseEmailTemplate(content, 'Reminder: candidate profiles awaiting review')
+}
+
+export interface CandidateProfileDecisionEmailParams {
+  firstName: string
+  dashboardUrl: string
+  reason?: string
+}
+
+export function candidateProfileApprovedEmailTemplate(
+  params: Pick<CandidateProfileDecisionEmailParams, 'firstName' | 'dashboardUrl'>,
+): string {
+  const content = `
+    <p class="email-content">Hi ${params.firstName},</p>
+    <p class="email-content">
+      Great news — your Ready to Work profile has been <strong>approved</strong> and is now visible to employers on our platform.
+    </p>
+    <div style="text-align: center;">
+      <a href="${params.dashboardUrl}" class="button">Go to your dashboard</a>
+    </div>
+  `
+  return baseEmailTemplate(content, 'Your profile is now live')
+}
+
+export function candidateProfileRejectedEmailTemplate(
+  params: CandidateProfileDecisionEmailParams,
+): string {
+  const reasonBlock = params.reason
+    ? `<p class="email-content"><strong>Reason:</strong> ${params.reason}</p>`
+    : ''
+  const content = `
+    <p class="email-content">Hi ${params.firstName},</p>
+    <p class="email-content">
+      We were unable to approve your profile at this time. It will not appear on the public candidates page.
+    </p>
+    ${reasonBlock}
+    <p class="email-content">You can update your profile and we will review it again.</p>
+    <div style="text-align: center;">
+      <a href="${params.dashboardUrl}" class="button">Update your profile</a>
+    </div>
+  `
+  return baseEmailTemplate(content, 'Profile review update')
+}
+
+export function candidateProfileNeedsChangesEmailTemplate(
+  params: CandidateProfileDecisionEmailParams,
+): string {
+  const reasonBlock = params.reason
+    ? `<p class="email-content"><strong>What to update:</strong> ${params.reason}</p>`
+    : '<p class="email-content">Please review your profile details and make the requested updates.</p>'
+  const content = `
+    <p class="email-content">Hi ${params.firstName},</p>
+    <p class="email-content">
+      Your profile is almost ready. We need a few changes before it can go live on Ready to Work.
+    </p>
+    ${reasonBlock}
+    <div style="text-align: center;">
+      <a href="${params.dashboardUrl}" class="button">Edit your profile</a>
+    </div>
+  `
+  return baseEmailTemplate(content, 'Action needed on your profile')
+}

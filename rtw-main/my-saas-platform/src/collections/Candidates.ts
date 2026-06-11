@@ -14,6 +14,7 @@ import {
 import { deleteRelatedBeforeCandidateDelete } from './Candidates/hooks/deleteRelatedBeforeCandidateDelete'
 import { ensureUniqueCandidatePhone } from './Candidates/hooks/ensureUniqueCandidatePhone'
 import { updateBioEmbeddingVector } from './Candidates/hooks/updateBioEmbeddingVector'
+import { notifyModeratorsOnQueueEntry } from './Candidates/hooks/notifyModeratorsOnQueueEntry'
 
 // Hook to set billing class from primary skill and generate bio embedding
 const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
@@ -24,11 +25,13 @@ const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({
     const isPasswordOnlyUpdate = 
       dataKeys.length > 0 &&
       !('bio_embedding' in data) && // Make sure bio_embedding is not being updated
-      dataKeys.every(key => 
-        ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt', 
-         'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified', 'lastLoginAt', 'sessionId',
-         'readyBot', 'screeningStatus', 'missingFields', 'whatsappOptIn', 'whatsappOptInAt', 'preferredContactChannel',
-         'lastScreenedAt', 'lastContactedAt', 'lastReplyAt', 'screeningSummary', 'screeningConfidence', 'readyBotEnabled', 'whatsappNumber'].includes(key)
+      dataKeys.every(
+        (key) =>
+          ['password', 'passwordResetToken', 'passwordResetExpires', 'hash', 'salt',
+           'emailVerificationToken', 'emailVerificationExpires', 'emailVerified', 'phoneVerified', 'lastLoginAt', 'sessionId',
+           'readyBot', 'screeningStatus', 'missingFields', 'whatsappOptIn', 'whatsappOptInAt', 'preferredContactChannel',
+           'lastScreenedAt', 'lastContactedAt', 'lastReplyAt', 'screeningSummary', 'screeningConfidence', 'readyBotEnabled', 'whatsappNumber',
+           'profileStatus', 'moderation'].includes(key) || key.startsWith('moderation'),
       )
 
     if (isPasswordOnlyUpdate) {
@@ -502,6 +505,74 @@ export const Candidates: CollectionConfig = {
       required: true,
       defaultValue: false,
     },
+    // Profile moderation — human gate before appearing on public site
+    {
+      name: 'profileStatus',
+      type: 'select',
+      label: 'Profile Status',
+      defaultValue: 'pending_review',
+      required: true,
+      options: [
+        { label: 'Pending Review', value: 'pending_review' },
+        { label: 'Approved (Live)', value: 'approved' },
+        { label: 'Rejected', value: 'rejected' },
+        { label: 'Needs Changes', value: 'needs_changes' },
+      ],
+      admin: {
+        description: 'Only approved profiles appear on the public candidates page.',
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'moderation',
+      type: 'group',
+      label: 'Moderation',
+      admin: {
+        description: 'Review workflow for publishing candidate profiles.',
+      },
+      fields: [
+        {
+          name: 'submittedAt',
+          type: 'date',
+          label: 'Submitted At',
+          admin: { description: 'When the profile entered the moderation queue.' },
+        },
+        {
+          name: 'reviewedAt',
+          type: 'date',
+          label: 'Reviewed At',
+        },
+        {
+          name: 'reviewedBy',
+          type: 'relationship',
+          relationTo: 'users',
+          label: 'Reviewed By',
+        },
+        {
+          name: 'rejectionReason',
+          type: 'textarea',
+          label: 'Feedback / Rejection Reason',
+          admin: { description: 'Shown to candidate when rejected or changes are requested.' },
+        },
+        {
+          name: 'moderatorNotes',
+          type: 'textarea',
+          label: 'Internal Moderator Notes',
+        },
+        {
+          name: 'lastReminderSentAt',
+          type: 'date',
+          label: 'Last Reminder Sent At',
+          admin: { hidden: true },
+        },
+        {
+          name: 'moderatorNotifiedAt',
+          type: 'date',
+          label: 'Moderator Notified At',
+          admin: { hidden: true },
+        },
+      ],
+    },
     // ReadyBot — AI screening (WhatsApp / email)
     {
       name: 'readyBot',
@@ -608,7 +679,7 @@ export const Candidates: CollectionConfig = {
   hooks: {
     beforeDelete: [deleteRelatedBeforeCandidateDelete],
     beforeChange: [ensureUniqueCandidatePhone, setBillingClassAndGenerateEmbedding],
-    afterChange: [updateBioEmbeddingVector, revalidateCandidate],
+    afterChange: [updateBioEmbeddingVector, revalidateCandidate, notifyModeratorsOnQueueEntry],
     afterDelete: [revalidateCandidateDelete],
   },
 }
