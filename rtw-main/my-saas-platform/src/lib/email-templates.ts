@@ -689,6 +689,8 @@ export interface CandidateModerationReviewEmailParams {
   jobTitle: string
   location: string
   nationality: string
+  email?: string
+  phone?: string
   reviewUrl: string
   queueUrl: string
 }
@@ -696,18 +698,28 @@ export interface CandidateModerationReviewEmailParams {
 export function candidateModerationReviewEmailTemplate(
   params: CandidateModerationReviewEmailParams,
 ): string {
+  const contactLines = [
+    params.email ? `<p style="margin: 0 0 4px; color: #515151;">Email: ${params.email}</p>` : '',
+    params.phone ? `<p style="margin: 0 0 4px; color: #515151;">Phone: ${params.phone}</p>` : '',
+  ]
+    .filter(Boolean)
+    .join('')
+
   const content = `
-    <p class="email-content">A candidate profile is ready for your review on Ready to Work.</p>
+    <p class="email-content">
+      A candidate has verified their phone and is <strong>ready for profile review</strong> on Ready to Work.
+    </p>
     <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 16px 0;">
       <p style="margin: 0 0 8px;"><strong>${params.candidateName}</strong></p>
       <p style="margin: 0 0 4px; color: #515151;">${params.jobTitle}</p>
       <p style="margin: 0 0 4px; color: #515151;">${params.location} · ${params.nationality}</p>
+      ${contactLines}
     </div>
-    <div style="text-align: center;">
-      <a href="${params.reviewUrl}" class="button">Review profile</a>
+    <div style="text-align: center; margin: 20px 0;">
+      <a href="${params.queueUrl}" class="button">Open moderator queue</a>
     </div>
-    <p class="email-content" style="font-size: 14px; color: #757575; margin-top: 20px;">
-      <a href="${params.queueUrl}" style="color: #4644b8;">View all pending profiles</a>
+    <p class="email-content" style="font-size: 14px; color: #757575; margin-top: 12px; text-align: center;">
+      Or <a href="${params.reviewUrl}" style="color: #4644b8;">review this profile directly</a>
     </p>
   `
   return baseEmailTemplate(content, 'Candidate profile awaiting review')

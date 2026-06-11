@@ -9,7 +9,33 @@ import config from '@payload-config'
 import { verifyOTP, isOTPExpired, getOTPMaxAttempts } from '@/server/otp/utils'
 import { normalizePhone } from '@/server/sms/taqnyat'
 import { notifyModeratorsForCandidate } from '@/lib/admin/candidate-moderation-notify'
-import type { Candidate } from '@/payload-types'
+import type { Payload } from 'payload'
+
+async function resolveCandidateIdForOtp(
+  payload: Payload,
+  verification: { userId?: unknown; userCollection?: string | null },
+  normalizedPhone: string,
+): Promise<number | null> {
+  if (verification.userCollection === 'employers') {
+    return null
+  }
+
+  if (verification.userCollection === 'candidates' && verification.userId != null) {
+    const id = Number(verification.userId)
+    return Number.isFinite(id) ? id : null
+  }
+
+  const found = await payload.find({
+    collection: 'candidates',
+    where: { phone: { equals: normalizedPhone } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  const id = found.docs[0]?.id
+  return id != null ? Number(id) : null
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -119,42 +145,50 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // If user is linked, mark their phone as verified
-    // Only update Employers and Candidates (not Users - admin users don't need phone verification)
+    // Mark candidate/employer phone verified and notify moderators for new candidates
     let userEmail: string | null = null
-    if (verification.userId && verification.userCollection) {
-      const collection = verification.userCollection as 'users' | 'candidates' | 'employers'
-      
-      // Skip Users collection (admin users don't need phone verification)
-      if (collection === 'users') {
-        console.log('[OTP Verify] Skipping phoneVerified update for Users collection')
-      } else {
-        try {
-          const updatedUser = await payload.update({
-            collection: collection as 'candidates' | 'employers',
-            id: verification.userId as string,
-            data: {
-              phoneVerified: true,
-            },
+    const collection = verification.userCollection as 'users' | 'candidates' | 'employers' | null
+
+    if (collection === 'users') {
+      console.log('[OTP Verify] Skipping phoneVerified update for Users collection')
+    } else {
+      try {
+        const candidateId = await resolveCandidateIdForOtp(payload, verification, normalizedPhone)
+
+        if (candidateId != null) {
+          const updatedCandidate = await payload.update({
+            collection: 'candidates',
+            id: candidateId,
+            data: { phoneVerified: true },
+            overrideAccess: true,
           })
-          console.log('[OTP Verify] Updated phoneVerified for', collection, verification.userId)
+          console.log('[OTP Verify] Updated phoneVerified for candidate', candidateId)
 
-          if (collection === 'candidates') {
-            const notifyResult = await notifyModeratorsForCandidate(
-              payload,
-              updatedUser as Candidate,
-            )
-            console.log('[OTP Verify] Moderator profile-review notify:', notifyResult)
-          }
+          const notifyResult = await notifyModeratorsForCandidate(payload, updatedCandidate.id)
+          console.log('[OTP Verify] Moderator profile-review notify:', notifyResult)
 
-          // Store email for potential auto-login
-          if (updatedUser && 'email' in updatedUser && updatedUser.email) {
-            userEmail = updatedUser.email as string
+          if (updatedCandidate.email) {
+            userEmail = updatedCandidate.email
           }
-        } catch (error) {
-          // Log but don't fail - verification record is already updated
-          console.error('[OTP Verify] Failed to update user phoneVerified:', error)
+        } else if (collection === 'employers' && verification.userId) {
+          const updatedEmployer = await payload.update({
+            collection: 'employers',
+            id: verification.userId as string,
+            data: { phoneVerified: true },
+            overrideAccess: true,
+          })
+          console.log('[OTP Verify] Updated phoneVerified for employer', verification.userId)
+          if (updatedEmployer.email) {
+            userEmail = updatedEmployer.email
+          }
+        } else {
+          console.warn(
+            '[OTP Verify] OTP verified but no candidate/employer linked for phone',
+            normalizedPhone,
+          )
         }
+      } catch (error) {
+        console.error('[OTP Verify] Failed to update phoneVerified / notify moderators:', error)
       }
     }
 
