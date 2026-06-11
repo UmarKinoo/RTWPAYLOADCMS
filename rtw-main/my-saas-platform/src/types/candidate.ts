@@ -19,12 +19,22 @@ export interface CandidateListItem {
   email?: string
 }
 
+export type CandidateEducationEntry = {
+  degree: string
+  institution: string
+  fieldOfStudy?: string | null
+  graduationYear?: number | null
+  description?: string | null
+}
+
 export interface CandidateDetail extends CandidateListItem {
   phone: string
   whatsapp: string | null
   gender: 'male' | 'female'
   dob: string
   languages: string
+  aboutMe: string | null
+  education: CandidateEducationEntry[]
   /** Full job-matrix path at signup: discipline, category, subcategory, skill (comma-separated, localized). */
   jobMatrixSelection: string | null
   currentEmployer: string | null

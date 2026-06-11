@@ -246,70 +246,46 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
                 {candidate.currentEmployer && (
                   <li>{t('currentlyEmployedAt')} {candidate.currentEmployer}</li>
                 )}
-                <li>{t('availableImmediate')}</li>
               </ul>
             </InfoCard>
           </div>
         </div>
 
-        {/* Work History Section */}
-        <div className="mt-8 sm:mt-10 lg:mt-12">
-          <InfoCard title={t('workHistory')} className="w-full">
-            <div className="space-y-4">
-              {/* Work Entry */}
-              <div className="space-y-2">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                  <p className="font-semibold text-[#2c2c2c] text-sm sm:text-base leading-[140%]">
-                    {candidate.jobTitle}
-                    {candidate.currentEmployer && (
-                      <span className="underline">, {candidate.currentEmployer}</span>
+        {candidate.aboutMe && (
+          <div className="mt-8 sm:mt-10 lg:mt-12">
+            <InfoCard title={t('aboutMe')} className="w-full">
+              <p className="whitespace-pre-wrap">{candidate.aboutMe}</p>
+            </InfoCard>
+          </div>
+        )}
+
+        {candidate.education.length > 0 && (
+          <div className="mt-6 sm:mt-8">
+            <InfoCard title={t('education')} className="w-full">
+              <div className="space-y-6">
+                {candidate.education.map((entry, index) => (
+                  <div key={`${entry.degree}-${entry.institution}-${index}`} className="space-y-2">
+                    <p className="font-semibold text-[#2c2c2c] text-sm sm:text-base leading-[140%]">
+                      {entry.degree}
+                      {entry.fieldOfStudy ? ` — ${entry.fieldOfStudy}` : ''}
+                    </p>
+                    <p className="text-sm text-[#515151]">{entry.institution}</p>
+                    {entry.graduationYear != null && (
+                      <p className="text-xs sm:text-sm text-[#9a9a9a] uppercase">
+                        {entry.graduationYear}
+                      </p>
                     )}
-                  </p>
-                  <p className="text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
-                    {candidate.experienceYears} {t('yearsExperience')}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2 text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
-                  <span>{candidate.experienceYears} {t('yearsSuffix')}</span>
-                  <span>•</span>
-                  <span>{t('fullTime')}</span>
-                  <span>•</span>
-                  <span>{candidate.location}</span>
-                </div>
-
-                <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%] font-medium text-[#2c2c2c]">
-                  <li>{t('professionalWith', { jobTitle: candidate.jobTitle })}</li>
-                  <li>
-                    {candidate.saudiExperience} {t('yearsWorkingSaudi')}
-                  </li>
-                  <li>{t('fluentIn')} {candidate.languages}</li>
-                  <li>{t('strongCommitment')}</li>
-                </ul>
+                    {entry.description?.trim() && (
+                      <p className="whitespace-pre-wrap text-sm sm:text-base leading-[140%] text-[#2c2c2c]">
+                        {entry.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
-            </div>
-          </InfoCard>
-        </div>
-
-        {/* Education Section */}
-        <div className="mt-6 sm:mt-8">
-          <InfoCard title={t('education')} className="w-full">
-            <div className="space-y-2">
-              <p className="font-semibold text-[#2c2c2c] text-sm sm:text-base leading-[140%]">
-                {t('professionalTraining')}
-              </p>
-              <div className="flex flex-wrap gap-2 text-xs sm:text-sm leading-[140%] text-[#9a9a9a] uppercase">
-                <span>{t('professionalCertification')}</span>
-                <span>•</span>
-                <span>{candidate.jobTitle}</span>
-              </div>
-              <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%] font-medium text-[#2c2c2c]">
-                <li>{t('completedTraining', { jobTitle: candidate.jobTitle })}</li>
-                <li>{t('certifiedSaudi')}</li>
-              </ul>
-            </div>
-          </InfoCard>
-        </div>
+            </InfoCard>
+          </div>
+        )}
       </HomepageSection>
 
       {/* Similar Candidates Section */}

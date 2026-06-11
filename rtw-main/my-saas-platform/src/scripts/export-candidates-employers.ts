@@ -34,11 +34,16 @@ if (!process.env.PAYLOAD_SECRET) {
   process.exit(1)
 }
 
-const dbUri = process.env.DATABASE_URI || process.env.DATABASE_URL
-if (!dbUri) {
-  console.error('❌ Set DATABASE_URI or PRODUCTION_DATABASE_URI for the target database')
-  process.exit(1)
+function requireDbUri(): string {
+  const uri = process.env.DATABASE_URI || process.env.DATABASE_URL
+  if (!uri) {
+    console.error('❌ Set DATABASE_URI or PRODUCTION_DATABASE_URI for the target database')
+    process.exit(1)
+  }
+  return uri
 }
+
+const dbUri = requireDbUri()
 
 // Read-only against prod: avoid schema push
 process.env.PAYLOAD_DISABLE_PUSH = '1'
@@ -81,7 +86,7 @@ function skillName(skill: number | Skill | null | undefined): string {
 function planName(plan: number | Plan | null | undefined): string {
   if (!plan) return ''
   if (typeof plan === 'number') return String(plan)
-  return plan.name || ''
+  return plan.title_en || plan.title || plan.slug || ''
 }
 
 function joinList(items: unknown, formatter: (item: unknown) => string): string {

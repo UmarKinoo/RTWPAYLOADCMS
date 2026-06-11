@@ -81,6 +81,7 @@ async function main(): Promise<void> {
       location: 'Riyadh',
       visaStatus: 'active',
       termsAccepted: true,
+      profileStatus: 'approved',
     },
     overrideAccess: true,
     context: ctx,

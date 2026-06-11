@@ -86,7 +86,7 @@ async function main() {
     limit: 1,
     overrideAccess: true,
   })
-  assert(admin.docs[0], 'Need an admin user to test approval')
+  assert(Boolean(admin.docs[0]), 'Need an admin user to test approval')
 
   await payload.update({
     collection: 'candidates',
