@@ -47,7 +47,7 @@ export async function sendCandidateModerationReminders(
     return { sent: false, pendingCount, reason: 'reminder_cooldown' }
   }
 
-  const emails = await getModeratorEmails(payload)
+  const emails = getModeratorEmails()
   if (emails.length === 0) {
     return { sent: false, pendingCount, reason: 'no_moderator_emails' }
   }

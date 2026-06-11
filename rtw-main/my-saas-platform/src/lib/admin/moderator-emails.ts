@@ -1,36 +1,12 @@
-import type { Payload } from 'payload'
-
 /**
- * Emails for staff who can moderate candidate profiles and interview requests.
+ * Moderator notification recipients — MODERATOR_EMAILS env only (comma-separated).
+ * Example: umar@example.com,aziz@example.com
  */
-export async function getModeratorEmails(payload: Payload): Promise<string[]> {
-  const fallback =
+export function getModeratorEmails(): string[] {
+  const emails =
     process.env.MODERATOR_EMAILS?.split(',')
-      .map((e) => e.trim())
-      .filter(Boolean) ||
-    (process.env.CONTACT_EMAIL ? [process.env.CONTACT_EMAIL] : [])
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean) ?? []
 
-  try {
-    const result = await payload.find({
-      collection: 'users',
-      where: {
-        role: { in: ['moderator', 'admin'] },
-      },
-      limit: 100,
-      depth: 0,
-      overrideAccess: true,
-    })
-
-    const emails = result.docs
-      .map((u) => u.email?.trim().toLowerCase())
-      .filter((e): e is string => Boolean(e))
-
-    if (emails.length > 0) {
-      return [...new Set(emails)]
-    }
-  } catch (error) {
-    console.error('[getModeratorEmails] Failed to load users:', error)
-  }
-
-  return fallback
+  return [...new Set(emails)]
 }

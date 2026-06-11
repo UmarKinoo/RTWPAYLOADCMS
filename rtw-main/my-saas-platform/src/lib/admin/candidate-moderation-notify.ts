@@ -40,7 +40,7 @@ export async function notifyModeratorsForCandidate(
     return { sent: false, reason: 'already_notified' }
   }
 
-  const emails = await getModeratorEmails(payload)
+  const emails = getModeratorEmails()
   if (emails.length === 0) {
     console.warn('[candidate-moderation-notify] No moderator emails configured')
     return { sent: false, reason: 'no_moderator_emails' }
