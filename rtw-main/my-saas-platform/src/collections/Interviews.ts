@@ -5,6 +5,7 @@ import {
   revalidateInterview,
   revalidateInterviewDelete,
 } from './Interviews/hooks/revalidateInterview'
+import { notifyModeratorsOnInterviewRequest } from './Interviews/hooks/notifyModeratorsOnInterviewRequest'
 
 // Access control: Admins can see all interviews, employers and candidates can see their own
 const ownInterviews = ({ req: { user } }: { req: any }) => {
@@ -206,7 +207,7 @@ export const Interviews: CollectionConfig = {
   ],
   timestamps: true,
   hooks: {
-    afterChange: [revalidateInterview],
+    afterChange: [revalidateInterview, notifyModeratorsOnInterviewRequest],
     afterDelete: [revalidateInterviewDelete],
   },
 }

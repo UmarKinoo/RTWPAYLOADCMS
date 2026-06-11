@@ -635,6 +635,55 @@ export function interviewInvitationEmailTemplate(params: InterviewInvitationEmai
   return baseEmailTemplate(content, 'New Interview Invitation - Ready to Work')
 }
 
+export interface InterviewModerationReviewEmailParams {
+  employerName: string
+  candidateName: string
+  scheduledAt: string
+  jobPosition?: string
+  jobLocation?: string
+  salary?: string
+  queueUrl: string
+}
+
+export function interviewModerationReviewEmailTemplate(
+  params: InterviewModerationReviewEmailParams,
+): string {
+  const scheduledDate = new Date(params.scheduledAt)
+  const formattedDate = scheduledDate.toLocaleDateString('en-SA', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+  const formattedTime = scheduledDate.toLocaleTimeString('en-SA', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+
+  const details: string[] = []
+  if (params.jobPosition) details.push(`<strong>Position:</strong> ${params.jobPosition}`)
+  if (params.jobLocation) details.push(`<strong>Location:</strong> ${params.jobLocation}`)
+  if (params.salary) details.push(`<strong>Salary:</strong> ${params.salary}`)
+  const detailsHtml =
+    details.length > 0
+      ? `<p style="margin: 8px 0 0; color: #515151; font-size: 14px;">${details.join(' · ')}</p>`
+      : ''
+
+  const content = `
+    <p class="email-content">An employer has requested an interview that needs your approval.</p>
+    <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 16px 0;">
+      <p style="margin: 0 0 8px;"><strong>${params.employerName}</strong> → <strong>${params.candidateName}</strong></p>
+      <p style="margin: 0; color: #515151;">Proposed: ${formattedDate} at ${formattedTime}</p>
+      ${detailsHtml}
+    </div>
+    <div style="text-align: center;">
+      <a href="${params.queueUrl}" class="button">Review interview requests</a>
+    </div>
+  `
+  return baseEmailTemplate(content, 'Interview request awaiting approval')
+}
+
 export interface CandidateModerationReviewEmailParams {
   candidateName: string
   jobTitle: string
