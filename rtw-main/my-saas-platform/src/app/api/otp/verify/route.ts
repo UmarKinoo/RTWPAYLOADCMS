@@ -8,6 +8,8 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { verifyOTP, isOTPExpired, getOTPMaxAttempts } from '@/server/otp/utils'
 import { normalizePhone } from '@/server/sms/taqnyat'
+import { notifyModeratorsForCandidate } from '@/lib/admin/candidate-moderation-notify'
+import type { Candidate } from '@/payload-types'
 
 export async function POST(request: NextRequest) {
   try {
@@ -136,7 +138,15 @@ export async function POST(request: NextRequest) {
             },
           })
           console.log('[OTP Verify] Updated phoneVerified for', collection, verification.userId)
-          
+
+          if (collection === 'candidates') {
+            const notifyResult = await notifyModeratorsForCandidate(
+              payload,
+              updatedUser as Candidate,
+            )
+            console.log('[OTP Verify] Moderator profile-review notify:', notifyResult)
+          }
+
           // Store email for potential auto-login
           if (updatedUser && 'email' in updatedUser && updatedUser.email) {
             userEmail = updatedUser.email as string

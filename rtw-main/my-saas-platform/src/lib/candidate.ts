@@ -9,6 +9,7 @@ import type { Candidate } from '@/payload-types'
 import { normalizePhone } from '@/server/sms/taqnyat'
 import { sendEmail, verificationEmailTemplate } from './email'
 import { adminSignUpNotificationTemplate } from './email-templates'
+import { getModeratorEmails } from '@/lib/admin/moderator-emails'
 
 export interface RegisterCandidateData {
   // Identity
@@ -200,10 +201,10 @@ export async function registerCandidate(
       // User can request resend later
     }
 
-    // Notify admin of new candidate sign-up (fire-and-forget)
-    const adminEmail = process.env.CONTACT_EMAIL || process.env.EMAIL_FROM || 'noreply@readytowork.sa'
+    // Notify moderators of new sign-up (profile still pending phone verification)
+    const moderatorEmails = getModeratorEmails()
     const adminResult = await sendEmail({
-      to: adminEmail,
+      to: moderatorEmails.length > 0 ? moderatorEmails : process.env.EMAIL_FROM || 'noreply@readytowork.sa',
       subject: 'New candidate sign-up - Ready to Work',
       html: adminSignUpNotificationTemplate('candidate', {
         firstName: data.firstName,

@@ -1,12 +1,21 @@
 /**
- * Moderator notification recipients — MODERATOR_EMAILS env only (comma-separated).
- * Example: umar@example.com,aziz@example.com
+ * Moderator notification recipients.
+ * Prefer MODERATOR_EMAILS (comma-separated); falls back to CONTACT_EMAIL.
  */
 export function getModeratorEmails(): string[] {
-  const emails =
+  const fromModerator =
     process.env.MODERATOR_EMAILS?.split(',')
       .map((e) => e.trim().toLowerCase())
       .filter(Boolean) ?? []
 
-  return [...new Set(emails)]
+  if (fromModerator.length > 0) {
+    return [...new Set(fromModerator)]
+  }
+
+  const fromContact =
+    process.env.CONTACT_EMAIL?.split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean) ?? []
+
+  return [...new Set(fromContact)]
 }

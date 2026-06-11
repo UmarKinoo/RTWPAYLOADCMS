@@ -36,8 +36,19 @@ export async function notifyModeratorsForCandidate(
     return { sent: false, reason: 'not_ready_for_queue' }
   }
 
-  if (candidate.moderation?.moderatorNotifiedAt && !options?.force) {
+  const fresh = await payload.findByID({
+    collection: 'candidates',
+    id: candidate.id,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  if (fresh.moderation?.moderatorNotifiedAt && !options?.force) {
     return { sent: false, reason: 'already_notified' }
+  }
+
+  if (!candidateReadyForModerationQueue(fresh)) {
+    return { sent: false, reason: 'not_ready_for_queue' }
   }
 
   const emails = getModeratorEmails()
@@ -46,19 +57,19 @@ export async function notifyModeratorsForCandidate(
     return { sent: false, reason: 'no_moderator_emails' }
   }
 
-  const { reviewUrl, queueUrl } = moderationUrls(candidate.id)
+  const { reviewUrl, queueUrl } = moderationUrls(fresh.id)
   const html = candidateModerationReviewEmailTemplate({
-    candidateName: `${candidate.firstName} ${candidate.lastName}`,
-    jobTitle: candidate.jobTitle,
-    location: candidate.location,
-    nationality: candidate.nationality,
+    candidateName: `${fresh.firstName} ${fresh.lastName}`,
+    jobTitle: fresh.jobTitle,
+    location: fresh.location,
+    nationality: fresh.nationality,
     reviewUrl,
     queueUrl,
   })
 
   const result = await sendEmail({
     to: emails,
-    subject: `Review candidate profile: ${candidate.firstName} ${candidate.lastName}`,
+    subject: `Review candidate profile: ${fresh.firstName} ${fresh.lastName}`,
     html,
   })
 
@@ -70,15 +81,16 @@ export async function notifyModeratorsForCandidate(
   const now = new Date().toISOString()
   await payload.update({
     collection: 'candidates',
-    id: candidate.id,
+    id: fresh.id,
     data: {
       moderation: {
-        ...(candidate.moderation || {}),
-        submittedAt: candidate.moderation?.submittedAt || now,
+        ...(fresh.moderation || {}),
+        submittedAt: fresh.moderation?.submittedAt || now,
         moderatorNotifiedAt: now,
       },
     },
     overrideAccess: true,
+    context: { disableRevalidate: true },
   })
 
   return { sent: true }
