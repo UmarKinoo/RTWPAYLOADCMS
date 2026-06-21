@@ -11,19 +11,34 @@ const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000 // 24h+ waiting
 
 export async function sendCandidateModerationReminders(
   payload: Payload,
-): Promise<{ sent: boolean; pendingCount: number; reason?: string }> {
-  const result = await payload.find({
-    collection: 'candidates',
-    where: moderationQueueWhere(),
-    sort: 'moderation.submittedAt',
-    limit: 500,
-    depth: 0,
-    overrideAccess: true,
-  })
+): Promise<{
+  sent: boolean
+  pendingCount: number
+  pendingInterviewCount: number
+  reason?: string
+}> {
+  const [result, pendingInterviewsResult] = await Promise.all([
+    payload.find({
+      collection: 'candidates',
+      where: moderationQueueWhere(),
+      sort: 'moderation.submittedAt',
+      limit: 500,
+      depth: 0,
+      overrideAccess: true,
+    }),
+    payload.find({
+      collection: 'interviews',
+      where: { status: { equals: 'pending' } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    }),
+  ])
 
   const pendingCount = result.totalDocs
+  const pendingInterviewCount = pendingInterviewsResult.totalDocs ?? 0
   if (pendingCount === 0) {
-    return { sent: false, pendingCount: 0, reason: 'queue_empty' }
+    return { sent: false, pendingCount: 0, pendingInterviewCount, reason: 'queue_empty' }
   }
 
   const now = Date.now()
@@ -34,7 +49,7 @@ export async function sendCandidateModerationReminders(
     .sort((a, b) => a - b)[0]
 
   if (!oldestSubmitted || now - oldestSubmitted < STALE_THRESHOLD_MS) {
-    return { sent: false, pendingCount, reason: 'not_stale_yet' }
+    return { sent: false, pendingCount, pendingInterviewCount, reason: 'not_stale_yet' }
   }
 
   const recentlyReminded = result.docs.some((c) => {
@@ -44,30 +59,35 @@ export async function sendCandidateModerationReminders(
   })
 
   if (recentlyReminded) {
-    return { sent: false, pendingCount, reason: 'reminder_cooldown' }
+    return { sent: false, pendingCount, pendingInterviewCount, reason: 'reminder_cooldown' }
   }
 
   const emails = getModeratorEmails()
   if (emails.length === 0) {
-    return { sent: false, pendingCount, reason: 'no_moderator_emails' }
+    return { sent: false, pendingCount, pendingInterviewCount, reason: 'no_moderator_emails' }
   }
 
   const oldestHours = Math.floor((now - oldestSubmitted) / (60 * 60 * 1000))
   const queueUrl = `${getServerSideURL()}/${defaultLocale}/moderator/candidates/pending`
+  const interviewsQueueUrl = `${getServerSideURL()}/${defaultLocale}/moderator/interviews/pending`
   const html = candidateModerationReminderEmailTemplate({
     pendingCount,
+    pendingInterviewCount,
     oldestHours,
     queueUrl,
+    interviewsQueueUrl,
   })
 
+  const profileLabel = `${pendingCount} profile${pendingCount === 1 ? '' : 's'}`
+  const interviewLabel = `${pendingInterviewCount} interview${pendingInterviewCount === 1 ? '' : 's'}`
   const emailResult = await sendEmail({
     to: emails,
-    subject: `Reminder: ${pendingCount} candidate profile${pendingCount === 1 ? '' : 's'} awaiting review`,
+    subject: `Reminder: ${profileLabel} and ${interviewLabel} awaiting review`,
     html,
   })
 
   if (!emailResult.success) {
-    return { sent: false, pendingCount, reason: 'email_failed' }
+    return { sent: false, pendingCount, pendingInterviewCount, reason: 'email_failed' }
   }
 
   const reminderAt = new Date().toISOString()
@@ -87,5 +107,5 @@ export async function sendCandidateModerationReminders(
     ),
   )
 
-  return { sent: true, pendingCount }
+  return { sent: true, pendingCount, pendingInterviewCount }
 }

@@ -727,28 +727,39 @@ export function candidateModerationReviewEmailTemplate(
 
 export interface CandidateModerationReminderEmailParams {
   pendingCount: number
+  pendingInterviewCount: number
   oldestHours: number
   queueUrl: string
+  interviewsQueueUrl: string
 }
 
 export function candidateModerationReminderEmailTemplate(
   params: CandidateModerationReminderEmailParams,
 ): string {
+  const profileLabel = `${params.pendingCount} candidate profile${params.pendingCount === 1 ? '' : 's'}`
+  const interviewLabel = `${params.pendingInterviewCount} interview request${params.pendingInterviewCount === 1 ? '' : 's'}`
+
   const content = `
     <p class="email-content">
-      You have <strong>${params.pendingCount}</strong> candidate profile${params.pendingCount === 1 ? '' : 's'}
-      still waiting for review.
+      You have <strong>${profileLabel}</strong> and <strong>${interviewLabel}</strong> still waiting for review.
     </p>
     ${
       params.oldestHours >= 24
-        ? `<p class="email-content">The oldest item has been waiting for over <strong>${params.oldestHours} hours</strong>.</p>`
+        ? `<p class="email-content">The oldest profile has been waiting for over <strong>${params.oldestHours} hours</strong>.</p>`
         : ''
     }
     <div style="text-align: center;">
-      <a href="${params.queueUrl}" class="button">Open moderation queue</a>
+      <a href="${params.queueUrl}" class="button">Review candidate profiles</a>
     </div>
+    ${
+      params.pendingInterviewCount > 0
+        ? `<div style="text-align: center; margin-top: 16px;">
+      <a href="${params.interviewsQueueUrl}" class="button" style="background-color: #16252d;">Review interview requests</a>
+    </div>`
+        : ''
+    }
   `
-  return baseEmailTemplate(content, 'Reminder: candidate profiles awaiting review')
+  return baseEmailTemplate(content, 'Reminder: moderation queue')
 }
 
 export interface CandidateProfileDecisionEmailParams {

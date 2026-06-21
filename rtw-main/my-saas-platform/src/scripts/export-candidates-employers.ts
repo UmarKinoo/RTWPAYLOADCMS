@@ -15,6 +15,7 @@ import path from 'path'
 import dotenv from 'dotenv'
 import { getPayload } from 'payload'
 import type { Candidate, Employer, Media, Plan, Skill } from '@/payload-types'
+import { jobMatrixPathWithFallback } from '@/lib/candidates/job-matrix-selection'
 
 const envPath = path.resolve(process.cwd(), '.env')
 const terminalDbUri =
@@ -96,6 +97,7 @@ function joinList(items: unknown, formatter: (item: unknown) => string): string 
 
 function flattenCandidate(c: Candidate): Record<string, string | number | boolean> {
   const rb = c.readyBot
+  const matrix = jobMatrixPathWithFallback(c.primarySkill, 'en')
   return {
     id: c.id,
     email: c.email,
@@ -104,7 +106,11 @@ function flattenCandidate(c: Candidate): Record<string, string | number | boolea
     phone: c.phone,
     phoneVerified: c.phoneVerified ?? false,
     whatsapp: c.whatsapp ?? '',
-    primarySkill: skillName(c.primarySkill),
+    careerPathway: matrix.careerPathway,
+    jobMatrixDiscipline: matrix.discipline,
+    jobMatrixCategory: matrix.category,
+    jobMatrixSubCategory: matrix.subCategory,
+    primarySkill: matrix.skill || skillName(c.primarySkill),
     billingClass: c.billingClass ?? '',
     gender: c.gender,
     dob: formatDate(c.dob),
@@ -219,7 +225,7 @@ async function fetchAll<T>(
       collection,
       limit,
       page,
-      depth: 2,
+      depth: 3,
       pagination: true,
       overrideAccess: true,
     })

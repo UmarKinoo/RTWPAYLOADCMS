@@ -36,7 +36,8 @@ import {
 import { profileStatusLabel } from '@/lib/candidates/profile-status'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import type { Candidate, Skill } from '@/payload-types'
+import { jobMatrixPathWithFallback } from '@/lib/candidates/job-matrix-selection'
+import type { Candidate } from '@/payload-types'
 import { cn } from '@/lib/utils'
 
 interface PendingCandidatesPageProps {
@@ -113,11 +114,9 @@ export function PendingCandidatesPage({
     }
   }
 
-  const skillName = (candidate: Candidate) => {
-    if (candidate.primarySkill && typeof candidate.primarySkill === 'object') {
-      return (candidate.primarySkill as Skill).name
-    }
-    return '—'
+  const careerPathway = (candidate: Candidate) => {
+    const path = jobMatrixPathWithFallback(candidate.primarySkill, locale)
+    return path.careerPathway || '—'
   }
 
   return (
@@ -195,9 +194,11 @@ export function PendingCandidatesPage({
                   </CardHeader>
                   <CardContent className="space-y-4 pt-0">
                     <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                      <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-[#757575]">Skill</p>
-                        <p className="mt-0.5 text-[#16252d]">{skillName(candidate)}</p>
+                      <div className="sm:col-span-2 lg:col-span-4">
+                        <p className="text-xs font-medium uppercase tracking-wide text-[#757575]">
+                          Career pathway
+                        </p>
+                        <p className="mt-0.5 text-[#16252d]">{careerPathway(candidate)}</p>
                       </div>
                       <div>
                         <p className="text-xs font-medium uppercase tracking-wide text-[#757575]">Experience</p>

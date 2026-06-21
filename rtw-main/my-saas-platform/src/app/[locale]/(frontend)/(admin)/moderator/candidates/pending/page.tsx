@@ -28,7 +28,7 @@ export default async function PendingCandidatesModeratorPage() {
     where: moderationQueueWhere(),
     sort: '-createdAt',
     limit: 100,
-    depth: 2,
+    depth: 3,
     overrideAccess: true,
   })
 

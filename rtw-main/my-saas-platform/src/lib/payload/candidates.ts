@@ -15,6 +15,9 @@ import {
   skillLevelToBillingClass,
 } from '@/lib/candidates/filter-params'
 import { publicCandidateWhere } from '@/lib/candidates/profile-status'
+import {
+  jobMatrixSelectionFromPrimarySkill,
+} from '@/lib/candidates/job-matrix-selection'
 
 // Re-export for server code that imports from this file
 export type { CandidateListItem, CandidateDetail }
@@ -49,67 +52,6 @@ function toListItem(doc: Candidate): CandidateListItem {
     billingClass: (doc.billingClass as BillingClass) || null,
     email: doc.email || undefined, // Temporarily added
   }
-}
-
-type NamedTaxonomy = {
-  name?: string
-  name_en?: string | null
-  name_ar?: string | null
-}
-
-function localizedTaxonomyName(doc: NamedTaxonomy | null | undefined, locale: string): string | null {
-  if (!doc) return null
-  const ar = doc.name_ar?.trim()
-  const en = doc.name_en?.trim()
-  const fallback = doc.name?.trim()
-  if (locale === 'ar') {
-    if (ar) return ar
-    if (fallback) return fallback
-    if (en) return en
-    return null
-  }
-  if (en) return en
-  if (fallback) return fallback
-  if (ar) return ar
-  return null
-}
-
-/**
- * Full path chosen on the job matrix: discipline → category → subcategory → primary skill.
- * Comma-separated for display (e.g. "Agriculture…, Veterinarian, Livestock…, Agricultural Logistics…").
- */
-function jobMatrixSelectionFromPrimarySkill(
-  primarySkill: Candidate['primarySkill'],
-  locale: string,
-): string | null {
-  if (!primarySkill || typeof primarySkill === 'number') return null
-
-  const skillName = localizedTaxonomyName(primarySkill, locale)
-  const sub = primarySkill.subCategory
-
-  if (!sub || typeof sub === 'number') {
-    return skillName
-  }
-
-  const subName = localizedTaxonomyName(sub, locale)
-  const cat = sub.category
-
-  if (!cat || typeof cat === 'number') {
-    const parts = [subName, skillName].filter(Boolean) as string[]
-    return parts.length ? parts.join(', ') : null
-  }
-
-  const catName = localizedTaxonomyName(cat, locale)
-  const disc = cat.discipline
-
-  if (!disc || typeof disc === 'number') {
-    const parts = [catName, subName, skillName].filter(Boolean) as string[]
-    return parts.length ? parts.join(', ') : null
-  }
-
-  const discName = localizedTaxonomyName(disc, locale)
-  const parts = [discName, catName, subName, skillName].filter(Boolean) as string[]
-  return parts.length ? parts.join(', ') : null
 }
 
 /**
