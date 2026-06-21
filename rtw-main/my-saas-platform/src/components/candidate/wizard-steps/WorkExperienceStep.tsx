@@ -27,17 +27,27 @@ export function WorkExperienceStep({ register, errors }: WorkExperienceStepProps
       </Field>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Field data-invalid={!!errors.experienceYears}>
-          <FieldLabel htmlFor="experienceYears">{t('totalExperienceYears')}</FieldLabel>
-          <Input
-            id="experienceYears"
-            type="number"
-            {...register('experienceYears', { valueAsNumber: true })}
-            placeholder={t('placeholderExperience')}
-            min={0}
-          />
-          {errors.experienceYears && <FieldError>{errors.experienceYears.message}</FieldError>}
-        </Field>
+      <Field data-invalid={!!errors.experienceYears}>
+        <FieldLabel htmlFor="experienceYears">{t('totalExperienceYears')}</FieldLabel>
+        <Input
+          id="experienceYears"
+          type="number"
+          {...register('experienceYears', { valueAsNumber: true })}
+          placeholder={t('placeholderExperience')}
+          min={0}
+        />
+        {errors.experienceYears && <FieldError>{errors.experienceYears.message}</FieldError>}
+      </Field>
+
+      <Field data-invalid={!!errors.industryExperience}>
+        <FieldLabel htmlFor="industryExperience">{t('industryExperience')}</FieldLabel>
+        <Input
+          id="industryExperience"
+          {...register('industryExperience')}
+          placeholder={t('placeholderIndustryExperience')}
+        />
+        {errors.industryExperience && <FieldError>{errors.industryExperience.message}</FieldError>}
+      </Field>
 
         <Field data-invalid={!!errors.saudiExperience}>
           <FieldLabel htmlFor="saudiExperience">{t('experienceInSaudi')}</FieldLabel>

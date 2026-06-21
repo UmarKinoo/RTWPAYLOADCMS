@@ -203,6 +203,22 @@ export const Candidates: CollectionConfig = {
         description: 'Primary skill determines discipline, category, and subcategory',
       },
     },
+    {
+      name: 'secondarySkill',
+      type: 'relationship',
+      relationTo: 'skills',
+      admin: {
+        description: 'Optional second skill from the job matrix',
+      },
+    },
+    {
+      name: 'tertiarySkill',
+      type: 'relationship',
+      relationTo: 'skills',
+      admin: {
+        description: 'Optional third skill from the job matrix',
+      },
+    },
     // Billing Class - Automatically set from primarySkill
     {
       name: 'billingClass',
@@ -260,6 +276,14 @@ export const Candidates: CollectionConfig = {
       label: 'Experience (Years)',
       required: true,
       min: 0,
+    },
+    {
+      name: 'industryExperience',
+      type: 'text',
+      label: 'Industry Experience',
+      admin: {
+        description: 'Industries or sectors the candidate has worked in',
+      },
     },
     {
       name: 'saudiExperience',

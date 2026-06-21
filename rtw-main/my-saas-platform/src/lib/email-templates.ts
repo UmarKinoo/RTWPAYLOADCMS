@@ -74,9 +74,10 @@ function baseEmailTemplate(content: string, title: string): string {
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     .email-header {
-      background: linear-gradient(135deg, #4644b8 0%, #3a3aa0 100%);
+      background-color: #f8f9ff;
       padding: 32px 24px;
       text-align: center;
+      border-bottom: 1px solid #e5e5e5;
     }
     .logo {
       max-width: 200px;

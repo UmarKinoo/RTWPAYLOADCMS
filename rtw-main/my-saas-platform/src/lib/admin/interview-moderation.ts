@@ -254,29 +254,16 @@ export async function rejectInterviewRequest(
       depth: 0,
     })
 
-    // Create notifications
-    // Candidate notification
-    await payload.create({
-      collection: 'notifications',
-      data: {
-        candidate: candidateId,
-        type: 'interview_request_rejected',
-        title: 'Interview Request Rejected',
-        message: reason
-          ? `Your interview request has been rejected. Reason: ${reason}`
-          : 'Your interview request has been rejected.',
-        read: false,
-      },
-    })
-
-    // Employer notification
+    // Create notifications — employer only (candidate was never notified about pending request)
     await payload.create({
       collection: 'notifications',
       data: {
         employer: employerId,
         type: 'system',
         title: 'Interview Request Rejected',
-        message: `Your interview request with ${candidate.firstName} ${candidate.lastName} has been rejected.`,
+        message: reason
+          ? `Your interview request with ${candidate.firstName} ${candidate.lastName} has been rejected. Reason: ${reason}`
+          : `Your interview request with ${candidate.firstName} ${candidate.lastName} has been rejected.`,
         read: false,
       },
     })

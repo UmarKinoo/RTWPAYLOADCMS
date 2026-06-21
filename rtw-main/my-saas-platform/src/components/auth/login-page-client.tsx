@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { LoginForm } from '@/components/auth/login-form'
 import { LoginPageToast } from '@/components/auth/login-page-toast'
+import { LoginVerificationBanner } from '@/components/auth/login-verification-banner'
 import { RegisterTypeModalWrapper } from '@/components/auth/RegisterTypeModalWrapper'
 import { Link } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
@@ -97,11 +98,11 @@ export function LoginPageClient({ success, error, initialCollection }: LoginPage
 
             {/* Card Body */}
             <div className="px-6 pb-5">
-              {/* Toast Messages */}
               {(success || error) && (
-                <div className="mb-3">
+                <>
+                  <LoginVerificationBanner success={success} error={error} />
                   <LoginPageToast success={success} error={error} />
-                </div>
+                </>
               )}
 
               {/* Type Selection or Login Form */}

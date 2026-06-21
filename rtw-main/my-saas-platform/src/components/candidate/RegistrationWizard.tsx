@@ -41,6 +41,8 @@ const candidateSchema = z
 
     // Smart Matrix
     primarySkill: z.string().min(1, 'Please select your job role'),
+    secondarySkill: z.string().optional(),
+    tertiarySkill: z.string().optional(),
 
     // Demographics
     gender: z.enum(['male', 'female'], { message: 'Gender is required' }),
@@ -54,6 +56,7 @@ const candidateSchema = z
     // Work
     jobTitle: z.string().min(1, 'Job title is required'),
     experienceYears: z.number().min(0, 'Experience must be 0 or greater'),
+    industryExperience: z.string().min(1, 'Industry experience is required'),
     saudiExperience: z.number().min(0, 'Saudi experience must be 0 or greater'),
     currentEmployer: z.string().optional(),
     availabilityDate: z.string().min(1, 'Availability date is required'),
@@ -93,6 +96,24 @@ const candidateSchema = z
     message: 'Only Saudi Arabia (KSA) phone numbers are accepted. Use +966...',
     path: ['phone'],
   })
+  .refine((data) => !data.secondarySkill || data.secondarySkill !== data.primarySkill, {
+    message: 'Secondary skill must be different from your primary skill',
+    path: ['secondarySkill'],
+  })
+  .refine((data) => !data.tertiarySkill || data.tertiarySkill !== data.primarySkill, {
+    message: 'Third skill must be different from your primary skill',
+    path: ['tertiarySkill'],
+  })
+  .refine(
+    (data) =>
+      !data.tertiarySkill ||
+      !data.secondarySkill ||
+      data.tertiarySkill !== data.secondarySkill,
+    {
+      message: 'Third skill must be different from your second skill',
+      path: ['tertiarySkill'],
+    },
+  )
 
 export type CandidateFormData = z.infer<typeof candidateSchema>
 
@@ -139,6 +160,8 @@ export function RegistrationWizard() {
 
   const phone = watch('phone')
   const primarySkill = watch('primarySkill')
+  const secondarySkill = watch('secondarySkill')
+  const tertiarySkill = watch('tertiarySkill')
   const password = watch('password')
   const confirmPassword = watch('confirmPassword')
   const formValues = watch()
@@ -171,8 +194,8 @@ export function RegistrationWizard() {
     const fieldsToValidate: (keyof CandidateFormData)[] = {
       1: ['email', 'password', 'confirmPassword'],
       2: ['firstName', 'lastName', 'phone', 'gender', 'dob', 'nationality', 'languages', 'location', 'currentlyInKSA'],
-      3: ['primarySkill'],
-      4: ['jobTitle', 'experienceYears', 'saudiExperience', 'availabilityDate'],
+      3: ['primarySkill', 'secondarySkill', 'tertiarySkill'],
+      4: ['jobTitle', 'experienceYears', 'industryExperience', 'saudiExperience', 'availabilityDate'],
       5: ['visaStatus'],
       6: ['acceptPrivacyTerms', 'acceptDataConsent', 'acceptPlatformDisclaimer'],
     }[step] as (keyof CandidateFormData)[]
@@ -245,12 +268,15 @@ export function RegistrationWizard() {
         phone: data.phone,
         whatsapp: sameAsPhone ? data.phone : data.whatsapp || data.phone,
         primarySkill: data.primarySkill,
+        secondarySkill: data.secondarySkill,
+        tertiarySkill: data.tertiarySkill,
         gender: data.gender,
         dob: data.dob,
         nationality: data.nationality,
         languages: data.languages,
         jobTitle: data.jobTitle,
         experienceYears: data.experienceYears,
+        industryExperience: data.industryExperience,
         saudiExperience: data.saudiExperience,
         currentEmployer: data.currentEmployer,
         availabilityDate: data.availabilityDate,
@@ -332,8 +358,10 @@ export function RegistrationWizard() {
         return (
           <JobRoleStep
             primarySkill={primarySkill}
+            secondarySkill={secondarySkill}
+            tertiarySkill={tertiarySkill}
             setValue={setValue}
-            error={errors.primarySkill?.message}
+            errors={errors}
           />
         )
       case 4:

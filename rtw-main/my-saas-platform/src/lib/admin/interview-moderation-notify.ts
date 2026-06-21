@@ -2,7 +2,7 @@ import type { Payload } from 'payload'
 import type { Interview, Employer, Candidate } from '@/payload-types'
 import { sendEmail } from '@/lib/email'
 import { interviewModerationReviewEmailTemplate } from '@/lib/email-templates'
-import { getModeratorEmails } from '@/lib/admin/moderator-emails'
+import { getInterviewNotificationEmails } from '@/lib/admin/moderator-emails'
 import { getServerSideURL } from '@/utilities/getURL'
 import { defaultLocale } from '@/i18n/config'
 
@@ -51,9 +51,9 @@ export async function notifyModeratorsForInterviewRequest(
     return { sent: false, reason: 'not_pending' }
   }
 
-  const emails = getModeratorEmails()
+  const emails = await getInterviewNotificationEmails(payload)
   if (emails.length === 0) {
-    console.warn('[interview-moderation-notify] No moderator emails configured')
+    console.warn('[interview-moderation-notify] No moderator/admin emails configured')
     return { sent: false, reason: 'no_moderator_emails' }
   }
 

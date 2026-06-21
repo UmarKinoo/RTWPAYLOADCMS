@@ -105,6 +105,10 @@
     },
     "skillSearch": {
       "label": "Search your Job Role or Skill *",
+      "primaryLabel": "Primary skill *",
+      "secondaryLabel": "Second skill (optional)",
+      "tertiaryLabel": "Third skill (optional)",
+      "optionalPlaceholder": "Type to search (optional)",
       "placeholder": "Type to search (e.g., Mason, Engineer, Electrician...)",
       "searching": "Searching...",
       "minChars": "Type at least 2 characters to search",
@@ -114,7 +118,7 @@
       "clearSelection": "Clear selection"
     },
     "jobRole": {
-      "description": "Search and select your primary job role or skill. This will help us match you with relevant opportunities."
+      "description": "Search and select up to three skills from the job matrix. Your primary skill is required; second and third skills are optional."
     },
     "location": {
       "currentLocationLabel": "Current Location (Saudi Arabia) *",
@@ -152,11 +156,13 @@
     "workExperience": {
       "jobTitle": "Job Title *",
       "totalExperienceYears": "Total Experience (Years) *",
+      "industryExperience": "Industry Experience *",
       "experienceInSaudi": "Experience in Saudi Arabia (Years) *",
       "currentEmployerOptional": "Current Employer (Optional)",
       "dateAvailable": "Date Available to Join *",
       "placeholderJobTitle": "Enter your current job title",
       "placeholderExperience": "Enter years of experience",
+      "placeholderIndustryExperience": "e.g. Healthcare, Hospitality, Construction",
       "placeholderSaudi": "Enter years of experience in Saudi",
       "placeholderEmployer": "Enter current employer name",
       "placeholderAvailability": "Select availability date"
@@ -194,6 +200,9 @@
       "nationality": "Nationality:",
       "languages": "Languages:",
       "primarySkill": "Primary Skill:",
+      "secondarySkill": "Second Skill:",
+      "tertiarySkill": "Third Skill:",
+      "industryExperience": "Industry Experience:",
       "selected": "Selected",
       "jobTitle": "Job Title:",
       "totalExperience": "Total Experience:",

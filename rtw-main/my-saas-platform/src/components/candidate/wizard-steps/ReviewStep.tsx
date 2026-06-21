@@ -171,10 +171,18 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
                 </Button>
               )}
             </div>
-            <div className="text-sm">
+            <div className="text-sm space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{r('primarySkill')}</span>
                 <span className="font-medium">{formValues.primarySkill ? r('selected') : r('notProvided')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{r('secondarySkill')}</span>
+                <span className="font-medium">{formValues.secondarySkill ? r('selected') : r('notProvided')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{r('tertiarySkill')}</span>
+                <span className="font-medium">{formValues.tertiarySkill ? r('selected') : r('notProvided')}</span>
               </div>
             </div>
           </CardContent>
@@ -212,6 +220,10 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
                 <span className="font-medium">
                   {formValues.experienceYears !== undefined ? `${formValues.experienceYears} ${r('years')}` : r('notProvided')}
                 </span>
+              </div>
+              <div className="flex justify-between md:col-span-2">
+                <span className="text-muted-foreground">{r('industryExperience')}</span>
+                <span className="font-medium">{formValues.industryExperience || r('notProvided')}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{r('saudiExperience')}</span>

@@ -31,9 +31,21 @@ interface SkillSearchProps {
   value?: string
   onValueChange: (skillId: string) => void
   error?: string
+  label?: string
+  inputId?: string
+  placeholder?: string
+  excludeSkillIds?: string[]
 }
 
-export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
+export function SkillSearch({
+  value,
+  onValueChange,
+  error,
+  label,
+  inputId = 'skill-search',
+  placeholder,
+  excludeSkillIds = [],
+}: SkillSearchProps) {
   const t = useTranslations('registration.skillSearch')
   const locale = useLocale()
   const [open, setOpen] = React.useState(false)
@@ -117,6 +129,9 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
   }, [])
 
   const handleSelect = (skill: Skill) => {
+    if (excludeSkillIds.includes(String(skill.id))) {
+      return
+    }
     setSelectedSkill(skill)
     onValueChange(String(skill.id))
     setOpen(false)
@@ -152,10 +167,11 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
   }
 
   const displayValue = selectedSkill ? selectedSkill.fullPath : searchQuery
+  const visibleSkills = skills.filter((skill) => !excludeSkillIds.includes(String(skill.id)))
 
   return (
     <Field data-invalid={!!error} className="relative">
-      <FieldLabel htmlFor="skill-search">{t('label')}</FieldLabel>
+      <FieldLabel htmlFor={inputId}>{label ?? t('label')}</FieldLabel>
       <Popover open={open && (loading || skills.length > 0 || (searchQuery.trim().length >= 2 && !loading))}>
         <div ref={containerRef} className="relative w-full">
           <PopoverAnchor asChild>
@@ -163,9 +179,9 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
                 ref={inputRef}
-                id="skill-search"
+                id={inputId}
                 type="text"
-                placeholder={t('placeholder')}
+                placeholder={placeholder ?? t('placeholder')}
                 value={displayValue}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
@@ -231,7 +247,7 @@ export function SkillSearch({ value, onValueChange, error }: SkillSearchProps) {
                 )}
                 {!loading && skills.length > 0 && (
                   <CommandGroup>
-                    {skills.map((skill) => (
+                    {visibleSkills.map((skill) => (
                       <CommandItem
                         key={String(skill.id)}
                         value={skill.fullPath}

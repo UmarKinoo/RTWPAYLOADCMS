@@ -22,6 +22,8 @@ export interface RegisterCandidateData {
 
   // Smart Matrix
   primarySkill: string // Skill ID
+  secondarySkill?: string
+  tertiarySkill?: string
 
   // Demographics
   gender: 'male' | 'female'
@@ -32,6 +34,7 @@ export interface RegisterCandidateData {
   // Work
   jobTitle: string
   experienceYears: number
+  industryExperience?: string
   saudiExperience: number
   currentEmployer?: string
   availabilityDate: string
@@ -170,12 +173,15 @@ export async function registerCandidate(
         emailVerificationToken: verificationToken,
         emailVerificationExpires: verificationExpires.toISOString(),
         primarySkill: parseInt(data.primarySkill, 10),
+        secondarySkill: data.secondarySkill ? parseInt(data.secondarySkill, 10) : undefined,
+        tertiarySkill: data.tertiarySkill ? parseInt(data.tertiarySkill, 10) : undefined,
         gender: data.gender,
         dob: formattedDob, // Required field, formatted as YYYY-MM-DD
         nationality: data.nationality,
         languages: data.languages,
         jobTitle: data.jobTitle,
         experienceYears: data.experienceYears,
+        industryExperience: data.industryExperience?.trim() || undefined,
         saudiExperience: data.saudiExperience,
         currentEmployer: data.currentEmployer || undefined,
         availabilityDate: formattedAvailabilityDate, // Required field, formatted as YYYY-MM-DD

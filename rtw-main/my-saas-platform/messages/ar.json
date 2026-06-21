@@ -105,6 +105,10 @@
     },
     "skillSearch": {
       "label": "ابحث عن دورك الوظيفي أو مهارتك *",
+      "primaryLabel": "المهارة الأساسية *",
+      "secondaryLabel": "المهارة الثانية (اختياري)",
+      "tertiaryLabel": "المهارة الثالثة (اختياري)",
+      "optionalPlaceholder": "اكتب للبحث (اختياري)",
       "placeholder": "اكتب للبحث (مثل: بناء، مهندس، كهربائي...)",
       "searching": "جاري البحث...",
       "minChars": "اكتب حرفين على الأقل للبحث",
@@ -114,7 +118,7 @@
       "clearSelection": "مسح الاختيار"
     },
     "jobRole": {
-      "description": "ابحث واختر دورك الوظيفي الأساسي أو مهارتك. سيساعدنا هذا في مطابقتك مع الفرص ذات الصلة."
+      "description": "ابحث واختر حتى ثلاث مهارات من مصفوفة الوظائف. المهارة الأساسية مطلوبة؛ الثانية والثالثة اختياريتان."
     },
     "location": {
       "currentLocationLabel": "الموقع الحالي (المملكة العربية السعودية) *",
@@ -152,11 +156,13 @@
     "workExperience": {
       "jobTitle": "المسمى الوظيفي *",
       "totalExperienceYears": "إجمالي الخبرة (بالسنوات) *",
+      "industryExperience": "خبرة القطاع *",
       "experienceInSaudi": "الخبرة في المملكة العربية السعودية (بالسنوات) *",
       "currentEmployerOptional": "صاحب العمل الحالي (اختياري)",
       "dateAvailable": "تاريخ الاستعداد للانضمام *",
       "placeholderJobTitle": "أدخل مسمى وظيفتك الحالي",
       "placeholderExperience": "أدخل سنوات الخبرة",
+      "placeholderIndustryExperience": "مثال: الرعاية الصحية، الضيافة، البناء",
       "placeholderSaudi": "أدخل سنوات الخبرة في السعودية",
       "placeholderEmployer": "أدخل اسم صاحب العمل الحالي",
       "placeholderAvailability": "اختر تاريخ التوفر"
@@ -194,6 +200,9 @@
       "nationality": "الجنسية:",
       "languages": "اللغات:",
       "primarySkill": "المهارة الأساسية:",
+      "secondarySkill": "المهارة الثانية:",
+      "tertiarySkill": "المهارة الثالثة:",
+      "industryExperience": "خبرة القطاع:",
       "selected": "محدد",
       "jobTitle": "المسمى الوظيفي:",
       "totalExperience": "إجمالي الخبرة:",

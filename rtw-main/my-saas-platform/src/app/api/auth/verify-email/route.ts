@@ -3,6 +3,22 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { sendEmail, welcomeEmailTemplate, employerWelcomeEmailTemplate } from '@/lib/email'
 import type { Employer } from '@/payload-types'
+import { defaultLocale } from '@/i18n/config'
+import { getServerSideURL } from '@/utilities/getURL'
+
+function loginRedirectUrl(
+  type: string,
+  params: { success?: string; error?: string; collection?: string },
+): string {
+  const base = `${getServerSideURL()}/${defaultLocale}/login`
+  const search = new URLSearchParams()
+  if (params.success) search.set('success', params.success)
+  if (params.error) search.set('error', params.error)
+  if (params.collection) search.set('collection', params.collection)
+  if (type === 'employer') search.set('collection', 'employers')
+  const qs = search.toString()
+  return qs ? `${base}?${qs}` : base
+}
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -11,7 +27,7 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type') || 'candidate' // 'candidate' or 'employer'
 
   if (!token || !email) {
-    return NextResponse.redirect(new URL('/login?error=invalid-verification-link', request.url))
+    return NextResponse.redirect(loginRedirectUrl(type, { error: 'invalid-verification-link' }))
   }
 
   try {
@@ -33,7 +49,7 @@ export async function GET(request: NextRequest) {
     })
 
     if (results.docs.length === 0) {
-      return NextResponse.redirect(new URL('/login?error=verification-link-expired', request.url))
+      return NextResponse.redirect(loginRedirectUrl(type, { error: 'verification-link-expired' }))
     }
 
     const user = results.docs[0]
@@ -69,14 +85,9 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Redirect to appropriate login page with success message
-    const redirectUrl = type === 'employer' 
-      ? '/login?success=email-verified&collection=employers'
-      : '/login?success=email-verified'
-    
-    return NextResponse.redirect(new URL(redirectUrl, request.url))
+    return NextResponse.redirect(loginRedirectUrl(type, { success: 'email-verified' }))
   } catch (error) {
     console.error('Email verification error:', error)
-    return NextResponse.redirect(new URL('/login?error=verification-failed', request.url))
+    return NextResponse.redirect(loginRedirectUrl(type, { error: 'verification-failed' }))
   }
 }
