@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { CandidateCard } from '@/components/homepage/blocks/CandidatesClient'
+import { CandidateCardSkeleton } from '@/components/candidates/CandidateCardSkeleton'
 import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
 import { Link } from '@/i18n/routing'
@@ -88,8 +89,16 @@ export function SearchResults({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm text-[#757575]">{t('searching')}</p>
+      <div aria-busy="true">
+        <div className="mb-4 flex items-center gap-2 sm:mb-6">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#4644b8]/20 border-b-[#4644b8]" />
+          <p className="text-sm text-[#757575]">{t('searching')}</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+          {Array.from({ length: 8 }, (_, i) => (
+            <CandidateCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     )
   }

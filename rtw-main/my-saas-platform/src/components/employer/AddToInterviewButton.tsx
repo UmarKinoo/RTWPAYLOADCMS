@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/routing'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Loader2, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { InterviewRequestModal } from './InterviewRequestModal'
 import { checkInterviewCredits } from '@/lib/employer/interviews'
@@ -73,7 +73,11 @@ export function AddToInterviewButton({
         >
           <span className="hidden sm:inline">{t('addToInterview')}</span>
           <span className="sm:hidden">{t('add')}</span>
-          <Plus className="w-3.5 h-3.5" />
+          {isChecking ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Plus className="w-3.5 h-3.5" />
+          )}
         </Button>
         <InterviewRequestModal
           open={isModalOpen}
@@ -98,7 +102,7 @@ export function AddToInterviewButton({
         )}
       >
         <span>{t('addToInterview')}</span>
-        <Plus className="w-6 h-6" />
+        {isChecking ? <Loader2 className="w-6 h-6 animate-spin" /> : <Plus className="w-6 h-6" />}
       </Button>
       <InterviewRequestModal
         open={isModalOpen}
