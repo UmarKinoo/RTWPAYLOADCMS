@@ -816,7 +816,8 @@
       "views": "views",
       "interviewed": "interviewed",
       "thisPeriod": "This {period}",
-      "noDataAvailable": "No data available"
+      "noDataAvailable": "No data available",
+      "declined": "declined"
     }
   },
   "candidateDetail": {
@@ -901,7 +902,9 @@
       "yanbu": "Yanbu",
       "abha": "Abha",
       "other": "Other"
-    }
+    },
+    "noCreditsTitle": "No interview credits",
+    "noCreditsDescription": "You need an active plan with interview credits to send interview requests. Choose a plan to continue."
   },
   "candidateDashboard": {
     "navMenuTitle": "Navigation Menu",
@@ -1285,4 +1288,3 @@
     "backToLogin": "Back to sign in"
   }
 }
-

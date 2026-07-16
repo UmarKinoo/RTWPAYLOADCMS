@@ -816,7 +816,8 @@
       "views": "مشاهدات",
       "interviewed": "مقابلات",
       "thisPeriod": "هذا {period}",
-      "noDataAvailable": "لا توجد بيانات"
+      "noDataAvailable": "لا توجد بيانات",
+      "declined": "مرفوض"
     }
   },
   "candidateDetail": {
@@ -901,7 +902,9 @@
       "yanbu": "ينبع",
       "abha": "أبها",
       "other": "أخرى"
-    }
+    },
+    "noCreditsTitle": "لا يوجد رصيد مقابلات",
+    "noCreditsDescription": "تحتاج إلى باقة نشطة برصيد مقابلات لإرسال طلبات المقابلة. اختر باقة للمتابعة."
   },
   "candidateDashboard": {
     "navMenuTitle": "قائمة التنقل",

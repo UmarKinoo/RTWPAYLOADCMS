@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/moderation-reminders",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-purchases",
+      "schedule": "30 9 * * *"
     }
   ]
 }

@@ -252,8 +252,9 @@ export const EmployerRegistrationForm: React.FC = () => {
               })
 
               if (loginResult.success) {
-                // Redirect to dashboard (which will route to employer dashboard)
-                router.push('/dashboard')
+                // New employers start with 0 credits — send them to the pricing page
+                // to pick a plan before they can request interviews
+                router.push('/pricing')
                 router.refresh() // Refresh to update auth state
               } else {
                 toast.error(t('phoneVerification.verificationSuccessfulLoginFailed'))

@@ -44,9 +44,20 @@ async function fetchCandidateInteractions(
   const result = await payload.find({
     collection: 'candidate-interactions',
     where: {
-      candidate: {
-        equals: candidateId,
-      },
+      and: [
+        {
+          candidate: {
+            equals: candidateId,
+          },
+        },
+        {
+          // interview_requested is recorded BEFORE moderator approval — candidates
+          // must never see a request until it is approved
+          interactionType: {
+            not_equals: 'interview_requested',
+          },
+        },
+      ],
     },
     sort: '-createdAt',
     limit: 100,
@@ -78,9 +89,11 @@ async function fetchCandidateInteractions(
 async function fetchCandidateActivity(
   candidateId: number,
 ): Promise<ActivityItem[]> {
-  // Fetch both interviews and interactions in parallel
+  // Fetch both interviews and interactions in parallel.
+  // Pending interviews are excluded — candidates only learn about an interview
+  // request after a moderator approves it.
   const [interviews, interactions] = await Promise.all([
-    getCandidateInterviews(candidateId, { excludePending: false }),
+    getCandidateInterviews(candidateId),
     fetchCandidateInteractions(candidateId),
   ])
 

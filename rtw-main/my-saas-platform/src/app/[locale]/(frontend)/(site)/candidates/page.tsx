@@ -339,26 +339,15 @@ function CandidatesBody(props: Readonly<{
     searchParams,
   } = props
   if (isSearchMode) {
-    if (hasEmployerAccess) {
-      return (
-        <SearchResults
-          searchQuery={searchQuery}
-          locale={locale}
-          currentPage={currentPage}
-          searchParams={searchParams}
-        />
-      )
-    }
+    // Smart Search is public — non-employers get locked (gated) profile cards
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center max-w-md mx-auto">
-        <p className="text-lg font-semibold text-[#16252d] mb-2">{t('employerOnlySearch')}</p>
-        <p className="text-sm text-[#757575] mb-4">{t('employerOnlySearchDescription')}</p>
-        <Link href="/employer/register" locale={locale}>
-          <Button className="bg-[#4644b8] hover:bg-[#3a3aa0] text-white rounded-lg px-6 py-2.5 font-medium">
-            {t('signInAsEmployer')}
-          </Button>
-        </Link>
-      </div>
+      <SearchResults
+        searchQuery={searchQuery}
+        locale={locale}
+        currentPage={currentPage}
+        searchParams={searchParams}
+        hasEmployerAccess={hasEmployerAccess}
+      />
     )
   }
   if (candidates.length > 0) {

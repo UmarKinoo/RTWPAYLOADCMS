@@ -112,6 +112,15 @@ export const Interviews: CollectionConfig = {
       },
     },
     {
+      name: 'creditDeducted',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description:
+          'Whether an interview credit was deducted from the employer wallet when this request was sent (refunded if the request is rejected or cancelled while pending)',
+      },
+    },
+    {
       name: 'approvedAt',
       type: 'date',
       admin: {

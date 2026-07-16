@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i18n/routing'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { InterviewRequestModal } from './InterviewRequestModal'
+import { checkInterviewCredits } from '@/lib/employer/interviews'
 import type { CandidateDetail, CandidateListItem } from '@/types/candidate'
 
 interface AddToInterviewButtonProps {
@@ -20,7 +23,37 @@ export function AddToInterviewButton({
   className,
 }: AddToInterviewButtonProps) {
   const t = useTranslations('requestInterview')
+  const router = useRouter()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
+
+  // Employers without interview credits are sent to the pricing page instead of
+  // the request form. The server action enforces the same rule as a safety net.
+  const handleClick = async () => {
+    if (isChecking) return
+    setIsChecking(true)
+    try {
+      const status = await checkInterviewCredits()
+      if (!status.isEmployer) {
+        router.push('/login')
+        return
+      }
+      if (status.interviewCredits <= 0) {
+        toast.error(t('noCreditsTitle'), {
+          description: t('noCreditsDescription'),
+        })
+        router.push('/pricing')
+        return
+      }
+      setIsModalOpen(true)
+    } catch {
+      // If the check itself fails, let the employer proceed — the server action
+      // will still block requests without credits
+      setIsModalOpen(true)
+    } finally {
+      setIsChecking(false)
+    }
+  }
 
   if (variant === 'outline') {
     return (
@@ -28,7 +61,8 @@ export function AddToInterviewButton({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleClick}
+          disabled={isChecking}
           className={cn(
             'mt-2 rounded-lg',
             'h-8 px-2.5 text-xs font-medium',
@@ -53,7 +87,8 @@ export function AddToInterviewButton({
   return (
     <>
       <Button
-        onClick={() => setIsModalOpen(true)}
+        onClick={handleClick}
+        disabled={isChecking}
         className={cn(
           'mt-4 sm:mt-6 bg-[#4644b8] hover:bg-[#3a3aa0] text-white hover:text-white',
           'rounded-xl h-12 sm:h-14 px-6 sm:px-8',
@@ -73,4 +108,3 @@ export function AddToInterviewButton({
     </>
   )
 }
-

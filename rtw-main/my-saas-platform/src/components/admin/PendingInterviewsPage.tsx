@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   AlertDialog,
@@ -58,15 +59,54 @@ export function PendingInterviewsPage({
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
   const [rejectTargetId, setRejectTargetId] = useState<number | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false)
+  const [approveTargetId, setApproveTargetId] = useState<number | null>(null)
+  const [approveDate, setApproveDate] = useState('')
+  const [approveTime, setApproveTime] = useState('')
 
-  const handleApprove = async (interviewId: number) => {
-    setProcessingId(interviewId)
+  const openApproveDialog = (interview: Interview) => {
+    setApproveTargetId(interview.id)
+    // Pre-fill with the employer's requested slot so approving as-is needs no edits
+    if (interview.scheduledAt) {
+      const d = new Date(interview.scheduledAt)
+      setApproveDate(format(d, 'yyyy-MM-dd'))
+      setApproveTime(format(d, 'HH:mm'))
+    } else {
+      setApproveDate('')
+      setApproveTime('')
+    }
+    setApproveDialogOpen(true)
+  }
+
+  const closeApproveDialog = () => {
+    setApproveDialogOpen(false)
+    setApproveTargetId(null)
+    setApproveDate('')
+    setApproveTime('')
+  }
+
+  const handleApproveConfirm = async () => {
+    if (approveTargetId == null) return
+    let scheduledAt: string | undefined
+    if (approveDate && approveTime) {
+      const combined = new Date(`${approveDate}T${approveTime}`)
+      if (Number.isNaN(combined.getTime())) {
+        toast.error('Invalid date or time')
+        return
+      }
+      scheduledAt = combined.toISOString()
+    }
+    setProcessingId(approveTargetId)
     try {
-      const result = await approveInterviewRequest(interviewId)
+      const result = await approveInterviewRequest(
+        approveTargetId,
+        scheduledAt ? { scheduledAt } : undefined,
+      )
       if (result.success) {
         toast.success('Interview request approved')
-        setInterviews((prev) => prev.filter((i) => i.id !== interviewId))
+        setInterviews((prev) => prev.filter((i) => i.id !== approveTargetId))
         router.refresh()
+        closeApproveDialog()
       } else {
         toast.error(result.error || 'Failed to approve')
       }
@@ -405,7 +445,7 @@ export function PendingInterviewsPage({
 
                     <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                       <Button
-                        onClick={() => handleApprove(interview.id)}
+                        onClick={() => openApproveDialog(interview)}
                         disabled={isProcessing}
                         className={cn(
                           'flex-1 font-medium',
@@ -448,6 +488,59 @@ export function PendingInterviewsPage({
           )}
         </div>
       </div>
+
+      <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+        <AlertDialogContent className="border-[#e5e5e5] sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[#16252d]">Approve interview request</AlertDialogTitle>
+            <AlertDialogDescription className="text-[#515151]">
+              Confirm the interview slot below. You can adjust the date and time before approving —
+              the candidate and employer will be notified with the final schedule.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="grid gap-3 py-2 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="approve-date" className="text-sm font-medium text-[#16252d]">
+                Date
+              </Label>
+              <Input
+                id="approve-date"
+                type="date"
+                value={approveDate}
+                onChange={(e) => setApproveDate(e.target.value)}
+                className="border-[#e5e5e5] text-sm focus-visible:ring-[#4644b8]"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="approve-time" className="text-sm font-medium text-[#16252d]">
+                Time
+              </Label>
+              <Input
+                id="approve-time"
+                type="time"
+                value={approveTime}
+                onChange={(e) => setApproveTime(e.target.value)}
+                className="border-[#e5e5e5] text-sm focus-visible:ring-[#4644b8]"
+              />
+            </div>
+          </div>
+          <AlertDialogFooter className="gap-2 sm:gap-0">
+            <AlertDialogCancel
+              onClick={closeApproveDialog}
+              className="border-[#e5e5e5] text-[#515151]"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              onClick={() => void handleApproveConfirm()}
+              disabled={processingId != null}
+              className="bg-[#4644b8] font-medium text-white hover:bg-[#3a3aa0] hover:text-white"
+            >
+              {processingId != null ? 'Approving…' : 'Approve'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <AlertDialogContent className="border-[#e5e5e5] sm:max-w-md">

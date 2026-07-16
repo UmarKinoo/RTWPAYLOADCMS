@@ -822,3 +822,62 @@ export function candidateProfileNeedsChangesEmailTemplate(
   `
   return baseEmailTemplate(content, 'Action needed on your profile')
 }
+
+export interface PaymentSuccessEmailParams {
+  companyName: string
+  planTitle: string
+  price?: string
+  interviewCredits: number
+  contactUnlockCredits: number
+  dashboardUrl: string
+}
+
+export function paymentSuccessEmailTemplate(params: PaymentSuccessEmailParams): string {
+  const priceRow = params.price
+    ? `<p class="email-content"><strong>Amount paid:</strong> ${params.price}</p>`
+    : ''
+  const content = `
+    <p class="email-content">Hi ${params.companyName},</p>
+    <p class="email-content">
+      Thank you for your purchase — your payment was received and your plan is now active.
+    </p>
+    <p class="email-content"><strong>Plan:</strong> ${params.planTitle}</p>
+    ${priceRow}
+    <p class="email-content">
+      <strong>Credits added:</strong> ${params.interviewCredits} interview credit${params.interviewCredits === 1 ? '' : 's'}${
+        params.contactUnlockCredits > 0
+          ? ` and ${params.contactUnlockCredits} contact unlock credit${params.contactUnlockCredits === 1 ? '' : 's'}`
+          : ''
+      }.
+    </p>
+    <p class="email-content">You can now send interview requests to candidates.</p>
+    <div style="text-align: center;">
+      <a href="${params.dashboardUrl}" class="button">Go to your dashboard</a>
+    </div>
+  `
+  return baseEmailTemplate(content, 'Payment confirmed — credits added')
+}
+
+export interface PaymentFailedEmailParams {
+  companyName: string
+  planTitle: string
+  pricingUrl: string
+}
+
+export function paymentFailedEmailTemplate(params: PaymentFailedEmailParams): string {
+  const content = `
+    <p class="email-content">Hi ${params.companyName},</p>
+    <p class="email-content">
+      Unfortunately your payment for the <strong>${params.planTitle}</strong> plan was not completed,
+      so no credits were added to your account.
+    </p>
+    <p class="email-content">
+      You can try again at any time. If you believe you were charged, please contact us at
+      <a href="mailto:${supportEmail}">${supportEmail}</a>.
+    </p>
+    <div style="text-align: center;">
+      <a href="${params.pricingUrl}" class="button">Try again</a>
+    </div>
+  `
+  return baseEmailTemplate(content, 'Payment not completed')
+}

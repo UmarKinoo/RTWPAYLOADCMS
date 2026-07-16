@@ -10,6 +10,7 @@ import * as migration_20260513_000000_add_users_display_name from './20260513_00
 import * as migration_20260609_205734_readybot_schema from './20260609_205734_readybot_schema';
 import * as migration_20260611_120000_candidate_profile_moderation from './20260611_120000_candidate_profile_moderation';
 import * as migration_20260618_120000_candidate_skills_industry from './20260618_120000_candidate_skills_industry';
+import * as migration_20260715_120000_interview_credit_deducted from './20260715_120000_interview_credit_deducted';
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20260618_120000_candidate_skills_industry.up,
     down: migration_20260618_120000_candidate_skills_industry.down,
     name: '20260618_120000_candidate_skills_industry',
+  },
+  {
+    up: migration_20260715_120000_interview_credit_deducted.up,
+    down: migration_20260715_120000_interview_credit_deducted.down,
+    name: '20260715_120000_interview_credit_deducted',
   },
 ];

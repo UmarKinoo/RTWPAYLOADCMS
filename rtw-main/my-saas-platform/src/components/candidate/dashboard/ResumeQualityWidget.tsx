@@ -11,20 +11,30 @@ interface ResumeQualityWidgetProps {
   candidate: Candidate
 }
 
+// Weights must add up to 100 so a fully completed profile reads 100%
+const WEIGHTS = {
+  name: 15,
+  email: 15,
+  phone: 10,
+  jobTitle: 10,
+  primarySkill: 15,
+  experienceYears: 15,
+  location: 10,
+  visaStatus: 10,
+} as const
+
 export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
   const t = useTranslations('candidateDashboard.resumeQuality')
-  // Calculate resume completeness (simplified)
   const calculateCompleteness = () => {
     let score = 0
-    if (candidate.firstName && candidate.lastName) score += 10
-    if (candidate.email) score += 10
-    if (candidate.phone) score += 5
-    if (candidate.jobTitle) score += 5
-    if (candidate.primarySkill) score += 10
-    if (candidate.experienceYears) score += 10
-    if (candidate.location) score += 5
-    if (candidate.visaStatus) score += 5
-    // Add more fields as needed
+    if (candidate.firstName && candidate.lastName) score += WEIGHTS.name
+    if (candidate.email) score += WEIGHTS.email
+    if (candidate.phone) score += WEIGHTS.phone
+    if (candidate.jobTitle) score += WEIGHTS.jobTitle
+    if (candidate.primarySkill) score += WEIGHTS.primarySkill
+    if (candidate.experienceYears) score += WEIGHTS.experienceYears
+    if (candidate.location) score += WEIGHTS.location
+    if (candidate.visaStatus) score += WEIGHTS.visaStatus
     return Math.min(score, 100)
   }
 
@@ -56,7 +66,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
           {!candidate.jobTitle && (
             <div className="flex items-center gap-2">
               <Badge className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] hover:bg-[#4644b8]/20 text-[10px] sm:text-xs">
-                +5%
+                +{WEIGHTS.jobTitle}%
               </Badge>
               <p className="text-[10px] text-[#757575] sm:text-xs">{t('completeJobTitle')}</p>
             </div>
@@ -64,7 +74,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
           {!candidate.location && (
             <div className="flex items-center gap-2">
               <Badge className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] hover:bg-[#4644b8]/20 text-[10px] sm:text-xs">
-                +5%
+                +{WEIGHTS.location}%
               </Badge>
               <p className="text-[10px] text-[#757575] sm:text-xs">{t('completePersonalInfo')}</p>
             </div>
@@ -72,7 +82,7 @@ export function ResumeQualityWidget({ candidate }: ResumeQualityWidgetProps) {
           {!candidate.experienceYears && (
             <div className="flex items-center gap-2">
               <Badge className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] hover:bg-[#4644b8]/20 text-[10px] sm:text-xs">
-                +5%
+                +{WEIGHTS.experienceYears}%
               </Badge>
               <p className="text-[10px] text-[#757575] sm:text-xs">{t('addWorkExperience')}</p>
             </div>

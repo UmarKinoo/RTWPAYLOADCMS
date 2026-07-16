@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { FolderOpen, Eye, FileText, TrendingUp, TrendingDown } from 'lucide-react'
+import { FolderOpen, Eye, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { StatisticsDataPoint } from '@/lib/payload/employer-dashboard'
 
@@ -74,27 +74,21 @@ export function StatisticsChart({
 
   const statsCards = [
     {
-      icon: FolderOpen,
-      labelKey: 'opened' as const,
-      value: totalViews.toString(),
-      change: '+0',
-      trend: 'up' as const,
-      periodKey: selectedPeriodKey,
-    },
-    {
       icon: Eye,
       labelKey: 'views' as const,
       value: totalViews.toString(),
-      change: '+0',
-      trend: 'up' as const,
       periodKey: selectedPeriodKey,
     },
     {
       icon: FileText,
       labelKey: 'interviewed' as const,
       value: totalInterviewed.toString(),
-      change: '+0',
-      trend: 'up' as const,
+      periodKey: selectedPeriodKey,
+    },
+    {
+      icon: FolderOpen,
+      labelKey: 'declined' as const,
+      value: totalDeclined.toString(),
       periodKey: selectedPeriodKey,
     },
   ]
@@ -241,19 +235,6 @@ export function StatisticsChart({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-normal text-[#a5a5a5]">{t('thisPeriod', { period: t(stat.periodKey) })}</span>
-                  <div className="flex items-center gap-0.5">
-                    {stat.trend === 'up' ? (
-                      <>
-                        <TrendingUp className="size-2 text-[#009e00]" />
-                        <span className="text-xs font-medium text-[#009e00]">{stat.change}</span>
-                      </>
-                    ) : (
-                      <>
-                        <TrendingDown className="size-2 text-[#dc0000]" />
-                        <span className="text-xs font-medium text-[#dc0000]">{stat.change}</span>
-                      </>
-                    )}
-                  </div>
                 </div>
               </div>
             )

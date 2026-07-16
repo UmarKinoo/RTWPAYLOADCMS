@@ -34,17 +34,9 @@ export interface UpcomingInterview {
 async function fetchEmployerStats(employerId: number): Promise<EmployerStats> {
   const payload = await getPayload({ config: configPromise })
 
-  // Get candidates to review (candidates not yet interacted with)
-  const allCandidates = await payload.find({
-    collection: 'candidates',
-    limit: 1000,
-    where: {
-      termsAccepted: { equals: true },
-      profileStatus: { equals: 'approved' },
-    },
-    overrideAccess: true,
-  })
-
+  // Get candidates to review (approved candidates this employer has not interacted with).
+  // Counted in the database (not over a limited page of docs) so the number stays
+  // correct beyond 1000 candidates.
   const interactions = await payload.find({
     collection: 'candidate-interactions',
     where: {
@@ -53,18 +45,32 @@ async function fetchEmployerStats(employerId: number): Promise<EmployerStats> {
       },
     },
     limit: 10000,
+    depth: 0,
     overrideAccess: true,
   })
 
-  const interactedCandidateIds = new Set(
-    interactions.docs.map((i) =>
-      typeof i.candidate === 'object' ? i.candidate.id : i.candidate,
+  const interactedCandidateIds = [
+    ...new Set(
+      interactions.docs.map((i) =>
+        typeof i.candidate === 'object' ? i.candidate.id : i.candidate,
+      ),
     ),
-  )
+  ].filter((id): id is number => typeof id === 'number')
 
-  const candidatesToReview = allCandidates.docs.filter(
-    (c) => !interactedCandidateIds.has(c.id),
-  ).length
+  const candidatesToReviewResult = await payload.count({
+    collection: 'candidates',
+    where: {
+      and: [
+        { termsAccepted: { equals: true } },
+        { profileStatus: { equals: 'approved' } },
+        ...(interactedCandidateIds.length > 0
+          ? [{ id: { not_in: interactedCandidateIds } }]
+          : []),
+      ],
+    },
+    overrideAccess: true,
+  })
+  const candidatesToReview = candidatesToReviewResult.totalDocs
 
   // Get unread notifications count
   const notifications = await payload.find({

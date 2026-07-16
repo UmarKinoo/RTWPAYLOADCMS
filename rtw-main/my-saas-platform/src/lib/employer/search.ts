@@ -37,24 +37,12 @@ export async function searchCandidates(
   try {
     const payload = await getPayload({ config: await configPromise })
 
-    // Get current user type
+    // Search is public. Employers get full results (and view tracking); everyone
+    // else (anonymous, candidates, admins) gets masked results — names and emails
+    // are withheld so profiles stay gated behind employer registration.
     const userType = await getCurrentUserType()
-
-    if (!userType) {
-      throw new Error('Unauthorized')
-    }
-
-    // Allow admin or employer
-    let employerId: number
-    if (userType.kind === 'admin') {
-      // Admin can search, but we need an employer ID for tracking interactions
-      // For now, throw error - you may want to handle admin search differently
-      throw new Error('Admin search not yet supported')
-    } else if (userType.kind === 'employer') {
-      employerId = userType.employer.id
-    } else {
-      throw new Error('Unauthorized')
-    }
+    const employerId: number | null = userType?.kind === 'employer' ? userType.employer.id : null
+    const hasEmployerAccess = employerId !== null
 
     if (!query || typeof query !== 'string') {
       throw new Error('Query is required')
@@ -326,7 +314,7 @@ export async function searchCandidates(
     )
 
     // Track first view per employer+candidate (skip if already viewed — avoids write storm on re-search)
-    if (pageIds.length > 0) {
+    if (hasEmployerAccess && pageIds.length > 0) {
       const existingViews = await payload.find({
         collection: 'candidate-interactions',
         where: {
@@ -371,8 +359,9 @@ export async function searchCandidates(
     return {
       candidates: finalCandidates.docs.map((candidate) => ({
         id: candidate.id,
-        firstName: candidate.firstName,
-        lastName: candidate.lastName,
+        // Identity fields are only sent to employers — public searches get gated cards
+        firstName: hasEmployerAccess ? candidate.firstName : '',
+        lastName: hasEmployerAccess ? candidate.lastName : '',
         jobTitle: candidate.jobTitle,
         location: candidate.location,
         nationality: candidate.nationality || '',
@@ -383,7 +372,7 @@ export async function searchCandidates(
             ? candidate.profilePicture.url || null
             : null,
         billingClass: (candidate.billingClass as BillingClass) || null,
-        email: candidate.email || undefined, // Temporarily added
+        email: hasEmployerAccess ? candidate.email || undefined : undefined, // Temporarily added
       })),
       total,
       totalPages,

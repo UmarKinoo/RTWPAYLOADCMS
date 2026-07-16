@@ -134,6 +134,15 @@ export async function startPayment(planSlug: string): Promise<StartPaymentRespon
  */
 export async function mockPurchase(planSlug: string): Promise<MockPurchaseResponse> {
   try {
+    // Mock checkout grants credits without payment — never allow it in production
+    // unless explicitly enabled for testing via ALLOW_MOCK_CHECKOUT=true
+    if (process.env.NODE_ENV === 'production' && process.env.ALLOW_MOCK_CHECKOUT !== 'true') {
+      return {
+        success: false,
+        error: 'Online payment is not available right now. Please try again later or contact support.',
+      }
+    }
+
     const payload = await getPayload({ config })
     const user = await getRequestAuthUser(payload)
 
@@ -233,6 +242,22 @@ export async function mockPurchase(planSlug: string): Promise<MockPurchaseRespon
         },
       },
     })
+
+    try {
+      await payload.create({
+        collection: 'notifications',
+        data: {
+          employer: user.id,
+          type: 'system',
+          title: 'Payment successful',
+          message: `Your ${plan.title || plan.slug} plan is active. ${plan.entitlements?.interviewCreditsGranted || 0} interview credit(s) and ${plan.entitlements?.contactUnlockCreditsGranted || 0} contact unlock credit(s) were added to your account.`,
+          read: false,
+          actionUrl: '/employer/dashboard',
+        },
+      })
+    } catch (notifyError) {
+      console.error('Failed to create mock purchase notification:', notifyError)
+    }
 
     revalidatePath('/pricing', 'page')
     revalidatePath('/candidates', 'page')

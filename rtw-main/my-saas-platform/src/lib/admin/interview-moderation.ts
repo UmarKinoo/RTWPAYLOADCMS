@@ -77,7 +77,10 @@ export async function approveInterviewRequest(
       depth: 0,
     })
 
-    if ((employer.wallet?.interviewCredits || 0) <= 0) {
+    // New requests deduct the credit at send time (creditDeducted=true).
+    // Legacy pending requests (created before send-time deduction) are still charged here.
+    const chargeOnApproval = !interview.creditDeducted
+    if (chargeOnApproval && (employer.wallet?.interviewCredits || 0) <= 0) {
       return { success: false, error: 'Employer has insufficient interview credits.' }
     }
 
@@ -107,17 +110,24 @@ export async function approveInterviewRequest(
       data: updateData,
     }) as Interview
 
-    // Deduct interview credit
-    await payload.update({
-      collection: 'employers',
-      id: employerId,
-      data: {
-        wallet: {
-          interviewCredits: Math.max(0, (employer.wallet?.interviewCredits || 0) - 1),
-          contactUnlockCredits: employer.wallet?.contactUnlockCredits || 0,
+    // Deduct interview credit (legacy requests only — new ones already paid at send time)
+    if (chargeOnApproval) {
+      await payload.update({
+        collection: 'interviews',
+        id: interviewId,
+        data: { creditDeducted: true },
+      })
+      await payload.update({
+        collection: 'employers',
+        id: employerId,
+        data: {
+          wallet: {
+            interviewCredits: Math.max(0, (employer.wallet?.interviewCredits || 0) - 1),
+            contactUnlockCredits: employer.wallet?.contactUnlockCredits || 0,
+          },
         },
-      },
-    })
+      })
+    }
 
     // Get candidate info
     const candidateId =
@@ -239,6 +249,7 @@ export async function rejectInterviewRequest(
       data: {
         status: 'rejected',
         rejectionReason: reason || 'Interview request rejected by moderator.',
+        creditDeducted: false,
       },
     })
 
@@ -247,6 +258,25 @@ export async function rejectInterviewRequest(
       typeof interview.candidate === 'object' ? interview.candidate.id : interview.candidate
     const employerId =
       typeof interview.employer === 'object' ? interview.employer.id : interview.employer
+
+    // Refund the interview credit that was deducted when the request was sent
+    if (interview.creditDeducted) {
+      const employer = await payload.findByID({
+        collection: 'employers',
+        id: employerId,
+        depth: 0,
+      })
+      await payload.update({
+        collection: 'employers',
+        id: employerId,
+        data: {
+          wallet: {
+            interviewCredits: (employer.wallet?.interviewCredits || 0) + 1,
+            contactUnlockCredits: employer.wallet?.contactUnlockCredits || 0,
+          },
+        },
+      })
+    }
 
     const candidate = await payload.findByID({
       collection: 'candidates',
@@ -261,9 +291,14 @@ export async function rejectInterviewRequest(
         employer: employerId,
         type: 'system',
         title: 'Interview Request Rejected',
-        message: reason
-          ? `Your interview request with ${candidate.firstName} ${candidate.lastName} has been rejected. Reason: ${reason}`
-          : `Your interview request with ${candidate.firstName} ${candidate.lastName} has been rejected.`,
+        message: [
+          reason
+            ? `Your interview request with ${candidate.firstName} ${candidate.lastName} has been rejected. Reason: ${reason}`
+            : `Your interview request with ${candidate.firstName} ${candidate.lastName} has been rejected.`,
+          interview.creditDeducted ? 'Your interview credit has been refunded.' : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
         read: false,
       },
     })

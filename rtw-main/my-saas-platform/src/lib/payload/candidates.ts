@@ -79,7 +79,8 @@ function toDetail(doc: Candidate, locale: string): CandidateDetail {
     visaStatus: doc.visaStatus,
     visaExpiry: doc.visaExpiry || null,
     visaProfession: doc.visaProfession || null,
-    resumeUrl: getMediaUrl(doc.resume),
+    // resume/CV is intentionally NOT exposed here — employers must never receive
+    // the CV URL (candidate self-view and moderation use their own data paths)
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
   }

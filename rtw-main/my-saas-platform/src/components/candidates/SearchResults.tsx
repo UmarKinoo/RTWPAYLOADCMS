@@ -16,6 +16,8 @@ interface SearchResultsProps {
   locale: string
   currentPage: number
   searchParams: Record<string, string | undefined>
+  /** Employers see full cards + interview button; everyone else gets locked cards */
+  hasEmployerAccess?: boolean
 }
 
 export function SearchResults({
@@ -23,6 +25,7 @@ export function SearchResults({
   locale,
   currentPage,
   searchParams,
+  hasEmployerAccess = true,
 }: SearchResultsProps) {
   const t = useTranslations('candidatesPage')
   const [candidates, setCandidates] = useState<CandidateListItem[]>([])
@@ -123,9 +126,13 @@ export function SearchResults({
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
         {candidates.map((candidate) => (
           <div key={candidate.id} className="flex flex-col items-center">
-            <Link href={`/candidates/${candidate.id}`} className="w-full" locale={locale}>
+            <Link
+              href={hasEmployerAccess ? `/candidates/${candidate.id}` : '/employer/register'}
+              className="w-full"
+              locale={locale}
+            >
               <CandidateCard
-                name={`${candidate.firstName} ${candidate.lastName}`}
+                name={`${candidate.firstName} ${candidate.lastName}`.trim()}
                 jobTitle={candidate.jobTitle}
                 experience={formatExperience(candidate.experienceYears)}
                 nationality={candidate.nationality}
@@ -135,9 +142,11 @@ export function SearchResults({
                 firstName={candidate.firstName}
                 lastName={candidate.lastName}
                 billingClass={candidate.billingClass}
+                locked={!hasEmployerAccess}
+                displayLabel={hasEmployerAccess ? undefined : candidate.jobTitle}
               />
             </Link>
-            <AddToInterviewButton candidate={candidate} variant="outline" />
+            {hasEmployerAccess && <AddToInterviewButton candidate={candidate} variant="outline" />}
           </div>
         ))}
       </div>

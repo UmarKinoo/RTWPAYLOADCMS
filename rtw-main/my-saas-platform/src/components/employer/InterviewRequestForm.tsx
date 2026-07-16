@@ -34,7 +34,8 @@ import {
 } from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { requestInterview } from '@/lib/employer/interviews'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/routing'
+import { toast } from 'sonner'
 
 const LOCATION_KEYS = ['riyadh', 'jeddah', 'dammam', 'khobar', 'mecca', 'medina', 'tabuk', 'yanbu', 'abha', 'other'] as const
 
@@ -110,6 +111,12 @@ export function InterviewRequestForm({
       if (result.success) {
         onSuccess?.()
         router.refresh()
+      } else if (result.code === 'NO_CREDITS') {
+        // Out of interview credits — send the employer to the pricing page to buy a plan
+        toast.error(t('noCreditsTitle'), {
+          description: t('noCreditsDescription'),
+        })
+        router.push('/pricing')
       } else {
         onError?.(result.error || t('failedToSend'))
       }

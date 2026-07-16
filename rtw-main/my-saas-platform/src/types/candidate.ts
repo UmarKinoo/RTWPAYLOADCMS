@@ -42,7 +42,6 @@ export interface CandidateDetail extends CandidateListItem {
   visaStatus: 'active' | 'expired' | 'nearly_expired' | 'none'
   visaExpiry: string | null
   visaProfession: string | null
-  resumeUrl: string | null
   createdAt: string
   updatedAt: string
 }

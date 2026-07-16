@@ -29,6 +29,7 @@ export async function sendCandidateModerationReminders(
     payload.find({
       collection: 'interviews',
       where: { status: { equals: 'pending' } },
+      sort: 'requestedAt',
       limit: 1,
       depth: 0,
       overrideAccess: true,
@@ -37,7 +38,7 @@ export async function sendCandidateModerationReminders(
 
   const pendingCount = result.totalDocs
   const pendingInterviewCount = pendingInterviewsResult.totalDocs ?? 0
-  if (pendingCount === 0) {
+  if (pendingCount === 0 && pendingInterviewCount === 0) {
     return { sent: false, pendingCount: 0, pendingInterviewCount, reason: 'queue_empty' }
   }
 
@@ -48,7 +49,18 @@ export async function sendCandidateModerationReminders(
     .map((d) => new Date(String(d)).getTime())
     .sort((a, b) => a - b)[0]
 
-  if (!oldestSubmitted || now - oldestSubmitted < STALE_THRESHOLD_MS) {
+  const oldestInterviewRequested = pendingInterviewsResult.docs
+    .map((i) => i.requestedAt || i.createdAt)
+    .filter(Boolean)
+    .map((d) => new Date(String(d)).getTime())
+    .sort((a, b) => a - b)[0]
+
+  // A digest goes out when anything (profile or interview request) has waited 24h+
+  const oldestWaiting = [oldestSubmitted, oldestInterviewRequested]
+    .filter((n): n is number => typeof n === 'number')
+    .sort((a, b) => a - b)[0]
+
+  if (!oldestWaiting || now - oldestWaiting < STALE_THRESHOLD_MS) {
     return { sent: false, pendingCount, pendingInterviewCount, reason: 'not_stale_yet' }
   }
 
@@ -67,7 +79,7 @@ export async function sendCandidateModerationReminders(
     return { sent: false, pendingCount, pendingInterviewCount, reason: 'no_moderator_emails' }
   }
 
-  const oldestHours = Math.floor((now - oldestSubmitted) / (60 * 60 * 1000))
+  const oldestHours = Math.floor((now - oldestWaiting) / (60 * 60 * 1000))
   const queueUrl = `${getServerSideURL()}/${defaultLocale}/moderator/candidates/pending`
   const interviewsQueueUrl = `${getServerSideURL()}/${defaultLocale}/moderator/interviews/pending`
   const html = candidateModerationReminderEmailTemplate({
