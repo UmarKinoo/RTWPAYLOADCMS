@@ -127,7 +127,7 @@ export function RegisterTypePageClient() {
               <div className="mt-4 pt-3 border-t border-gray-100 text-center">
                 <p className="text-xs text-gray-600">
                   Already have an account?{' '}
-                  <Link href={`/${locale}/login`} className="text-[#4644b8] hover:text-[#3a3aa0] font-semibold transition-colors hover:underline underline-offset-2">
+                  <Link href="/login" className="text-[#4644b8] hover:text-[#3a3aa0] font-semibold transition-colors hover:underline underline-offset-2">
                     {t('login')}
                   </Link>
                 </p>
