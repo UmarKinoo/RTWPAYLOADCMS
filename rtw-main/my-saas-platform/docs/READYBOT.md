@@ -70,11 +70,16 @@
 |------|--------|
 | `runScan` | ✅ |
 | `getPipelineStats` | ✅ |
+| `aggregateCandidates` | ✅ (read-only counts/breakdowns: major discipline, category, subcategory, skill, screening status, nationality, location, gender, visa, billing class, profile status) |
+| `searchCandidates` | ✅ (read-only filtered slices: discipline / category / skill / job title / nationality / location / status / experience range, max 10 rows/page) |
+| `getSiteStats` | ✅ (read-only site totals: candidates, employers, job postings, interviews, skills, disciplines, contact + newsletter submissions) |
 | `listCandidates` | ✅ (ReadyBot pipeline only, paginated) |
 | `findCandidate` | ✅ (name / email / job title search) |
 | `getCandidateProfile` | ✅ (full snapshot + memory + screening + messages) |
 | `listPendingReviews` | ✅ (read-only list) |
 | `updateCandidateProfile` | ✅ (requires inline Approve/Deny in chat) |
+
+All chat tools are read-only except `updateCandidateProfile` (confirmation-gated). No delete tool exists — deletes are only possible in Payload Admin.
 
 ### Not ReadyBot — rest of ReadyToWork platform
 

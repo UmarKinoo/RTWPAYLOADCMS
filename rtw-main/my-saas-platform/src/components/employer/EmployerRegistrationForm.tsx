@@ -13,6 +13,7 @@ import Image from 'next/image'
 import PhoneInput from 'react-phone-number-input'
 import { registerEmployer } from '@/lib/employer'
 import { PhoneVerification } from '@/components/auth/phone-verification'
+import { useFormDraft } from '@/hooks/useFormDraft'
 import { useTranslations } from 'next-intl'
 import 'react-phone-number-input/style.css'
 
@@ -117,6 +118,39 @@ export const EmployerRegistrationForm: React.FC = () => {
   })
   const tLegal = useTranslations('employerRegistration.legalStatements')
 
+  // Persist progress to the browser so closing the tab doesn't lose the form.
+  // Passwords and consent checkboxes are never saved.
+  const { loadDraft, saveDraft, clearDraft } = useFormDraft<{
+    responsiblePerson: string
+    companyName: string
+    email: string
+    phone: string
+  }>('employer-registration')
+  const draftRestoredRef = React.useRef(false)
+
+  React.useEffect(() => {
+    if (draftRestoredRef.current) return
+    draftRestoredRef.current = true
+    const draft = loadDraft()
+    if (!draft) return
+    if (!(draft.responsiblePerson || draft.companyName || draft.email || draft.phone)) return
+    setFormData((prev) => ({
+      ...prev,
+      responsiblePerson: draft.responsiblePerson || '',
+      companyName: draft.companyName || '',
+      email: draft.email || '',
+      phone: draft.phone || '',
+    }))
+    toast.info(t('messages.draftRestored'))
+  }, [loadDraft, t])
+
+  React.useEffect(() => {
+    if (showPhoneVerification || isPending) return
+    const { responsiblePerson, companyName, email, phone } = formData
+    if (!(responsiblePerson || companyName || email || phone)) return
+    saveDraft({ responsiblePerson, companyName, email, phone })
+  }, [formData, showPhoneVerification, isPending, saveDraft])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
     setFormData((prev) => ({
@@ -190,6 +224,7 @@ export const EmployerRegistrationForm: React.FC = () => {
       })
 
       if (result.success && result.employerId) {
+        clearDraft()
         toast.success(t('messages.registrationSuccessful'), {
           description: t('messages.registrationSuccessfulDescription'),
         })

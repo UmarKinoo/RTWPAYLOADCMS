@@ -25,6 +25,7 @@ import { WorkExperienceStep } from './wizard-steps/WorkExperienceStep'
 import { LocationVisaStep } from './wizard-steps/LocationVisaStep'
 import { ReviewStep } from './wizard-steps/ReviewStep'
 import { PhoneVerification } from '@/components/auth/phone-verification'
+import { useFormDraft } from '@/hooks/useFormDraft'
 import { cn } from '@/lib/utils'
 
 const candidateSchema = z
@@ -117,6 +118,45 @@ const candidateSchema = z
 
 export type CandidateFormData = z.infer<typeof candidateSchema>
 
+/** Draft persisted to localStorage so a closed tab can resume registration */
+interface CandidateRegistrationDraft {
+  step: number
+  values: Partial<CandidateFormData>
+}
+
+// Which wizard step each field lives on — used to jump to the first invalid
+// field on submit (e.g. a restored draft where the password must be re-entered)
+const FIELD_TO_STEP: Partial<Record<keyof CandidateFormData, number>> = {
+  email: 1,
+  password: 1,
+  confirmPassword: 1,
+  firstName: 2,
+  lastName: 2,
+  phone: 2,
+  whatsapp: 2,
+  gender: 2,
+  dob: 2,
+  nationality: 2,
+  languages: 2,
+  location: 2,
+  currentlyInKSA: 2,
+  primarySkill: 3,
+  secondarySkill: 3,
+  tertiarySkill: 3,
+  jobTitle: 4,
+  experienceYears: 4,
+  industryExperience: 4,
+  saudiExperience: 4,
+  currentEmployer: 4,
+  availabilityDate: 4,
+  visaStatus: 5,
+  visaExpiry: 5,
+  visaProfession: 5,
+  acceptPrivacyTerms: 6,
+  acceptDataConsent: 6,
+  acceptPlatformDisclaimer: 6,
+}
+
 export function RegistrationWizard() {
   const t = useTranslations('registration')
   const router = useRouter()
@@ -165,6 +205,51 @@ export function RegistrationWizard() {
   const password = watch('password')
   const confirmPassword = watch('confirmPassword')
   const formValues = watch()
+
+  // Persist progress to the browser so closing the tab doesn't lose the wizard.
+  // Passwords and consent checkboxes are never saved.
+  const { loadDraft, saveDraft, clearDraft } = useFormDraft<CandidateRegistrationDraft>(
+    'candidate-registration',
+  )
+  const draftRestoredRef = useRef(false)
+
+  React.useEffect(() => {
+    if (draftRestoredRef.current) return
+    draftRestoredRef.current = true
+    const draft = loadDraft()
+    if (!draft?.values) return
+    const values = draft.values
+    const hasContent = Boolean(
+      values.email || values.firstName || values.phone || values.primarySkill || values.jobTitle,
+    )
+    if (!hasContent) return
+    Object.entries(values).forEach(([field, value]) => {
+      if (value !== undefined && value !== null) {
+        setValue(field as keyof CandidateFormData, value as never, { shouldValidate: false })
+      }
+    })
+    if (values.sameAsPhone) setSameAsPhone(true)
+    // Land on step 1 first so the (never persisted) password gets re-entered,
+    // then the rest of the steps are already pre-filled
+    toast.info(t('draftRestored'))
+  }, [loadDraft, setValue, t])
+
+  React.useEffect(() => {
+    if (showPhoneVerification || isPending) return
+    const {
+      password: _password,
+      confirmPassword: _confirmPassword,
+      acceptPrivacyTerms: _consent1,
+      acceptDataConsent: _consent2,
+      acceptPlatformDisclaimer: _consent3,
+      ...safeValues
+    } = formValues
+    const hasContent = Boolean(
+      safeValues.email || safeValues.firstName || safeValues.phone || safeValues.primarySkill,
+    )
+    if (!hasContent) return
+    saveDraft({ step: currentStep, values: safeValues })
+  }, [formValues, currentStep, showPhoneVerification, isPending, saveDraft])
   
   // Check if passwords match for step 1 validation
   const passwordsMatch = password && confirmPassword ? password === confirmPassword : true
@@ -290,6 +375,7 @@ export function RegistrationWizard() {
       console.log('Registration result:', result)
 
       if (result.success && result.candidateId) {
+        clearDraft()
         toast.success('Registration Successful!', {
           description: 'Please verify your phone number to continue.',
         })
@@ -323,6 +409,14 @@ export function RegistrationWizard() {
 
   const handleFormError = (errors: any) => {
     console.error('Form validation errors:', errors)
+    // Jump to the step containing the first invalid field (e.g. a restored
+    // draft submitted before the password was re-entered)
+    const firstField = Object.keys(errors)[0] as keyof CandidateFormData | undefined
+    const targetStep = firstField ? FIELD_TO_STEP[firstField] : undefined
+    if (targetStep && targetStep !== currentStep) {
+      setCurrentStep(targetStep)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
     // Show first error
     const firstError = Object.values(errors)[0] as any
     if (firstError?.message) {

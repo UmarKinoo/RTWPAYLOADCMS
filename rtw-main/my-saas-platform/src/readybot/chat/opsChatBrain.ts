@@ -5,11 +5,13 @@
 import { Annotation, END, START, StateGraph } from '@langchain/langgraph'
 import type { Payload } from 'payload'
 import {
+  executeAggregateCandidates,
   executeFindCandidate,
   executeGetCandidateProfile,
   executeGetPipelineStats,
   executeListPendingReviews,
   executeRunScan,
+  type CandidateGroupDimension,
 } from './toolActions'
 import { isExplicitRunScanRequest, isVagueUserMessage } from './chatGuards'
 
@@ -28,7 +30,7 @@ function classifyIntent(message: string): OpsChatIntent {
     return 'scan'
   }
   if (
-    /\b(pending review|human review|find candidate|search candidate|pipeline stats|active task|how many)\b/.test(
+    /\b(pending review|human review|find candidate|search candidate|pipeline stats|active task|how many|breakdown|distribution|count|per\s+\w+|grouped? by)\b/.test(
       m,
     )
   ) {
@@ -42,6 +44,23 @@ function classifyIntent(message: string): OpsChatIntent {
     return 'profile'
   }
   return 'chat'
+}
+
+/** Breakdown dimension mentioned in an aggregate-style question, if any. */
+function detectGroupByDimension(message: string): CandidateGroupDimension | null {
+  const m = message.toLowerCase()
+  if (!/\b(how many|count|breakdown|distribution|per|by|grouped)\b/.test(m)) return null
+  if (/\bdisciplines?\b/.test(m)) return 'discipline'
+  if (/\bsub.?categor/.test(m)) return 'subcategory'
+  if (/\bcategor/.test(m)) return 'category'
+  if (/\bskills?\b/.test(m)) return 'primarySkill'
+  if (/\b(screening\s+)?status(es)?\b/.test(m)) return 'screeningStatus'
+  if (/\bnationalit/.test(m)) return 'nationality'
+  if (/\b(location|city|cities)\b/.test(m)) return 'location'
+  if (/\bgender\b/.test(m)) return 'gender'
+  if (/\bvisa\b/.test(m)) return 'visaStatus'
+  if (/\bbilling\b/.test(m)) return 'billingClass'
+  return null
 }
 
 function extractCandidateQuery(message: string): string | null {
@@ -75,6 +94,7 @@ async function executeToolsNode(
   }
 
   if (state.intent === 'query') {
+    const groupBy = detectGroupByDimension(state.userMessage)
     const [stats, reviews] = await Promise.all([
       executeGetPipelineStats(payload),
       executeListPendingReviews(payload, 8),
@@ -82,9 +102,13 @@ async function executeToolsNode(
     toolResults.pipelineStats = stats
     toolResults.pendingReviews = reviews
 
-    const q = extractCandidateQuery(state.userMessage)
-    if (q) {
-      toolResults.findCandidate = await executeFindCandidate(payload, q)
+    if (groupBy) {
+      toolResults.aggregateCandidates = await executeAggregateCandidates({ groupBy })
+    } else {
+      const q = extractCandidateQuery(state.userMessage)
+      if (q) {
+        toolResults.findCandidate = await executeFindCandidate(payload, q)
+      }
     }
   }
 

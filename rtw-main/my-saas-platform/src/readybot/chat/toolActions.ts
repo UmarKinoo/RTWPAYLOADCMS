@@ -1,4 +1,5 @@
 import type { Payload, Where } from 'payload'
+import { query as dbQuery } from '@/lib/db'
 import { scanIncompleteCandidates } from '@/trigger/scanIncompleteCandidates'
 import { loadReadyBotSettings } from '@/lib/readybot/settings'
 import { candidateLabelFromDoc } from '@/lib/readybot/dashboard-helpers'
@@ -427,5 +428,312 @@ export async function executeUpdateCandidateProfile(
     applied: resolved.preview,
     reason: input.reason ?? null,
     reviewedBy: adminUserId,
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Read-only analytics tools                                           */
+/* ------------------------------------------------------------------ */
+
+export const CANDIDATE_GROUP_DIMENSIONS = [
+  'discipline',
+  'category',
+  'subcategory',
+  'primarySkill',
+  'screeningStatus',
+  'nationality',
+  'location',
+  'gender',
+  'visaStatus',
+  'billingClass',
+  'profileStatus',
+] as const
+
+export type CandidateGroupDimension = (typeof CANDIDATE_GROUP_DIMENSIONS)[number]
+
+const TAXONOMY_JOINS = `
+  INNER JOIN skills s ON c.primary_skill_id = s.id
+  INNER JOIN subcategories sc ON s.sub_category_id = sc.id
+  INNER JOIN categories cat ON sc.category_id = cat.id
+  INNER JOIN disciplines d ON cat.discipline_id = d.id`
+
+/** Group-by SQL expression per dimension (taxonomy dims need joins). */
+const GROUP_DIMENSION_SQL: Record<
+  CandidateGroupDimension,
+  { expr: string; joins: string }
+> = {
+  discipline: { expr: `COALESCE(NULLIF(TRIM(d.name_en), ''), d.name)`, joins: TAXONOMY_JOINS },
+  category: { expr: `COALESCE(NULLIF(TRIM(cat.name_en), ''), cat.name)`, joins: TAXONOMY_JOINS },
+  subcategory: { expr: `COALESCE(NULLIF(TRIM(sc.name_en), ''), sc.name)`, joins: TAXONOMY_JOINS },
+  primarySkill: {
+    expr: `COALESCE(NULLIF(TRIM(s.name_en), ''), s.name)`,
+    joins: `\n  INNER JOIN skills s ON c.primary_skill_id = s.id`,
+  },
+  screeningStatus: { expr: `COALESCE(NULLIF(TRIM(c.ready_bot_screening_status::text), ''), '(not set)')`, joins: '' },
+  nationality: { expr: `COALESCE(NULLIF(TRIM(c.nationality), ''), '(not set)')`, joins: '' },
+  location: { expr: `COALESCE(NULLIF(TRIM(c.location), ''), '(not set)')`, joins: '' },
+  gender: { expr: `COALESCE(NULLIF(TRIM(c.gender::text), ''), '(not set)')`, joins: '' },
+  visaStatus: { expr: `COALESCE(NULLIF(TRIM(c.visa_status::text), ''), '(not set)')`, joins: '' },
+  billingClass: { expr: `COALESCE(NULLIF(TRIM(c.billing_class::text), ''), '(not set)')`, joins: '' },
+  profileStatus: { expr: `COALESCE(NULLIF(TRIM(c.profile_status::text), ''), '(not set)')`, joins: '' },
+}
+
+export async function executeAggregateCandidates(input: {
+  groupBy: CandidateGroupDimension
+  screeningStatus?: string
+  termsAcceptedOnly?: boolean
+  limit?: number
+}) {
+  const dimension = GROUP_DIMENSION_SQL[input.groupBy]
+  if (!dimension) {
+    return { error: `Unsupported groupBy "${input.groupBy}". Use one of: ${CANDIDATE_GROUP_DIMENSIONS.join(', ')}` }
+  }
+
+  const rowLimit = Math.min(100, Math.max(1, Math.floor(input.limit ?? 30)))
+  const params: unknown[] = []
+  const conditions: string[] = []
+  if (input.termsAcceptedOnly !== false) conditions.push('c.terms_accepted = true')
+  if (input.screeningStatus?.trim()) {
+    params.push(input.screeningStatus.trim())
+    conditions.push(`c.ready_bot_screening_status::text = $${params.length}`)
+  }
+  const whereSql = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+
+  void agentEventService.recordEvent('tool_call', { tool: 'aggregate_candidates', groupBy: input.groupBy }, {})
+
+  const [grouped, totalRes] = await Promise.all([
+    dbQuery<{ grp: string; count: string }>(
+      `SELECT ${dimension.expr} AS grp, COUNT(*)::int AS count
+       FROM candidates c${dimension.joins}
+       ${whereSql}
+       GROUP BY 1
+       ORDER BY 2 DESC, 1 ASC`,
+      params,
+    ),
+    dbQuery<{ total: string }>(`SELECT COUNT(*)::int AS total FROM candidates c ${whereSql}`, params),
+  ])
+
+  const total = Number(totalRes.rows[0]?.total ?? 0)
+  const allRows = grouped.rows.map((r) => ({
+    group: r.grp,
+    count: Number(r.count),
+    percentOfTotal: total > 0 ? Math.round((Number(r.count) / total) * 1000) / 10 : 0,
+  }))
+  const rows = allRows.slice(0, rowLimit)
+  const truncatedGroups = allRows.length - rows.length
+  const groupedSum = allRows.reduce((sum, r) => sum + r.count, 0)
+  // Taxonomy joins are INNER, so candidates without a mapped primary skill fall out.
+  const unassigned = total - groupedSum
+
+  void agentEventService.recordEvent('tool_result', { tool: 'aggregate_candidates', groupBy: input.groupBy, groups: allRows.length, total }, {})
+  return {
+    groupBy: input.groupBy,
+    totalCandidates: total,
+    groupCount: allRows.length,
+    rows,
+    truncatedGroups: truncatedGroups > 0 ? truncatedGroups : 0,
+    unassigned: unassigned > 0 ? { count: unassigned, note: 'Candidates not counted in any group (e.g. no primary skill mapped).' } : null,
+    filters: {
+      termsAcceptedOnly: input.termsAcceptedOnly !== false,
+      screeningStatus: input.screeningStatus ?? null,
+    },
+  }
+}
+
+export type SearchCandidatesFilters = {
+  discipline?: string
+  category?: string
+  skill?: string
+  jobTitle?: string
+  nationality?: string
+  location?: string
+  screeningStatus?: string
+  gender?: string
+  visaStatus?: string
+  billingClass?: string
+  minExperienceYears?: number
+  maxExperienceYears?: number
+  termsAcceptedOnly?: boolean
+  limit?: number
+  page?: number
+}
+
+export async function executeSearchCandidates(input: SearchCandidatesFilters, locale = 'en') {
+  const limit = Math.min(CHAT_LIST_MAX_ROWS, Math.max(1, Math.floor(input.limit ?? 5)))
+  const page = Math.max(1, Math.floor(input.page ?? 1))
+  const offset = (page - 1) * limit
+
+  const params: unknown[] = []
+  const conditions: string[] = []
+  const like = (value: string) => `%${value.trim()}%`
+
+  if (input.termsAcceptedOnly !== false) conditions.push('c.terms_accepted = true')
+  if (input.discipline?.trim()) {
+    params.push(like(input.discipline))
+    const i = params.length
+    conditions.push(`(d.name ILIKE $${i} OR COALESCE(d.name_en, '') ILIKE $${i} OR COALESCE(d.slug, '') ILIKE $${i})`)
+  }
+  if (input.category?.trim()) {
+    params.push(like(input.category))
+    const i = params.length
+    conditions.push(`(cat.name ILIKE $${i} OR COALESCE(cat.name_en, '') ILIKE $${i})`)
+  }
+  if (input.skill?.trim()) {
+    params.push(like(input.skill))
+    const i = params.length
+    conditions.push(`(s.name ILIKE $${i} OR COALESCE(s.name_en, '') ILIKE $${i})`)
+  }
+  if (input.jobTitle?.trim()) {
+    params.push(like(input.jobTitle))
+    conditions.push(`c.job_title ILIKE $${params.length}`)
+  }
+  if (input.nationality?.trim()) {
+    params.push(like(input.nationality))
+    conditions.push(`c.nationality ILIKE $${params.length}`)
+  }
+  if (input.location?.trim()) {
+    params.push(like(input.location))
+    conditions.push(`c.location ILIKE $${params.length}`)
+  }
+  if (input.screeningStatus?.trim()) {
+    params.push(input.screeningStatus.trim())
+    conditions.push(`c.ready_bot_screening_status::text = $${params.length}`)
+  }
+  if (input.gender?.trim()) {
+    params.push(input.gender.trim())
+    conditions.push(`c.gender::text = $${params.length}`)
+  }
+  if (input.visaStatus?.trim()) {
+    params.push(input.visaStatus.trim())
+    conditions.push(`c.visa_status::text = $${params.length}`)
+  }
+  if (input.billingClass?.trim()) {
+    params.push(input.billingClass.trim())
+    conditions.push(`c.billing_class::text = $${params.length}`)
+  }
+  if (typeof input.minExperienceYears === 'number') {
+    params.push(input.minExperienceYears)
+    conditions.push(`c.experience_years >= $${params.length}`)
+  }
+  if (typeof input.maxExperienceYears === 'number') {
+    params.push(input.maxExperienceYears)
+    conditions.push(`c.experience_years <= $${params.length}`)
+  }
+
+  const whereSql = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+  const fromSql = `
+    FROM candidates c
+    LEFT JOIN skills s ON c.primary_skill_id = s.id
+    LEFT JOIN subcategories sc ON s.sub_category_id = sc.id
+    LEFT JOIN categories cat ON sc.category_id = cat.id
+    LEFT JOIN disciplines d ON cat.discipline_id = d.id`
+
+  void agentEventService.recordEvent('tool_call', { tool: 'search_candidates', filters: Object.keys(input) }, {})
+
+  const [countRes, rowsRes] = await Promise.all([
+    dbQuery<{ total: string }>(`SELECT COUNT(*)::int AS total ${fromSql} ${whereSql}`, params),
+    dbQuery<{
+      id: string
+      first_name: string | null
+      last_name: string | null
+      job_title: string | null
+      skill_name: string | null
+      discipline_name: string | null
+      nationality: string | null
+      location: string | null
+      experience_years: string | null
+      screening_status: string | null
+    }>(
+      `SELECT c.id, c.first_name, c.last_name, c.job_title,
+              COALESCE(NULLIF(TRIM(s.name_en), ''), s.name) AS skill_name,
+              COALESCE(NULLIF(TRIM(d.name_en), ''), d.name) AS discipline_name,
+              c.nationality, c.location, c.experience_years,
+              c.ready_bot_screening_status::text AS screening_status
+       ${fromSql}
+       ${whereSql}
+       ORDER BY c.updated_at DESC
+       LIMIT ${limit} OFFSET ${offset}`,
+      params,
+    ),
+  ])
+
+  const totalDocs = Number(countRes.rows[0]?.total ?? 0)
+  const candidates = rowsRes.rows.map((r) => {
+    const name = [r.first_name, r.last_name].filter(Boolean).join(' ').trim() || `Candidate ${r.id}`
+    const dashboardUrl = `/${locale}/readybot/candidates/${r.id}`
+    return {
+      id: Number(r.id),
+      name,
+      jobTitle: r.job_title,
+      primarySkill: r.skill_name,
+      discipline: r.discipline_name,
+      nationality: r.nationality,
+      location: r.location,
+      experienceYears: r.experience_years != null ? Number(r.experience_years) : null,
+      screeningStatus: r.screening_status,
+      dashboardUrl,
+      dashboardLinkLine: `${name} (ID ${r.id}) — Dashboard: ${dashboardUrl}`,
+    }
+  })
+
+  void agentEventService.recordEvent('tool_result', { tool: 'search_candidates', totalDocs, returned: candidates.length }, {})
+  return {
+    page,
+    limit,
+    totalDocs,
+    totalPages: Math.max(1, Math.ceil(totalDocs / limit)),
+    candidates,
+    dashboardLinks: candidates.map((c) => c.dashboardLinkLine),
+    bulkBrowse:
+      totalDocs > CHAT_LIST_REDIRECT_THRESHOLD
+        ? {
+            totalMatching: totalDocs,
+            payloadAdminUrl: PAYLOAD_CANDIDATES_ADMIN_PATH,
+            message: `${totalDocs} candidates match. Chat shows at most ${CHAT_LIST_MAX_ROWS} rows per page — for full browsing/export use Payload Admin (${PAYLOAD_CANDIDATES_ADMIN_PATH}) or narrow the filters.`,
+          }
+        : null,
+    replyInstruction:
+      'Summarize the match count, then list each returned row with its dashboardLinkLine. Read-only — never claim you changed anything.',
+  }
+}
+
+export async function executeGetSiteStats(payload: Payload) {
+  void agentEventService.recordEvent('tool_call', { tool: 'get_site_stats' }, {})
+  const [
+    candidatesTotal,
+    candidatesRegistered,
+    employers,
+    jobPostings,
+    interviews,
+    skills,
+    disciplines,
+    contactSubmissions,
+    newsletterSubscriptions,
+  ] = await Promise.all([
+    payload.count({ collection: 'candidates', overrideAccess: true }),
+    payload.count({
+      collection: 'candidates',
+      where: { termsAccepted: { equals: true } },
+      overrideAccess: true,
+    }),
+    payload.count({ collection: 'employers', overrideAccess: true }),
+    payload.count({ collection: 'job-postings', overrideAccess: true }),
+    payload.count({ collection: 'interviews', overrideAccess: true }),
+    payload.count({ collection: 'skills', overrideAccess: true }),
+    payload.count({ collection: 'disciplines', overrideAccess: true }),
+    payload.count({ collection: 'contact-submissions', overrideAccess: true }),
+    payload.count({ collection: 'newsletter-subscriptions', overrideAccess: true }),
+  ])
+
+  return {
+    candidatesTotal: candidatesTotal.totalDocs,
+    candidatesRegistered: candidatesRegistered.totalDocs,
+    employers: employers.totalDocs,
+    jobPostings: jobPostings.totalDocs,
+    interviews: interviews.totalDocs,
+    skills: skills.totalDocs,
+    disciplines: disciplines.totalDocs,
+    contactSubmissions: contactSubmissions.totalDocs,
+    newsletterSubscriptions: newsletterSubscriptions.totalDocs,
   }
 }

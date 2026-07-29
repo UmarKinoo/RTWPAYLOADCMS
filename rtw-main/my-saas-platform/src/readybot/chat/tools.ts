@@ -2,12 +2,16 @@ import { tool } from 'ai'
 import { z } from 'zod'
 import type { Payload } from 'payload'
 import {
+  CANDIDATE_GROUP_DIMENSIONS,
+  executeAggregateCandidates,
   executeFindCandidate,
+  executeGetSiteStats,
   executeListCandidates,
   executeGetCandidateProfile,
   executeGetPipelineStats,
   executeListPendingReviews,
   executeRunScan,
+  executeSearchCandidates,
   executeUpdateCandidateProfile,
 } from './toolActions'
 import { CHAT_LIST_MAX_ROWS } from './chatGuards'
@@ -50,6 +54,54 @@ export function createReadyBotChatTools(
         'Get ReadyBot pipeline counts: pending reviews, active tasks, screening results, agent settings.',
       inputSchema: z.object({}),
       execute: async () => executeGetPipelineStats(payload),
+    }),
+
+    aggregateCandidates: tool({
+      description:
+        'Read-only count of candidates grouped by one dimension (e.g. "how many candidates per major discipline / nationality / screening status"). Returns rows with count and percentOfTotal. Prefer this over listing candidates for any counting or breakdown question.',
+      inputSchema: z.object({
+        groupBy: z
+          .enum(CANDIDATE_GROUP_DIMENSIONS)
+          .describe('Dimension to group by; "discipline" = major discipline'),
+        screeningStatus: z
+          .string()
+          .optional()
+          .describe('Optional filter: new, incomplete, contacted, awaiting_reply, info_received, needs_human_review, verified, unresponsive, opted_out'),
+        termsAcceptedOnly: z
+          .boolean()
+          .optional()
+          .describe('Default true — count only registered candidates (terms accepted)'),
+        limit: z.number().int().min(1).max(100).optional().describe('Max groups returned (default 30)'),
+      }),
+      execute: async (input) => executeAggregateCandidates(input),
+    }),
+
+    searchCandidates: tool({
+      description: `Read-only filtered candidate search (max ${CHAT_LIST_MAX_ROWS} compact rows per page). Filter by discipline, category, skill, job title, nationality, location, screening status, gender, visa status, billing class, or experience range. Use findCandidate instead for name/email lookups, and aggregateCandidates for counts.`,
+      inputSchema: z.object({
+        discipline: z.string().optional().describe('Major discipline name, e.g. "Construction"'),
+        category: z.string().optional(),
+        skill: z.string().optional().describe('Primary skill name, e.g. "Electrician"'),
+        jobTitle: z.string().optional(),
+        nationality: z.string().optional(),
+        location: z.string().optional(),
+        screeningStatus: z.string().optional(),
+        gender: z.string().optional().describe('male or female'),
+        visaStatus: z.string().optional(),
+        billingClass: z.string().optional(),
+        minExperienceYears: z.number().optional(),
+        maxExperienceYears: z.number().optional(),
+        limit: z.number().int().min(1).max(CHAT_LIST_MAX_ROWS).optional().describe('Rows per page (default 5)'),
+        page: z.number().int().min(1).optional(),
+      }),
+      execute: async (input) => executeSearchCandidates(input, locale),
+    }),
+
+    getSiteStats: tool({
+      description:
+        'Read-only site-wide totals: candidates (total + registered), employers, job postings, interviews, skills, disciplines, contact submissions, newsletter subscriptions. Use for platform-level "how many X do we have" questions beyond the ReadyBot pipeline.',
+      inputSchema: z.object({}),
+      execute: async () => executeGetSiteStats(payload),
     }),
 
     ...(allowListCandidates

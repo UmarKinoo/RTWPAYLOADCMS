@@ -24,7 +24,7 @@ export function isVagueUserMessage(message: string): boolean {
 
   if (isExplicitRunScanRequest(t)) return false
   if (
-    /\b(find|search|list|show|tell me|how many|pending review|human review|pipeline stats)\b/i.test(
+    /\b(find|search|list|show|tell me|how many|count|breakdown|distribution|stats|overview|report|pending review|human review|pipeline stats)\b/i.test(
       lower,
     )
   ) {
@@ -76,7 +76,12 @@ export function hasExplicitListScope(message: string): boolean {
     /\b(incomplete|verified|contacted|info_received|needs.?human|new)\b/.test(lower) ||
     /\b(screening status|pending review|human review|missing fields)\b/.test(lower) ||
     /\b(pipeline|readybot)\s*(only|candidates|queue)\b/.test(lower) ||
-    /\bwith\b.+\b(status|skill|title|location)\b/.test(lower)
+    /\bwith\b.+\b(status|skill|title|location)\b/.test(lower) ||
+    // Aggregate/breakdown questions and taxonomy filters are scoped —
+    // aggregateCandidates / searchCandidates handle them without dumping rows.
+    /\b(discipline|category|categories|subcategor|skill|nationalit|breakdown|distribution|how many|count)\b/.test(lower) ||
+    /\b(per|by|grouped by|from)\s+(major\s+)?(discipline|category|skill|nationality|location|status|gender|visa)\b/.test(lower) ||
+    /\b(in|from)\s+(riyadh|jeddah|dammam|saudi|ksa)\b/.test(lower)
   )
 }
 
