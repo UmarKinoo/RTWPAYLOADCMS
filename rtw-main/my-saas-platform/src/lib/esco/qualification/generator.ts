@@ -1,7 +1,7 @@
 /**
  * AI qualification-question generator — server-only.
  *
- * Generates 8–12 occupation-specific qualification questions from ESCO
+ * Generates 3–5 occupation-specific qualification questions from ESCO
  * occupation data. Output is validated strictly; regenerates on failure.
  */
 
@@ -19,7 +19,7 @@ import { validateTemplate } from './validate'
 
 const SYSTEM_PROMPT = `You are a qualification-question generator for ReadyToWork, a blue-collar job matching platform in Saudi Arabia.
 
-Given an ESCO occupation (title, description, skills), generate a short qualification form (8–12 questions) that helps assess how qualified a candidate is for that specific occupation.
+Given an ESCO occupation (title, description, skills), generate a short qualification form (3–5 questions) that helps assess how qualified a candidate is for that specific occupation.
 
 RULES:
 1. Questions must be short, simple, mobile-friendly, suitable for candidates with limited digital literacy.
@@ -73,7 +73,7 @@ Language for labels and options: ${language}
 promptVersion: ${PROMPT_VERSION}
 
 Set escoOccupationUri to the ESCO URI above, occupationLabel to the preferred title, language to "${language}", promptVersion to "${PROMPT_VERSION}".
-Generate 6–10 occupation-specific questions only (tasks, equipment, licences/certificates for this job, work environment). Do not include generic experience, availability, languages, location, or visa questions.`
+Generate exactly 3–5 occupation-specific questions only (the most important tasks, equipment, licences/certificates, or work environment for this job). Prefer 3 when the occupation is simple. Do not include generic experience, availability, languages, location, or visa questions.`
 
   if (previousErrors?.length) {
     prompt += `\n\nYour previous output was rejected for these reasons. Fix ALL of them:\n${previousErrors.map((e) => `- ${e}`).join('\n')}`

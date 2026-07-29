@@ -77,7 +77,7 @@ export const QualificationTemplates: CollectionConfig = {
       name: 'questions',
       type: 'array',
       required: true,
-      minRows: 6,
+      minRows: 3,
       maxRows: 12,
       admin: {
         description: 'Ordered list of qualification questions for this occupation.',

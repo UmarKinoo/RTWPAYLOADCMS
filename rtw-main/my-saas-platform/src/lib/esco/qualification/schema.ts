@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const PROMPT_VERSION = '1.1'
+export const PROMPT_VERSION = '1.2'
 export const SCHEMA_VERSION = '1'
 
 export const QUESTION_CATEGORIES = [
@@ -56,7 +56,7 @@ export const qualificationTemplateSchema = z.object({
   occupationLabel: z.string().min(1),
   language: z.string().min(2).max(5),
   promptVersion: z.string(),
-  questions: z.array(qualificationQuestionSchema).min(6).max(10),
+  questions: z.array(qualificationQuestionSchema).min(3).max(5),
 })
 
 export type QualificationQuestionRaw = z.infer<typeof qualificationQuestionSchema>

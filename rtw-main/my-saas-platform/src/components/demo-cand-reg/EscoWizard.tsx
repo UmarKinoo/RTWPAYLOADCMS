@@ -30,7 +30,6 @@ import type { QualificationTemplateResponse } from '@/lib/esco/qualification/sch
 import { validatePassword, validateEmail } from '@/lib/validation'
 import { AccountStep } from '@/components/candidate/wizard-steps/AccountStep'
 import { PersonalInfoStep } from '@/components/candidate/wizard-steps/PersonalInfoStep'
-import { JobRoleStep } from '@/components/candidate/wizard-steps/JobRoleStep'
 import { ReviewStep } from '@/components/candidate/wizard-steps/ReviewStep'
 import { PhoneVerification } from '@/components/auth/phone-verification'
 import type { CandidateFormData } from '@/components/candidate/RegistrationWizard'
@@ -83,12 +82,12 @@ type Step =
   | 'qualify'
   | 'saved'
   | 'notListed'
-  | 'jobRole'
   | 'review'
   | 'verify'
 
-// ─── Registration form (account + personal + job role + consents) ──
-// Work/visa/availability fields come from qualification answers.
+// ─── Registration form (account + personal + consents) ──────────────
+// Work/visa/availability come from lean qualification questions.
+// primarySkill is auto-resolved from the confirmed ESCO occupation.
 
 const demoRegistrationSchema = z
   .object({
@@ -108,9 +107,6 @@ const demoRegistrationSchema = z
       message: 'Please confirm you are currently located in Saudi Arabia',
     }),
     location: z.string().min(1, 'Location is required'),
-    primarySkill: z.string().min(1, 'Please select your job role'),
-    secondarySkill: z.string().optional(),
-    tertiarySkill: z.string().optional(),
     acceptPrivacyTerms: z.boolean().refine((val) => val === true, {
       message: 'You must accept the Privacy Policy and Terms and Conditions',
     }),
@@ -138,22 +134,6 @@ const demoRegistrationSchema = z
     message: 'Only Saudi Arabia (KSA) phone numbers are accepted. Use +966...',
     path: ['phone'],
   })
-  .refine((data) => !data.secondarySkill || data.secondarySkill !== data.primarySkill, {
-    message: 'Secondary skill must be different from your primary skill',
-    path: ['secondarySkill'],
-  })
-  .refine((data) => !data.tertiarySkill || data.tertiarySkill !== data.primarySkill, {
-    message: 'Third skill must be different from your primary skill',
-    path: ['tertiarySkill'],
-  })
-  .refine(
-    (data) =>
-      !data.tertiarySkill || !data.secondarySkill || data.tertiarySkill !== data.secondarySkill,
-    {
-      message: 'Third skill must be different from your second skill',
-      path: ['tertiarySkill'],
-    },
-  )
 
 type DemoFormData = z.infer<typeof demoRegistrationSchema>
 
@@ -212,6 +192,8 @@ export function EscoWizard() {
   const [sameAsPhone, setSameAsPhone] = useState(false)
   const [candidateId, setCandidateId] = useState<string | null>(null)
   const [registrationSnapshot, setRegistrationSnapshot] = useState<DemoFormData | null>(null)
+  const [essentialVisibleCount, setEssentialVisibleCount] = useState(8)
+  const [optionalVisibleCount, setOptionalVisibleCount] = useState(6)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const qualificationPrefetchRef = useRef<string | null>(null)
   const draftRestoredRef = useRef(false)
@@ -238,9 +220,6 @@ export function EscoWizard() {
   })
 
   const phone = watch('phone')
-  const primarySkill = watch('primarySkill')
-  const secondarySkill = watch('secondarySkill')
-  const tertiarySkill = watch('tertiarySkill')
   const password = watch('password')
   const confirmPassword = watch('confirmPassword')
   const formValues = watch()
@@ -284,9 +263,7 @@ export function EscoWizard() {
       acceptPlatformDisclaimer: _a3,
       ...safeValues
     } = formValues
-    const hasContent = Boolean(
-      safeValues.email || safeValues.firstName || safeValues.phone || safeValues.primarySkill,
-    )
+    const hasContent = Boolean(safeValues.email || safeValues.firstName || safeValues.phone)
     if (!hasContent) return
     saveDraft({ values: safeValues })
   }, [formValues, step, isRegistering, saveDraft])
@@ -333,6 +310,8 @@ export function EscoWizard() {
     return {
       ...(formValues as Partial<CandidateFormData>),
       jobTitle: savedOccupations[0]?.preferredLabel || '',
+      // Mark job role as resolved from ESCO so Review doesn't show empty
+      primarySkill: savedOccupations[0] ? 'esco' : undefined,
       experienceYears: mappedFields.experienceYears,
       saudiExperience: mappedFields.saudiExperience,
       currentEmployer: mappedFields.currentEmployer,
@@ -345,6 +324,7 @@ export function EscoWizard() {
   }, [formValues, savedOccupations, mappedFields])
 
   // ─── Step navigation ────────────────────────────────────────────
+  // Order: account → describe → personal → suggested → … → review → phone
 
   const goAccountNext = async () => {
     const ok = await trigger(['email', 'password', 'confirmPassword'])
@@ -354,45 +334,13 @@ export function EscoWizard() {
       })
       return
     }
-    setStep('personal')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const goPersonalNext = async () => {
-    const ok = await trigger([
-      'firstName',
-      'lastName',
-      'phone',
-      'whatsapp',
-      'gender',
-      'dob',
-      'nationality',
-      'languages',
-      'location',
-      'currentlyInKSA',
-    ])
-    if (!ok) {
-      toast.error(t('validationError'))
-      return
-    }
     setStep('search')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const goJobRoleNext = async () => {
-    const ok = await trigger(['primarySkill', 'secondarySkill', 'tertiarySkill'])
-    if (!ok) {
-      toast.error(t('validationError'))
-      return
-    }
-    setStep('review')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleEditFromReview = (wizardStep: number) => {
     if (wizardStep === 1) setStep('account')
     else if (wizardStep === 2) setStep('personal')
-    else if (wizardStep === 3) setStep('jobRole')
     else setStep('saved')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -419,9 +367,6 @@ export function EscoWizard() {
         nationality: data.nationality,
         languages: data.languages,
         location: data.location,
-        primarySkill: data.primarySkill,
-        secondarySkill: data.secondarySkill,
-        tertiarySkill: data.tertiarySkill,
         sessionId: getSessionId(),
         jobTitle: savedOccupations[0].preferredLabel,
         answers: mergedAnswers,
@@ -496,6 +441,42 @@ export function EscoWizard() {
     }
   }, [inputText, locale, t])
 
+  const goDescribeNext = () => {
+    if (!inputText.trim() || inputText.trim().length < 2) {
+      toast.error(t('validationError'))
+      return
+    }
+    // Adding another occupation: personal already filled — search immediately
+    if (formValues.firstName && formValues.phone && formValues.gender && formValues.location) {
+      void handleSearch()
+      return
+    }
+    setStep('personal')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const goPersonalNext = async () => {
+    const ok = await trigger([
+      'firstName',
+      'lastName',
+      'phone',
+      'whatsapp',
+      'gender',
+      'dob',
+      'nationality',
+      'languages',
+      'location',
+      'currentlyInKSA',
+    ])
+    if (!ok) {
+      toast.error(t('validationError'))
+      return
+    }
+    // Personal → run occupation search → suggested results
+    await handleSearch()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const fetchOccupationDetail = useCallback(
     async (uri: string) => {
       setLoadingDetail(true)
@@ -554,6 +535,8 @@ export function EscoWizard() {
     if (!occupationDetail) return
     const essentialUris = new Set(occupationDetail.essentialSkills.map((s) => s.uri))
     setSelectedSkillUris(essentialUris)
+    setEssentialVisibleCount(8)
+    setOptionalVisibleCount(6)
     prefetchQualification(occupationDetail.uri)
     setStep('skills')
   }, [occupationDetail, prefetchQualification])
@@ -773,7 +756,7 @@ export function EscoWizard() {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Saved occupations banner */}
-      {savedOccupations.length > 0 && step !== 'saved' && step !== 'review' && step !== 'jobRole' && (
+      {savedOccupations.length > 0 && step !== 'saved' && step !== 'review' && (
         <Card className="border-[#4644b8]/20 bg-[#4644b8]/5">
           <CardContent className="py-4">
             <div className="flex items-center gap-2 mb-2">
@@ -821,7 +804,7 @@ export function EscoWizard() {
         </Card>
       )}
 
-      {/* Personal */}
+      {/* Personal — after describe work, before suggested occupations */}
       {step === 'personal' && (
         <Card>
           <CardHeader>
@@ -829,7 +812,7 @@ export function EscoWizard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setStep('account')}
+                onClick={() => setStep('search')}
                 className="p-1"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -854,16 +837,26 @@ export function EscoWizard() {
             />
             <Button
               onClick={goPersonalNext}
+              disabled={isSearching}
               className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
             >
-              {t('continueToOccupations')}
-              <ChevronRight className="w-5 h-5 ms-2" />
+              {isSearching ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin me-2" />
+                  {t('searching')}
+                </>
+              ) : (
+                <>
+                  {t('continueToOccupations')}
+                  <ChevronRight className="w-5 h-5 ms-2" />
+                </>
+              )}
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Search */}
+      {/* Describe work */}
       {step === 'search' && (
         <Card>
           <CardHeader>
@@ -871,7 +864,7 @@ export function EscoWizard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setStep('personal')}
+                onClick={() => setStep('account')}
                 className="p-1"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -896,7 +889,7 @@ export function EscoWizard() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()
-                  handleSearch()
+                  goDescribeNext()
                 }
               }}
             />
@@ -918,22 +911,13 @@ export function EscoWizard() {
             </div>
 
             <Button
-              onClick={handleSearch}
-              disabled={isSearching || inputText.trim().length < 2}
+              onClick={goDescribeNext}
+              disabled={inputText.trim().length < 2}
               className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
               size="lg"
             >
-              {isSearching ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin me-2" />
-                  {t('searching')}
-                </>
-              ) : (
-                <>
-                  <Search className="w-5 h-5 me-2" />
-                  {t('searchButton')}
-                </>
-              )}
+              <Search className="w-5 h-5 me-2" />
+              {t('continue')}
             </Button>
 
             <p className="text-xs text-gray-400 text-center">{t('aiNote')}</p>
@@ -949,7 +933,7 @@ export function EscoWizard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setStep('search')}
+                onClick={() => setStep('personal')}
                 className="p-1"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -1149,7 +1133,7 @@ export function EscoWizard() {
                   {t('essentialSkills')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {occupationDetail.essentialSkills.map((skill) => (
+                  {occupationDetail.essentialSkills.slice(0, essentialVisibleCount).map((skill) => (
                     <SkillChip
                       key={skill.uri}
                       label={skill.label}
@@ -1158,6 +1142,16 @@ export function EscoWizard() {
                     />
                   ))}
                 </div>
+                {occupationDetail.essentialSkills.length > essentialVisibleCount && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-3"
+                    onClick={() => setEssentialVisibleCount((n) => n + 8)}
+                  >
+                    {t('loadMore')}
+                  </Button>
+                )}
               </div>
             )}
 
@@ -1170,7 +1164,7 @@ export function EscoWizard() {
                   {t('optionalSkills')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {occupationDetail.optionalSkills.map((skill) => (
+                  {occupationDetail.optionalSkills.slice(0, optionalVisibleCount).map((skill) => (
                     <SkillChip
                       key={skill.uri}
                       label={skill.label}
@@ -1179,6 +1173,16 @@ export function EscoWizard() {
                     />
                   ))}
                 </div>
+                {occupationDetail.optionalSkills.length > optionalVisibleCount && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-3"
+                    onClick={() => setOptionalVisibleCount((n) => n + 8)}
+                  >
+                    {t('loadMore')}
+                  </Button>
+                )}
               </div>
             )}
 
@@ -1281,59 +1285,15 @@ export function EscoWizard() {
               </Button>
               <Button
                 onClick={() => {
-                  setStep('jobRole')
+                  setStep('review')
                   window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
                 className="flex-1 h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
               >
-                {t('continueToJobRole')}
+                {t('continueToReview')}
                 <ChevronRight className="w-5 h-5 ms-2" />
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Job role (Smart Matrix primarySkill) */}
-      {step === 'jobRole' && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setStep('saved')}
-                className="p-1"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
-              <div>
-                <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
-                  {t('jobRoleTitle')}
-                </CardTitle>
-                <CardDescription>
-                  {t('jobRoleSubtitle', {
-                    occupation: savedOccupations[0]?.preferredLabel || '',
-                  })}
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <JobRoleStep
-              primarySkill={primarySkill || ''}
-              secondarySkill={secondarySkill}
-              tertiarySkill={tertiarySkill}
-              setValue={setValueAs}
-              errors={errorsAs}
-            />
-            <Button
-              onClick={goJobRoleNext}
-              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
-            >
-              {t('continue')}
-              <ChevronRight className="w-5 h-5 ms-2" />
-            </Button>
           </CardContent>
         </Card>
       )}
@@ -1346,7 +1306,7 @@ export function EscoWizard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setStep('jobRole')}
+                onClick={() => setStep('saved')}
                 className="p-1"
               >
                 <ChevronLeft className="w-5 h-5" />

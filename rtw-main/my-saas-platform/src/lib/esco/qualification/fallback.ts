@@ -2,18 +2,14 @@ import type { QualificationQuestion, QualificationTemplateResponse } from './sch
 import { PROMPT_VERSION, SCHEMA_VERSION } from './schema'
 
 /**
- * Universal questions shown immediately while AI generates occupation-specific
- * ones. Mirrors the registration wizard's work / visa fields.
+ * Lean universal questions shown while AI generates occupation-specific ones.
  *
- * Kept in sync with RegistrationWizard: experienceYears, saudiExperience,
- * currentEmployer, availabilityDate, visaStatus, visaExpiry, visaProfession —
- * plus mobility / verification extras.
+ * Only high-value fields needed for the candidates profile that are not
+ * collected in Account / Personal steps: experience, visa, availability.
  *
- * Intentionally omitted: identity and account fields (name, phone, WhatsApp,
- * email, password), languages and current city — those are collected by the
- * Account and Personal steps at the start of the demo registration flow.
- * Also omitted (registration fairness rules for screening): gender, date of
- * birth, nationality — asked once in the Personal step, never in screening.
+ * Identity (name, phone, languages, city) and account credentials live on
+ * earlier registration steps. Extra mobility/proof questions are skipped here
+ * to keep the mobile flow short — ReadyBot can chase gaps later.
  */
 const FALLBACK_EN: QualificationQuestion[] = [
   {
@@ -31,29 +27,6 @@ const FALLBACK_EN: QualificationQuestion[] = [
     label: 'How many years have you worked in Saudi Arabia?',
     required: true,
     options: ['None yet', 'Less than 1 year', '1–2 years', '3–5 years', 'More than 5 years'],
-  },
-  {
-    id: 'countries_worked',
-    category: 'experience',
-    type: 'multi_select',
-    label: 'In which countries have you done this work?',
-    required: true,
-    options: ['Saudi Arabia', 'UAE', 'Egypt', 'India', 'Philippines', 'Other'],
-  },
-  {
-    id: 'last_worked',
-    category: 'experience',
-    type: 'single_select',
-    label: 'When did you last work in this occupation?',
-    required: true,
-    options: ['Currently working', 'Within the last year', '1–3 years ago', 'More than 3 years ago'],
-  },
-  {
-    id: 'current_employer',
-    category: 'experience',
-    type: 'short_text',
-    label: 'Who is your current employer? (optional — leave blank if none)',
-    required: false,
   },
   {
     id: 'visa_status',
@@ -76,44 +49,11 @@ const FALLBACK_EN: QualificationQuestion[] = [
     },
   },
   {
-    id: 'visa_profession',
-    category: 'licence',
-    type: 'short_text',
-    label: 'What job position is written on your visa? (optional)',
-    required: false,
-    showWhen: {
-      questionId: 'visa_status',
-      operator: 'not_equals',
-      value: 'No visa',
-    },
-  },
-  {
     id: 'availability_date',
     category: 'availability',
     type: 'date',
     label: 'When are you available to join a new job?',
     required: true,
-  },
-  {
-    id: 'willing_relocate',
-    category: 'availability',
-    type: 'yes_no',
-    label: 'Are you willing to relocate within Saudi Arabia?',
-    required: true,
-  },
-  {
-    id: 'willing_shifts',
-    category: 'availability',
-    type: 'yes_no',
-    label: 'Are you willing to work shifts?',
-    required: false,
-  },
-  {
-    id: 'proof_available',
-    category: 'verification',
-    type: 'yes_no',
-    label: 'Can you provide proof of this experience (reference, certificate, or contact)?',
-    required: false,
   },
 ]
 
@@ -133,29 +73,6 @@ const FALLBACK_AR: QualificationQuestion[] = [
     label: 'كم سنة عملت في المملكة العربية السعودية؟',
     required: true,
     options: ['لا يوجد بعد', 'أقل من سنة', '1–2 سنوات', '3–5 سنوات', 'أكثر من 5 سنوات'],
-  },
-  {
-    id: 'countries_worked',
-    category: 'experience',
-    type: 'multi_select',
-    label: 'في أي دول عملت في هذه المهنة؟',
-    required: true,
-    options: ['السعودية', 'الإمارات', 'مصر', 'الهند', 'الفلبين', 'أخرى'],
-  },
-  {
-    id: 'last_worked',
-    category: 'experience',
-    type: 'single_select',
-    label: 'متى كانت آخر مرة عملت في هذه المهنة؟',
-    required: true,
-    options: ['أعمل حالياً', 'خلال السنة الماضية', 'منذ 1–3 سنوات', 'منذ أكثر من 3 سنوات'],
-  },
-  {
-    id: 'current_employer',
-    category: 'experience',
-    type: 'short_text',
-    label: 'من هو صاحب عملك الحالي؟ (اختياري — اتركه فارغاً إن لم يكن لديك)',
-    required: false,
   },
   {
     id: 'visa_status',
@@ -178,44 +95,11 @@ const FALLBACK_AR: QualificationQuestion[] = [
     },
   },
   {
-    id: 'visa_profession',
-    category: 'licence',
-    type: 'short_text',
-    label: 'ما المسمى الوظيفي المكتوب على تأشيرتك؟ (اختياري)',
-    required: false,
-    showWhen: {
-      questionId: 'visa_status',
-      operator: 'not_equals',
-      value: 'لا توجد تأشيرة',
-    },
-  },
-  {
     id: 'availability_date',
     category: 'availability',
     type: 'date',
     label: 'متى يمكنك الانضمام لعمل جديد؟',
     required: true,
-  },
-  {
-    id: 'willing_relocate',
-    category: 'availability',
-    type: 'yes_no',
-    label: 'هل أنت مستعد للانتقال داخل السعودية؟',
-    required: true,
-  },
-  {
-    id: 'willing_shifts',
-    category: 'availability',
-    type: 'yes_no',
-    label: 'هل أنت مستعد للعمل بنظام الورديات؟',
-    required: false,
-  },
-  {
-    id: 'proof_available',
-    category: 'verification',
-    type: 'yes_no',
-    label: 'هل يمكنك تقديم إثبات لهذه الخبرة (مرجع أو شهادة أو جهة اتصال)؟',
-    required: false,
   },
 ]
 
@@ -223,7 +107,7 @@ const FALLBACK_AR: QualificationQuestion[] = [
 export const UNIVERSAL_QUESTION_IDS = new Set(FALLBACK_EN.map((q) => q.id))
 
 /**
- * Topics already asked in the universal / registration set. AI questions whose
+ * Topics already asked in universal / registration steps. AI questions whose
  * labels match these are dropped even if their id/category differs.
  */
 export const UNIVERSAL_TOPIC_PATTERNS: RegExp[] = [
@@ -258,25 +142,15 @@ export const UNIVERSAL_TOPIC_PATTERNS: RegExp[] = [
   /الورديات/,
 ]
 
-/**
- * Universal occupation-independent questions (mirrors the registration wizard's
- * experience / location / visa steps). Shown immediately while AI generates
- * occupation-specific questions, and doubles as the fallback set when generation fails.
- */
 export function getUniversalQuestions(language: string): QualificationQuestion[] {
   return language === 'ar' ? FALLBACK_AR : FALLBACK_EN
 }
 
-/**
- * Universal fallback questions used when AI generation fails.
- * Never persisted as a template — returned with source: 'fallback'.
- */
 export function getFallbackTemplate(
   escoUri: string,
   occupationLabel: string,
   language: string,
 ): QualificationTemplateResponse {
-  const questions = language === 'ar' ? FALLBACK_AR : FALLBACK_EN
   return {
     templateId: null,
     escoOccupationUri: escoUri,
@@ -285,11 +159,10 @@ export function getFallbackTemplate(
     promptVersion: PROMPT_VERSION,
     schemaVersion: SCHEMA_VERSION,
     source: 'fallback',
-    questions,
+    questions: getUniversalQuestions(language),
   }
 }
 
-/** True when an AI question duplicates a universal / registration topic. */
 export function isUniversalDuplicate(question: QualificationQuestion): boolean {
   if (UNIVERSAL_QUESTION_IDS.has(question.id)) return true
   const label = question.label.trim()

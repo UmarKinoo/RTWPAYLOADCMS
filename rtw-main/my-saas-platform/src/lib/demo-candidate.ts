@@ -21,9 +21,6 @@ export interface RegisterDemoCandidateInput {
   nationality: string
   languages: string
   location: string
-  primarySkill: string
-  secondarySkill?: string
-  tertiarySkill?: string
 
   // ESCO flow context
   sessionId: string
@@ -36,6 +33,63 @@ export interface RegisterDemoCandidateInput {
 }
 
 /**
+ * Resolve a ReadyToWork skills-tree primarySkill from the ESCO occupation label.
+ * Candidates.primarySkill is required; the demo no longer asks for a separate
+ * "job role" step because the occupation was already confirmed.
+ */
+async function resolvePrimarySkillId(jobTitle: string): Promise<string | null> {
+  const payload = await getPayload({ config })
+  const title = jobTitle.trim()
+  if (!title) return null
+
+  const tryFind = async (term: string) => {
+    const result = await payload.find({
+      collection: 'skills',
+      where: {
+        or: [
+          { name: { contains: term } },
+          { name_en: { contains: term } },
+          { name_ar: { contains: term } },
+        ],
+      },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    })
+    return result.docs[0] ? String(result.docs[0].id) : null
+  }
+
+  const exact = await tryFind(title)
+  if (exact) return exact
+
+  // Try first two significant words (e.g. "air conditioning" from a longer label)
+  const words = title.split(/\s+/).filter((w) => w.length > 2)
+  if (words.length >= 2) {
+    const partial = await tryFind(words.slice(0, 2).join(' '))
+    if (partial) return partial
+  }
+  if (words.length >= 1) {
+    const one = await tryFind(words[0])
+    if (one) return one
+  }
+
+  // Last resort so registration can complete — moderators / ReadyBot can fix.
+  const any = await payload.find({
+    collection: 'skills',
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  })
+  if (any.docs[0]) {
+    console.warn(
+      `[registerDemoCandidate] No skill match for "${title}"; falling back to skill id ${any.docs[0].id}`,
+    )
+    return String(any.docs[0].id)
+  }
+  return null
+}
+
+/**
  * Creates the real candidates record from the demo-cand-reg flow, then claims
  * every candidate-occupation saved under the anonymous session id so the ESCO
  * occupations, skills, and qualification answers belong to the new candidate.
@@ -45,6 +99,14 @@ export async function registerDemoCandidate(
 ): Promise<RegisterCandidateResponse> {
   const mapped = mapUniversalAnswers(input.answers ?? {})
 
+  const primarySkill = await resolvePrimarySkillId(input.jobTitle)
+  if (!primarySkill) {
+    return {
+      success: false,
+      error: 'Could not match a job role for your occupation. Please contact support.',
+    }
+  }
+
   const result = await registerCandidate({
     firstName: input.firstName,
     lastName: input.lastName,
@@ -52,9 +114,7 @@ export async function registerDemoCandidate(
     password: input.password,
     phone: input.phone,
     whatsapp: input.whatsapp,
-    primarySkill: input.primarySkill,
-    secondarySkill: input.secondarySkill,
-    tertiarySkill: input.tertiarySkill,
+    primarySkill,
     gender: input.gender,
     dob: input.dob,
     nationality: input.nationality,
