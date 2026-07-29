@@ -17,11 +17,17 @@ import {
   AlertTriangle,
   RefreshCw,
   Briefcase,
+  Mail,
+  User,
+  FileCheck,
+  ShieldCheck,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Progress } from '@/components/ui/progress'
+import { cn } from '@/lib/utils'
 import {
   QualificationForm,
   type AnswerMap,
@@ -84,6 +90,51 @@ type Step =
   | 'notListed'
   | 'review'
   | 'verify'
+
+/** High-level phases shown in the progress chrome (ESCO substeps share one phase). */
+type PhaseId = 'account' | 'search' | 'personal' | 'occupation' | 'review' | 'verify'
+
+const PHASE_ORDER: PhaseId[] = [
+  'account',
+  'search',
+  'personal',
+  'occupation',
+  'review',
+  'verify',
+]
+
+function stepToPhase(step: Step): PhaseId {
+  switch (step) {
+    case 'account':
+      return 'account'
+    case 'search':
+      return 'search'
+    case 'personal':
+      return 'personal'
+    case 'review':
+      return 'review'
+    case 'verify':
+      return 'verify'
+    default:
+      return 'occupation'
+  }
+}
+
+const PHASE_ICONS = {
+  account: Mail,
+  search: Search,
+  personal: User,
+  occupation: Briefcase,
+  review: FileCheck,
+  verify: ShieldCheck,
+} as const
+
+const STEP_CARD =
+  'border-0 shadow-md shadow-[#16252d]/[0.06] ring-1 ring-[#16252d]/5 overflow-hidden'
+const STEP_HEADER = 'space-y-1.5 px-5 sm:px-8 pt-6 sm:pt-8 pb-2'
+const STEP_CONTENT = 'px-5 sm:px-8 pb-6 sm:pb-8 space-y-6'
+const PRIMARY_BTN =
+  'w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white shadow-sm'
 
 // ─── Registration form (account + personal + consents) ──────────────
 // Work/visa/availability come from lean qualification questions.
@@ -703,19 +754,83 @@ export function EscoWizard() {
     { key: 'cook', text: t('exampleChips.cook') },
   ]
 
+  const currentPhase = stepToPhase(step)
+  const phaseIndex = PHASE_ORDER.indexOf(currentPhase)
+  const progressPercentage = ((phaseIndex + 1) / PHASE_ORDER.length) * 100
+
+  const renderProgressChrome = () => (
+    <div className="mb-6 sm:mb-8 space-y-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-medium text-[#16252d]">
+            {t(`phases.${currentPhase}`)}
+          </p>
+          <Badge
+            variant="outline"
+            className="text-xs border-[#4644b8]/30 text-[#4644b8] bg-[#4644b8]/5 shrink-0"
+          >
+            {t('stepOf', { current: phaseIndex + 1, total: PHASE_ORDER.length })}
+          </Badge>
+        </div>
+        <Progress value={progressPercentage} className="h-2 [&>div]:bg-[#4644b8]" />
+      </div>
+
+      {/* Desktop phase strip */}
+      <div className="hidden sm:grid grid-cols-6 gap-2">
+        {PHASE_ORDER.map((phase, index) => {
+          const Icon = PHASE_ICONS[phase]
+          const done = index < phaseIndex
+          const current = index === phaseIndex
+          return (
+            <div
+              key={phase}
+              className={cn(
+                'flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center transition-colors',
+                current && 'bg-[#4644b8]/10',
+                done && 'bg-[#4644b8]/5',
+              )}
+            >
+              <div
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors',
+                  done && 'border-[#4644b8] bg-[#4644b8] text-white',
+                  current && 'border-[#4644b8] bg-white text-[#4644b8]',
+                  !done && !current && 'border-gray-200 bg-white text-gray-400',
+                )}
+              >
+                {done ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
+              </div>
+              <span
+                className={cn(
+                  'text-[11px] font-medium leading-tight',
+                  current || done ? 'text-[#16252d]' : 'text-gray-400',
+                )}
+              >
+                {t(`phases.${phase}`)}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+
   // ─── Phone verification screen ──────────────────────────────────
 
   if (step === 'verify' && candidateId && registrationSnapshot) {
     return (
-      <div className="w-full max-w-2xl mx-auto space-y-6">
-        <Card>
-          <CardHeader>
+      <div className="w-full max-w-4xl mx-auto">
+        {renderProgressChrome()}
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
               {t('verifyPhoneTitle')}
             </CardTitle>
-            <CardDescription>{t('verifyPhoneSubtitle')}</CardDescription>
+            <CardDescription className="text-sm sm:text-base">
+              {t('verifyPhoneSubtitle')}
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className={STEP_CONTENT}>
             <PhoneVerification
               phone={registrationSnapshot.phone}
               userId={candidateId}
@@ -746,7 +861,7 @@ export function EscoWizard() {
             />
           </CardContent>
         </Card>
-        <p className="text-xs text-gray-400 text-center px-4">{t('attribution')}</p>
+        <p className="text-xs text-gray-400 text-center px-4 mt-6">{t('attribution')}</p>
       </div>
     )
   }
@@ -754,11 +869,14 @@ export function EscoWizard() {
   // ─── Render Steps ───────────────────────────────────────────────
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-4xl mx-auto">
+      {renderProgressChrome()}
+
+      <div className="space-y-5 sm:space-y-6">
       {/* Saved occupations banner */}
       {savedOccupations.length > 0 && step !== 'saved' && step !== 'review' && (
-        <Card className="border-[#4644b8]/20 bg-[#4644b8]/5">
-          <CardContent className="py-4">
+        <Card className="border-[#4644b8]/20 bg-[#4644b8]/5 shadow-none">
+          <CardContent className="py-4 px-5 sm:px-6">
             <div className="flex items-center gap-2 mb-2">
               <Briefcase className="w-4 h-4 text-[#4644b8]" />
               <span className="font-medium text-sm text-[#16252d]">
@@ -783,19 +901,19 @@ export function EscoWizard() {
 
       {/* Account */}
       {step === 'account' && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
               {t('accountTitle')}
             </CardTitle>
-            <CardDescription>{t('accountSubtitle')}</CardDescription>
+            <CardDescription className="text-sm sm:text-base">{t('accountSubtitle')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className={STEP_CONTENT}>
             <AccountStep register={registerAs} errors={errorsAs} control={controlAs} />
             <Button
               onClick={goAccountNext}
               disabled={!passwordsMatch}
-              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+              className={PRIMARY_BTN}
             >
               {t('continue')}
               <ChevronRight className="w-5 h-5 ms-2" />
@@ -806,8 +924,8 @@ export function EscoWizard() {
 
       {/* Personal — after describe work, before suggested occupations */}
       {step === 'personal' && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -821,11 +939,11 @@ export function EscoWizard() {
                 <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
                   {t('personalTitle')}
                 </CardTitle>
-                <CardDescription>{t('personalSubtitle')}</CardDescription>
+                <CardDescription className="text-sm sm:text-base">{t('personalSubtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className={STEP_CONTENT}>
             <PersonalInfoStep
               register={registerAs}
               errors={errorsAs}
@@ -838,7 +956,7 @@ export function EscoWizard() {
             <Button
               onClick={goPersonalNext}
               disabled={isSearching}
-              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+              className={PRIMARY_BTN}
             >
               {isSearching ? (
                 <>
@@ -858,8 +976,8 @@ export function EscoWizard() {
 
       {/* Describe work */}
       {step === 'search' && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -873,11 +991,11 @@ export function EscoWizard() {
                 <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
                   {t('step1Title')}
                 </CardTitle>
-                <CardDescription>{t('step1Hint')}</CardDescription>
+                <CardDescription className="text-sm sm:text-base">{t('step1Hint')}</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={cn(STEP_CONTENT, 'space-y-4')}>
             <textarea
               ref={inputRef}
               value={inputText}
@@ -913,7 +1031,7 @@ export function EscoWizard() {
             <Button
               onClick={goDescribeNext}
               disabled={inputText.trim().length < 2}
-              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+              className={PRIMARY_BTN}
               size="lg"
             >
               <Search className="w-5 h-5 me-2" />
@@ -927,8 +1045,8 @@ export function EscoWizard() {
 
       {/* Results */}
       {step === 'results' && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -942,11 +1060,11 @@ export function EscoWizard() {
                 <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
                   {t('step2Title')}
                 </CardTitle>
-                <CardDescription>{t('step2Subtitle')}</CardDescription>
+                <CardDescription className="text-sm sm:text-base">{t('step2Subtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className={cn(STEP_CONTENT, 'space-y-3')}>
             {searchError && (
               <div className="flex flex-col items-center gap-3 py-8 text-center">
                 <AlertTriangle className="w-10 h-10 text-amber-500" />
@@ -1017,8 +1135,8 @@ export function EscoWizard() {
 
       {/* Confirm */}
       {step === 'confirm' && selectedOccupation && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -1032,11 +1150,11 @@ export function EscoWizard() {
                 <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
                   {t('step3Title')}
                 </CardTitle>
-                <CardDescription>{t('step3Subtitle')}</CardDescription>
+                <CardDescription className="text-sm sm:text-base">{t('step3Subtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={cn(STEP_CONTENT, 'space-y-4')}>
             {loadingDetail ? (
               <div className="flex justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-[#4644b8]" />
@@ -1100,8 +1218,8 @@ export function EscoWizard() {
 
       {/* Skills */}
       {step === 'skills' && occupationDetail && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -1115,11 +1233,11 @@ export function EscoWizard() {
                 <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
                   {t('step4Title')}
                 </CardTitle>
-                <CardDescription>{t('step4Subtitle')}</CardDescription>
+                <CardDescription className="text-sm sm:text-base">{t('step4Subtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className={STEP_CONTENT}>
             <div className="rounded-lg bg-gray-50 p-3">
               <p className="text-sm font-medium text-[#16252d]">
                 {occupationDetail.preferredLabel}
@@ -1189,7 +1307,7 @@ export function EscoWizard() {
             <Button
               onClick={handleSaveSkills}
               disabled={isSaving || selectedSkillUris.size === 0}
-              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+              className={PRIMARY_BTN}
               size="lg"
             >
               {isSaving ? (
@@ -1224,14 +1342,14 @@ export function EscoWizard() {
 
       {/* Saved / Summary */}
       {step === 'saved' && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
               {t('step5Title')}
             </CardTitle>
-            <CardDescription>{t('step5Summary')}</CardDescription>
+            <CardDescription className="text-sm sm:text-base">{t('step5Summary')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className={cn(STEP_CONTENT, 'space-y-4')}>
             {savedOccupations.map((occ) => (
               <div
                 key={occ.id}
@@ -1288,7 +1406,7 @@ export function EscoWizard() {
                   setStep('review')
                   window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
-                className="flex-1 h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+                className="flex-1 h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white shadow-sm"
               >
                 {t('continueToReview')}
                 <ChevronRight className="w-5 h-5 ms-2" />
@@ -1300,8 +1418,8 @@ export function EscoWizard() {
 
       {/* Review + consents */}
       {step === 'review' && (
-        <Card>
-          <CardHeader>
+        <Card className={STEP_CARD}>
+          <CardHeader className={STEP_HEADER}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -1315,11 +1433,11 @@ export function EscoWizard() {
                 <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
                   {t('reviewTitle')}
                 </CardTitle>
-                <CardDescription>{t('reviewSubtitle')}</CardDescription>
+                <CardDescription className="text-sm sm:text-base">{t('reviewSubtitle')}</CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className={STEP_CONTENT}>
             {savedOccupations.length > 0 && (
               <div className="rounded-lg border border-[#4644b8]/20 bg-[#4644b8]/5 p-4 space-y-2">
                 <p className="text-sm font-semibold text-[#16252d]">{t('savedOccupations')}</p>
@@ -1346,7 +1464,7 @@ export function EscoWizard() {
             <Button
               onClick={handleRegisterSubmit}
               disabled={isRegistering}
-              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+              className={PRIMARY_BTN}
             >
               {isRegistering ? (
                 <>
@@ -1360,8 +1478,9 @@ export function EscoWizard() {
           </CardContent>
         </Card>
       )}
+      </div>
 
-      <p className="text-xs text-gray-400 text-center px-4">{t('attribution')}</p>
+      <p className="text-xs text-gray-400 text-center px-4 mt-6">{t('attribution')}</p>
     </div>
   )
 }
@@ -1456,8 +1575,8 @@ function NotListedForm({
   const [customTitle, setCustomTitle] = useState('')
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className={STEP_CARD}>
+      <CardHeader className={STEP_HEADER}>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={onBack} className="p-1">
             <ChevronLeft className="w-5 h-5" />
@@ -1467,7 +1586,7 @@ function NotListedForm({
           </CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className={cn(STEP_CONTENT, 'space-y-4')}>
         <input
           type="text"
           value={customTitle}
@@ -1479,7 +1598,7 @@ function NotListedForm({
         <Button
           onClick={() => onSubmit(customTitle)}
           disabled={isSaving || !customTitle.trim()}
-          className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+          className={PRIMARY_BTN}
         >
           {isSaving ? (
             <>

@@ -1314,6 +1314,15 @@
     "needOccupation": "Please save at least one occupation before creating your account.",
     "validationError": "Please fix the highlighted fields.",
     "passwordsMustMatch": "Passwords must match.",
+    "stepOf": "Step {current} of {total}",
+    "phases": {
+      "account": "Account",
+      "search": "Your work",
+      "personal": "About you",
+      "occupation": "Occupation",
+      "review": "Review",
+      "verify": "Verify"
+    },
     "step1Title": "What type of work have you done?",
     "step1Placeholder": "Describe your work, for example: AC technician, housemaid, forklift driver, I install split air conditioners...",
     "step1Hint": "You can write in English, Arabic, or French. Describe your job or duties in your own words.",

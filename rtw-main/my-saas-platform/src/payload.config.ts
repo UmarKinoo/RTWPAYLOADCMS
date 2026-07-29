@@ -4,7 +4,7 @@ import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
-import { customType } from 'drizzle-orm/pg-core'
+import { customType, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
 import sharp from 'sharp'
 import path from 'node:path'
@@ -172,6 +172,25 @@ export default buildConfig({
       !process.env.PAYLOAD_DISABLE_PUSH &&
       process.env.NODE_ENV !== 'production' &&
       !process.env.VERCEL,
+    beforeSchemaInit: [
+      ({ schema }) => ({
+        ...schema,
+        tables: {
+          ...schema.tables,
+          // Ledger table owned by our custom SQL migration runner (src/scripts/db/migrate.ts),
+          // not a Payload collection. Declared here so dev schema push knows it belongs and
+          // does not offer to drop it. Cast to `any` because multiple deduped drizzle-orm
+          // copies give the local pgTable a different type identity than the one the adapter
+          // uses to type schema.tables; the runtime value is correct.
+          app_migrations: pgTable('app_migrations', {
+            name: text('name').primaryKey(),
+            applied_at: timestamp('applied_at', { withTimezone: true })
+              .notNull()
+              .defaultNow(),
+          }) as any,
+        },
+      }),
+    ],
     afterSchemaInit: [
       ({ schema, extendTable }) => {
         // Define vector type for pgvector columns (1536 dimensions)
