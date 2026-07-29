@@ -3,47 +3,19 @@ import { PROMPT_VERSION, SCHEMA_VERSION } from './schema'
 
 /**
  * Universal questions shown immediately while AI generates occupation-specific
- * ones. Mirrors the registration wizard's personal / work / location / visa
- * fields (excluding account credentials and protected characteristics).
+ * ones. Mirrors the registration wizard's work / visa fields.
  *
- * Kept in sync with RegistrationWizard: firstName, lastName, phone, whatsapp,
- * experienceYears, saudiExperience, currentEmployer, availabilityDate,
- * languages, location, visaStatus, visaExpiry, visaProfession — plus
- * mobility / verification extras.
+ * Kept in sync with RegistrationWizard: experienceYears, saudiExperience,
+ * currentEmployer, availabilityDate, visaStatus, visaExpiry, visaProfession —
+ * plus mobility / verification extras.
  *
- * Intentionally omitted (same as registration fairness rules for screening):
- * gender, date of birth, nationality. Account credentials (email/password)
- * stay on the real registration Account step.
+ * Intentionally omitted: identity and account fields (name, phone, WhatsApp,
+ * email, password), languages and current city — those are collected by the
+ * Account and Personal steps at the start of the demo registration flow.
+ * Also omitted (registration fairness rules for screening): gender, date of
+ * birth, nationality — asked once in the Personal step, never in screening.
  */
 const FALLBACK_EN: QualificationQuestion[] = [
-  {
-    id: 'first_name',
-    category: 'experience',
-    type: 'short_text',
-    label: 'What is your first name?',
-    required: true,
-  },
-  {
-    id: 'last_name',
-    category: 'experience',
-    type: 'short_text',
-    label: 'What is your last name?',
-    required: true,
-  },
-  {
-    id: 'phone',
-    category: 'availability',
-    type: 'short_text',
-    label: 'What is your Saudi phone number? (e.g. +9665…)',
-    required: true,
-  },
-  {
-    id: 'whatsapp',
-    category: 'availability',
-    type: 'short_text',
-    label: 'WhatsApp number (optional — leave blank if same as phone)',
-    required: false,
-  },
   {
     id: 'experience_years',
     category: 'experience',
@@ -82,32 +54,6 @@ const FALLBACK_EN: QualificationQuestion[] = [
     type: 'short_text',
     label: 'Who is your current employer? (optional — leave blank if none)',
     required: false,
-  },
-  {
-    id: 'languages',
-    category: 'experience',
-    type: 'multi_select',
-    label: 'Which languages do you speak?',
-    required: true,
-    options: ['Arabic', 'English', 'Hindi', 'Urdu', 'Tagalog', 'Malayalam', 'Bengali', 'Other'],
-  },
-  {
-    id: 'current_location',
-    category: 'availability',
-    type: 'single_select',
-    label: 'Which city in Saudi Arabia are you currently in?',
-    required: true,
-    options: [
-      'Riyadh',
-      'Jeddah',
-      'Dammam',
-      'Khobar',
-      'Mecca',
-      'Medina',
-      'Abha',
-      'Tabuk',
-      'Other',
-    ],
   },
   {
     id: 'visa_status',
@@ -173,34 +119,6 @@ const FALLBACK_EN: QualificationQuestion[] = [
 
 const FALLBACK_AR: QualificationQuestion[] = [
   {
-    id: 'first_name',
-    category: 'experience',
-    type: 'short_text',
-    label: 'ما هو اسمك الأول؟',
-    required: true,
-  },
-  {
-    id: 'last_name',
-    category: 'experience',
-    type: 'short_text',
-    label: 'ما هو اسم العائلة؟',
-    required: true,
-  },
-  {
-    id: 'phone',
-    category: 'availability',
-    type: 'short_text',
-    label: 'ما هو رقم هاتفك السعودي؟ (مثال: +9665…)',
-    required: true,
-  },
-  {
-    id: 'whatsapp',
-    category: 'availability',
-    type: 'short_text',
-    label: 'رقم واتساب (اختياري — اتركه فارغاً إن كان نفس رقم الهاتف)',
-    required: false,
-  },
-  {
     id: 'experience_years',
     category: 'experience',
     type: 'single_select',
@@ -238,32 +156,6 @@ const FALLBACK_AR: QualificationQuestion[] = [
     type: 'short_text',
     label: 'من هو صاحب عملك الحالي؟ (اختياري — اتركه فارغاً إن لم يكن لديك)',
     required: false,
-  },
-  {
-    id: 'languages',
-    category: 'experience',
-    type: 'multi_select',
-    label: 'ما هي اللغات التي تتحدثها؟',
-    required: true,
-    options: ['العربية', 'الإنجليزية', 'الهندية', 'الأردية', 'التاغالوغية', 'المالايالامية', 'البنغالية', 'أخرى'],
-  },
-  {
-    id: 'current_location',
-    category: 'availability',
-    type: 'single_select',
-    label: 'في أي مدينة في السعودية تقيم حالياً؟',
-    required: true,
-    options: [
-      'الرياض',
-      'جدة',
-      'الدمام',
-      'الخبر',
-      'مكة',
-      'المدينة',
-      'أبها',
-      'تبوك',
-      'أخرى',
-    ],
   },
   {
     id: 'visa_status',

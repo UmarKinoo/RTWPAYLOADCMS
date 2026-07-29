@@ -1,11 +1,16 @@
 'use client'
 
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
+import { useForm, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { toast } from 'sonner'
 import {
   Search,
   ChevronLeft,
+  ChevronRight,
   Loader2,
   Check,
   Plus,
@@ -22,6 +27,16 @@ import {
   type AnswerMap,
 } from '@/components/demo-cand-reg/QualificationForm'
 import type { QualificationTemplateResponse } from '@/lib/esco/qualification/schema'
+import { validatePassword, validateEmail } from '@/lib/validation'
+import { AccountStep } from '@/components/candidate/wizard-steps/AccountStep'
+import { PersonalInfoStep } from '@/components/candidate/wizard-steps/PersonalInfoStep'
+import { JobRoleStep } from '@/components/candidate/wizard-steps/JobRoleStep'
+import { ReviewStep } from '@/components/candidate/wizard-steps/ReviewStep'
+import { PhoneVerification } from '@/components/auth/phone-verification'
+import type { CandidateFormData } from '@/components/candidate/RegistrationWizard'
+import { registerDemoCandidate } from '@/lib/demo-candidate'
+import { mapUniversalAnswers } from '@/lib/esco/qualification/mapToCandidate'
+import { useFormDraft } from '@/hooks/useFormDraft'
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -58,7 +73,93 @@ interface SavedOccupation {
   qualificationTemplate?: QualificationTemplateResponse | null
 }
 
-type Step = 'search' | 'results' | 'confirm' | 'skills' | 'qualify' | 'saved' | 'notListed'
+type Step =
+  | 'account'
+  | 'personal'
+  | 'search'
+  | 'results'
+  | 'confirm'
+  | 'skills'
+  | 'qualify'
+  | 'saved'
+  | 'notListed'
+  | 'jobRole'
+  | 'review'
+  | 'verify'
+
+// ─── Registration form (account + personal + job role + consents) ──
+// Work/visa/availability fields come from qualification answers.
+
+const demoRegistrationSchema = z
+  .object({
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    phone: z.string().min(1, 'Phone number is required'),
+    whatsapp: z.string().optional(),
+    sameAsPhone: z.boolean().optional(),
+    gender: z.enum(['male', 'female'], { message: 'Gender is required' }),
+    dob: z.string().min(1, 'Date of birth is required'),
+    nationality: z.string().min(1, 'Nationality is required'),
+    languages: z.string().min(1, 'Languages are required'),
+    currentlyInKSA: z.boolean().refine((val) => val === true, {
+      message: 'Please confirm you are currently located in Saudi Arabia',
+    }),
+    location: z.string().min(1, 'Location is required'),
+    primarySkill: z.string().min(1, 'Please select your job role'),
+    secondarySkill: z.string().optional(),
+    tertiarySkill: z.string().optional(),
+    acceptPrivacyTerms: z.boolean().refine((val) => val === true, {
+      message: 'You must accept the Privacy Policy and Terms and Conditions',
+    }),
+    acceptDataConsent: z.boolean().refine((val) => val === true, {
+      message: 'You must consent to data collection and publication',
+    }),
+    acceptPlatformDisclaimer: z.boolean().refine((val) => val === true, {
+      message: 'You must acknowledge the platform disclaimer',
+    }),
+  })
+  .refine((data) => validatePassword(data.password).valid, {
+    message:
+      'Password must be at least 8 characters with uppercase, lowercase, number, and special character',
+    path: ['password'],
+  })
+  .refine((data) => validateEmail(data.email).valid, {
+    message: 'Invalid email address',
+    path: ['email'],
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
+  .refine((data) => (data.phone || '').startsWith('+966'), {
+    message: 'Only Saudi Arabia (KSA) phone numbers are accepted. Use +966...',
+    path: ['phone'],
+  })
+  .refine((data) => !data.secondarySkill || data.secondarySkill !== data.primarySkill, {
+    message: 'Secondary skill must be different from your primary skill',
+    path: ['secondarySkill'],
+  })
+  .refine((data) => !data.tertiarySkill || data.tertiarySkill !== data.primarySkill, {
+    message: 'Third skill must be different from your primary skill',
+    path: ['tertiarySkill'],
+  })
+  .refine(
+    (data) =>
+      !data.tertiarySkill || !data.secondarySkill || data.tertiarySkill !== data.secondarySkill,
+    {
+      message: 'Third skill must be different from your second skill',
+      path: ['tertiarySkill'],
+    },
+  )
+
+type DemoFormData = z.infer<typeof demoRegistrationSchema>
+
+interface DemoRegistrationDraft {
+  values: Partial<DemoFormData>
+}
 
 // ─── Session ID ─────────────────────────────────────────────────────
 
@@ -73,16 +174,25 @@ function getSessionId(): string {
   return id
 }
 
+function clearSessionStorage() {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem('esco-demo-session-id')
+  localStorage.removeItem('esco-demo-input')
+}
+
 // ─── Component ──────────────────────────────────────────────────────
 
 export function EscoWizard() {
   const t = useTranslations('demoCandReg')
+  const tReg = useTranslations('registration')
   const locale = useLocale()
+  const router = useRouter()
 
-  const [step, setStep] = useState<Step>('search')
+  const [step, setStep] = useState<Step>('account')
   const [inputText, setInputText] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isRegistering, setIsRegistering] = useState(false)
   const [searchError, setSearchError] = useState<string | null>(null)
   const [results, setResults] = useState<OccupationResult[]>([])
   const [moreResults, setMoreResults] = useState<OccupationResult[]>([])
@@ -99,10 +209,103 @@ export function EscoWizard() {
   const [pendingSkills, setPendingSkills] = useState<
     Array<{ label: string; type: 'essential' | 'optional' }>
   >([])
+  const [sameAsPhone, setSameAsPhone] = useState(false)
+  const [candidateId, setCandidateId] = useState<string | null>(null)
+  const [registrationSnapshot, setRegistrationSnapshot] = useState<DemoFormData | null>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const qualificationPrefetchRef = useRef<string | null>(null)
+  const draftRestoredRef = useRef(false)
 
-  // Persist input text across sessions
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    trigger,
+    clearErrors,
+    formState: { errors },
+  } = useForm<DemoFormData>({
+    resolver: zodResolver(demoRegistrationSchema),
+    mode: 'onChange',
+    defaultValues: {
+      sameAsPhone: false,
+      currentlyInKSA: false,
+      acceptPrivacyTerms: false,
+      acceptDataConsent: false,
+      acceptPlatformDisclaimer: false,
+    },
+  })
+
+  const phone = watch('phone')
+  const primarySkill = watch('primarySkill')
+  const secondarySkill = watch('secondarySkill')
+  const tertiarySkill = watch('tertiarySkill')
+  const password = watch('password')
+  const confirmPassword = watch('confirmPassword')
+  const formValues = watch()
+
+  const { loadDraft, saveDraft, clearDraft } = useFormDraft<DemoRegistrationDraft>(
+    'demo-cand-reg',
+  )
+
+  // Cast helpers — wizard step components are typed against the full CandidateFormData
+  const registerAs = register as unknown as UseFormRegister<CandidateFormData>
+  const controlAs = control as unknown as Control<CandidateFormData>
+  const errorsAs = errors as unknown as FieldErrors<CandidateFormData>
+  const setValueAs = setValue as unknown as UseFormSetValue<CandidateFormData>
+
+  // Restore draft (never restores passwords / consents)
+  useEffect(() => {
+    if (draftRestoredRef.current) return
+    draftRestoredRef.current = true
+    const draft = loadDraft()
+    if (!draft?.values) return
+    const values = draft.values
+    const hasContent = Boolean(values.email || values.firstName || values.phone)
+    if (!hasContent) return
+    Object.entries(values).forEach(([field, value]) => {
+      if (value !== undefined && value !== null) {
+        setValue(field as keyof DemoFormData, value as never, { shouldValidate: false })
+      }
+    })
+    if (values.sameAsPhone) setSameAsPhone(true)
+    toast.info(tReg('draftRestored'))
+  }, [loadDraft, setValue, tReg])
+
+  // Persist safe form values
+  useEffect(() => {
+    if (step === 'verify' || isRegistering) return
+    const {
+      password: _p,
+      confirmPassword: _c,
+      acceptPrivacyTerms: _a1,
+      acceptDataConsent: _a2,
+      acceptPlatformDisclaimer: _a3,
+      ...safeValues
+    } = formValues
+    const hasContent = Boolean(
+      safeValues.email || safeValues.firstName || safeValues.phone || safeValues.primarySkill,
+    )
+    if (!hasContent) return
+    saveDraft({ values: safeValues })
+  }, [formValues, step, isRegistering, saveDraft])
+
+  useEffect(() => {
+    if (sameAsPhone && phone) setValue('whatsapp', phone)
+  }, [sameAsPhone, phone, setValue])
+
+  useEffect(() => {
+    if (step !== 'review') {
+      clearErrors(['acceptPrivacyTerms', 'acceptDataConsent', 'acceptPlatformDisclaimer'])
+    }
+  }, [step, clearErrors])
+
+  useEffect(() => {
+    if (step !== 'personal') clearErrors(['currentlyInKSA'])
+  }, [step, clearErrors])
+
+  // Persist occupation search input
   useEffect(() => {
     const saved = localStorage.getItem('esco-demo-input')
     if (saved) setInputText(saved)
@@ -111,7 +314,149 @@ export function EscoWizard() {
     if (inputText) localStorage.setItem('esco-demo-input', inputText)
   }, [inputText])
 
-  // ─── API Calls ──────────────────────────────────────────────────
+  const passwordsMatch = password && confirmPassword ? password === confirmPassword : true
+
+  // Merged universal answers from the first occupation that has them
+  const mergedAnswers = useMemo(() => {
+    for (const occ of savedOccupations) {
+      if (occ.qualificationAnswers && Object.keys(occ.qualificationAnswers).length > 0) {
+        return occ.qualificationAnswers
+      }
+    }
+    return {} as AnswerMap
+  }, [savedOccupations])
+
+  const mappedFields = useMemo(() => mapUniversalAnswers(mergedAnswers), [mergedAnswers])
+
+  // Form values enriched for ReviewStep display (job title / experience / visa)
+  const reviewFormValues = useMemo((): Partial<CandidateFormData> => {
+    return {
+      ...(formValues as Partial<CandidateFormData>),
+      jobTitle: savedOccupations[0]?.preferredLabel || '',
+      experienceYears: mappedFields.experienceYears,
+      saudiExperience: mappedFields.saudiExperience,
+      currentEmployer: mappedFields.currentEmployer,
+      availabilityDate: mappedFields.availabilityDate,
+      visaStatus: mappedFields.visaStatus,
+      visaExpiry: mappedFields.visaExpiry,
+      visaProfession: mappedFields.visaProfession,
+      industryExperience: savedOccupations.map((o) => o.preferredLabel).join(', '),
+    }
+  }, [formValues, savedOccupations, mappedFields])
+
+  // ─── Step navigation ────────────────────────────────────────────
+
+  const goAccountNext = async () => {
+    const ok = await trigger(['email', 'password', 'confirmPassword'])
+    if (!ok || !passwordsMatch) {
+      toast.error(t('validationError'), {
+        description: !passwordsMatch ? t('passwordsMustMatch') : undefined,
+      })
+      return
+    }
+    setStep('personal')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const goPersonalNext = async () => {
+    const ok = await trigger([
+      'firstName',
+      'lastName',
+      'phone',
+      'whatsapp',
+      'gender',
+      'dob',
+      'nationality',
+      'languages',
+      'location',
+      'currentlyInKSA',
+    ])
+    if (!ok) {
+      toast.error(t('validationError'))
+      return
+    }
+    setStep('search')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const goJobRoleNext = async () => {
+    const ok = await trigger(['primarySkill', 'secondarySkill', 'tertiarySkill'])
+    if (!ok) {
+      toast.error(t('validationError'))
+      return
+    }
+    setStep('review')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleEditFromReview = (wizardStep: number) => {
+    if (wizardStep === 1) setStep('account')
+    else if (wizardStep === 2) setStep('personal')
+    else if (wizardStep === 3) setStep('jobRole')
+    else setStep('saved')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // ─── Registration ───────────────────────────────────────────────
+
+  const onRegister = async (data: DemoFormData) => {
+    if (savedOccupations.length === 0) {
+      toast.error(t('needOccupation'))
+      setStep('search')
+      return
+    }
+    setIsRegistering(true)
+    try {
+      const result = await registerDemoCandidate({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        phone: data.phone,
+        whatsapp: sameAsPhone ? data.phone : data.whatsapp || data.phone,
+        gender: data.gender,
+        dob: data.dob,
+        nationality: data.nationality,
+        languages: data.languages,
+        location: data.location,
+        primarySkill: data.primarySkill,
+        secondarySkill: data.secondarySkill,
+        tertiarySkill: data.tertiarySkill,
+        sessionId: getSessionId(),
+        jobTitle: savedOccupations[0].preferredLabel,
+        answers: mergedAnswers,
+        termsAccepted: true,
+      })
+
+      if (result.success && result.candidateId) {
+        clearDraft()
+        toast.success(t('registrationSuccess'), {
+          description: t('verifyPhoneHint'),
+        })
+        setCandidateId(result.candidateId)
+        setRegistrationSnapshot(data)
+        setStep('verify')
+      } else {
+        toast.error(tReg('registrationFailed'), {
+          description: result.error || tReg('pleaseTryAgainLater'),
+        })
+      }
+    } catch (error) {
+      console.error('Demo registration error:', error)
+      toast.error(tReg('registrationFailed'), {
+        description: error instanceof Error ? error.message : tReg('somethingWentWrong'),
+      })
+    } finally {
+      setIsRegistering(false)
+    }
+  }
+
+  const handleRegisterSubmit = handleSubmit(onRegister, (formErrors) => {
+    const first = Object.values(formErrors)[0] as { message?: string } | undefined
+    toast.error(t('validationError'), { description: first?.message })
+  })
+
+  // ─── ESCO API Calls ─────────────────────────────────────────────
 
   const handleSearch = useCallback(async () => {
     if (!inputText.trim() || inputText.trim().length < 2) return
@@ -196,7 +541,6 @@ export function EscoWizard() {
         const data = await res.json()
         setQualificationTemplate(data.template)
       } catch {
-        // Leave template null — QualificationForm shows loading then we retry on enter
         setQualificationTemplate(null)
         qualificationPrefetchRef.current = null
       } finally {
@@ -210,7 +554,6 @@ export function EscoWizard() {
     if (!occupationDetail) return
     const essentialUris = new Set(occupationDetail.essentialSkills.map((s) => s.uri))
     setSelectedSkillUris(essentialUris)
-    // Prefetch qualification template while the candidate picks skills
     prefetchQualification(occupationDetail.uri)
     setStep('skills')
   }, [occupationDetail, prefetchQualification])
@@ -264,7 +607,6 @@ export function EscoWizard() {
       setPendingOccupationId(data.occupationId)
       setPendingSkills(selectedSkills.map((s) => ({ label: s.skillLabel, type: s.skillType })))
 
-      // Ensure template is loading / loaded before showing qualify step
       if (!qualificationTemplate && selectedOccupation.uri) {
         prefetchQualification(selectedOccupation.uri)
       }
@@ -369,8 +711,6 @@ export function EscoWizard() {
     setMoreResults((prev) => prev.slice(8))
   }, [moreResults])
 
-  // ─── Example Chips ────────────────────────────────────────────────
-
   const exampleChips = [
     { key: 'acWorker', text: t('exampleChips.acWorker') },
     { key: 'driver', text: t('exampleChips.driver') },
@@ -380,12 +720,60 @@ export function EscoWizard() {
     { key: 'cook', text: t('exampleChips.cook') },
   ]
 
-  // ─── Render Steps ─────────────────────────────────────────────────
+  // ─── Phone verification screen ──────────────────────────────────
+
+  if (step === 'verify' && candidateId && registrationSnapshot) {
+    return (
+      <div className="w-full max-w-2xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
+              {t('verifyPhoneTitle')}
+            </CardTitle>
+            <CardDescription>{t('verifyPhoneSubtitle')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PhoneVerification
+              phone={registrationSnapshot.phone}
+              userId={candidateId}
+              userCollection="candidates"
+              onVerified={async () => {
+                toast.success(t('phoneVerified'))
+                try {
+                  const { loginUser } = await import('@/lib/auth')
+                  const loginResult = await loginUser({
+                    email: registrationSnapshot.email,
+                    password: registrationSnapshot.password,
+                    collection: 'candidates',
+                  })
+                  clearSessionStorage()
+                  if (loginResult.success) {
+                    router.push('/dashboard')
+                    router.refresh()
+                  } else {
+                    toast.error(t('loginAfterVerifyFailed'))
+                    router.push('/login')
+                  }
+                } catch (error) {
+                  console.error('Error logging in after verification:', error)
+                  toast.error(t('loginAfterVerifyFailed'))
+                  router.push('/login')
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
+        <p className="text-xs text-gray-400 text-center px-4">{t('attribution')}</p>
+      </div>
+    )
+  }
+
+  // ─── Render Steps ───────────────────────────────────────────────
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Saved occupations banner */}
-      {savedOccupations.length > 0 && step !== 'saved' && (
+      {savedOccupations.length > 0 && step !== 'saved' && step !== 'review' && step !== 'jobRole' && (
         <Card className="border-[#4644b8]/20 bg-[#4644b8]/5">
           <CardContent className="py-4">
             <div className="flex items-center gap-2 mb-2">
@@ -410,14 +798,91 @@ export function EscoWizard() {
         </Card>
       )}
 
-      {/* Step 1: Search */}
-      {step === 'search' && (
+      {/* Account */}
+      {step === 'account' && (
         <Card>
           <CardHeader>
             <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
-              {t('step1Title')}
+              {t('accountTitle')}
             </CardTitle>
-            <CardDescription>{t('step1Hint')}</CardDescription>
+            <CardDescription>{t('accountSubtitle')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <AccountStep register={registerAs} errors={errorsAs} control={controlAs} />
+            <Button
+              onClick={goAccountNext}
+              disabled={!passwordsMatch}
+              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+            >
+              {t('continue')}
+              <ChevronRight className="w-5 h-5 ms-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Personal */}
+      {step === 'personal' && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep('account')}
+                className="p-1"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
+                  {t('personalTitle')}
+                </CardTitle>
+                <CardDescription>{t('personalSubtitle')}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <PersonalInfoStep
+              register={registerAs}
+              errors={errorsAs}
+              control={controlAs}
+              sameAsPhone={sameAsPhone}
+              setSameAsPhone={setSameAsPhone}
+              phone={phone || ''}
+              setValue={setValueAs}
+            />
+            <Button
+              onClick={goPersonalNext}
+              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+            >
+              {t('continueToOccupations')}
+              <ChevronRight className="w-5 h-5 ms-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Search */}
+      {step === 'search' && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep('personal')}
+                className="p-1"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
+                  {t('step1Title')}
+                </CardTitle>
+                <CardDescription>{t('step1Hint')}</CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <textarea
@@ -436,7 +901,6 @@ export function EscoWizard() {
               }}
             />
 
-            {/* Example chips */}
             <div className="flex flex-wrap gap-2">
               {exampleChips.map((chip) => (
                 <button
@@ -477,7 +941,7 @@ export function EscoWizard() {
         </Card>
       )}
 
-      {/* Step 2: Results */}
+      {/* Results */}
       {step === 'results' && (
         <Card>
           <CardHeader>
@@ -503,11 +967,7 @@ export function EscoWizard() {
               <div className="flex flex-col items-center gap-3 py-8 text-center">
                 <AlertTriangle className="w-10 h-10 text-amber-500" />
                 <p className="text-sm text-gray-600">{searchError}</p>
-                <Button
-                  onClick={handleSearch}
-                  variant="outline"
-                  className="gap-2"
-                >
+                <Button onClick={handleSearch} variant="outline" className="gap-2">
                   <RefreshCw className="w-4 h-4" />
                   {t('retry')}
                 </Button>
@@ -517,10 +977,7 @@ export function EscoWizard() {
             {!searchError && results.length === 0 && (
               <div className="py-8 text-center">
                 <p className="text-sm text-gray-500 mb-4">{t('noResults')}</p>
-                <Button
-                  onClick={() => setStep('search')}
-                  variant="outline"
-                >
+                <Button onClick={() => setStep('search')} variant="outline">
                   {t('back')}
                 </Button>
               </div>
@@ -533,13 +990,9 @@ export function EscoWizard() {
                 onClick={() => handleSelectOccupation(occ)}
                 className="w-full text-start rounded-lg border border-gray-200 p-4 hover:border-[#4644b8] hover:bg-[#4644b8]/5 transition-colors active:bg-[#4644b8]/10 focus:outline-none focus:ring-2 focus:ring-[#4644b8]"
               >
-                <p className="font-medium text-[#16252d] text-base">
-                  {occ.preferredLabel}
-                </p>
+                <p className="font-medium text-[#16252d] text-base">{occ.preferredLabel}</p>
                 {occ.description && (
-                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                    {occ.description}
-                  </p>
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">{occ.description}</p>
                 )}
                 {occ.altLabels?.length > 0 && (
                   <p className="text-xs text-gray-400 mt-1">
@@ -550,11 +1003,7 @@ export function EscoWizard() {
             ))}
 
             {moreResults.length > 0 && (
-              <Button
-                onClick={handleLoadMore}
-                variant="outline"
-                className="w-full"
-              >
+              <Button onClick={handleLoadMore} variant="outline" className="w-full">
                 {t('loadMore')}
               </Button>
             )}
@@ -582,7 +1031,7 @@ export function EscoWizard() {
         />
       )}
 
-      {/* Step 3: Confirm */}
+      {/* Confirm */}
       {step === 'confirm' && selectedOccupation && (
         <Card>
           <CardHeader>
@@ -665,7 +1114,7 @@ export function EscoWizard() {
         </Card>
       )}
 
-      {/* Step 4: Skills */}
+      {/* Skills */}
       {step === 'skills' && occupationDetail && (
         <Card>
           <CardHeader>
@@ -693,13 +1142,10 @@ export function EscoWizard() {
               </p>
             </div>
 
-            {/* Essential Skills */}
             {occupationDetail.essentialSkills.length > 0 && (
               <div>
                 <h4 className="font-semibold text-sm text-[#16252d] mb-3 flex items-center gap-2">
-                  <Badge className="bg-[#4644b8] text-white text-xs">
-                    {t('essential')}
-                  </Badge>
+                  <Badge className="bg-[#4644b8] text-white text-xs">{t('essential')}</Badge>
                   {t('essentialSkills')}
                 </h4>
                 <div className="flex flex-wrap gap-2">
@@ -715,7 +1161,6 @@ export function EscoWizard() {
               </div>
             )}
 
-            {/* Optional Skills */}
             {occupationDetail.optionalSkills.length > 0 && (
               <div>
                 <h4 className="font-semibold text-sm text-[#16252d] mb-3 flex items-center gap-2">
@@ -759,7 +1204,7 @@ export function EscoWizard() {
         </Card>
       )}
 
-      {/* Qualification questions */}
+      {/* Qualification */}
       {step === 'qualify' && selectedOccupation && pendingOccupationId && (
         <QualificationForm
           template={qualificationTemplate}
@@ -773,7 +1218,7 @@ export function EscoWizard() {
         />
       )}
 
-      {/* Step: Saved / Summary */}
+      {/* Saved / Summary */}
       {step === 'saved' && (
         <Card>
           <CardHeader>
@@ -835,17 +1280,127 @@ export function EscoWizard() {
                 {t('addAnother')}
               </Button>
               <Button
-                onClick={() => toast.success(t('finish'))}
+                onClick={() => {
+                  setStep('jobRole')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
                 className="flex-1 h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
               >
-                {t('finish')}
+                {t('continueToJobRole')}
+                <ChevronRight className="w-5 h-5 ms-2" />
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Attribution footer */}
+      {/* Job role (Smart Matrix primarySkill) */}
+      {step === 'jobRole' && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep('saved')}
+                className="p-1"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
+                  {t('jobRoleTitle')}
+                </CardTitle>
+                <CardDescription>
+                  {t('jobRoleSubtitle', {
+                    occupation: savedOccupations[0]?.preferredLabel || '',
+                  })}
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <JobRoleStep
+              primarySkill={primarySkill || ''}
+              secondarySkill={secondarySkill}
+              tertiarySkill={tertiarySkill}
+              setValue={setValueAs}
+              errors={errorsAs}
+            />
+            <Button
+              onClick={goJobRoleNext}
+              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+            >
+              {t('continue')}
+              <ChevronRight className="w-5 h-5 ms-2" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Review + consents */}
+      {step === 'review' && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep('jobRole')}
+                className="p-1"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <CardTitle className="text-xl sm:text-2xl text-[#16252d]">
+                  {t('reviewTitle')}
+                </CardTitle>
+                <CardDescription>{t('reviewSubtitle')}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {savedOccupations.length > 0 && (
+              <div className="rounded-lg border border-[#4644b8]/20 bg-[#4644b8]/5 p-4 space-y-2">
+                <p className="text-sm font-semibold text-[#16252d]">{t('savedOccupations')}</p>
+                {savedOccupations.map((occ) => (
+                  <p key={occ.id} className="text-sm text-gray-700">
+                    {occ.preferredLabel}
+                    {occ.skills.length > 0 && (
+                      <span className="text-gray-500">
+                        {' '}
+                        — {occ.skills.length} {t('skills')}
+                      </span>
+                    )}
+                  </p>
+                ))}
+              </div>
+            )}
+            <ReviewStep
+              formValues={reviewFormValues}
+              sameAsPhone={sameAsPhone}
+              control={controlAs}
+              errors={errorsAs}
+              onEditStep={handleEditFromReview}
+            />
+            <Button
+              onClick={handleRegisterSubmit}
+              disabled={isRegistering}
+              className="w-full h-12 text-base bg-[#4644b8] hover:bg-[#3533a0] text-white"
+            >
+              {isRegistering ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin me-2" />
+                  {t('creatingAccount')}
+                </>
+              ) : (
+                t('createAccount')
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <p className="text-xs text-gray-400 text-center px-4">{t('attribution')}</p>
     </div>
   )
@@ -901,8 +1456,6 @@ function QualificationSummary({
     </div>
   )
 }
-
-// ─── Sub-components ─────────────────────────────────────────────────
 
 function SkillChip({
   label,

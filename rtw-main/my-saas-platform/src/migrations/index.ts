@@ -13,6 +13,7 @@ import * as migration_20260618_120000_candidate_skills_industry from './20260618
 import * as migration_20260715_120000_interview_credit_deducted from './20260715_120000_interview_credit_deducted';
 import * as migration_20260729_160000_esco_candidate_reg from './20260729_160000_esco_candidate_reg';
 import * as migration_20260729_163000_esco_locked_docs_rels from './20260729_163000_esco_locked_docs_rels';
+import * as migration_20260729_170000_candidate_occupations_candidate_link from './20260729_170000_candidate_occupations_candidate_link';
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20260729_163000_esco_locked_docs_rels.up,
     down: migration_20260729_163000_esco_locked_docs_rels.down,
     name: '20260729_163000_esco_locked_docs_rels',
+  },
+  {
+    up: migration_20260729_170000_candidate_occupations_candidate_link.up,
+    down: migration_20260729_170000_candidate_occupations_candidate_link.down,
+    name: '20260729_170000_candidate_occupations_candidate_link',
   },
 ];

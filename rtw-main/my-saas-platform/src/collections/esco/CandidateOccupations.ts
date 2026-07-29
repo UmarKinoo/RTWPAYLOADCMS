@@ -52,6 +52,16 @@ export const CandidateOccupations: CollectionConfig = {
       },
     },
     {
+      name: 'candidate',
+      type: 'relationship',
+      relationTo: 'candidates',
+      required: false,
+      index: true,
+      admin: {
+        description: 'Main candidate profile this occupation belongs to (set once the account is created).',
+      },
+    },
+    {
       name: 'escoUri',
       type: 'text',
       required: false,
