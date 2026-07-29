@@ -50,6 +50,7 @@
     "registrationSuccessful": "Registration Successful!",
     "registrationSuccessfulDescription": "Your candidate profile has been created.",
     "registrationFailed": "Registration Failed",
+    "draftRestored": "Welcome back! We restored your saved progress — please re-enter your password to continue.",
     "steps": {
       "account": {
         "title": "Account",
@@ -536,7 +537,8 @@
       "registrationSuccessfulDescription": "Please verify your phone number to continue.",
       "registrationFailed": "Registration Failed",
       "registrationFailedDescription": "Please try again.",
-      "unexpectedError": "An unexpected error occurred. Please try again."
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "draftRestored": "Welcome back! We restored your saved details."
     },
     "passwordToggle": {
       "show": "Show password",
@@ -1286,5 +1288,57 @@
     "description": "Your account doesn't have access to the dashboard or admin panel. If you believe this is an error, please contact support.",
     "contactSupport": "Contact support to complete your profile or get access.",
     "backToLogin": "Back to sign in"
+  },
+  "demoCandReg": {
+    "pageTitle": "Find Your Occupation",
+    "pageDescription": "Tell us what kind of work you have done and we will help you find the right occupation and skills.",
+    "step1Title": "What type of work have you done?",
+    "step1Placeholder": "Describe your work, for example: AC technician, housemaid, forklift driver, I install split air conditioners...",
+    "step1Hint": "You can write in English, Arabic, or French. Describe your job or duties in your own words.",
+    "searchButton": "Find Occupations",
+    "searching": "Searching...",
+    "step2Title": "Suggested Occupations",
+    "step2Subtitle": "Which one best matches the work you have done?",
+    "noResults": "No matching occupations found. Try describing your work differently.",
+    "loadMore": "Load more results",
+    "notListed": "I cannot find my occupation",
+    "notListedTitle": "Enter your job title",
+    "notListedPlaceholder": "Type your job title as you know it",
+    "notListedSubmit": "Submit custom title",
+    "step3Title": "Confirm Occupation",
+    "step3Subtitle": "Is this the right match for the work you have done?",
+    "confirmOccupation": "Yes, this is correct",
+    "changeSelection": "No, go back",
+    "step4Title": "Select Your Skills",
+    "step4Subtitle": "Choose only the skills you actually have.",
+    "essentialSkills": "Essential Skills",
+    "optionalSkills": "Optional Skills",
+    "noSkillsSelected": "Please select at least one skill.",
+    "saveSkills": "Save Skills",
+    "saving": "Saving...",
+    "step5Title": "Occupation Saved",
+    "step5Summary": "Your occupation and skills have been saved.",
+    "addAnother": "Add Another Occupation",
+    "finish": "Finish",
+    "savedOccupations": "Your Saved Occupations",
+    "skills": "skills selected",
+    "essential": "Essential",
+    "optional": "Optional",
+    "retry": "Try Again",
+    "escoUnavailable": "The occupation service is temporarily unavailable. Please try again.",
+    "aiNote": "We use AI to understand your description and find the right occupations. The final choice is always yours.",
+    "attribution": "This service uses the ESCO classification of the European Commission.",
+    "exampleChips": {
+      "acWorker": "AC technician",
+      "driver": "Driver",
+      "housekeeper": "Housekeeper",
+      "electrician": "Electrician",
+      "warehouse": "Warehouse worker",
+      "cook": "Cook"
+    },
+    "altLabel": "Also known as",
+    "occupationDescription": "Description",
+    "back": "Back",
+    "startOver": "Start over"
   }
 }

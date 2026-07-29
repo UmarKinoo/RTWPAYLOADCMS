@@ -36,6 +36,11 @@ import { AgentAuditLogs } from '@/collections/AgentAuditLogs'
 import { ScreeningResults } from '@/collections/ScreeningResults'
 import { ReadyBotOpsChatSessions } from '@/collections/ReadyBotOpsChatSessions'
 import { AgentEvents } from '@/collections/AgentEvents'
+import { EscoAliases } from '@/collections/esco/EscoAliases'
+import { EscoQueryCache } from '@/collections/esco/EscoQueryCache'
+import { EscoSearchLogs } from '@/collections/esco/EscoSearchLogs'
+import { CandidateOccupations } from '@/collections/esco/CandidateOccupations'
+import { CandidateOccupationSkills } from '@/collections/esco/CandidateOccupationSkills'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
 import { ReadyBotSettings } from '@/globals/ReadyBotSettings'
@@ -130,6 +135,11 @@ export default buildConfig({
     ScreeningResults,
     ReadyBotOpsChatSessions,
     AgentEvents,
+    EscoAliases,
+    EscoQueryCache,
+    EscoSearchLogs,
+    CandidateOccupations,
+    CandidateOccupationSkills,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   // Only set email adapter if API key is present and not empty
