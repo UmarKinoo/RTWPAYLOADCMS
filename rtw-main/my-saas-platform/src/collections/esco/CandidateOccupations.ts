@@ -2,13 +2,18 @@ import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 import { allowOnlyAdmin } from '../../access/allowOnlyAdmin'
 
 /**
- * Remove the occupation's skills before the occupation itself is deleted.
- * The relationship column is NOT NULL, so Postgres' ON DELETE SET NULL would
- * otherwise abort the delete and leave the record undeletable from the admin.
+ * Remove linked skills and qualification answers before the occupation itself
+ * is deleted. Relationship columns are NOT NULL, so Postgres' ON DELETE SET NULL
+ * would otherwise abort the delete and leave the record undeletable from admin.
  */
-const deleteLinkedSkills: CollectionBeforeDeleteHook = async ({ id, req }) => {
+const deleteLinkedChildren: CollectionBeforeDeleteHook = async ({ id, req }) => {
   await req.payload.delete({
     collection: 'candidate-occupation-skills',
+    where: { candidateOccupation: { equals: id } },
+    req,
+  })
+  await req.payload.delete({
+    collection: 'candidate-qualification-answers',
     where: { candidateOccupation: { equals: id } },
     req,
   })
@@ -34,7 +39,7 @@ export const CandidateOccupations: CollectionConfig = {
     delete: allowOnlyAdmin,
   },
   hooks: {
-    beforeDelete: [deleteLinkedSkills],
+    beforeDelete: [deleteLinkedChildren],
   },
   fields: [
     {

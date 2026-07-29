@@ -17,6 +17,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import {
+  QualificationForm,
+  type AnswerMap,
+} from '@/components/demo-cand-reg/QualificationForm'
+import type { QualificationTemplateResponse } from '@/lib/esco/qualification/schema'
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -49,9 +54,11 @@ interface SavedOccupation {
   escoUri: string
   skills: Array<{ label: string; type: 'essential' | 'optional' }>
   isUnmapped: boolean
+  qualificationAnswers?: AnswerMap
+  qualificationTemplate?: QualificationTemplateResponse | null
 }
 
-type Step = 'search' | 'results' | 'confirm' | 'skills' | 'saved' | 'notListed'
+type Step = 'search' | 'results' | 'confirm' | 'skills' | 'qualify' | 'saved' | 'notListed'
 
 // ─── Session ID ─────────────────────────────────────────────────────
 
@@ -85,7 +92,15 @@ export function EscoWizard() {
   const [selectedSkillUris, setSelectedSkillUris] = useState<Set<string>>(new Set())
   const [savedOccupations, setSavedOccupations] = useState<SavedOccupation[]>([])
   const [loadingDetail, setLoadingDetail] = useState(false)
+  const [qualificationTemplate, setQualificationTemplate] =
+    useState<QualificationTemplateResponse | null>(null)
+  const [loadingQualification, setLoadingQualification] = useState(false)
+  const [pendingOccupationId, setPendingOccupationId] = useState<string | null>(null)
+  const [pendingSkills, setPendingSkills] = useState<
+    Array<{ label: string; type: 'essential' | 'optional' }>
+  >([])
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const qualificationPrefetchRef = useRef<string | null>(null)
 
   // Persist input text across sessions
   useEffect(() => {
@@ -165,13 +180,40 @@ export function EscoWizard() {
     [fetchOccupationDetail],
   )
 
+  const prefetchQualification = useCallback(
+    async (uri: string) => {
+      if (qualificationPrefetchRef.current === uri && qualificationTemplate) return
+      qualificationPrefetchRef.current = uri
+      setLoadingQualification(true)
+      setQualificationTemplate(null)
+      try {
+        const res = await fetch('/api/esco/qualification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ escoUri: uri, language: locale }),
+        })
+        if (!res.ok) throw new Error()
+        const data = await res.json()
+        setQualificationTemplate(data.template)
+      } catch {
+        // Leave template null — QualificationForm shows loading then we retry on enter
+        setQualificationTemplate(null)
+        qualificationPrefetchRef.current = null
+      } finally {
+        setLoadingQualification(false)
+      }
+    },
+    [locale, qualificationTemplate],
+  )
+
   const handleConfirm = useCallback(() => {
     if (!occupationDetail) return
-    // Pre-select all essential skills
     const essentialUris = new Set(occupationDetail.essentialSkills.map((s) => s.uri))
     setSelectedSkillUris(essentialUris)
+    // Prefetch qualification template while the candidate picks skills
+    prefetchQualification(occupationDetail.uri)
     setStep('skills')
-  }, [occupationDetail])
+  }, [occupationDetail, prefetchQualification])
 
   const toggleSkill = useCallback((uri: string) => {
     setSelectedSkillUris((prev) => {
@@ -219,24 +261,30 @@ export function EscoWizard() {
       if (!res.ok) throw new Error()
       const data = await res.json()
 
-      setSavedOccupations((prev) => [
-        ...prev,
-        {
-          id: data.occupationId,
-          preferredLabel: selectedOccupation.preferredLabel,
-          escoUri: selectedOccupation.uri,
-          skills: selectedSkills.map((s) => ({ label: s.skillLabel, type: s.skillType })),
-          isUnmapped: false,
-        },
-      ])
-      toast.success(t('step5Title'))
-      setStep('saved')
+      setPendingOccupationId(data.occupationId)
+      setPendingSkills(selectedSkills.map((s) => ({ label: s.skillLabel, type: s.skillType })))
+
+      // Ensure template is loading / loaded before showing qualify step
+      if (!qualificationTemplate && selectedOccupation.uri) {
+        prefetchQualification(selectedOccupation.uri)
+      }
+      setStep('qualify')
     } catch {
       toast.error('Failed to save. Please try again.')
     } finally {
       setIsSaving(false)
     }
-  }, [occupationDetail, selectedOccupation, selectedSkillUris, locale, inputText, searchLogId, t])
+  }, [
+    occupationDetail,
+    selectedOccupation,
+    selectedSkillUris,
+    locale,
+    inputText,
+    searchLogId,
+    t,
+    qualificationTemplate,
+    prefetchQualification,
+  ])
 
   const handleNotListedSubmit = useCallback(
     async (customTitle: string) => {
@@ -277,6 +325,29 @@ export function EscoWizard() {
     [inputText, locale, t],
   )
 
+  const handleQualificationComplete = useCallback(
+    (answers: AnswerMap, template: QualificationTemplateResponse) => {
+      if (!selectedOccupation || !pendingOccupationId) return
+      setSavedOccupations((prev) => [
+        ...prev,
+        {
+          id: pendingOccupationId,
+          preferredLabel: selectedOccupation.preferredLabel,
+          escoUri: selectedOccupation.uri,
+          skills: pendingSkills,
+          isUnmapped: false,
+          qualificationAnswers: answers,
+          qualificationTemplate: template,
+        },
+      ])
+      setPendingOccupationId(null)
+      setPendingSkills([])
+      toast.success(t('step5Title'))
+      setStep('saved')
+    },
+    [selectedOccupation, pendingOccupationId, pendingSkills, t],
+  )
+
   const handleAddAnother = useCallback(() => {
     setInputText('')
     setResults([])
@@ -285,6 +356,10 @@ export function EscoWizard() {
     setOccupationDetail(null)
     setSelectedSkillUris(new Set())
     setSearchError(null)
+    setQualificationTemplate(null)
+    setPendingOccupationId(null)
+    setPendingSkills([])
+    qualificationPrefetchRef.current = null
     setStep('search')
     localStorage.removeItem('esco-demo-input')
   }, [])
@@ -684,7 +759,21 @@ export function EscoWizard() {
         </Card>
       )}
 
-      {/* Step 5: Saved */}
+      {/* Qualification questions */}
+      {step === 'qualify' && selectedOccupation && pendingOccupationId && (
+        <QualificationForm
+          template={qualificationTemplate}
+          loading={loadingQualification}
+          occupationLabel={selectedOccupation.preferredLabel}
+          sessionId={getSessionId()}
+          occupationUri={selectedOccupation.uri}
+          candidateOccupationId={pendingOccupationId}
+          onComplete={handleQualificationComplete}
+          onBack={() => setStep('skills')}
+        />
+      )}
+
+      {/* Step: Saved / Summary */}
       {step === 'saved' && (
         <Card>
           <CardHeader>
@@ -697,10 +786,10 @@ export function EscoWizard() {
             {savedOccupations.map((occ) => (
               <div
                 key={occ.id}
-                className="rounded-lg border border-gray-200 p-4 space-y-2"
+                className="rounded-lg border border-gray-200 p-4 space-y-3"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-medium text-[#16252d]">{occ.preferredLabel}</h4>
+                  <h4 className="font-medium text-[#16252d] text-lg">{occ.preferredLabel}</h4>
                   {occ.isUnmapped && (
                     <Badge variant="outline" className="text-xs shrink-0">
                       Custom
@@ -708,21 +797,30 @@ export function EscoWizard() {
                   )}
                 </div>
                 {occ.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {occ.skills.map((s) => (
-                      <Badge
-                        key={s.label}
-                        variant={s.type === 'essential' ? 'default' : 'outline'}
-                        className={
-                          s.type === 'essential'
-                            ? 'bg-[#4644b8]/10 text-[#4644b8] text-xs'
-                            : 'text-xs'
-                        }
-                      >
-                        {s.label}
-                      </Badge>
-                    ))}
+                  <div>
+                    <p className="text-xs font-medium text-gray-500 mb-1.5">{t('skills')}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {occ.skills.map((s) => (
+                        <Badge
+                          key={s.label}
+                          variant={s.type === 'essential' ? 'default' : 'outline'}
+                          className={
+                            s.type === 'essential'
+                              ? 'bg-[#4644b8]/10 text-[#4644b8] text-xs'
+                              : 'text-xs'
+                          }
+                        >
+                          {s.label}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
+                )}
+                {occ.qualificationTemplate && occ.qualificationAnswers && (
+                  <QualificationSummary
+                    template={occ.qualificationTemplate}
+                    answers={occ.qualificationAnswers}
+                  />
                 )}
               </div>
             ))}
@@ -749,6 +847,57 @@ export function EscoWizard() {
 
       {/* Attribution footer */}
       <p className="text-xs text-gray-400 text-center px-4">{t('attribution')}</p>
+    </div>
+  )
+}
+
+function QualificationSummary({
+  template,
+  answers,
+}: {
+  template: QualificationTemplateResponse
+  answers: AnswerMap
+}) {
+  const t = useTranslations('demoCandReg.qualification')
+  const categories = [
+    'experience',
+    'tasks',
+    'equipment',
+    'licence',
+    'environment',
+    'verification',
+    'availability',
+  ] as const
+
+  return (
+    <div className="space-y-3 border-t border-gray-100 pt-3">
+      <p className="text-xs font-semibold text-[#4644b8]">{t('summaryTitle')}</p>
+      {categories.map((cat) => {
+        const qs = template.questions.filter(
+          (q) => q.category === cat && answers[q.id] !== undefined,
+        )
+        if (!qs.length) return null
+        return (
+          <div key={cat}>
+            <p className="text-xs font-medium text-gray-500 mb-1">{t(`categories.${cat}`)}</p>
+            <ul className="space-y-1">
+              {qs.map((q) => {
+                const a = answers[q.id]
+                let display = '—'
+                if (typeof a === 'boolean') display = a ? t('yes') : t('no')
+                else if (Array.isArray(a)) display = a.join(', ')
+                else if (a !== undefined && a !== null) display = String(a)
+                return (
+                  <li key={q.id} className="text-sm text-[#16252d]">
+                    <span className="text-gray-500">{q.label}: </span>
+                    {display}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )
+      })}
     </div>
   )
 }

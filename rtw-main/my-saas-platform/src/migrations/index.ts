@@ -11,6 +11,7 @@ import * as migration_20260609_205734_readybot_schema from './20260609_205734_re
 import * as migration_20260611_120000_candidate_profile_moderation from './20260611_120000_candidate_profile_moderation';
 import * as migration_20260618_120000_candidate_skills_industry from './20260618_120000_candidate_skills_industry';
 import * as migration_20260715_120000_interview_credit_deducted from './20260715_120000_interview_credit_deducted';
+import * as migration_20260729_160000_esco_candidate_reg from './20260729_160000_esco_candidate_reg';
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20260715_120000_interview_credit_deducted.up,
     down: migration_20260715_120000_interview_credit_deducted.down,
     name: '20260715_120000_interview_credit_deducted',
+  },
+  {
+    up: migration_20260729_160000_esco_candidate_reg.up,
+    down: migration_20260729_160000_esco_candidate_reg.down,
+    name: '20260729_160000_esco_candidate_reg',
   },
 ];

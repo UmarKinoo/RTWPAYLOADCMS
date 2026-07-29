@@ -1339,6 +1339,43 @@
     "altLabel": "يُعرف أيضاً بـ",
     "occupationDescription": "الوصف",
     "back": "رجوع",
-    "startOver": "ابدأ من جديد"
+    "startOver": "ابدأ من جديد",
+    "qualification": {
+      "title": "أسئلة التأهيل",
+      "subtitle": "أجب عن بعض الأسئلة القصيرة حول خبرتك في هذه المهنة.",
+      "loading": "جارٍ إعداد أسئلتك...",
+      "moreComing": "يتم إعداد المزيد من الأسئلة حول هذه المهنة...",
+      "preparingSpecific": "جارٍ إعداد أسئلة خاصة بهذه المهنة...",
+      "waitingHint": "تم حفظ إجاباتك. عادةً ما يستغرق هذا بضع ثوانٍ.",
+      "skipWaiting": "تخطَّ وراجع إجاباتي",
+      "fallbackNotice": "تعذر إنشاء أسئلة مخصصة لهذه المهنة. يرجى الإجابة على هذه الأسئلة العامة.",
+      "required": "مطلوب",
+      "optional": "اختياري",
+      "yes": "نعم",
+      "no": "لا",
+      "next": "التالي",
+      "previous": "السابق",
+      "reviewTitle": "مراجعة إجاباتك",
+      "reviewSubtitle": "تحقق من إجاباتك قبل الإرسال.",
+      "edit": "تعديل",
+      "submit": "إرسال الإجابات",
+      "submitting": "جارٍ الإرسال...",
+      "progress": "السؤال {current} من {total}",
+      "selectOne": "اختر واحداً",
+      "selectAll": "اختر كل ما ينطبق",
+      "enterText": "اكتب إجابتك",
+      "enterDate": "اختر تاريخاً",
+      "answerRequired": "يرجى الإجابة على هذا السؤال للمتابعة.",
+      "categories": {
+        "experience": "الخبرة",
+        "tasks": "المهام",
+        "equipment": "المعدات والأدوات",
+        "licence": "الرخص والشهادات",
+        "environment": "بيئة العمل",
+        "verification": "التحقق",
+        "availability": "التوفر"
+      },
+      "summaryTitle": "ملخص التأهيل"
+    }
   }
 }

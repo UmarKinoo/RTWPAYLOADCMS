@@ -41,6 +41,8 @@ import { EscoQueryCache } from '@/collections/esco/EscoQueryCache'
 import { EscoSearchLogs } from '@/collections/esco/EscoSearchLogs'
 import { CandidateOccupations } from '@/collections/esco/CandidateOccupations'
 import { CandidateOccupationSkills } from '@/collections/esco/CandidateOccupationSkills'
+import { QualificationTemplates } from '@/collections/esco/QualificationTemplates'
+import { CandidateQualificationAnswers } from '@/collections/esco/CandidateQualificationAnswers'
 import { Header } from '@/Header/config'
 import { Footer } from '@/Footer/config'
 import { ReadyBotSettings } from '@/globals/ReadyBotSettings'
@@ -140,6 +142,8 @@ export default buildConfig({
     EscoSearchLogs,
     CandidateOccupations,
     CandidateOccupationSkills,
+    QualificationTemplates,
+    CandidateQualificationAnswers,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   // Only set email adapter if API key is present and not empty

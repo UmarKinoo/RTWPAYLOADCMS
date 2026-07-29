@@ -1339,6 +1339,43 @@
     "altLabel": "Also known as",
     "occupationDescription": "Description",
     "back": "Back",
-    "startOver": "Start over"
+    "startOver": "Start over",
+    "qualification": {
+      "title": "Qualification Questions",
+      "subtitle": "Answer a few short questions about your experience in this occupation.",
+      "loading": "Preparing your questions...",
+      "moreComing": "More questions about this occupation are being prepared...",
+      "preparingSpecific": "Preparing questions specific to this occupation...",
+      "waitingHint": "Your answers are saved. This usually takes a few seconds.",
+      "skipWaiting": "Skip and review my answers",
+      "fallbackNotice": "We could not generate custom questions for this occupation. Please answer these general questions.",
+      "required": "Required",
+      "optional": "Optional",
+      "yes": "Yes",
+      "no": "No",
+      "next": "Next",
+      "previous": "Previous",
+      "reviewTitle": "Review Your Answers",
+      "reviewSubtitle": "Check your answers before submitting.",
+      "edit": "Edit",
+      "submit": "Submit Answers",
+      "submitting": "Submitting...",
+      "progress": "Question {current} of {total}",
+      "selectOne": "Select one",
+      "selectAll": "Select all that apply",
+      "enterText": "Type your answer",
+      "enterDate": "Select a date",
+      "answerRequired": "Please answer this question to continue.",
+      "categories": {
+        "experience": "Experience",
+        "tasks": "Tasks",
+        "equipment": "Equipment & tools",
+        "licence": "Licences & certificates",
+        "environment": "Work environment",
+        "verification": "Verification",
+        "availability": "Availability"
+      },
+      "summaryTitle": "Qualification Summary"
+    }
   }
 }
