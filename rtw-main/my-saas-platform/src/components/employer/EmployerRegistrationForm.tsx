@@ -287,9 +287,9 @@ export const EmployerRegistrationForm: React.FC = () => {
               })
 
               if (loginResult.success) {
-                // New employers start with 0 credits — send them to the pricing page
-                // to pick a plan before they can request interviews
-                router.push('/pricing')
+                // Land on the employer dashboard — pricing is only required when
+                // they try to send an interview invitation without credits
+                router.push('/employer/dashboard')
                 router.refresh() // Refresh to update auth state
               } else {
                 toast.error(t('phoneVerification.verificationSuccessfulLoginFailed'))
