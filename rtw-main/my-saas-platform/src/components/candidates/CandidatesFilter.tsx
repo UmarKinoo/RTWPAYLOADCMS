@@ -27,11 +27,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Search, SlidersHorizontal, MapPin, Briefcase, User, Clock, X, Award, Globe, Loader2 } from 'lucide-react'
+import { Search, SlidersHorizontal, Briefcase, User, Clock, X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { getFilterOptions as fetchFilterOptions } from '@/lib/candidates/filter-options'
+import type { FilterOptions } from '@/lib/candidates/filter-options'
 
 // Filter configuration - maps to URL params and database fields
 interface FilterConfig {
@@ -40,42 +41,29 @@ interface FilterConfig {
   options: string[]
 }
 
-// Param to translation key for filter labels (so filters display in current locale)
-const JOB_TYPE_LABELS: Record<string, string> = {
-  'full-time': 'Full-time',
-  'part-time': 'Part-time',
-  contract: 'Contract',
-  freelance: 'Freelance',
-}
+const GENDER_OPTIONS = ['male', 'female'] as const
 
 const paramToLabelKey: Record<string, string> = {
-  country: 'country',
-  state: 'stateCity',
-  jobType: 'jobType',
   discipline: 'majorDiscipline',
   category: 'category',
   subCategory: 'subCategory',
-  skillLevel: 'skillLevel',
   availability: 'whenAvailable',
   nationality: 'nationality',
-  experience: 'experience',
-  language: 'language',
+  gender: 'gender',
 }
 
-// Base filter configuration
+// Base filter configuration (visible filters only)
 const baseFilterConfigs: FilterConfig[] = [
-  { label: 'Country', param: 'country', options: [] },
-  { label: 'State', param: 'state', options: [] },
-  { label: 'Job Type', param: 'jobType', options: [] },
   { label: 'Major Discipline', param: 'discipline', options: [] },
   { label: 'Category', param: 'category', options: [] },
   { label: 'Sub Category', param: 'subCategory', options: [] },
-  { label: 'Skill Level', param: 'skillLevel', options: ['Beginner', 'Intermediate', 'Advanced', 'Expert'] },
   { label: 'Availability', param: 'availability', options: ['Immediate', '1 Week', '2 Weeks', '1 Month', '2+ Months'] },
   { label: 'Nationality', param: 'nationality', options: [] },
-  { label: 'Experience', param: 'experience', options: ['0-1 years', '1-3 years', '3-5 years', '5-10 years', '10+ years'] },
-  { label: 'Language', param: 'language', options: [] },
+  { label: 'Gender', param: 'gender', options: [...GENDER_OPTIONS] },
 ]
+
+/** Session-level cache so remounting the sidebar does not wait on filter options again */
+const filterOptionsCache = new Map<string, FilterOptions>()
 
 // Styled Select Component with label always visible
 const FilterSelect: React.FC<{
@@ -159,7 +147,8 @@ const MobileFilterSheet: React.FC<{
   isLoadingOptions: boolean
   t: ReturnType<typeof useTranslations<'candidatesPage.filters'>>
   labelMaps: { discipline: Record<string, string>; category: Record<string, string>; subCategory: Record<string, string> } | null
-}> = ({ filters, onFilterChange, onClearAll, filterConfigs, isLoadingOptions, t, labelMaps }) => {
+  getGenderLabel: (value: string) => string
+}> = ({ filters, onFilterChange, onClearAll, filterConfigs, isLoadingOptions, t, labelMaps, getGenderLabel }) => {
   const activeFilterCount = Object.values(filters).filter((v) => v).length
 
   const getFilterOptions = (param: string) => {
@@ -167,8 +156,17 @@ const MobileFilterSheet: React.FC<{
   }
 
   const getOptionLabelForParam = (param: string) => {
+    if (param === 'gender') return getGenderLabel
     if (!labelMaps || (param !== 'discipline' && param !== 'category' && param !== 'subCategory')) return undefined
     return (val: string) => labelMaps[param as keyof typeof labelMaps][val] ?? val
+  }
+
+  const displayFilterValue = (key: string, value: string) => {
+    if (key === 'gender') return getGenderLabel(value)
+    if (labelMaps && (key === 'discipline' || key === 'category' || key === 'subCategory')) {
+      return labelMaps[key as keyof typeof labelMaps][value] ?? value
+    }
+    return value
   }
 
   return (
@@ -233,9 +231,6 @@ const MobileFilterSheet: React.FC<{
                 {Object.entries(filters).map(([key, value]) => {
                   if (!value) return null
                   const config = filterConfigs.find((f) => f.param === key)
-                  const displayValue = labelMaps && (key === 'discipline' || key === 'category' || key === 'subCategory')
-                    ? (labelMaps[key as keyof typeof labelMaps][value] ?? value)
-                    : value
                   return (
                     <Badge
                       key={key}
@@ -243,7 +238,7 @@ const MobileFilterSheet: React.FC<{
                       className="border-[#4644b8] bg-[#4644b8]/10 text-[#4644b8] px-3.5 py-2 text-sm font-medium inline-flex max-w-full min-w-0 items-start justify-start gap-2 whitespace-normal text-left"
                     >
                       <span className="min-w-0 flex-1 break-words leading-snug">
-                        {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayValue}
+                        {config ? t(paramToLabelKey[config.param] ?? config.param) : key}: {displayFilterValue(key, value)}
                       </span>
                       <button
                         type="button"
@@ -264,37 +259,7 @@ const MobileFilterSheet: React.FC<{
           )}
 
           {/* Accordion for grouped filters */}
-          <Accordion type="multiple" defaultValue={['location', 'job', 'profile', 'availability']} className="w-full space-y-2">
-            {/* Location */}
-            <AccordionItem value="location" className="border border-gray-100 rounded-xl overflow-hidden bg-white shadow-sm">
-              <AccordionTrigger className="px-4 py-3.5 hover:no-underline hover:bg-gray-50 [&[data-state=open]]:bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <span className="font-semibold text-[#16252d]">{t('location')}</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-2 space-y-3">
-                <FilterSelect
-                  label={t('country')}
-                  value={filters.country}
-                  options={getFilterOptions('country')}
-                  isLoading={isLoadingOptions}
-                  onValueChange={(value) => onFilterChange('country', value)}
-                  t={t}
-                />
-                <FilterSelect
-                  label={t('stateCity')}
-                  value={filters.state}
-                  options={getFilterOptions('state')}
-                  isLoading={isLoadingOptions}
-                  onValueChange={(value) => onFilterChange('state', value)}
-                  t={t}
-                />
-              </AccordionContent>
-            </AccordionItem>
-
+          <Accordion type="multiple" defaultValue={['job', 'profile', 'availability']} className="w-full space-y-2">
             {/* Job Details */}
             <AccordionItem value="job" className="border border-gray-100 rounded-xl overflow-hidden bg-white shadow-sm">
               <AccordionTrigger className="px-4 py-3.5 hover:no-underline hover:bg-gray-50 [&[data-state=open]]:bg-gray-50">
@@ -307,20 +272,13 @@ const MobileFilterSheet: React.FC<{
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-2 space-y-3">
                 <FilterSelect
-                  label={t('jobType')}
-                  value={filters.jobType}
-                  options={getFilterOptions('jobType')}
-                  isLoading={false}
-                  onValueChange={(value) => onFilterChange('jobType', value)}
-                  t={t}
-                />
-                <FilterSelect
                   label={t('majorDiscipline')}
                   value={filters.discipline}
                   options={getFilterOptions('discipline')}
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('discipline', value)}
                   t={t}
+                  getOptionLabel={getOptionLabelForParam('discipline')}
                 />
                 <FilterSelect
                   label={t('category')}
@@ -329,6 +287,7 @@ const MobileFilterSheet: React.FC<{
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('category', value)}
                   t={t}
+                  getOptionLabel={getOptionLabelForParam('category')}
                 />
                 <FilterSelect
                   label={t('subCategory')}
@@ -337,14 +296,7 @@ const MobileFilterSheet: React.FC<{
                   isLoading={isLoadingOptions}
                   onValueChange={(value) => onFilterChange('subCategory', value)}
                   t={t}
-                />
-                <FilterSelect
-                  label={t('skillLevel')}
-                  value={filters.skillLevel}
-                  options={getFilterOptions('skillLevel')}
-                  isLoading={false}
-                  onValueChange={(value) => onFilterChange('skillLevel', value)}
-                  t={t}
+                  getOptionLabel={getOptionLabelForParam('subCategory')}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -369,20 +321,13 @@ const MobileFilterSheet: React.FC<{
                   t={t}
                 />
                 <FilterSelect
-                  label={t('experience')}
-                  value={filters.experience}
-                  options={getFilterOptions('experience')}
+                  label={t('gender')}
+                  value={filters.gender}
+                  options={getFilterOptions('gender')}
                   isLoading={false}
-                  onValueChange={(value) => onFilterChange('experience', value)}
+                  onValueChange={(value) => onFilterChange('gender', value)}
                   t={t}
-                />
-                <FilterSelect
-                  label={t('language')}
-                  value={filters.language}
-                  options={getFilterOptions('language')}
-                  isLoading={isLoadingOptions}
-                  onValueChange={(value) => onFilterChange('language', value)}
-                  t={t}
+                  getOptionLabel={getGenderLabel}
                 />
               </AccordionContent>
             </AccordionItem>
@@ -437,6 +382,15 @@ export const CandidatesFilter: React.FC = () => {
   const locale = useLocale()
   const searchParams = useSearchParams()
   const t = useTranslations('candidatesPage.filters')
+
+  const getGenderLabel = useCallback(
+    (value: string) => {
+      if (value === 'male') return t('male')
+      if (value === 'female') return t('female')
+      return value
+    },
+    [t],
+  )
   
   // Initialize all filters from URL params
   const initialFilters: Record<string, string> = {}
@@ -457,14 +411,10 @@ export const CandidatesFilter: React.FC = () => {
 
   // State for dynamic filter options
   const [filterOptions, setFilterOptions] = useState<Record<string, string[]>>({
-    country: [],
-    state: [],
     nationality: [],
-    language: [],
     discipline: [],
     category: [],
     subCategory: [],
-    jobType: [],
   })
 
   // Hierarchy maps for cascading discipline -> category -> subCategory
@@ -481,43 +431,50 @@ export const CandidatesFilter: React.FC = () => {
   } | null>(null)
 
   // Loading state for filter options
-  const [isLoadingOptions, setIsLoadingOptions] = useState(true)
+  const [isLoadingOptions, setIsLoadingOptions] = useState(() => !filterOptionsCache.has(locale))
 
-  // Fetch dynamic filter options using Server Action (pass locale for localized labels)
+  const applyFilterData = useCallback((data: FilterOptions) => {
+    setFilterOptions({
+      nationality: data.nationalities || [],
+      discipline: data.disciplines || [],
+      category: data.categories || [],
+      subCategory: data.subCategories || [],
+    })
+    setHierarchyMaps({
+      categoriesByDiscipline: data.categoriesByDiscipline ?? {},
+      subCategoriesByCategory: data.subCategoriesByCategory ?? {},
+    })
+    setLabelMaps(data.labelMaps ?? null)
+  }, [])
+
+  // Fetch dynamic filter options (session cache + server unstable_cache)
   useEffect(() => {
+    const cached = filterOptionsCache.get(locale)
+    if (cached) {
+      applyFilterData(cached)
+      setIsLoadingOptions(false)
+      return
+    }
+
+    let cancelled = false
     const loadFilterOptions = async () => {
       setIsLoadingOptions(true)
       try {
         const data = await fetchFilterOptions(locale)
-        setFilterOptions({
-          country: data.countries || [],
-          state: data.states || [],
-          nationality: data.nationalities || [],
-          language: data.languages || [],
-          discipline: data.disciplines || [],
-          category: data.categories || [],
-          subCategory: data.subCategories || [],
-          jobType: data.jobTypes?.length
-            ? data.jobTypes
-            : ['full-time', 'part-time', 'contract'],
-        })
-        setHierarchyMaps({
-          categoriesByDiscipline: data.categoriesByDiscipline ?? {},
-          subCategoriesByCategory: data.subCategoriesByCategory ?? {},
-        })
-        if (data.labelMaps) {
-          setLabelMaps(data.labelMaps)
-        } else {
-          setLabelMaps(null)
-        }
+        if (cancelled) return
+        filterOptionsCache.set(locale, data)
+        applyFilterData(data)
       } catch (error) {
         console.error('Failed to fetch filter options:', error)
       } finally {
-        setIsLoadingOptions(false)
+        if (!cancelled) setIsLoadingOptions(false)
       }
     }
     loadFilterOptions()
-  }, [locale])
+    return () => {
+      cancelled = true
+    }
+  }, [locale, applyFilterData])
 
   // Build filter configs with dynamic options; category/subCategory cascade from hierarchy
   const filterConfigs = baseFilterConfigs.map((config) => {
@@ -585,6 +542,7 @@ export const CandidatesFilter: React.FC = () => {
           isLoadingOptions={isLoadingOptions}
           t={t}
           labelMaps={labelMaps}
+          getGenderLabel={getGenderLabel}
         />
       </div>
 
@@ -640,9 +598,12 @@ export const CandidatesFilter: React.FC = () => {
               {Object.entries(filters).map(([key, value]) => {
                 if (!value) return null
                 const config = filterConfigs.find((f) => f.param === key)
-                const displayValue = labelMaps && (key === 'discipline' || key === 'category' || key === 'subCategory')
-                  ? (labelMaps[key as keyof typeof labelMaps][value] ?? value)
-                  : value
+                const displayValue =
+                  key === 'gender'
+                    ? getGenderLabel(value)
+                    : labelMaps && (key === 'discipline' || key === 'category' || key === 'subCategory')
+                      ? (labelMaps[key as keyof typeof labelMaps][value] ?? value)
+                      : value
                 return (
                   <Badge
                     key={key}
@@ -673,20 +634,13 @@ export const CandidatesFilter: React.FC = () => {
         {/* Filter Dropdowns */}
         <div className="space-y-4">
           {filterConfigs.map((filter) => {
-            const needsLoading = [
-              'country',
-              'state',
-              'nationality',
-              'language',
-              'discipline',
-              'category',
-              'subCategory',
-              'jobType',
-            ].includes(filter.param)
+            const needsLoading = ['nationality', 'discipline', 'category', 'subCategory'].includes(
+              filter.param,
+            )
             const labelKey = paramToLabelKey[filter.param] ?? filter.param
             const getOptionLabel =
-              filter.param === 'jobType'
-                ? (val: string) => JOB_TYPE_LABELS[val] ?? val
+              filter.param === 'gender'
+                ? getGenderLabel
                 : labelMaps &&
                     (filter.param === 'discipline' ||
                       filter.param === 'category' ||

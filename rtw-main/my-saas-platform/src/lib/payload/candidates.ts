@@ -107,6 +107,7 @@ async function fetchCandidates(options?: {
   skillLevel?: string
   availability?: string
   language?: string
+  gender?: string
 }): Promise<{
   candidates: CandidateListItem[]
   totalDocs: number
@@ -134,6 +135,7 @@ async function fetchCandidates(options?: {
     skillLevel,
     availability,
     language,
+    gender,
   } = options || {}
 
   // Build where clause — only approved profiles on the public site
@@ -172,6 +174,13 @@ async function fetchCandidates(options?: {
   if (language) {
     where.languages = {
       contains: language,
+    }
+  }
+
+  // Apply gender filter (male | female)
+  if (gender === 'male' || gender === 'female') {
+    where.gender = {
+      equals: gender,
     }
   }
 
@@ -370,6 +379,7 @@ export const getCandidates = (options?: {
   skillLevel?: string
   availability?: string
   language?: string
+  gender?: string
 }) =>
   unstable_cache(
     async () => fetchCandidates(options),
@@ -388,6 +398,7 @@ export const getCandidates = (options?: {
       `language-${options?.language || 'all'}`,
       `jobType-${options?.jobType || 'all'}`,
       `skillLevel-${options?.skillLevel || 'all'}`,
+      `gender-${options?.gender || 'all'}`,
     ],
     {
       tags: ['candidates'],

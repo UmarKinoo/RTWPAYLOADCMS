@@ -80,7 +80,7 @@ const PLANS = [
   },
   {
     slug: 'custom',
-    title: 'Custom',
+    title: 'Business',
     price: null,
     currency: 'SAR',
     entitlements: {

@@ -177,6 +177,7 @@ interface CandidatesPageProps {
     skillLevel?: string
     availability?: string
     language?: string
+    gender?: string
   }>
 }
 
@@ -215,6 +216,7 @@ export default async function CandidatesPage({ params, searchParams }: Candidate
       skillLevel: q.skillLevel,
       availability: q.availability,
       language: q.language,
+      gender: q.gender,
     })
     candidates = result.candidates
     totalDocs = result.totalDocs

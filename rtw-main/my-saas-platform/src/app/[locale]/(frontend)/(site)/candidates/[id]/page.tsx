@@ -234,20 +234,6 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
                 {candidate.jobMatrixSelection ?? t('careerPathwayNotSpecified')}
               </p>
             </InfoCard>
-
-            {/* Row 3: Tools & Skills (Full width) */}
-            <InfoCard title={t('toolsAndSkills')} className="sm:col-span-2">
-              <ul className="list-disc list-inside space-y-1 text-sm sm:text-base leading-[140%]">
-                <li>{t('specializedIn')} {candidate.jobTitle}</li>
-                <li>
-                  {candidate.experienceYears} {t('yearsProfessional')}
-                </li>
-                <li>{candidate.saudiExperience} {t('yearsSaudi')}</li>
-                {candidate.currentEmployer && (
-                  <li>{t('currentlyEmployedAt')} {candidate.currentEmployer}</li>
-                )}
-              </ul>
-            </InfoCard>
           </div>
         </div>
 

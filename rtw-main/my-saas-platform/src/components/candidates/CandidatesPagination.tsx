@@ -8,6 +8,8 @@ import { CANDIDATES_PER_PAGE } from '@/lib/candidates/profile-status'
 export { CANDIDATES_PER_PAGE }
 
 const PAGE_PARAM = 'page'
+/** How many numbered page buttons to show in the pagination bar */
+const VISIBLE_PAGE_NUMBERS = 5
 
 type SearchParams = Record<string, string | undefined>
 
@@ -20,6 +22,23 @@ function buildCandidatesHref(searchParams: SearchParams, page: number): string {
   if (page > 1) params.set(PAGE_PARAM, String(page))
   const qs = params.toString()
   return qs ? `/candidates?${qs}` : '/candidates'
+}
+
+function getVisiblePages(current: number, total: number, maxVisible: number): number[] {
+  if (total <= maxVisible) {
+    return Array.from({ length: total }, (_, i) => i + 1)
+  }
+
+  const half = Math.floor(maxVisible / 2)
+  let start = Math.max(1, current - half)
+  let end = start + maxVisible - 1
+
+  if (end > total) {
+    end = total
+    start = end - maxVisible + 1
+  }
+
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
 }
 
 export function CandidatesPagination(props: Readonly<{
@@ -36,8 +55,9 @@ export function CandidatesPagination(props: Readonly<{
 
   const hasPrevPage = page > 1
   const hasNextPage = page < totalPages
-  const hasExtraPrevPages = page - 1 > 1
-  const hasExtraNextPages = page + 1 < totalPages
+  const visiblePages = getVisiblePages(page, totalPages, VISIBLE_PAGE_NUMBERS)
+  const showLeadingEllipsis = visiblePages[0] > 1
+  const showTrailingEllipsis = visiblePages[visiblePages.length - 1] < totalPages
 
   const pageLinkClass = (active: boolean) =>
     cn(
@@ -77,7 +97,7 @@ export function CandidatesPagination(props: Readonly<{
           )}
         </li>
 
-        {hasExtraPrevPages && (
+        {showLeadingEllipsis && (
           <li>
             <span className="flex size-9 items-center justify-center">
               <MoreHorizontal className="size-4" />
@@ -86,42 +106,20 @@ export function CandidatesPagination(props: Readonly<{
           </li>
         )}
 
-        {hasPrevPage && (
-          <li>
+        {visiblePages.map((pageNum) => (
+          <li key={pageNum}>
             <Link
-              href={buildCandidatesHref(searchParams, page - 1)}
+              href={buildCandidatesHref(searchParams, pageNum)}
               locale={locale}
-              className={pageLinkClass(false)}
+              aria-current={pageNum === page ? 'page' : undefined}
+              className={pageLinkClass(pageNum === page)}
             >
-              {page - 1}
+              {pageNum}
             </Link>
           </li>
-        )}
+        ))}
 
-        <li>
-          <Link
-            href={buildCandidatesHref(searchParams, page)}
-            locale={locale}
-            aria-current="page"
-            className={pageLinkClass(true)}
-          >
-            {page}
-          </Link>
-        </li>
-
-        {hasNextPage && (
-          <li>
-            <Link
-              href={buildCandidatesHref(searchParams, page + 1)}
-              locale={locale}
-              className={pageLinkClass(false)}
-            >
-              {page + 1}
-            </Link>
-          </li>
-        )}
-
-        {hasExtraNextPages && (
+        {showTrailingEllipsis && (
           <li>
             <span className="flex size-9 items-center justify-center">
               <MoreHorizontal className="size-4" />
