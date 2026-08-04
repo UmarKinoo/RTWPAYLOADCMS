@@ -140,6 +140,8 @@ export const Candidates: CollectionConfig = {
     hidden: hiddenFromBlogEditorUnlessCandidatesViewer,
     useAsTitle: 'email',
     defaultColumns: ['firstName', 'lastName', 'email', 'primarySkill', 'billingClass', 'updatedAt'],
+    // Default search is email only (useAsTitle); expand so admins can find by name/phone
+    listSearchableFields: ['email', 'firstName', 'lastName', 'phone'],
   },
   fields: [
     {
@@ -163,16 +165,19 @@ export const Candidates: CollectionConfig = {
       name: 'firstName',
       type: 'text',
       required: true,
+      index: true,
     },
     {
       name: 'lastName',
       type: 'text',
       required: true,
+      index: true,
     },
     {
       name: 'phone',
       type: 'text',
       required: true,
+      index: true,
       admin: {
         description:
           'E.164 after normalization. Must be unique — one candidate account per phone (enforced in beforeChange hook).',
