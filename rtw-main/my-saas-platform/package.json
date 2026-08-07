@@ -36,6 +36,7 @@
     "verify:myfatoorah": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-myfatoorah-token.ts",
     "email:logo": "tsx scripts/svg-to-png-email-logo.ts",
     "verify:interview-flow": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-interview-candidate-flow.ts",
+    "report:contact-duplicates": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/report-contact-duplicates.ts",
     "create:test-candidate": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/create-test-candidate.ts",
     "seed:readybot-test-candidates": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-readybot-test-candidates.ts",
     "verify:cv-upload": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-cv-upload.ts",

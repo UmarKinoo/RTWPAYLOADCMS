@@ -12,7 +12,7 @@ import {
   revalidateCandidateDelete,
 } from './Candidates/hooks/revalidateCandidate'
 import { deleteRelatedBeforeCandidateDelete } from './Candidates/hooks/deleteRelatedBeforeCandidateDelete'
-import { ensureUniqueCandidatePhone } from './Candidates/hooks/ensureUniqueCandidatePhone'
+import { ensureUniqueCandidateContact } from './Candidates/hooks/ensureUniqueCandidateContact'
 import { updateBioEmbeddingVector } from './Candidates/hooks/updateBioEmbeddingVector'
 import { notifyModeratorsOnQueueEntry } from './Candidates/hooks/notifyModeratorsOnQueueEntry'
 
@@ -180,7 +180,7 @@ export const Candidates: CollectionConfig = {
       index: true,
       admin: {
         description:
-          'E.164 after normalization. Must be unique — one candidate account per phone (enforced in beforeChange hook).',
+          'E.164 after normalization. Must be unique across candidates and employers (enforced in beforeChange hook).',
       },
     },
     {
@@ -707,7 +707,7 @@ export const Candidates: CollectionConfig = {
   ],
   hooks: {
     beforeDelete: [deleteRelatedBeforeCandidateDelete],
-    beforeChange: [ensureUniqueCandidatePhone, setBillingClassAndGenerateEmbedding],
+    beforeChange: [ensureUniqueCandidateContact, setBillingClassAndGenerateEmbedding],
     afterChange: [updateBioEmbeddingVector, revalidateCandidate, notifyModeratorsOnQueueEntry],
     afterDelete: [revalidateCandidateDelete],
   },

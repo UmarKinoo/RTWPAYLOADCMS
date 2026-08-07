@@ -10,6 +10,7 @@ import { AddToInterviewButton } from '@/components/employer/AddToInterviewButton
 import { getCandidateDetail } from '@/lib/candidates/candidate-detail'
 import { getCandidates } from '@/lib/payload/candidates'
 import { formatExperience, getNationalityFlag } from '@/lib/utils/candidate-utils'
+import { getPackageLabelKey } from '@/lib/billing'
 import { getCurrentUserType } from '@/lib/currentUserType'
 import { cn } from '@/lib/utils'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -139,6 +140,14 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
     .map((lang) => lang.trim())
     .filter(Boolean)
 
+  const packageLabelKey = getPackageLabelKey(candidate.billingClass)
+  const packageClass = packageLabelKey
+    ? String(candidate.billingClass).toUpperCase().trim()
+    : null
+  const packageLabel = packageLabelKey
+    ? t(packageLabelKey as 'packageEssential' | 'packageSkilled' | 'packageSpecialty' | 'packageElite' | 'packageSaudiNationals')
+    : null
+
   // Locked view for non-employers: teaser + CTA only
   if (!hasEmployerAccess) {
     const t = await getTranslations('candidatesPage')
@@ -230,9 +239,21 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
 
             {/* Full job matrix path (discipline, category, subcategory, skill) at signup */}
             <InfoCard title={t('careerPathway')} className="sm:col-span-2">
-              <p className="break-words leading-relaxed">
-                {candidate.jobMatrixSelection ?? t('careerPathwayNotSpecified')}
-              </p>
+              <div className="flex flex-col gap-3">
+                {packageClass && packageLabel && (
+                  <span
+                    className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#4644b8]/30 bg-[#ececff] px-3 py-1 text-xs sm:text-sm font-semibold uppercase tracking-wide text-[#4644b8]"
+                    title={t('package')}
+                  >
+                    <span>{packageClass}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{packageLabel}</span>
+                  </span>
+                )}
+                <p className="break-words leading-relaxed">
+                  {candidate.jobMatrixSelection ?? t('careerPathwayNotSpecified')}
+                </p>
+              </div>
             </InfoCard>
           </div>
         </div>

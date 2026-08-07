@@ -7,6 +7,10 @@ import { getRequestAuthUser } from '@/lib/payload-auth'
 import { randomBytes } from 'crypto'
 import type { Candidate } from '@/payload-types'
 import { normalizePhone } from '@/server/sms/taqnyat'
+import {
+  assertUniqueContact,
+  isContactConflictError,
+} from '@/lib/auth/assertUniqueContact'
 import { sendEmail, verificationEmailTemplate } from './email'
 import { adminSignUpNotificationTemplate } from './email-templates'
 import { getModeratorEmails } from '@/lib/admin/moderator-emails'
@@ -116,7 +120,7 @@ export async function registerCandidate(
     }
     const formattedAvailabilityDate = availabilityDateObj.toISOString().split('T')[0]
 
-    // Normalize phone number
+    // Normalize phone number and block reuse across candidates / employers / users (email)
     let normalizedPhone: string
     try {
       normalizedPhone = normalizePhone(data.phone)
@@ -127,18 +131,27 @@ export async function registerCandidate(
       }
     }
 
-    const existingPhone = await payload.find({
-      collection: 'candidates',
-      where: { phone: { equals: normalizedPhone } },
-      limit: 1,
-      depth: 0,
-      overrideAccess: true,
-    })
-    if (existingPhone.docs.length > 0) {
-      return {
-        success: false,
-        error: 'An account with this phone number already exists',
+    try {
+      await assertUniqueContact(
+        {
+          email: data.email,
+          phone: normalizedPhone,
+        },
+        { payload },
+      )
+    } catch (e: unknown) {
+      if (isContactConflictError(e)) {
+        return {
+          success: false,
+          error:
+            e instanceof Error
+              ? e.message.includes('email')
+                ? 'An account with this email already exists'
+                : 'An account with this phone number already exists'
+              : 'Contact details already in use',
+        }
       }
+      throw e
     }
 
     // Normalize WhatsApp if provided
@@ -488,10 +501,22 @@ export async function updateCandidate(
   } catch (error: unknown) {
     console.error('Error updating candidate:', error)
     const message = error instanceof Error ? error.message : 'Failed to update candidate'
-    if (message.includes('already registered to another account')) {
+    if (
+      message.includes('already registered to another account') ||
+      message.includes('phone number already exists')
+    ) {
       return {
         success: false,
         error: 'An account with this phone number already exists',
+      }
+    }
+    if (
+      message.includes('email already exists') ||
+      message.toLowerCase().includes('email is already')
+    ) {
+      return {
+        success: false,
+        error: 'An account with this email already exists',
       }
     }
     return {

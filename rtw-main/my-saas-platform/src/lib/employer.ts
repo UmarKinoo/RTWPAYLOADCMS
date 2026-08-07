@@ -7,6 +7,10 @@ import { revalidatePath } from 'next/cache'
 import { randomBytes } from 'crypto'
 import { sendEmail, verificationEmailTemplate } from './email'
 import { adminSignUpNotificationTemplate } from './email-templates'
+import {
+  assertUniqueContact,
+  isContactConflictError,
+} from '@/lib/auth/assertUniqueContact'
 import type { Employer } from '@/payload-types'
 
 export interface RegisterEmployerData {
@@ -59,19 +63,33 @@ export async function registerEmployer(
       return { success: false, error: 'You must accept the terms and conditions' }
     }
 
-    // Check if employer with this email already exists
-    const existing = await payload.find({
-      collection: 'employers',
-      where: {
-        email: {
-          equals: data.email.toLowerCase().trim(),
-        },
-      },
-      limit: 1,
-    })
+    const email = data.email.toLowerCase().trim()
 
-    if (existing.docs.length > 0) {
-      return { success: false, error: 'An employer with this email already exists' }
+    // Block email/phone reuse across employers, candidates, and users
+    let normalizedPhone: string | null = null
+    try {
+      const checked = await assertUniqueContact(
+        {
+          email,
+          phone: data.phone?.trim() || null,
+        },
+        { payload },
+      )
+      normalizedPhone = checked.phone ?? null
+    } catch (e: unknown) {
+      if (isContactConflictError(e)) {
+        return {
+          success: false,
+          error:
+            e instanceof Error && e.message.toLowerCase().includes('email')
+              ? 'An account with this email already exists'
+              : 'An account with this phone number already exists',
+        }
+      }
+      return {
+        success: false,
+        error: e instanceof Error ? e.message : 'Invalid contact details',
+      }
     }
 
     // Generate email verification token
@@ -84,8 +102,8 @@ export async function registerEmployer(
       data: {
         responsiblePerson: data.responsiblePerson.trim(),
         companyName: data.companyName.trim(),
-        email: data.email.toLowerCase().trim(),
-        phone: data.phone?.trim() || null,
+        email,
+        phone: normalizedPhone,
         password: data.password,
         termsAccepted: data.termsAccepted,
         emailVerified: false,
@@ -102,9 +120,9 @@ export async function registerEmployer(
 
     // Send verification email
     const emailResult = await sendEmail({
-      to: data.email.toLowerCase().trim(),
+      to: email,
       subject: 'Verify your email address - Ready to Work',
-      html: verificationEmailTemplate(data.email.toLowerCase().trim(), verificationToken, 'employer'),
+      html: verificationEmailTemplate(email, verificationToken, 'employer'),
     })
 
     if (!emailResult.success) {
@@ -121,8 +139,8 @@ export async function registerEmployer(
       html: adminSignUpNotificationTemplate('employer', {
         responsiblePerson: data.responsiblePerson.trim(),
         companyName: data.companyName.trim(),
-        email: data.email.toLowerCase().trim(),
-        phone: data.phone?.trim() || null,
+        email,
+        phone: normalizedPhone,
       }),
     })
     if (!adminResult.success) {
@@ -139,6 +157,15 @@ export async function registerEmployer(
     // SECURITY: Never log passwords or sensitive data
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Error registering employer:', errorMessage)
+    if (isContactConflictError(error)) {
+      return {
+        success: false,
+        error:
+          errorMessage.toLowerCase().includes('email')
+            ? 'An account with this email already exists'
+            : 'An account with this phone number already exists',
+      }
+    }
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to register employer. Please try again.',

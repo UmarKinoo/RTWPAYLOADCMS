@@ -2,11 +2,13 @@ import type { CollectionConfig } from 'payload'
 import { hiddenFromBlogEditor } from '../access/hiddenFromBlogEditor'
 import { allowOnlyAdmin } from '../access/allowOnlyAdmin'
 import { deleteRelatedBeforeEmployerDelete } from './Employers/hooks/deleteRelatedBeforeEmployerDelete'
+import { ensureUniqueEmployerContact } from './Employers/hooks/ensureUniqueEmployerContact'
 
 export const Employers: CollectionConfig = {
   slug: 'employers',
   auth: true,
   hooks: {
+    beforeChange: [ensureUniqueEmployerContact],
     beforeDelete: [deleteRelatedBeforeEmployerDelete],
   },
   access: {
@@ -56,7 +58,8 @@ export const Employers: CollectionConfig = {
       label: 'Phone Number',
       required: false, // Made optional to allow existing records, but required in form validation
       admin: {
-        description: 'Phone number will be verified via OTP during registration. Required for new registrations.',
+        description:
+          'Phone number will be verified via OTP during registration. Required for new registrations. Must be unique across employers and candidates.',
       },
     },
     {

@@ -235,6 +235,7 @@ export function PendingInterviewsPage({
           {interviews.length > 0 ? (
             interviews.map((interview) => {
               const interviewDate = interview.scheduledAt ? new Date(interview.scheduledAt) : null
+              const requestedAtTime = interview.requestedAt || interview.createdAt
               const isProcessing = processingId === interview.id
               const employerId = getEmployerId(interview)
               const candidateId = getCandidateId(interview)
@@ -263,10 +264,16 @@ export function PendingInterviewsPage({
                           <span className="font-medium text-[#16252d]">Candidate:</span>{' '}
                           {getCandidateName(interview)}
                         </CardDescription>
-                        <div className="mt-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
                           <Badge className="border-amber-200 bg-amber-50 font-medium text-amber-800">
                             Pending approval
                           </Badge>
+                          {requestedAtTime && (
+                            <p className="text-xs text-[#757575]">
+                              Requested{' '}
+                              {format(new Date(requestedAtTime), 'MMM d, yyyy · h:mm a')}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -434,12 +441,6 @@ export function PendingInterviewsPage({
                         </div>
                       )}
                     </div>
-
-                    {interview.requestedAt && (
-                      <p className="text-xs text-[#757575]">
-                        Requested {format(new Date(interview.requestedAt), 'MMM d, yyyy · h:mm a')}
-                      </p>
-                    )}
 
                     <Separator className="bg-[#e5e5e5]" />
 

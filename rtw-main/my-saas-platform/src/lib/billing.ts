@@ -91,6 +91,42 @@ export function isValidBillingClass(billingClass: string | null | undefined): bi
   return ['A', 'B', 'C', 'D', 'S'].includes(billingClass.toUpperCase().trim())
 }
 
+/** Short package labels for career-pathway UI (D = Elite, not Elite Specialty). */
+export const PACKAGE_LABELS: Record<BillingClass, string> = {
+  A: 'Essential',
+  B: 'Skilled',
+  C: 'Specialty',
+  D: 'Elite',
+  S: 'Saudi Nationals',
+}
+
+/** next-intl keys under `candidateDetail` for package labels. */
+export const PACKAGE_LABEL_I18N_KEYS: Record<BillingClass, string> = {
+  A: 'packageEssential',
+  B: 'packageSkilled',
+  C: 'packageSpecialty',
+  D: 'packageElite',
+  S: 'packageSaudiNationals',
+}
+
+/**
+ * Short English package label for career-pathway tag (or null if invalid/missing).
+ */
+export function getPackageLabel(billingClass: BillingClass | string | null | undefined): string | null {
+  if (!isValidBillingClass(billingClass)) return null
+  return PACKAGE_LABELS[billingClass.toUpperCase().trim() as BillingClass]
+}
+
+/**
+ * i18n message key for package label under `candidateDetail` (or null if invalid/missing).
+ */
+export function getPackageLabelKey(
+  billingClass: BillingClass | string | null | undefined,
+): string | null {
+  if (!isValidBillingClass(billingClass)) return null
+  return PACKAGE_LABEL_I18N_KEYS[billingClass.toUpperCase().trim() as BillingClass]
+}
+
 
 
 
