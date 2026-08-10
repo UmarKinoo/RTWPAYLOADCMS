@@ -34,6 +34,7 @@ export interface RegisterCandidateData {
   dob: string
   nationality: string
   languages: string
+  currentlyInKSA?: boolean
 
   // Work
   jobTitle: string
@@ -192,6 +193,7 @@ export async function registerCandidate(
         dob: formattedDob, // Required field, formatted as YYYY-MM-DD
         nationality: data.nationality,
         languages: data.languages,
+        currentlyInKSA: data.currentlyInKSA !== false,
         jobTitle: data.jobTitle,
         experienceYears: data.experienceYears,
         industryExperience: data.industryExperience?.trim() || undefined,
@@ -410,6 +412,16 @@ export async function updateCandidate(
     if (data.whatsapp !== undefined) updateData.whatsapp = data.whatsapp
     if (data.primarySkill !== undefined)
       updateData.primarySkill = parseInt(data.primarySkill, 10)
+    if (data.secondarySkill !== undefined) {
+      updateData.secondarySkill = data.secondarySkill
+        ? parseInt(data.secondarySkill, 10)
+        : null
+    }
+    if (data.tertiarySkill !== undefined) {
+      updateData.tertiarySkill = data.tertiarySkill
+        ? parseInt(data.tertiarySkill, 10)
+        : null
+    }
     if (data.gender !== undefined) updateData.gender = data.gender
     if (data.dob !== undefined) {
       // Format DOB to YYYY-MM-DD
@@ -422,8 +434,12 @@ export async function updateCandidate(
     }
     if (data.nationality !== undefined) updateData.nationality = data.nationality
     if (data.languages !== undefined) updateData.languages = data.languages
+    if (data.currentlyInKSA !== undefined) updateData.currentlyInKSA = data.currentlyInKSA
     if (data.jobTitle !== undefined) updateData.jobTitle = data.jobTitle
     if (data.experienceYears !== undefined) updateData.experienceYears = data.experienceYears
+    if (data.industryExperience !== undefined) {
+      updateData.industryExperience = data.industryExperience?.trim() || null
+    }
     if (data.saudiExperience !== undefined) updateData.saudiExperience = data.saudiExperience
     if (data.currentEmployer !== undefined) updateData.currentEmployer = data.currentEmployer
     if (data.availabilityDate !== undefined) {

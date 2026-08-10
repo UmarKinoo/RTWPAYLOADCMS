@@ -269,6 +269,15 @@ export const Candidates: CollectionConfig = {
         description: 'Languages speaking/reading and writing',
       },
     },
+    {
+      name: 'currentlyInKSA',
+      type: 'checkbox',
+      label: 'Currently located in Saudi Arabia',
+      defaultValue: true,
+      admin: {
+        description: 'Candidate confirmed they are currently located in Saudi Arabia',
+      },
+    },
     // Work
     {
       name: 'jobTitle',

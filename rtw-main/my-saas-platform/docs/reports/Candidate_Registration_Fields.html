@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Candidate Registration &amp; Dashboard Fields — ReadyToWork</title>
+<style>
+  @page { size: A4; margin: 36px 44px; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #1a1a2e; margin: 0; padding: 40px 48px; font-size: 12.5px; line-height: 1.45; }
+  h1 { font-size: 28px; letter-spacing: 0.5px; margin: 0 0 4px; }
+  .docno { text-align: right; color: #3b46f1; font-weight: bold; font-size: 14px; }
+  .rule { border: none; border-top: 3px solid #3b46f1; margin: 8px 0 22px; }
+  .cols { display: flex; gap: 28px; margin-bottom: 22px; }
+  .col { flex: 1; }
+  .lbl { color: #3b46f1; font-weight: bold; font-size: 10.5px; letter-spacing: .5px; margin-bottom: 6px; text-transform: uppercase; }
+  .name { font-weight: bold; font-size: 14px; }
+  .muted { color: #6b7280; }
+  h2 { color: #3b46f1; font-size: 13px; letter-spacing: .4px; text-transform: uppercase; margin: 26px 0 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  thead th { background: #3b46f1; color: #fff; text-align: left; padding: 10px 12px; font-size: 10.5px; letter-spacing: .4px; }
+  thead th.c, td.c { text-align: center; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  tbody tr:nth-child(odd) td { background: #f7f8ff; }
+  .req { color: #3b46f1; font-weight: bold; }
+  .opt { color: #6b7280; }
+  .note { background: #f7f8ff; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; color: #374151; margin: 10px 0 0; }
+  ul { margin: 6px 0 0; padding-left: 18px; color: #374151; }
+  ul li { margin-bottom: 4px; }
+  .foot { text-align: center; color: #b0b4c0; margin-top: 28px; padding-top: 14px; border-top: 1px solid #e5e7eb; font-size: 11.5px; }
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="docno">RTW-REG-FIELDS</div>
+  <h1>Candidate Registration &amp; Dashboard</h1>
+  <div class="muted" style="margin-bottom: 4px;">What candidates provide at signup, and what they can add or edit on their dashboard</div>
+  <hr class="rule">
+
+  <div class="cols">
+    <div class="col">
+      <div class="lbl">Prepared for</div>
+      <div class="name">ReadyToWork</div>
+      <div class="muted">Client</div>
+    </div>
+    <div class="col">
+      <div class="lbl">Scope</div>
+      <div>Website registration wizard + candidate dashboard</div>
+      <div class="muted">Does not include ESCO or ReadyBot flows</div>
+    </div>
+    <div class="col">
+      <div class="lbl">Legend</div>
+      <div><span class="req">*</span> = Required to continue / submit</div>
+      <div class="muted">Optional = can be left blank</div>
+    </div>
+  </div>
+
+  <p class="note">
+    Candidates complete a <b>6-step</b> registration on the website, then are redirected to their <b>dashboard</b>.
+    Required fields must be filled before moving to the next step or submitting.
+    After signup they can edit most of their profile and add extra items (photo, bio, education, CV, preferences, benefits).
+  </p>
+
+  <h2>Part A — Website registration wizard</h2>
+
+  <h2>Step 1 — Account</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th class="c" style="width: 120px;">Required</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Email</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Password</td>
+        <td class="c req">*</td>
+        <td>Min. 8 characters; must include uppercase, lowercase, a number, and a special character</td>
+      </tr>
+      <tr>
+        <td>Confirm password</td>
+        <td class="c req">*</td>
+        <td>Must match password</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Step 2 — Personal info</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th class="c" style="width: 120px;">Required</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>First name</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Last name</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Phone</td>
+        <td class="c req">*</td>
+        <td>Saudi Arabia numbers only (+966)</td>
+      </tr>
+      <tr>
+        <td>WhatsApp</td>
+        <td class="c opt">Optional</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Same as phone</td>
+        <td class="c opt">Optional</td>
+        <td>Helper checkbox to copy phone into WhatsApp</td>
+      </tr>
+      <tr>
+        <td>Gender</td>
+        <td class="c req">*</td>
+        <td>Male or Female</td>
+      </tr>
+      <tr>
+        <td>Date of birth</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Nationality</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Languages</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Location</td>
+        <td class="c req">*</td>
+        <td>City in Saudi Arabia</td>
+      </tr>
+      <tr>
+        <td>Confirm currently located in Saudi Arabia</td>
+        <td class="c req">*</td>
+        <td>Must be confirmed</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Step 3 — Job role</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th class="c" style="width: 120px;">Required</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Primary skill / job role</td>
+        <td class="c req">*</td>
+        <td>Main role selected from the job matrix</td>
+      </tr>
+      <tr>
+        <td>Secondary skill</td>
+        <td class="c opt">Optional</td>
+        <td>Must differ from primary (and tertiary) if provided</td>
+      </tr>
+      <tr>
+        <td>Tertiary skill</td>
+        <td class="c opt">Optional</td>
+        <td>Must differ from primary and secondary if provided</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Step 4 — Work experience</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th class="c" style="width: 120px;">Required</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Job title</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Years of experience</td>
+        <td class="c req">*</td>
+        <td>0 allowed</td>
+      </tr>
+      <tr>
+        <td>Industry experience</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Years of Saudi experience</td>
+        <td class="c req">*</td>
+        <td>0 allowed</td>
+      </tr>
+      <tr>
+        <td>Current employer</td>
+        <td class="c opt">Optional</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Availability date</td>
+        <td class="c req">*</td>
+        <td>When the candidate can start</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Step 5 — Visa</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th class="c" style="width: 120px;">Required</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Visa status</td>
+        <td class="c req">*</td>
+        <td>Active / Nearly expired / Expired / None</td>
+      </tr>
+      <tr>
+        <td>Visa expiry date</td>
+        <td class="c opt">Optional</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Job position on visa</td>
+        <td class="c opt">Optional</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Step 6 — Review &amp; consent</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th class="c" style="width: 120px;">Required</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Accept Privacy Policy and Terms and Conditions</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Consent to data collection and publication</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Acknowledge platform disclaimer</td>
+        <td class="c req">*</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Part B — After registration (candidate dashboard)</h2>
+  <p class="muted" style="margin-top:0">
+    After signup, candidates land on their dashboard. They can update information from registration and add new profile sections below.
+  </p>
+
+  <h2>New items they can add (not asked at signup)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Section</th>
+        <th>What they can add</th>
+        <th class="c" style="width: 120px;">Required?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Profile</td>
+        <td>Profile photo (JPEG / PNG / WebP / GIF, max 5MB)</td>
+        <td class="c opt">Optional</td>
+      </tr>
+      <tr>
+        <td>About me</td>
+        <td>Bio / about text (up to 2,000 characters)</td>
+        <td class="c opt">Optional</td>
+      </tr>
+      <tr>
+        <td>Education</td>
+        <td>
+          Multiple entries. Per entry:
+          Degree/Certification (<span class="req">*</span>),
+          Institution (<span class="req">*</span>),
+          Field of study (optional),
+          Graduation year (optional),
+          Description (optional)
+        </td>
+        <td class="c opt">Section optional; * required when saving an entry</td>
+      </tr>
+      <tr>
+        <td>Job preferences</td>
+        <td>Preferred job title, preferred location, preferred salary, work type (full-time / part-time / contract / freelance / any), shift preference (day / night / rotating / any)</td>
+        <td class="c opt">Optional</td>
+      </tr>
+      <tr>
+        <td>Job benefits</td>
+        <td>
+          Preferred benefits (e.g. health insurance, accommodation, transportation, annual leave, end of service, training, performance bonus, overtime pay, meal allowance, other).
+          Multiple benefits can be added.
+        </td>
+        <td class="c opt">Optional</td>
+      </tr>
+      <tr>
+        <td>Resume / CV</td>
+        <td>Upload or replace CV (PDF / DOC / DOCX, max 10MB); download or remove</td>
+        <td class="c opt">Optional</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Editable from registration (already collected at signup)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Section</th>
+        <th>Fields</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Personal information</td>
+        <td>First name, last name, phone, WhatsApp, location, date of birth, gender, nationality, currently located in Saudi Arabia</td>
+        <td>Email is shown read-only here; change email in Account Settings</td>
+      </tr>
+      <tr>
+        <td>Professional skills</td>
+        <td>Primary skill / job role, secondary skill, tertiary skill</td>
+        <td>Primary is required; secondary and tertiary are optional</td>
+      </tr>
+      <tr>
+        <td>Work experience</td>
+        <td>Job title, current employer, total experience (years), Saudi experience (years), industry experience, availability date</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Visa status</td>
+        <td>Visa status, visa expiry date, job position on visa</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Languages</td>
+        <td>Languages</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Other dashboard areas (not profile forms)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Area</th>
+        <th>What it is for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>My Resume</td>
+        <td>CV upload/management and resume completeness tips</td>
+      </tr>
+      <tr>
+        <td>Interviews</td>
+        <td>View interview requests; accept or reject</td>
+      </tr>
+      <tr>
+        <td>Notifications</td>
+        <td>In-app alerts (e.g. interview updates)</td>
+      </tr>
+      <tr>
+        <td>Activity</td>
+        <td>Timeline of employer interest and interview events (read-only)</td>
+      </tr>
+      <tr>
+        <td>Account Settings</td>
+        <td>Change password, change/verify email, change/verify phone, WhatsApp, delete account</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    ReadyToWork — Candidate Registration &amp; Dashboard Fields · Open in a browser · Print / Save as PDF from File → Print
+  </div>
+
+</body>
+</html>

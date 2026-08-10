@@ -992,10 +992,20 @@
       "selectGender": "اختر الجنس",
       "male": "ذكر",
       "female": "أنثى",
+      "currentlyInKSA": "متواجد حالياً في السعودية",
+      "confirmInKSA": "أؤكد أنني مقيم حاليًا في المملكة العربية السعودية",
+      "yes": "نعم",
+      "no": "لا",
       "personalInfoUpdated": "تم تحديث المعلومات الشخصية بنجاح"
     },
     "professionalSkills": {
-      "title": "المهارة الرئيسية"
+      "title": "المهارات المهنية",
+      "primarySkill": "المهارة الرئيسية",
+      "secondarySkill": "المهارة الثانية",
+      "tertiarySkill": "المهارة الثالثة",
+      "primaryRequired": "يرجى اختيار المهارة الرئيسية",
+      "skillsMustDiffer": "يجب أن تكون المهارات مختلفة عن بعضها",
+      "skillsUpdated": "تم تحديث المهارات بنجاح"
     },
     "workExperience": {
       "title": "الخبرة العملية",
@@ -1003,6 +1013,7 @@
       "currentEmployer": "صاحب العمل الحالي",
       "totalExperienceYears": "إجمالي الخبرة (بالسنوات)",
       "saudiExperienceYears": "الخبرة في السعودية (بالسنوات)",
+      "industryExperience": "خبرة القطاع",
       "availabilityDate": "تاريخ التوفر",
       "years": "سنوات",
       "workExperienceUpdated": "تم تحديث الخبرة العملية بنجاح"

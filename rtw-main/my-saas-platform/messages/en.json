@@ -992,10 +992,20 @@
       "selectGender": "Select gender",
       "male": "Male",
       "female": "Female",
+      "currentlyInKSA": "Currently in Saudi Arabia",
+      "confirmInKSA": "I confirm I am currently located in Saudi Arabia",
+      "yes": "Yes",
+      "no": "No",
       "personalInfoUpdated": "Personal information updated successfully"
     },
     "professionalSkills": {
-      "title": "Primary Skill"
+      "title": "Professional Skills",
+      "primarySkill": "Primary Skill",
+      "secondarySkill": "Second Skill",
+      "tertiarySkill": "Third Skill",
+      "primaryRequired": "Please select your primary skill",
+      "skillsMustDiffer": "Skills must be different from each other",
+      "skillsUpdated": "Skills updated successfully"
     },
     "workExperience": {
       "title": "Work Experience",
@@ -1003,6 +1013,7 @@
       "currentEmployer": "Current Employer",
       "totalExperienceYears": "Total Experience (Years)",
       "saudiExperienceYears": "Saudi Experience (Years)",
+      "industryExperience": "Industry Experience",
       "availabilityDate": "Availability Date",
       "years": "years",
       "workExperienceUpdated": "Work experience updated successfully"

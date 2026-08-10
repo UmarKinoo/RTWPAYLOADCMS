@@ -23,8 +23,9 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
   const [formData, setFormData] = useState({
     jobTitle: candidate.jobTitle || '',
     experienceYears: candidate.experienceYears?.toString() || '0',
-    saudiExperience: (candidate as any).saudiExperience?.toString() || '0',
-    currentEmployer: (candidate as any).currentEmployer || '',
+    industryExperience: candidate.industryExperience || '',
+    saudiExperience: candidate.saudiExperience?.toString() || '0',
+    currentEmployer: candidate.currentEmployer || '',
     availabilityDate: candidate.availabilityDate
       ? new Date(candidate.availabilityDate).toISOString().split('T')[0]
       : '',
@@ -37,6 +38,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
       const result = await updateCandidate(candidate.id, {
         jobTitle: formData.jobTitle,
         experienceYears: parseInt(formData.experienceYears, 10),
+        industryExperience: formData.industryExperience,
         saudiExperience: parseInt(formData.saudiExperience, 10),
         currentEmployer: formData.currentEmployer || undefined,
         availabilityDate: formData.availabilityDate,
@@ -49,7 +51,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
       } else {
         toast.error(result.error || tCommon('failedToUpdate'))
       }
-    } catch (error) {
+    } catch {
       toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
@@ -60,8 +62,9 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
     setFormData({
       jobTitle: candidate.jobTitle || '',
       experienceYears: candidate.experienceYears?.toString() || '0',
-      saudiExperience: (candidate as any).saudiExperience?.toString() || '0',
-      currentEmployer: (candidate as any).currentEmployer || '',
+      industryExperience: candidate.industryExperience || '',
+      saudiExperience: candidate.saudiExperience?.toString() || '0',
+      currentEmployer: candidate.currentEmployer || '',
       availabilityDate: candidate.availabilityDate
         ? new Date(candidate.availabilityDate).toISOString().split('T')[0]
         : '',
@@ -71,7 +74,6 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
 
   return (
     <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
-      {/* Header */}
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <Building className="size-5 text-[#282828] sm:size-6" />
@@ -106,9 +108,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
         )}
       </div>
 
-      {/* Form Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-        {/* Job Title */}
         <Field>
           <FieldLabel className="text-xs text-[#757575]">{t('jobTitle')}</FieldLabel>
           {isEditing ? (
@@ -124,7 +124,6 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
           )}
         </Field>
 
-        {/* Current Employer */}
         <Field>
           <FieldLabel className="text-xs text-[#757575]">{t('currentEmployer')}</FieldLabel>
           {isEditing ? (
@@ -135,12 +134,11 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {(candidate as any).currentEmployer || tCommon('notSet')}
+              {candidate.currentEmployer || tCommon('notSet')}
             </p>
           )}
         </Field>
 
-        {/* Total Experience */}
         <Field>
           <FieldLabel className="text-xs text-[#757575]">{t('totalExperienceYears')}</FieldLabel>
           {isEditing ? (
@@ -158,7 +156,6 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
           )}
         </Field>
 
-        {/* Saudi Experience */}
         <Field>
           <FieldLabel className="text-xs text-[#757575]">{t('saudiExperienceYears')}</FieldLabel>
           {isEditing ? (
@@ -171,12 +168,26 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">
-              {(candidate as any).saudiExperience || 0} {t('years')}
+              {candidate.saudiExperience || 0} {t('years')}
             </p>
           )}
         </Field>
 
-        {/* Availability Date */}
+        <Field className="sm:col-span-2">
+          <FieldLabel className="text-xs text-[#757575]">{t('industryExperience')}</FieldLabel>
+          {isEditing ? (
+            <Input
+              value={formData.industryExperience}
+              onChange={(e) => setFormData({ ...formData, industryExperience: e.target.value })}
+              className="h-10 rounded-lg border-[#ededed] text-sm"
+            />
+          ) : (
+            <p className="text-sm font-medium text-[#282828]">
+              {candidate.industryExperience || tCommon('notSet')}
+            </p>
+          )}
+        </Field>
+
         <Field className="sm:col-span-2">
           <FieldLabel className="text-xs text-[#757575]">{t('availabilityDate')}</FieldLabel>
           {isEditing ? (

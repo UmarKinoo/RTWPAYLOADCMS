@@ -359,6 +359,7 @@ export function RegistrationWizard() {
         dob: data.dob,
         nationality: data.nationality,
         languages: data.languages,
+        currentlyInKSA: data.currentlyInKSA,
         jobTitle: data.jobTitle,
         experienceYears: data.experienceYears,
         industryExperience: data.industryExperience,

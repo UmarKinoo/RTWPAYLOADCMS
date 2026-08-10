@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { updateCandidate } from '@/lib/candidate'
 import { toast } from 'sonner'
 
@@ -32,11 +33,12 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
     lastName: candidate.lastName || '',
     email: candidate.email || '',
     phone: candidate.phone || '',
-    whatsapp: (candidate as any).whatsapp || '',
+    whatsapp: candidate.whatsapp || '',
     gender: candidate.gender || '',
     dob: candidate.dob || '',
     nationality: candidate.nationality || '',
     location: candidate.location || '',
+    currentlyInKSA: candidate.currentlyInKSA !== false,
   })
   const [isSaving, setIsSaving] = useState(false)
 
@@ -52,6 +54,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
         dob: formData.dob,
         nationality: formData.nationality,
         location: formData.location,
+        currentlyInKSA: formData.currentlyInKSA,
       })
 
       if (result.success) {
@@ -61,7 +64,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
       } else {
         toast.error(result.error || tCommon('failedToUpdate'))
       }
-    } catch (error) {
+    } catch {
       toast.error(tCommon('anErrorOccurred'))
     } finally {
       setIsSaving(false)
@@ -72,13 +75,14 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
     setFormData({
       firstName: candidate.firstName || '',
       lastName: candidate.lastName || '',
-      email: (candidate as any).email || '',
+      email: candidate.email || '',
       phone: candidate.phone || '',
-      whatsapp: (candidate as any).whatsapp || '',
+      whatsapp: candidate.whatsapp || '',
       gender: candidate.gender || '',
       dob: candidate.dob || '',
       nationality: candidate.nationality || '',
       location: candidate.location || '',
+      currentlyInKSA: candidate.currentlyInKSA !== false,
     })
     setIsEditing(false)
   }
@@ -249,6 +253,29 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
             />
           ) : (
             <p className="text-sm font-medium text-[#282828]">{candidate.nationality || tCommon('notSet')}</p>
+          )}
+        </Field>
+
+        {/* Currently in KSA */}
+        <Field className="sm:col-span-2">
+          <FieldLabel className="text-xs text-[#757575]">{t('currentlyInKSA')}</FieldLabel>
+          {isEditing ? (
+            <div className="flex items-center gap-2 pt-1">
+              <Checkbox
+                id="currentlyInKSA"
+                checked={formData.currentlyInKSA}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, currentlyInKSA: checked === true })
+                }
+              />
+              <label htmlFor="currentlyInKSA" className="text-sm text-[#282828] cursor-pointer">
+                {t('confirmInKSA')}
+              </label>
+            </div>
+          ) : (
+            <p className="text-sm font-medium text-[#282828]">
+              {candidate.currentlyInKSA !== false ? t('yes') : t('no')}
+            </p>
           )}
         </Field>
       </div>
