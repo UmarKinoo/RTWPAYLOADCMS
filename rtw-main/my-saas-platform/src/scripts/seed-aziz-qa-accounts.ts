@@ -3,7 +3,7 @@
  *
  * Usage: pnpm seed:aziz-qa
  *
- * Login password for both: AzizTest2026!
+ * Login password for both: set AZIZ_QA_PASSWORD env or see docs/reports/Client_Update_Aziz_2026-08-24.md
  */
 import dotenv from 'dotenv'
 import path from 'node:path'
@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '../..')
 dotenv.config({ path: path.join(root, '.env') })
 
-export const AZIZ_QA_PASSWORD = 'AzizTest2026!'
+export const AZIZ_QA_PASSWORD = process.env.AZIZ_QA_PASSWORD?.trim() || 'RtwAzizUAT-Aug2026!'
 export const AZIZ_QA_CANDIDATE_EMAIL = 'aziz.qa.candidate@readybot-qa.example.test'
 export const AZIZ_QA_EMPLOYER_EMAIL = 'aziz.qa.employer@readybot-qa.example.test'
 

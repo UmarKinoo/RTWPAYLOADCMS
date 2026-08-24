@@ -60,14 +60,14 @@ Nothing changes on the backend — we still store skill IDs on primary/secondary
 **Live site:** [https://readytowork.sa](https://readytowork.sa)  
 **Login:** [https://readytowork.sa/en/login](https://readytowork.sa/en/login)
 
-Both accounts use the same password: **`AzizTest2026!`**
+Both accounts use the same password: **`RtwAzizUAT-Aug2026!`** *(rotated 25 Aug 2026 — previous test password revoked)*
 
 ### Candidate — job role picker + profile strength
 
 | | |
 |---|---|
 | **Email** | `aziz.qa.candidate@readybot-qa.example.test` |
-| **Password** | `AzizTest2026!` |
+| **Password** | `RtwAzizUAT-Aug2026!` |
 
 Profile is partially complete — **Complete now** shows missing items (photo, resume, about me, education, job preferences, benefits, etc.).
 
@@ -82,7 +82,7 @@ Profile is partially complete — **Complete now** shows missing items (photo, r
 | | |
 |---|---|
 | **Email** | `aziz.qa.employer@readybot-qa.example.test` |
-| **Password** | `AzizTest2026!` |
+| **Password** | `RtwAzizUAT-Aug2026!` |
 
 No plan active yet — use this to test purchasing.  
 *(If login fails, register at [Employer registration](https://readytowork.sa/en/register?collection=employers) with the same email/password, or ask Umar to run `pnpm seed:aziz-qa` on the live database.)*
