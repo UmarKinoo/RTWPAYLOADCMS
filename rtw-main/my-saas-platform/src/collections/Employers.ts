@@ -177,6 +177,16 @@ export const Employers: CollectionConfig = {
       },
     },
     {
+      name: 'planExpiresAt',
+      type: 'date',
+      admin: {
+        description: 'When the active plan expires (set on purchase to now + plan.validityDays)',
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+      },
+    },
+    {
       name: 'features',
       type: 'group',
       label: 'Active Features',

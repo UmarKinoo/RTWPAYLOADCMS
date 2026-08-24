@@ -6,6 +6,7 @@ import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath } from 'next/cache'
 import { sendPayment } from '@/lib/myfatoorah'
 import { getServerSideURL } from '@/utilities/getURL'
+import { buildPlanPurchaseMessage, computePlanExpiresAt } from '@/lib/plan-access'
 
 export interface MockPurchaseResponse {
   success: boolean
@@ -226,6 +227,8 @@ export async function mockPurchase(planSlug: string): Promise<MockPurchaseRespon
     const newContactUnlockCredits =
       currentContactUnlockCredits + (plan.entitlements?.contactUnlockCreditsGranted || 0)
 
+    const planExpiresAt = computePlanExpiresAt(plan.entitlements?.validityDays)
+
     // Update employer with new credits and features
     await payload.update({
       collection: 'employers',
@@ -236,9 +239,10 @@ export async function mockPurchase(planSlug: string): Promise<MockPurchaseRespon
           contactUnlockCredits: newContactUnlockCredits,
         },
         activePlan: plan.id,
+        planExpiresAt,
         features: {
           basicFilters: plan.entitlements?.basicFilters || false,
-          nationalityRestriction: plan.entitlements?.nationalityRestriction || 'NONE',
+          nationalityRestriction: 'NONE',
         },
       },
     })
@@ -250,7 +254,7 @@ export async function mockPurchase(planSlug: string): Promise<MockPurchaseRespon
           employer: user.id,
           type: 'system',
           title: 'Payment successful',
-          message: `Your ${plan.title || plan.slug} plan is active. ${plan.entitlements?.interviewCreditsGranted || 0} interview credit(s) and ${plan.entitlements?.contactUnlockCreditsGranted || 0} contact unlock credit(s) were added to your account.`,
+          message: buildPlanPurchaseMessage(plan),
           read: false,
           actionUrl: '/employer/dashboard',
         },

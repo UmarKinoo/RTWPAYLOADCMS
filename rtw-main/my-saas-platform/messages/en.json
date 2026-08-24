@@ -458,28 +458,31 @@
       "description": "Find the right talent without complexity. Our pricing plans are designed to support different client requirements, giving you flexibility, clarity, and access to qualified candidates when you need it."
     },
     "cards": {
-      "topPicks": "Saudi Nationals",
-      "saudiNationals": "Saudi Nationals",
-      "skilled": "Skilled Workers",
-      "specialty": "Certified Technical",
-      "eliteSpecialty": "Expert Licensed staff",
+      "popular": "Popular",
+      "basic": "Basic",
+      "standard": "Standard",
+      "premium": "Premium",
+      "basicSubtitle": "7 interviews · 1 CV",
+      "standardSubtitle": "Unlimited interviews · 2 CVs",
+      "premiumSubtitle": "Unlimited interviews · 3 CVs",
       "custom": "Business",
       "processing": "Processing...",
       "getStarted": "Get Started",
       "features": {
         "interviewCandidates": "Interview up to {count} candidates",
+        "unlimitedInterviewsMonth": "Unlimited interviews for 1 month",
+        "validForMonth": "Valid for 1 month from purchase",
         "basicFilters": "Use basic filters (age, experience, location, language)",
-        "contactUnlock": "Access contact details of {count} selected candidate{plural} after interviews",
-        "saudiOnly": "Saudi candidates only",
+        "cvsSharedByTeam": "{count, plural, one {# CV shared with you by our operations team} other {# CVs shared with you by our operations team}}",
         "customMoreThan5": "Receive more than 5 matched candidates",
         "customTargetProfiles": "Target specific candidate profiles",
         "customRespondQuestions": "Respond to up to 10 employer questions",
         "customAccessContact": "Access contact details of one candidate"
       },
       "toasts": {
-        "creditsAdded": "Credits Added!",
-        "creditsAddedDescription": "You now have {interviewCredits} interview credits and {contactCredits} contact unlock credits.",
-        "paymentSuccessDescription": "Your payment was successful. Credits have been added to your account.",
+        "creditsAdded": "Plan activated!",
+        "creditsAddedDescription": "Your plan is active. You have {interviewCredits} interview credits and {contactCredits} CV(s) from our team.",
+        "paymentSuccessDescription": "Your payment was successful. Your plan is now active.",
         "paymentFailedDescription": "Payment could not be completed. Please try again.",
         "purchaseFailed": "Purchase Failed",
         "purchaseFailedDescription": "Please try again.",
@@ -645,6 +648,10 @@
       "automaticRenewal": "Automatic renewal",
       "daysLeft": "{count} Days left",
       "credits": "Credits",
+      "unlimitedInterviews": "Unlimited",
+      "interviews": "Interviews",
+      "cvs": "CVs",
+      "expired": "Expired",
       "manageSubscription": "Manage Subscription"
     },
     "notifications": {
@@ -915,7 +922,9 @@
       "other": "Other"
     },
     "noCreditsTitle": "No interview credits",
-    "noCreditsDescription": "You need an active plan with interview credits to send interview requests. Choose a plan to continue."
+    "noCreditsDescription": "You need an active plan with interview credits to send interview requests. Choose a plan to continue.",
+    "planExpiredTitle": "Plan expired",
+    "planExpiredDescription": "Your plan has expired. Purchase a plan to continue sending interview requests."
   },
   "candidateDashboard": {
     "navMenuTitle": "Navigation Menu",

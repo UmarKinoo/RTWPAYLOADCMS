@@ -26,7 +26,7 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
   const [isLoading, setIsLoading] = useState(false)
   const t = useTranslations('pricing.cards')
   const isCustom = plan.entitlements.isCustom
-  const isPopular = plan.slug === 'top-picks'
+  const isPopular = plan.slug === 'premium'
 
   const handleClick = async () => {
     if (isCustom) {
@@ -49,41 +49,58 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
   }
 
   const getSubtitle = () => {
-    if (plan.slug === 'skilled') return t('skilled')
-    if (plan.slug === 'specialty') return t('specialty')
-    if (plan.slug === 'elite-specialty') return t('eliteSpecialty')
-    if (plan.slug === 'top-picks') return 'N/A'
+    if (plan.slug === 'basic') return t('basicSubtitle')
+    if (plan.slug === 'standard') return t('standardSubtitle')
+    if (plan.slug === 'premium') return t('premiumSubtitle')
     if (plan.slug === 'custom') return ''
     return ''
   }
 
   const getFeatures = () => {
-    const features = []
-    if (plan.entitlements.interviewCreditsGranted > 0) {
-      features.push(t('features.interviewCandidates', { count: plan.entitlements.interviewCreditsGranted }))
-    }
-    if (plan.entitlements.basicFilters) {
-      features.push(t('features.basicFilters'))
-    }
-    if (plan.entitlements.contactUnlockCreditsGranted > 0) {
-      features.push(
-        t('features.contactUnlock', {
-          count: plan.entitlements.contactUnlockCreditsGranted,
-          plural: plan.entitlements.contactUnlockCreditsGranted > 1 ? 's' : '',
-        }),
-      )
-    }
-    if (plan.entitlements.nationalityRestriction === 'SAUDI') {
-      features.push(t('features.saudiOnly'))
-    }
+    const features: string[] = []
     if (isCustom) {
       features.push(t('features.customMoreThan5'))
       features.push(t('features.customTargetProfiles'))
       features.push(t('features.customRespondQuestions'))
       features.push(t('features.customAccessContact'))
+      return features
     }
+
+    if (plan.entitlements.unlimitedInterviews) {
+      features.push(t('features.unlimitedInterviewsMonth'))
+    } else if (plan.entitlements.interviewCreditsGranted > 0) {
+      features.push(
+        t('features.interviewCandidates', { count: plan.entitlements.interviewCreditsGranted }),
+      )
+    }
+
+    features.push(t('features.validForMonth'))
+
+    if (plan.entitlements.basicFilters) {
+      features.push(t('features.basicFilters'))
+    }
+
+    if (plan.entitlements.contactUnlockCreditsGranted > 0) {
+      features.push(
+        t('features.cvsSharedByTeam', {
+          count: plan.entitlements.contactUnlockCreditsGranted,
+        }),
+      )
+    }
+
     return features
   }
+
+  const displayTitle =
+    plan.slug === 'custom'
+      ? t('custom')
+      : plan.slug === 'basic'
+        ? t('basic')
+        : plan.slug === 'standard'
+          ? t('standard')
+          : plan.slug === 'premium'
+            ? t('premium')
+            : plan.title
 
   return (
     <Card
@@ -96,7 +113,7 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
       {/* Popular Badge */}
       {isPopular && (
         <Badge className="absolute -top-3 end-4 bg-[#d8e530] hover:bg-[#c8d520] text-[#222] px-3 py-1 rounded-full text-xs font-medium">
-          {t('topPicks')}
+          {t('popular')}
         </Badge>
       )}
 
@@ -104,11 +121,7 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
         {/* Plan Name & Subtitle */}
         <div className="space-y-1">
           <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-inter text-[#16252d] leading-tight">
-            {plan.slug === 'top-picks'
-              ? t('saudiNationals')
-              : plan.slug === 'custom'
-                ? t('custom')
-                : plan.title}
+            {displayTitle}
           </h3>
           <p className="text-sm sm:text-base text-[#757575] font-medium">{getSubtitle()}</p>
         </div>
@@ -200,25 +213,24 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
     }
   }
 
-  // Separate plans into rows: first 3, then remaining 2
-  const firstRow = plans.filter((p) => !p.entitlements.isCustom).slice(0, 3)
-  const secondRow = plans.filter((p) => p.entitlements.isCustom || p.slug === 'top-picks').slice(0, 2)
+  const paidPlans = plans.filter((p) => !p.entitlements.isCustom)
+  const customPlans = plans.filter((p) => p.entitlements.isCustom)
 
   return (
     <HomepageSection className="pb-12 sm:pb-16 md:pb-20">
-      {/* First Row - 3 Cards */}
-      {firstRow.length > 0 && (
+      {/* First Row - paid plans */}
+      {paidPlans.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mb-4 sm:mb-5 md:mb-6">
-          {firstRow.map((plan) => (
+          {paidPlans.map((plan) => (
             <PricingCard key={plan.id} plan={plan} onPurchase={handlePurchase} />
           ))}
         </div>
       )}
 
-      {/* Second Row - 2 Cards Centered */}
-      {secondRow.length > 0 && (
+      {/* Second Row - Business / custom */}
+      {customPlans.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 lg:max-w-[66%] mx-auto">
-          {secondRow.map((plan) => (
+          {customPlans.map((plan) => (
             <PricingCard key={plan.id} plan={plan} onPurchase={handlePurchase} />
           ))}
         </div>

@@ -15,6 +15,7 @@ import * as migration_20260729_160000_esco_candidate_reg from './20260729_160000
 import * as migration_20260729_163000_esco_locked_docs_rels from './20260729_163000_esco_locked_docs_rels';
 import * as migration_20260729_170000_candidate_occupations_candidate_link from './20260729_170000_candidate_occupations_candidate_link';
 import * as migration_20260810_120000_candidates_currently_in_ksa from './20260810_120000_candidates_currently_in_ksa';
+import * as migration_20260824_143000_plan_entitlements_expiry from './20260824_143000_plan_entitlements_expiry';
 
 export const migrations = [
   {
@@ -101,5 +102,10 @@ export const migrations = [
     up: migration_20260810_120000_candidates_currently_in_ksa.up,
     down: migration_20260810_120000_candidates_currently_in_ksa.down,
     name: '20260810_120000_candidates_currently_in_ksa',
+  },
+  {
+    up: migration_20260824_143000_plan_entitlements_expiry.up,
+    down: migration_20260824_143000_plan_entitlements_expiry.down,
+    name: '20260824_143000_plan_entitlements_expiry',
   },
 ];

@@ -7,6 +7,7 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import type { Interview } from '@/payload-types'
 import { sendEmail } from '@/lib/email'
 import { interviewInvitationEmailTemplate } from '@/lib/email-templates'
+import { canRequestInterview } from '@/lib/plan-access'
 
 export interface ApproveInterviewRequestData {
   scheduledAt?: string
@@ -68,18 +69,20 @@ export async function approveInterviewRequest(
       }
     }
 
-    // Get employer to check credits
+    // Get employer to check credits / unlimited access
     const employerId =
       typeof interview.employer === 'object' ? interview.employer.id : interview.employer
     const employer = await payload.findByID({
       collection: 'employers',
       id: employerId,
-      depth: 0,
+      depth: 1,
     })
 
     // New requests deduct the credit at send time (creditDeducted=true).
+    // Unlimited plans never deduct (creditDeducted=false) — do not charge on approval.
     // Legacy pending requests (created before send-time deduction) are still charged here.
-    const chargeOnApproval = !interview.creditDeducted
+    const access = canRequestInterview(employer)
+    const chargeOnApproval = !interview.creditDeducted && !access.unlimited
     if (chargeOnApproval && (employer.wallet?.interviewCredits || 0) <= 0) {
       return { success: false, error: 'Employer has insufficient interview credits.' }
     }

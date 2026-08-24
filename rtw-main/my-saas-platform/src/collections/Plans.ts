@@ -27,7 +27,7 @@ export const Plans: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'Unique identifier for the plan (e.g., skilled, specialty, elite-specialty)',
+        description: 'Unique identifier for the plan (e.g., basic, standard, premium)',
       },
     },
     {
@@ -118,6 +118,23 @@ export const Plans: CollectionConfig = {
           defaultValue: false,
           admin: {
             description: 'Whether this is a custom plan (no credits granted, routes to request form)',
+          },
+        },
+        {
+          name: 'unlimitedInterviews',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: {
+            description: 'If true, employer can send unlimited interview requests while the plan is active',
+          },
+        },
+        {
+          name: 'validityDays',
+          type: 'number',
+          required: true,
+          defaultValue: 30,
+          admin: {
+            description: 'How many days the plan stays valid after purchase',
           },
         },
       ],

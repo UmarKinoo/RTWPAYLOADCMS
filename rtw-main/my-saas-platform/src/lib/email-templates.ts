@@ -829,6 +829,8 @@ export interface PaymentSuccessEmailParams {
   price?: string
   interviewCredits: number
   contactUnlockCredits: number
+  unlimitedInterviews?: boolean
+  validityDays?: number
   dashboardUrl: string
 }
 
@@ -836,26 +838,30 @@ export function paymentSuccessEmailTemplate(params: PaymentSuccessEmailParams): 
   const priceRow = params.price
     ? `<p class="email-content"><strong>Amount paid:</strong> ${params.price}</p>`
     : ''
+  const days = params.validityDays || 30
+  const interviewPart = params.unlimitedInterviews
+    ? `Unlimited interviews for ${days} days`
+    : `${params.interviewCredits} interview credit${params.interviewCredits === 1 ? '' : 's'}`
+  const cvPart =
+    params.contactUnlockCredits > 0
+      ? `${params.contactUnlockCredits} CV${params.contactUnlockCredits === 1 ? '' : 's'} shared by our operations team`
+      : null
   const content = `
     <p class="email-content">Hi ${params.companyName},</p>
     <p class="email-content">
-      Thank you for your purchase — your payment was received and your plan is now active.
+      Thank you for your purchase — your payment was received and your plan is now active for ${days} days.
     </p>
     <p class="email-content"><strong>Plan:</strong> ${params.planTitle}</p>
     ${priceRow}
     <p class="email-content">
-      <strong>Credits added:</strong> ${params.interviewCredits} interview credit${params.interviewCredits === 1 ? '' : 's'}${
-        params.contactUnlockCredits > 0
-          ? ` and ${params.contactUnlockCredits} contact unlock credit${params.contactUnlockCredits === 1 ? '' : 's'}`
-          : ''
-      }.
+      <strong>Included:</strong> ${interviewPart}${cvPart ? ` and ${cvPart}` : ''}.
     </p>
     <p class="email-content">You can now send interview requests to candidates.</p>
     <div style="text-align: center;">
       <a href="${params.dashboardUrl}" class="button">Go to your dashboard</a>
     </div>
   `
-  return baseEmailTemplate(content, 'Payment confirmed — credits added')
+  return baseEmailTemplate(content, 'Payment confirmed — your plan is active')
 }
 
 export interface PaymentFailedEmailParams {

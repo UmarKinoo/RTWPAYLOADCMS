@@ -38,17 +38,23 @@ export function AddToInterviewButton({
         router.push('/login')
         return
       }
-      if (status.interviewCredits <= 0) {
-        toast.error(t('noCreditsTitle'), {
-          description: t('noCreditsDescription'),
-        })
+      if (!status.canRequest) {
+        if (status.blockCode === 'PLAN_EXPIRED') {
+          toast.error(t('planExpiredTitle'), {
+            description: t('planExpiredDescription'),
+          })
+        } else {
+          toast.error(t('noCreditsTitle'), {
+            description: t('noCreditsDescription'),
+          })
+        }
         router.push('/pricing')
         return
       }
       setIsModalOpen(true)
     } catch {
       // If the check itself fails, let the employer proceed — the server action
-      // will still block requests without credits
+      // will still block requests without access
       setIsModalOpen(true)
     } finally {
       setIsChecking(false)

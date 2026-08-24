@@ -89,7 +89,10 @@ async function main(): Promise<void> {
 
   const pool = new Pool({
     connectionString: DATABASE_URI,
-    ssl: DATABASE_URI.includes('localhost') ? undefined : { rejectUnauthorized: false },
+    ssl:
+      DATABASE_URI.includes('localhost') || DATABASE_URI.includes('127.0.0.1')
+        ? undefined
+        : { rejectUnauthorized: false },
   })
 
   try {

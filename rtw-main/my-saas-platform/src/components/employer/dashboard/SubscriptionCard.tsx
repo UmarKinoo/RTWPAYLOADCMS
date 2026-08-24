@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CreditCard, Clock } from 'lucide-react'
 import type { Employer, Plan, Purchase } from '@/payload-types'
+import { isPlanActive } from '@/lib/plan-access'
 
 interface SubscriptionCardProps {
   employer: Employer
@@ -18,9 +19,11 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
   const locale = useLocale()
   const dateLocale = locale === 'ar' ? 'ar-SA' : 'en-US'
   // Get plan info
-  const plan = typeof employer.activePlan === 'object' ? employer.activePlan : null
+  const plan = (typeof employer.activePlan === 'object' ? employer.activePlan : null) as Plan | null
   const planName = plan?.title || t('free')
-  const planType = t('monthly') // All plans are monthly by default
+  const planType = t('monthly')
+  const unlimited = Boolean(plan?.entitlements?.unlimitedInterviews)
+  const planActive = isPlanActive(employer.planExpiresAt)
 
   // Calculate joined date from employer creation
   const joinedDate = employer.createdAt
@@ -31,34 +34,34 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
       })
     : 'N/A'
 
-  // Calculate days left from most recent purchase (30 days billing cycle)
+  // Prefer planExpiresAt; fall back to purchase date + 30 days for legacy rows
   let daysLeft = 0
-  if (recentPurchase?.createdAt) {
+  if (employer.planExpiresAt) {
+    const diffTime = new Date(employer.planExpiresAt).getTime() - Date.now()
+    daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+  } else if (recentPurchase?.createdAt) {
     const purchaseDate = new Date(recentPurchase.createdAt)
     const renewalDate = new Date(purchaseDate)
-    renewalDate.setDate(renewalDate.getDate() + 30) // 30-day billing cycle
-    const now = new Date()
-    const diffTime = renewalDate.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    daysLeft = Math.max(0, diffDays)
+    renewalDate.setDate(renewalDate.getDate() + 30)
+    const diffTime = renewalDate.getTime() - Date.now()
+    daysLeft = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
   }
 
-  // Calculate credits remaining
   const interviewCredits = employer.wallet?.interviewCredits || 0
   const contactUnlockCredits = employer.wallet?.contactUnlockCredits || 0
-  const totalCredits = interviewCredits + contactUnlockCredits
-  
-  // For max credits, use the plan's entitlements if available
-  // The max represents the credits granted per billing cycle, even if user has accumulated more
   const planInterviewCredits = plan?.entitlements?.interviewCreditsGranted || 0
   const planContactCredits = plan?.entitlements?.contactUnlockCreditsGranted || 0
-  const planMaxCredits = planInterviewCredits + planContactCredits
-  const maxCredits = planMaxCredits > 0 ? planMaxCredits : (totalCredits > 0 ? totalCredits : 1)
-  
-  // Progress circle: cap at 100% if credits exceed plan max
-  const creditsProgress = Math.min((totalCredits / maxCredits) * 100, 100)
-  
-  // Calculate circumference for circular progress
+
+  // Circle shows interview credits for Basic; unlimited plans show ∞
+  const displayCurrent = unlimited ? null : interviewCredits
+  const displayMax = unlimited ? null : planInterviewCredits > 0 ? planInterviewCredits : interviewCredits || 1
+  const creditsProgress =
+    unlimited || !displayMax
+      ? planActive
+        ? 100
+        : 0
+      : Math.min((interviewCredits / displayMax) * 100, 100)
+
   const radius = 40
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (creditsProgress / 100) * circumference
@@ -81,13 +84,15 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
               <div className="flex items-center gap-1">
                 <CreditCard className="size-4 text-[#353535]" />
                 <span className="text-xs font-normal text-[#353535]">
-                  {t('automaticRenewal')}
+                  {contactUnlockCredits > 0
+                    ? `${contactUnlockCredits}/${planContactCredits || contactUnlockCredits} ${t('cvs')}`
+                    : t('automaticRenewal')}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="size-4 text-[#353535]" />
                 <span className="text-xs font-normal text-[#353535]">
-                  {t('daysLeft', { count: daysLeft })}
+                  {planActive || daysLeft > 0 ? t('daysLeft', { count: daysLeft }) : t('expired')}
                 </span>
               </div>
             </div>
@@ -95,9 +100,7 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
 
           {/* Circle Progress */}
           <div className="relative flex size-24 shrink-0 items-center justify-center">
-            {/* Outer ring */}
             <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 100 100">
-              {/* Background circle */}
               <circle
                 cx="50"
                 cy="50"
@@ -106,7 +109,6 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
                 stroke="#ededed"
                 strokeWidth="8"
               />
-              {/* Progress circle */}
               <circle
                 cx="50"
                 cy="50"
@@ -120,15 +122,23 @@ export function SubscriptionCard({ employer, recentPurchase }: SubscriptionCardP
                 className="transition-all duration-300 ease-in-out"
               />
             </svg>
-            {/* Center content */}
             <div className="flex flex-col items-center text-center z-10">
-              <div className="flex items-baseline gap-0.5 text-[#222]">
-                <span className="text-base font-semibold">{totalCredits}</span>
-                {maxCredits > 0 && (
-                  <span className="text-xs font-normal text-[#515151]">/{maxCredits}</span>
-                )}
-              </div>
-              <span className="text-[10px] font-normal text-[#515151] mt-0.5">{t('credits')}</span>
+              {unlimited ? (
+                <>
+                  <span className="text-base font-semibold text-[#222]">{t('unlimitedInterviews')}</span>
+                  <span className="text-[10px] font-normal text-[#515151] mt-0.5">{t('interviews')}</span>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-baseline gap-0.5 text-[#222]">
+                    <span className="text-base font-semibold">{displayCurrent ?? 0}</span>
+                    {displayMax != null && displayMax > 0 && (
+                      <span className="text-xs font-normal text-[#515151]">/{displayMax}</span>
+                    )}
+                  </div>
+                  <span className="text-[10px] font-normal text-[#515151] mt-0.5">{t('interviews')}</span>
+                </>
+              )}
             </div>
           </div>
         </div>

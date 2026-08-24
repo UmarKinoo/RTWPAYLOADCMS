@@ -25,73 +25,92 @@ import { getPayload } from 'payload'
 // Dynamic import of config to ensure env vars are loaded first
 const configPromise = import('@payload-config')
 
+/** Old slug → new slug for in-place rename during seed */
+const SLUG_RENAMES: Record<string, string> = {
+  skilled: 'basic',
+  specialty: 'standard',
+  'elite-specialty': 'premium',
+}
+
 const PLANS = [
   {
-    slug: 'skilled',
-    title: 'Skilled',
+    slug: 'basic',
+    title: 'Basic',
+    title_en: 'Basic',
+    title_ar: 'أساسي',
     price: 350,
     currency: 'SAR',
     entitlements: {
-      interviewCreditsGranted: 5,
+      interviewCreditsGranted: 7,
       contactUnlockCreditsGranted: 1,
       basicFilters: true,
-      nationalityRestriction: 'NONE' as 'NONE' | 'SAUDI',
+      nationalityRestriction: 'NONE' as const,
       isCustom: false,
+      unlimitedInterviews: false,
+      validityDays: 30,
     },
   },
   {
-    slug: 'specialty',
-    title: 'Specialty',
+    slug: 'standard',
+    title: 'Standard',
+    title_en: 'Standard',
+    title_ar: 'قياسي',
     price: 450,
     currency: 'SAR',
     entitlements: {
-      interviewCreditsGranted: 5,
-      contactUnlockCreditsGranted: 1,
+      interviewCreditsGranted: 0,
+      contactUnlockCreditsGranted: 2,
       basicFilters: true,
-      nationalityRestriction: 'NONE' as 'NONE' | 'SAUDI',
+      nationalityRestriction: 'NONE' as const,
       isCustom: false,
+      unlimitedInterviews: true,
+      validityDays: 30,
     },
   },
   {
-    slug: 'elite-specialty',
-    title: 'Elite Specialty',
+    slug: 'premium',
+    title: 'Premium',
+    title_en: 'Premium',
+    title_ar: 'مميز',
     price: 600,
     currency: 'SAR',
     entitlements: {
-      interviewCreditsGranted: 5,
-      contactUnlockCreditsGranted: 1,
+      interviewCreditsGranted: 0,
+      contactUnlockCreditsGranted: 3,
       basicFilters: true,
-      nationalityRestriction: 'NONE' as 'NONE' | 'SAUDI',
+      nationalityRestriction: 'NONE' as const,
       isCustom: false,
-    },
-  },
-  {
-    slug: 'top-picks',
-    title: 'Saudi Nationals',
-    price: 700,
-    currency: 'SAR',
-    entitlements: {
-      interviewCreditsGranted: 5,
-      contactUnlockCreditsGranted: 1,
-      basicFilters: true,
-      nationalityRestriction: 'SAUDI' as 'NONE' | 'SAUDI',
-      isCustom: false,
+      unlimitedInterviews: true,
+      validityDays: 30,
     },
   },
   {
     slug: 'custom',
     title: 'Business',
+    title_en: 'Business',
+    title_ar: 'أعمال',
     price: null,
     currency: 'SAR',
     entitlements: {
       interviewCreditsGranted: 0,
       contactUnlockCreditsGranted: 0,
       basicFilters: false,
-      nationalityRestriction: 'NONE' as 'NONE' | 'SAUDI',
+      nationalityRestriction: 'NONE' as const,
       isCustom: true,
+      unlimitedInterviews: false,
+      validityDays: 30,
     },
   },
 ]
+
+async function findPlanBySlug(payload: Awaited<ReturnType<typeof getPayload>>, slug: string) {
+  const existing = await payload.find({
+    collection: 'plans',
+    where: { slug: { equals: slug } },
+    limit: 1,
+  })
+  return existing.docs[0] ?? null
+}
 
 async function seedPlans() {
   console.log('🌱 Starting plans seeding...')
@@ -99,7 +118,6 @@ async function seedPlans() {
   console.log(`🔑 PAYLOAD_SECRET: ${process.env.PAYLOAD_SECRET ? '✅ Set' : '❌ Missing'}`)
   console.log('⏳ Initializing Payload (this may take a moment on first run)...\n')
 
-  // Dynamically import config after env vars are loaded
   const config = await configPromise
   console.log('📦 Config loaded, connecting to database...')
 
@@ -109,46 +127,73 @@ async function seedPlans() {
 
     let created = 0
     let updated = 0
+    let deleted = 0
     let skipped = 0
+
+    // Rename legacy slugs in place (preserves plan IDs referenced by employers/purchases)
+    for (const [oldSlug, newSlug] of Object.entries(SLUG_RENAMES)) {
+      const oldPlan = await findPlanBySlug(payload, oldSlug)
+      if (!oldPlan) continue
+      const conflict = await findPlanBySlug(payload, newSlug)
+      if (conflict) {
+        console.log(`⊘ Skip rename ${oldSlug} → ${newSlug} (target already exists); deleting old`)
+        await payload.delete({
+          collection: 'plans',
+          id: oldPlan.id,
+          context: { disableRevalidate: true },
+        })
+        deleted++
+        continue
+      }
+      await payload.update({
+        collection: 'plans',
+        id: oldPlan.id,
+        data: { slug: newSlug },
+        context: { disableRevalidate: true },
+      })
+      console.log(`✓ Renamed plan slug: ${oldSlug} → ${newSlug}`)
+    }
+
+    // Remove Saudi / top-picks plan
+    const saudiPlan = await findPlanBySlug(payload, 'top-picks')
+    if (saudiPlan) {
+      await payload.delete({
+        collection: 'plans',
+        id: saudiPlan.id,
+        context: { disableRevalidate: true },
+      })
+      console.log('✓ Deleted plan: top-picks (Saudi Nationals)')
+      deleted++
+    }
 
     for (const planData of PLANS) {
       try {
-        // Check if plan already exists by slug
-        const existing = await payload.find({
-          collection: 'plans',
-          where: {
-            slug: {
-              equals: planData.slug,
-            },
-          },
-          limit: 1,
-        })
+        const existingPlan = await findPlanBySlug(payload, planData.slug)
 
-        if (existing.docs.length > 0) {
-          // Update existing plan
-          const existingPlan = existing.docs[0]
+        if (existingPlan) {
           await payload.update({
             collection: 'plans',
             id: existingPlan.id,
             data: {
               title: planData.title,
+              title_en: planData.title_en,
+              title_ar: planData.title_ar,
               price: planData.price,
               currency: planData.currency,
               entitlements: planData.entitlements,
             },
             context: {
-              disableRevalidate: true, // Disable revalidation during seeding
+              disableRevalidate: true,
             },
           })
           console.log(`✓ Updated plan: ${planData.slug}`)
           updated++
         } else {
-          // Create new plan
           await payload.create({
             collection: 'plans',
             data: planData,
             context: {
-              disableRevalidate: true, // Disable revalidation during seeding
+              disableRevalidate: true,
             },
           })
           console.log(`✓ Created plan: ${planData.slug}`)
@@ -165,6 +210,7 @@ async function seedPlans() {
     console.log('================================')
     console.log(`✓ Created: ${created}`)
     console.log(`✓ Updated: ${updated}`)
+    console.log(`✓ Deleted: ${deleted}`)
     console.log(`⊘ Skipped: ${skipped}`)
     console.log('\n✨ Plans seeding completed!\n')
   } catch (error) {
@@ -174,4 +220,3 @@ async function seedPlans() {
 }
 
 seedPlans().catch(console.error)
-

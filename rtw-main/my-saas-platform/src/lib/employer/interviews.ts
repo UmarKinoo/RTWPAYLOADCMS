@@ -5,6 +5,7 @@ import config from '@payload-config'
 import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { Interview } from '@/payload-types'
+import { canRequestInterview } from '@/lib/plan-access'
 
 export interface RequestInterviewData {
   candidateId: number
@@ -20,14 +21,19 @@ export interface RequestInterviewData {
 export interface RequestInterviewResponse {
   success: boolean
   error?: string
-  /** Machine-readable error code; NO_CREDITS means the client should send the employer to /pricing */
-  code?: 'NO_CREDITS'
+  /** Machine-readable error code; client should send the employer to /pricing */
+  code?: 'NO_CREDITS' | 'PLAN_EXPIRED'
   interview?: Interview
 }
 
 export interface InterviewCreditsStatus {
   isEmployer: boolean
   interviewCredits: number
+  unlimited: boolean
+  planExpiresAt: string | null
+  planActive: boolean
+  canRequest: boolean
+  blockCode?: 'NO_CREDITS' | 'PLAN_EXPIRED'
 }
 
 export interface UpdateInterviewData {
@@ -89,6 +95,7 @@ export async function updateInterview(
     }) as Interview
 
     // Refund the interview credit when a still-pending request is cancelled
+    // (only if a credit was actually deducted — unlimited plans skip deduction)
     if (interview.status === 'pending' && data.status === 'cancelled' && interview.creditDeducted) {
       const employer = await payload.findByID({
         collection: 'employers',
@@ -153,20 +160,23 @@ export async function requestInterview(
       return { success: false, error: 'Authentication required as an employer.' }
     }
 
-    // Check interview credits before creating the request (paywall gate)
+    // Load employer with active plan for expiry / unlimited checks
     const employer = await payload.findByID({
       collection: 'employers',
       id: user.id,
-      depth: 0,
+      depth: 1,
     })
 
-    if ((employer.wallet?.interviewCredits || 0) <= 0) {
+    const access = canRequestInterview(employer)
+    if (!access.allowed) {
       return {
         success: false,
-        error: 'You have no interview credits. Please purchase a plan to send interview requests.',
-        code: 'NO_CREDITS',
+        error: access.error,
+        code: access.code,
       }
     }
+
+    const deductCredit = !access.unlimited
 
     // Get candidate info
     const candidate = await payload.findByID({
@@ -189,7 +199,7 @@ export async function requestInterview(
         duration: 30, // Default duration, can be updated on approval
         status: 'pending',
         requestedAt: new Date().toISOString(),
-        creditDeducted: true,
+        creditDeducted: deductCredit,
         jobPosition: data.jobPosition,
         jobLocation: data.jobLocation,
         salary: data.salary,
@@ -199,17 +209,19 @@ export async function requestInterview(
       },
     }) as Interview
 
-    // Deduct one interview credit at send time (refunded on rejection/cancellation)
-    await payload.update({
-      collection: 'employers',
-      id: user.id,
-      data: {
-        wallet: {
-          interviewCredits: Math.max(0, (employer.wallet?.interviewCredits || 0) - 1),
-          contactUnlockCredits: employer.wallet?.contactUnlockCredits || 0,
+    // Deduct one interview credit at send time (skipped for unlimited plans)
+    if (deductCredit) {
+      await payload.update({
+        collection: 'employers',
+        id: user.id,
+        data: {
+          wallet: {
+            interviewCredits: Math.max(0, (employer.wallet?.interviewCredits || 0) - 1),
+            contactUnlockCredits: employer.wallet?.contactUnlockCredits || 0,
+          },
         },
-      },
-    })
+      })
+    }
 
     // NOTE: Candidate notification is NOT sent here - candidates only receive notifications after admin approval
     // The notification will be sent in approveInterviewRequest function
@@ -242,8 +254,8 @@ export async function requestInterview(
 }
 
 /**
- * Get the current user's interview credit balance.
- * Used by the UI to send employers without credits to the pricing page
+ * Get the current user's interview access status.
+ * Used by the UI to send employers without access to the pricing page
  * before they open the interview request form.
  */
 export async function checkInterviewCredits(): Promise<InterviewCreditsStatus> {
@@ -252,21 +264,44 @@ export async function checkInterviewCredits(): Promise<InterviewCreditsStatus> {
     const user = await getRequestAuthUser(payload)
 
     if (!user || user.collection !== 'employers') {
-      return { isEmployer: false, interviewCredits: 0 }
+      return {
+        isEmployer: false,
+        interviewCredits: 0,
+        unlimited: false,
+        planExpiresAt: null,
+        planActive: false,
+        canRequest: false,
+      }
     }
 
     const employer = await payload.findByID({
       collection: 'employers',
       id: user.id,
-      depth: 0,
+      depth: 1,
     })
 
-    return { isEmployer: true, interviewCredits: employer.wallet?.interviewCredits || 0 }
+    const access = canRequestInterview(employer)
+
+    return {
+      isEmployer: true,
+      interviewCredits: employer.wallet?.interviewCredits || 0,
+      unlimited: access.unlimited,
+      planExpiresAt: employer.planExpiresAt || null,
+      planActive:
+        access.allowed ||
+        Boolean(employer.planExpiresAt && new Date(employer.planExpiresAt) > new Date()),
+      canRequest: access.allowed,
+      blockCode: access.code,
+    }
   } catch (error) {
     console.error('Error checking interview credits:', error)
-    return { isEmployer: false, interviewCredits: 0 }
+    return {
+      isEmployer: false,
+      interviewCredits: 0,
+      unlimited: false,
+      planExpiresAt: null,
+      planActive: false,
+      canRequest: false,
+    }
   }
 }
-
-
-

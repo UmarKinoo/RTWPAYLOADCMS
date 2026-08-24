@@ -6,6 +6,7 @@ import { sendEmail } from '@/lib/email'
 import { paymentSuccessEmailTemplate, paymentFailedEmailTemplate } from '@/lib/email-templates'
 import { getServerSideURL } from '@/utilities/getURL'
 import { defaultLocale } from '@/i18n/config'
+import { buildPlanPurchaseMessage, computePlanExpiresAt } from '@/lib/plan-access'
 
 /**
  * Notify the employer about the payment outcome (in-app + email).
@@ -22,6 +23,9 @@ async function notifyEmployerPaymentResult(
     price?: string
     interviewCredits?: number
     contactUnlockCredits?: number
+    unlimitedInterviews?: boolean
+    validityDays?: number
+    successMessage?: string
   },
 ): Promise<void> {
   const baseUrl = getServerSideURL().replace(/\/$/, '')
@@ -34,7 +38,8 @@ async function notifyEmployerPaymentResult(
         title: params.outcome === 'success' ? 'Payment successful' : 'Payment not completed',
         message:
           params.outcome === 'success'
-            ? `Your payment for the ${params.planTitle} plan was received. ${params.interviewCredits || 0} interview credit(s) and ${params.contactUnlockCredits || 0} contact unlock credit(s) were added to your account.`
+            ? params.successMessage ||
+              `Your payment for the ${params.planTitle} plan was received.`
             : `Your payment for the ${params.planTitle} plan was not completed. No credits were added — you can try again from the pricing page.`,
         read: false,
         actionUrl: params.outcome === 'success' ? '/employer/dashboard' : '/pricing',
@@ -54,6 +59,8 @@ async function notifyEmployerPaymentResult(
             price: params.price,
             interviewCredits: params.interviewCredits || 0,
             contactUnlockCredits: params.contactUnlockCredits || 0,
+            unlimitedInterviews: params.unlimitedInterviews,
+            validityDays: params.validityDays,
             dashboardUrl: `${baseUrl}/${defaultLocale}/employer/dashboard`,
           })
         : paymentFailedEmailTemplate({
@@ -65,7 +72,7 @@ async function notifyEmployerPaymentResult(
       to: params.employerEmail,
       subject:
         params.outcome === 'success'
-          ? 'Payment confirmed — credits added to your account'
+          ? 'Payment confirmed — your plan is active'
           : 'Payment not completed - Ready to Work',
       html,
     })
@@ -214,6 +221,9 @@ export async function fulfillPurchaseByKey(
   const contactGranted = purchase.creditsGranted?.contactUnlockCreditsGranted ?? plan.entitlements?.contactUnlockCreditsGranted ?? 0
   const currentInterview = employer.wallet?.interviewCredits ?? 0
   const currentContact = employer.wallet?.contactUnlockCredits ?? 0
+  const planExpiresAt = computePlanExpiresAt(plan.entitlements?.validityDays)
+  const unlimitedInterviews = Boolean(plan.entitlements?.unlimitedInterviews)
+  const validityDays = plan.entitlements?.validityDays || 30
 
   await payload.update({
     collection: 'purchases',
@@ -229,9 +239,10 @@ export async function fulfillPurchaseByKey(
         contactUnlockCredits: currentContact + contactGranted,
       },
       activePlan: plan.id,
+      planExpiresAt,
       features: {
         basicFilters: plan.entitlements?.basicFilters ?? false,
-        nationalityRestriction: plan.entitlements?.nationalityRestriction ?? 'NONE',
+        nationalityRestriction: 'NONE',
       },
     },
   })
@@ -247,6 +258,9 @@ export async function fulfillPurchaseByKey(
     price: plan.price != null ? `${plan.currency || 'SAR'} ${plan.price}` : undefined,
     interviewCredits: interviewGranted,
     contactUnlockCredits: contactGranted,
+    unlimitedInterviews,
+    validityDays,
+    successMessage: buildPlanPurchaseMessage(plan),
   })
 
   if (options.revalidate !== false) {

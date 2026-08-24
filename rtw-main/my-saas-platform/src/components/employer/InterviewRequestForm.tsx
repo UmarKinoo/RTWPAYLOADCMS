@@ -111,6 +111,11 @@ export function InterviewRequestForm({
       if (result.success) {
         onSuccess?.()
         router.refresh()
+      } else if (result.code === 'PLAN_EXPIRED') {
+        toast.error(t('planExpiredTitle'), {
+          description: t('planExpiredDescription'),
+        })
+        router.push('/pricing')
       } else if (result.code === 'NO_CREDITS') {
         // Out of interview credits — send the employer to the pricing page to buy a plan
         toast.error(t('noCreditsTitle'), {

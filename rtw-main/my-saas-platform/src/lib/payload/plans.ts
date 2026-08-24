@@ -14,6 +14,8 @@ export interface Plan {
     basicFilters: boolean
     nationalityRestriction: 'NONE' | 'SAUDI'
     isCustom: boolean
+    unlimitedInterviews: boolean
+    validityDays: number
   }
 }
 
@@ -72,6 +74,8 @@ export const getPlans = (locale: string = 'en') =>
           basicFilters: doc.entitlements?.basicFilters || false,
           nationalityRestriction: (doc.entitlements?.nationalityRestriction as 'NONE' | 'SAUDI') || 'NONE',
           isCustom: doc.entitlements?.isCustom || false,
+          unlimitedInterviews: doc.entitlements?.unlimitedInterviews || false,
+          validityDays: doc.entitlements?.validityDays || 30,
         },
       })) as Plan[]
     },

@@ -458,28 +458,31 @@
       "description": "اعثر على المواهب المناسبة دون أي تعقيد. تم تصميم خطط التسعير لدينا لدعم مختلف احتياجات التوظيف، مع توفير المرونة والوضوح وإمكانية الوصول إلى مرشحين مؤهلين عندما تحتاج إليهم."
     },
     "cards": {
-      "topPicks": "المواطنون السعوديون",
-      "saudiNationals": "المواطنون السعوديون",
-      "skilled": "عمالة ماهرة",
-      "specialty": "فنيون معتمدون",
-      "eliteSpecialty": "خبراء مرخصون",
+      "popular": "الأكثر طلباً",
+      "basic": "أساسي",
+      "standard": "قياسي",
+      "premium": "مميز",
+      "basicSubtitle": "7 مقابلات · سيرة ذاتية واحدة",
+      "standardSubtitle": "مقابلات غير محدودة · سيرتان ذاتيتان",
+      "premiumSubtitle": "مقابلات غير محدودة · 3 سير ذاتية",
       "custom": "الأعمال",
       "processing": "جاري المعالجة...",
       "getStarted": "ابدأ الآن",
       "features": {
         "interviewCandidates": "إجراء مقابلات مع ما يصل إلى {count} مرشح",
+        "unlimitedInterviewsMonth": "مقابلات غير محدودة لمدة شهر",
+        "validForMonth": "صالحة لمدة شهر من تاريخ الشراء",
         "basicFilters": "استخدام الفلاتر الأساسية (العمر، الخبرة، الموقع، اللغة)",
-        "contactUnlock": "الوصول إلى بيانات الاتصال لـ {count} مرشح{plural} محدد بعد المقابلات",
-        "saudiOnly": "مرشحون سعوديون فقط",
+        "cvsSharedByTeam": "{count, plural, one {سيرة ذاتية واحدة يشاركها معك فريق العمليات} other {# سير ذاتية يشاركها معك فريق العمليات}}",
         "customMoreThan5": "استقبل أكثر من 5 مرشحين متطابقين",
         "customTargetProfiles": "استهداف ملفات مرشحين محددة",
-        "customRespondQuestions": "الرد على ما يصل إلى 5 أسئلة من صاحب العمل",
+        "customRespondQuestions": "الرد على ما يصل إلى 10 أسئلة من صاحب العمل",
         "customAccessContact": "الوصول إلى تفاصيل الاتصال لمرشح واحد"
       },
       "toasts": {
-        "creditsAdded": "تمت إضافة الرصيد!",
-        "creditsAddedDescription": "لديك الآن {interviewCredits} رصيد مقابلة و {contactCredits} رصيد فتح جهة الاتصال.",
-        "paymentSuccessDescription": "تم الدفع بنجاح. تمت إضافة الرصيد إلى حسابك.",
+        "creditsAdded": "تم تفعيل الباقة!",
+        "creditsAddedDescription": "باقتك نشطة. لديك {interviewCredits} رصيد مقابلة و {contactCredits} سيرة ذاتية من فريقنا.",
+        "paymentSuccessDescription": "تم الدفع بنجاح. باقتك نشطة الآن.",
         "paymentFailedDescription": "تعذر إتمام الدفع. يرجى المحاولة مرة أخرى.",
         "purchaseFailed": "فشل الشراء",
         "purchaseFailedDescription": "يرجى المحاولة مرة أخرى.",
@@ -645,6 +648,10 @@
       "automaticRenewal": "التجديد التلقائي",
       "daysLeft": "{count} يوم متبقي",
       "credits": "الرصيد",
+      "unlimitedInterviews": "غير محدود",
+      "interviews": "المقابلات",
+      "cvs": "السير الذاتية",
+      "expired": "منتهية",
       "manageSubscription": "إدارة الاشتراك"
     },
     "notifications": {
@@ -915,7 +922,9 @@
       "other": "أخرى"
     },
     "noCreditsTitle": "لا يوجد رصيد مقابلات",
-    "noCreditsDescription": "تحتاج إلى باقة نشطة برصيد مقابلات لإرسال طلبات المقابلة. اختر باقة للمتابعة."
+    "noCreditsDescription": "تحتاج إلى باقة نشطة برصيد مقابلات لإرسال طلبات المقابلة. اختر باقة للمتابعة.",
+    "planExpiredTitle": "انتهت صلاحية الباقة",
+    "planExpiredDescription": "انتهت صلاحية باقتك. اشترِ باقة لمتابعة إرسال طلبات المقابلة."
   },
   "candidateDashboard": {
     "navMenuTitle": "قائمة التنقل",
