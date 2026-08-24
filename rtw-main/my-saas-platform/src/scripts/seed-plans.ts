@@ -154,9 +154,44 @@ async function seedPlans() {
       console.log(`✓ Renamed plan slug: ${oldSlug} → ${newSlug}`)
     }
 
-    // Remove Saudi / top-picks plan
+    // Remove Saudi / top-picks plan (reassign FKs first — purchases.plan_id is NOT NULL)
     const saudiPlan = await findPlanBySlug(payload, 'top-picks')
     if (saudiPlan) {
+      const premiumPlan =
+        (await findPlanBySlug(payload, 'premium')) || (await findPlanBySlug(payload, 'custom'))
+      if (premiumPlan) {
+        const purchases = await payload.find({
+          collection: 'purchases',
+          where: { plan: { equals: saudiPlan.id } },
+          limit: 500,
+          depth: 0,
+        })
+        for (const purchase of purchases.docs) {
+          await payload.update({
+            collection: 'purchases',
+            id: purchase.id,
+            data: { plan: premiumPlan.id },
+            context: { disableRevalidate: true },
+          })
+        }
+        const employers = await payload.find({
+          collection: 'employers',
+          where: { activePlan: { equals: saudiPlan.id } },
+          limit: 500,
+          depth: 0,
+        })
+        for (const employer of employers.docs) {
+          await payload.update({
+            collection: 'employers',
+            id: employer.id,
+            data: { activePlan: premiumPlan.id },
+            context: { disableRevalidate: true },
+          })
+        }
+        console.log(
+          `✓ Reassigned ${purchases.docs.length} purchase(s) and ${employers.docs.length} employer(s) off top-picks`,
+        )
+      }
       await payload.delete({
         collection: 'plans',
         id: saudiPlan.id,
