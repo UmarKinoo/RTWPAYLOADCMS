@@ -73,7 +73,7 @@ export function WorkExperienceSection({ candidate, onUpdate }: WorkExperienceSec
   }
 
   return (
-    <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
+    <Card id="work-experience" className="scroll-mt-24 rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <Building className="size-5 text-[#282828] sm:size-6" />

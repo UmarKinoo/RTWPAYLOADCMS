@@ -105,21 +105,53 @@
       "acceptPlatformDisclaimer": "I acknowledge that ReadyToWork.sa is not a recruitment agency and does not guarantee employment or participate in any hiring decision."
     },
     "skillSearch": {
-      "label": "Search your Job Role or Skill *",
-      "primaryLabel": "Primary skill *",
-      "secondaryLabel": "Second skill (optional)",
-      "tertiaryLabel": "Third skill (optional)",
-      "optionalPlaceholder": "Type to search (optional)",
-      "placeholder": "Type to search (e.g., Mason, Engineer, Electrician...)",
+      "label": "Job role *",
+      "primaryLabel": "Primary job role *",
+      "secondaryLabel": "Second job role (optional)",
+      "tertiaryLabel": "Third job role (optional)",
+      "optionalPlaceholder": "Search or browse (optional)",
+      "placeholder": "Search or browse job roles",
       "searching": "Searching...",
       "minChars": "Type at least 2 characters to search",
-      "noResults": "No skills found",
-      "tryDifferent": "Try a different search term",
+      "noResults": "No job roles found",
+      "tryDifferent": "Try a different search term, or browse by industry",
       "billingClass": "Billing Class:",
-      "clearSelection": "Clear selection"
+      "clearSelection": "Clear selection",
+      "browseByIndustry": "Browse by industry",
+      "back": "Back",
+      "loadingIndustries": "Loading industries...",
+      "treeError": "Could not load industries. Try searching instead.",
+      "roleCount": "{count, plural, one {# role} other {# roles}}"
     },
     "jobRole": {
-      "description": "Search and select up to three skills from the job matrix. Your primary skill is required; second and third skills are optional."
+      "description": "Choose your primary job role by browsing industries or searching. You can add up to two more optional roles."
+    },
+    "jobRolePicker": {
+      "chooseIndustry": "Choose your industry",
+      "chooseCategory": "Choose a category",
+      "chooseRole": "Choose your job role",
+      "searchShortcut": "Know your job title? Search it",
+      "searchPlaceholder": "e.g. Electrician, Cashier, Cook…",
+      "searching": "Searching...",
+      "noResults": "No job roles found",
+      "change": "Change",
+      "remove": "Remove",
+      "addSecond": "Add a second job role (optional)",
+      "addThird": "Add a third job role (optional)",
+      "back": "Back",
+      "loadingIndustries": "Loading industries...",
+      "treeError": "Could not load industries. Try searching instead.",
+      "roleCount": "{count, plural, one {# role} other {# roles}}",
+      "primaryLabel": "Primary job role *",
+      "secondaryLabel": "Second job role",
+      "tertiaryLabel": "Third job role",
+      "pathIndustry": "Industry",
+      "pathCategory": "Category",
+      "pathRole": "Job role",
+      "yourPath": "Your career path",
+      "editPath": "Edit career path",
+      "selectIndustry": "Select industry",
+      "selectCategory": "Select category"
     },
     "location": {
       "currentLocationLabel": "Current Location (Saudi Arabia) *",
@@ -282,7 +314,7 @@
       "zeroCandidatesMessage": "New profiles are added regularly. Browse the full directory when you're ready."
     },
     "majorDisciplines": {
-      "title": "Explore job by Major Discipline",
+      "title": "Explore jobs by industry",
       "subtitle": "Our platform connects you with top employers across various industries"
     },
     "uploadResume": {
@@ -431,7 +463,7 @@
       "country": "Country",
       "stateCity": "State/City",
       "jobType": "Job Type",
-      "majorDiscipline": "Major Discipline",
+      "majorDiscipline": "Industry",
       "category": "Category",
       "subCategory": "Sub Category",
       "skillLevel": "Skill Level",
@@ -1008,13 +1040,13 @@
       "personalInfoUpdated": "Personal information updated successfully"
     },
     "professionalSkills": {
-      "title": "Professional Skills",
-      "primarySkill": "Primary Skill",
-      "secondarySkill": "Second Skill",
-      "tertiarySkill": "Third Skill",
-      "primaryRequired": "Please select your primary skill",
-      "skillsMustDiffer": "Skills must be different from each other",
-      "skillsUpdated": "Skills updated successfully"
+      "title": "Job Roles",
+      "primarySkill": "Primary Job Role",
+      "secondarySkill": "Second Job Role",
+      "tertiarySkill": "Third Job Role",
+      "primaryRequired": "Please select your primary job role",
+      "skillsMustDiffer": "Job roles must be different from each other",
+      "skillsUpdated": "Job roles updated successfully"
     },
     "workExperience": {
       "title": "Work Experience",
@@ -1116,6 +1148,33 @@
       "completeJobTitle": "Complete your job title",
       "completePersonalInfo": "Complete personal information",
       "addWorkExperience": "Add your work experience"
+    },
+    "profileCompleteness": {
+      "title": "Profile completeness",
+      "subtitle": "Fill required fields for a better chance to be hired",
+      "filledCount": "{filled} of {total} required fields",
+      "checklistTitle": "Finish these to improve your chances",
+      "completeTitle": "You're ready!",
+      "completeDescription": "Your hire-ready profile is complete. Employers can review you with confidence.",
+      "bannerTitle": "Complete your profile to get hired",
+      "bannerDescription": "Your profile is {percent}% complete — {count} required {count, plural, one {item} other {items}} left.",
+      "bannerCta": "See what to fill",
+      "fields": {
+        "resume": "Resume / CV",
+        "location": "Current location",
+        "visaStatus": "Visa status",
+        "availabilityDate": "Availability date",
+        "experienceYears": "Years of experience",
+        "jobTitle": "Job title",
+        "primarySkill": "Primary skill",
+        "aboutMe": "About me",
+        "whatsappNumber": "WhatsApp number"
+      },
+      "actions": {
+        "add": "Add",
+        "upload": "Upload",
+        "confirm": "Confirm"
+      }
     },
     "resumeUpload": {
       "resumeCv": "Resume/CV",

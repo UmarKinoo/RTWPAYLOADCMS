@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import type { Candidate } from '@/payload-types'
 import { DashboardSidebar } from './dashboard/DashboardSidebar'
@@ -15,7 +16,8 @@ import { VisaStatusSection } from './dashboard/VisaStatusSection'
 import { LanguagesSection } from './dashboard/LanguagesSection'
 import { JobPreferencesSection } from './dashboard/JobPreferencesSection'
 import { JobBenefitsSection } from './dashboard/JobBenefitsSection'
-import { ResumeQualityWidget } from './dashboard/ResumeQualityWidget'
+import { ProfileCompletenessCard } from './dashboard/ResumeQualityWidget'
+import { IncompleteProfileBanner } from './dashboard/IncompleteProfileBanner'
 import { ResumeUploadSection } from './dashboard/ResumeUploadSection'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@/components/ui/visually-hidden'
@@ -31,14 +33,41 @@ interface CandidateDashboardContentProps {
   notifications?: CandidateNotification[]
 }
 
-export function CandidateDashboardContent({ candidate: initialCandidate, unreadNotificationsCount = 0, notifications = [] }: CandidateDashboardContentProps) {
+export function CandidateDashboardContent({
+  candidate: initialCandidate,
+  unreadNotificationsCount = 0,
+  notifications = [],
+}: CandidateDashboardContentProps) {
   const t = useTranslations('candidateDashboard')
+  const searchParams = useSearchParams()
   const [candidate, setCandidate] = useState(initialCandidate)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleUpdate = (updatedData: Partial<Candidate>) => {
     setCandidate((prev) => ({ ...prev, ...updatedData } as Candidate))
   }
+
+  // Welcome email / deep links: scroll to completeness card or hash section
+  useEffect(() => {
+    const scrollToId = (id: string) => {
+      const el = document.getElementById(id)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        return true
+      }
+      return false
+    }
+
+    const hash = typeof window !== 'undefined' ? window.location.hash.replace(/^#/, '') : ''
+    const wantsComplete = searchParams.get('complete') === '1'
+
+    const timer = window.setTimeout(() => {
+      if (hash && scrollToId(hash)) return
+      if (wantsComplete) scrollToId('profile-completeness')
+    }, 150)
+
+    return () => window.clearTimeout(timer)
+  }, [searchParams])
 
   return (
     <div className="relative min-h-screen bg-[#f5f5f5] overflow-x-hidden">
@@ -61,74 +90,54 @@ export function CandidateDashboardContent({ candidate: initialCandidate, unreadN
 
       {/* Mobile Sidebar Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-full max-w-[280px] sm:w-[320px] p-0 flex flex-col overflow-hidden z-[110]">
+        <SheetContent
+          side="left"
+          className="w-full max-w-[280px] sm:w-[320px] p-0 flex flex-col overflow-hidden z-[110]"
+        >
           <VisuallyHidden>
             <SheetTitle>{t('navMenuTitle')}</SheetTitle>
           </VisuallyHidden>
-          <DashboardSidebar mobile onClose={() => setMobileMenuOpen(false)} unreadNotificationsCount={unreadNotificationsCount} />
+          <DashboardSidebar
+            mobile
+            onClose={() => setMobileMenuOpen(false)}
+            unreadNotificationsCount={unreadNotificationsCount}
+          />
         </SheetContent>
       </Sheet>
 
       {/* Main Content */}
       <div className="px-4 pb-20 md:pb-8 pt-16 sm:px-6 lg:ml-[220px] lg:pr-6 lg:pt-6">
-        {/* Header Section */}
-        <DashboardHeader 
-          candidate={candidate} 
+        <DashboardHeader
+          candidate={candidate}
           unreadNotificationsCount={unreadNotificationsCount}
           notifications={notifications}
         />
 
         <ProfileModerationBanner candidate={candidate} />
+        <IncompleteProfileBanner candidate={candidate} />
 
-        {/* Content Area - Dashboard overview (Activity & Notifications are separate routes) */}
         <div className="mt-4 sm:mt-6 flex flex-col gap-4 xl:flex-row">
-            {/* Left Column - Main Content */}
-            <div className="flex flex-1 flex-col gap-3 sm:gap-4">
-              {/* Profile Section */}
-              <ProfileSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Personal Information */}
-              <PersonalInfoSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Professional Skills */}
-              <ProfessionalSkillsSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Work Experience */}
-              <WorkExperienceSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* About Me */}
-              <AboutMeSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Education */}
-              <EducationSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Visa Status */}
-              <VisaStatusSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Languages */}
-              <LanguagesSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Job Preferences */}
-              <JobPreferencesSection candidate={candidate} onUpdate={handleUpdate} />
-
-              {/* Preferred Job Benefits */}
-              <JobBenefitsSection candidate={candidate} onUpdate={handleUpdate} />
-            </div>
-
-            {/* Right Column - Widgets */}
-            <div className="flex w-full flex-col gap-3 sm:gap-4 xl:w-[340px]">
-              {/* Resume Quality Widget */}
-              <ResumeQualityWidget candidate={candidate} />
-
-              {/* Resume Upload Section */}
-              <ResumeUploadSection candidate={candidate} onUpdate={handleUpdate} />
-            </div>
+          <div className="flex flex-1 flex-col gap-3 sm:gap-4">
+            <ProfileSection candidate={candidate} onUpdate={handleUpdate} />
+            <PersonalInfoSection candidate={candidate} onUpdate={handleUpdate} />
+            <ProfessionalSkillsSection candidate={candidate} onUpdate={handleUpdate} />
+            <WorkExperienceSection candidate={candidate} onUpdate={handleUpdate} />
+            <AboutMeSection candidate={candidate} onUpdate={handleUpdate} />
+            <EducationSection candidate={candidate} onUpdate={handleUpdate} />
+            <VisaStatusSection candidate={candidate} onUpdate={handleUpdate} />
+            <LanguagesSection candidate={candidate} onUpdate={handleUpdate} />
+            <JobPreferencesSection candidate={candidate} onUpdate={handleUpdate} />
+            <JobBenefitsSection candidate={candidate} onUpdate={handleUpdate} />
           </div>
+
+          <div className="flex w-full flex-col gap-3 sm:gap-4 xl:w-[340px]">
+            <ProfileCompletenessCard candidate={candidate} />
+            <ResumeUploadSection candidate={candidate} onUpdate={handleUpdate} />
+          </div>
+        </div>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav candidate={candidate} />
     </div>
   )
 }
-

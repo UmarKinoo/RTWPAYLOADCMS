@@ -105,21 +105,53 @@
       "acceptPlatformDisclaimer": "كما أقرّ بأن منصة ReadyToWork.sa ليست جهة توظيف ولا تضمن الحصول على وظيفة أو تشارك في أي قرار توظيف."
     },
     "skillSearch": {
-      "label": "ابحث عن دورك الوظيفي أو مهارتك *",
-      "primaryLabel": "المهارة الأساسية *",
-      "secondaryLabel": "المهارة الثانية (اختياري)",
-      "tertiaryLabel": "المهارة الثالثة (اختياري)",
-      "optionalPlaceholder": "اكتب للبحث (اختياري)",
-      "placeholder": "اكتب للبحث (مثل: بناء، مهندس، كهربائي...)",
+      "label": "الدور الوظيفي *",
+      "primaryLabel": "الدور الوظيفي الأساسي *",
+      "secondaryLabel": "الدور الوظيفي الثاني (اختياري)",
+      "tertiaryLabel": "الدور الوظيفي الثالث (اختياري)",
+      "optionalPlaceholder": "ابحث أو تصفّح (اختياري)",
+      "placeholder": "ابحث أو تصفّح الأدوار الوظيفية",
       "searching": "جاري البحث...",
       "minChars": "اكتب حرفين على الأقل للبحث",
-      "noResults": "لم يتم العثور على مهارات",
-      "tryDifferent": "جرب مصطلح بحث مختلف",
+      "noResults": "لم يتم العثور على أدوار وظيفية",
+      "tryDifferent": "جرب مصطلح بحث مختلف، أو تصفّح حسب المجال",
       "billingClass": "فئة الفوترة:",
-      "clearSelection": "مسح الاختيار"
+      "clearSelection": "مسح الاختيار",
+      "browseByIndustry": "تصفّح حسب المجال",
+      "back": "رجوع",
+      "loadingIndustries": "جاري تحميل المجالات...",
+      "treeError": "تعذّر تحميل المجالات. جرّب البحث بدلاً من ذلك.",
+      "roleCount": "{count, plural, zero {لا أدوار} one {دور واحد} two {دوران} few {# أدوار} many {# دورًا} other {# دور}}"
     },
     "jobRole": {
-      "description": "ابحث واختر حتى ثلاث مهارات من مصفوفة الوظائف. المهارة الأساسية مطلوبة؛ الثانية والثالثة اختياريتان."
+      "description": "اختر دورك الوظيفي الأساسي عبر تصفّح المجالات أو البحث. يمكنك إضافة دورين اختياريين إضافيين."
+    },
+    "jobRolePicker": {
+      "chooseIndustry": "اختر مجالك",
+      "chooseCategory": "اختر فئة",
+      "chooseRole": "اختر دورك الوظيفي",
+      "searchShortcut": "تعرف المسمى الوظيفي؟ ابحث عنه",
+      "searchPlaceholder": "مثل: كهربائي، كاشير، طباخ…",
+      "searching": "جاري البحث...",
+      "noResults": "لم يتم العثور على أدوار وظيفية",
+      "change": "تغيير",
+      "remove": "إزالة",
+      "addSecond": "أضف دورًا وظيفيًا ثانيًا (اختياري)",
+      "addThird": "أضف دورًا وظيفيًا ثالثًا (اختياري)",
+      "back": "رجوع",
+      "loadingIndustries": "جاري تحميل المجالات...",
+      "treeError": "تعذّر تحميل المجالات. جرّب البحث بدلاً من ذلك.",
+      "roleCount": "{count, plural, zero {لا أدوار} one {دور واحد} two {دوران} few {# أدوار} many {# دورًا} other {# دور}}",
+      "primaryLabel": "الدور الوظيفي الأساسي *",
+      "secondaryLabel": "الدور الوظيفي الثاني",
+      "tertiaryLabel": "الدور الوظيفي الثالث",
+      "pathIndustry": "المجال",
+      "pathCategory": "الفئة",
+      "pathRole": "الدور الوظيفي",
+      "yourPath": "مسارك المهني",
+      "editPath": "تعديل المسار المهني",
+      "selectIndustry": "اختر المجال",
+      "selectCategory": "اختر الفئة"
     },
     "location": {
       "currentLocationLabel": "الموقع الحالي (المملكة العربية السعودية) *",
@@ -282,7 +314,7 @@
       "zeroCandidatesMessage": "تُضاف ملفات جديدة بانتظام. تصفّح الدليل الكامل عندما تكون جاهزًا."
     },
     "majorDisciplines": {
-      "title": "استكشف الوظائف حسب التخصص الرئيسي",
+      "title": "استكشف الوظائف حسب المجال",
       "subtitle": "منصتنا تربطك بأفضل أصحاب العمل في مختلف القطاعات"
     },
     "uploadResume": {
@@ -431,7 +463,7 @@
       "country": "الدولة",
       "stateCity": "المنطقة/المدينة",
       "jobType": "نوع الوظيفة",
-      "majorDiscipline": "التخصص الرئيسي",
+      "majorDiscipline": "المجال",
       "category": "الفئة",
       "subCategory": "الفئة الفرعية",
       "skillLevel": "مستوى المهارة",
@@ -1008,13 +1040,13 @@
       "personalInfoUpdated": "تم تحديث المعلومات الشخصية بنجاح"
     },
     "professionalSkills": {
-      "title": "المهارات المهنية",
-      "primarySkill": "المهارة الرئيسية",
-      "secondarySkill": "المهارة الثانية",
-      "tertiarySkill": "المهارة الثالثة",
-      "primaryRequired": "يرجى اختيار المهارة الرئيسية",
-      "skillsMustDiffer": "يجب أن تكون المهارات مختلفة عن بعضها",
-      "skillsUpdated": "تم تحديث المهارات بنجاح"
+      "title": "الأدوار الوظيفية",
+      "primarySkill": "الدور الوظيفي الأساسي",
+      "secondarySkill": "الدور الوظيفي الثاني",
+      "tertiarySkill": "الدور الوظيفي الثالث",
+      "primaryRequired": "يرجى اختيار دورك الوظيفي الأساسي",
+      "skillsMustDiffer": "يجب أن تكون الأدوار الوظيفية مختلفة عن بعضها",
+      "skillsUpdated": "تم تحديث الأدوار الوظيفية بنجاح"
     },
     "workExperience": {
       "title": "الخبرة العملية",
@@ -1116,6 +1148,33 @@
       "completeJobTitle": "أكمل المسمى الوظيفي",
       "completePersonalInfo": "أكمل المعلومات الشخصية",
       "addWorkExperience": "أضف خبرتك العملية"
+    },
+    "profileCompleteness": {
+      "title": "اكتمال الملف الشخصي",
+      "subtitle": "أكمل الحقول المطلوبة لزيادة فرص توظيفك",
+      "filledCount": "{filled} من {total} حقول مطلوبة",
+      "checklistTitle": "أكمل هذه العناصر لتحسين فرصك",
+      "completeTitle": "أنت جاهز!",
+      "completeDescription": "ملفك جاهز للتوظيف. يمكن لأصحاب العمل مراجعته بثقة.",
+      "bannerTitle": "أكمل ملفك لزيادة فرص التوظيف",
+      "bannerDescription": "ملفك مكتمل بنسبة {percent}% — يتبقى {count} {count, plural, one {عنصر مطلوب} other {عناصر مطلوبة}}.",
+      "bannerCta": "عرض ما يجب إكماله",
+      "fields": {
+        "resume": "السيرة الذاتية",
+        "location": "الموقع الحالي",
+        "visaStatus": "حالة التأشيرة",
+        "availabilityDate": "تاريخ التوفر",
+        "experienceYears": "سنوات الخبرة",
+        "jobTitle": "المسمى الوظيفي",
+        "primarySkill": "المهارة الأساسية",
+        "aboutMe": "نبذة عني",
+        "whatsappNumber": "رقم الواتساب"
+      },
+      "actions": {
+        "add": "إضافة",
+        "upload": "رفع",
+        "confirm": "تأكيد"
+      }
     },
     "resumeUpload": {
       "resumeCv": "السيرة الذاتية",

@@ -88,7 +88,7 @@ export function PersonalInfoSection({ candidate, onUpdate }: PersonalInfoSection
   }
 
   return (
-    <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
+    <Card id="personal-info" className="scroll-mt-24 rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">

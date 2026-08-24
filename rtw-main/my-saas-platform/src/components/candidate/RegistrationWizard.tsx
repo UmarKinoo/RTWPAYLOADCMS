@@ -157,10 +157,13 @@ const FIELD_TO_STEP: Partial<Record<keyof CandidateFormData, number>> = {
   acceptPlatformDisclaimer: 6,
 }
 
-export function RegistrationWizard() {
+export function RegistrationWizard({ initialStep }: { initialStep?: number } = {}) {
   const t = useTranslations('registration')
   const router = useRouter()
-  const [currentStep, setCurrentStep] = useState(1)
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (initialStep && initialStep >= 1 && initialStep <= 6) return initialStep
+    return 1
+  })
   const [isPending, setIsPending] = useState(false)
   const [sameAsPhone, setSameAsPhone] = useState(false)
   const [showPhoneVerification, setShowPhoneVerification] = useState(false)

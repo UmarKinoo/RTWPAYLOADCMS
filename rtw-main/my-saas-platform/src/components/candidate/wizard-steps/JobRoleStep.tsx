@@ -1,8 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { UseFormSetValue, FieldErrors } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
-import { SkillSearch } from '@/components/candidate/SkillSearch'
+import { AddJobRoleButton, JobRolePicker } from '@/components/candidate/JobRolePicker'
 import type { CandidateFormData } from '../RegistrationWizard'
 
 interface JobRoleStepProps {
@@ -21,40 +22,70 @@ export function JobRoleStep({
   errors,
 }: JobRoleStepProps) {
   const t = useTranslations('registration.jobRole')
-  const tSkill = useTranslations('registration.skillSearch')
+  const tp = useTranslations('registration.jobRolePicker')
+
+  const [showSecondary, setShowSecondary] = useState(Boolean(secondarySkill))
+  const [showTertiary, setShowTertiary] = useState(Boolean(tertiarySkill))
 
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">{t('description')}</p>
 
-      <SkillSearch
-        inputId="primary-skill-search"
-        label={tSkill('primaryLabel')}
+      <JobRolePicker
+        label={tp('primaryLabel')}
         value={primarySkill}
         onValueChange={(skillId) => setValue('primarySkill', skillId)}
         error={errors.primarySkill?.message}
         excludeSkillIds={[secondarySkill, tertiarySkill].filter(Boolean) as string[]}
       />
 
-      <SkillSearch
-        inputId="secondary-skill-search"
-        label={tSkill('secondaryLabel')}
-        placeholder={tSkill('optionalPlaceholder')}
-        value={secondarySkill}
-        onValueChange={(skillId) => setValue('secondarySkill', skillId || undefined)}
-        error={errors.secondarySkill?.message}
-        excludeSkillIds={[primarySkill, tertiarySkill].filter(Boolean) as string[]}
-      />
+      {showSecondary ? (
+        <JobRolePicker
+          label={tp('secondaryLabel')}
+          value={secondarySkill}
+          forceOpen={!secondarySkill}
+          onValueChange={(skillId) => setValue('secondarySkill', skillId || undefined)}
+          error={errors.secondarySkill?.message}
+          excludeSkillIds={[primarySkill, tertiarySkill].filter(Boolean) as string[]}
+          onRemove={() => {
+            setValue('secondarySkill', undefined)
+            setShowSecondary(false)
+            if (showTertiary && !tertiarySkill) {
+              // keep tertiary open if already shown
+            }
+          }}
+        />
+      ) : (
+        primarySkill && (
+          <AddJobRoleButton
+            label={tp('addSecond')}
+            onClick={() => setShowSecondary(true)}
+          />
+        )
+      )}
 
-      <SkillSearch
-        inputId="tertiary-skill-search"
-        label={tSkill('tertiaryLabel')}
-        placeholder={tSkill('optionalPlaceholder')}
-        value={tertiarySkill}
-        onValueChange={(skillId) => setValue('tertiarySkill', skillId || undefined)}
-        error={errors.tertiarySkill?.message}
-        excludeSkillIds={[primarySkill, secondarySkill].filter(Boolean) as string[]}
-      />
+      {showTertiary ? (
+        <JobRolePicker
+          label={tp('tertiaryLabel')}
+          value={tertiarySkill}
+          forceOpen={!tertiarySkill}
+          onValueChange={(skillId) => setValue('tertiarySkill', skillId || undefined)}
+          error={errors.tertiarySkill?.message}
+          excludeSkillIds={[primarySkill, secondarySkill].filter(Boolean) as string[]}
+          onRemove={() => {
+            setValue('tertiarySkill', undefined)
+            setShowTertiary(false)
+          }}
+        />
+      ) : (
+        showSecondary &&
+        secondarySkill && (
+          <AddJobRoleButton
+            label={tp('addThird')}
+            onClick={() => setShowTertiary(true)}
+          />
+        )
+      )}
     </div>
   )
 }

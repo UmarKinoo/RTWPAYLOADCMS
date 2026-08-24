@@ -54,7 +54,7 @@ const paramToLabelKey: Record<string, string> = {
 
 // Base filter configuration (visible filters only)
 const baseFilterConfigs: FilterConfig[] = [
-  { label: 'Major Discipline', param: 'discipline', options: [] },
+  { label: 'Industry', param: 'discipline', options: [] },
   { label: 'Category', param: 'category', options: [] },
   { label: 'Sub Category', param: 'subCategory', options: [] },
   { label: 'Availability', param: 'availability', options: ['Immediate', '1 Week', '2 Weeks', '1 Month', '2+ Months'] },

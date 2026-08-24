@@ -6,7 +6,7 @@ import { useState } from 'react'
 import type { Candidate, Skill } from '@/payload-types'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { SkillSearch } from '@/components/candidate/SkillSearch'
+import { AddJobRoleButton, JobRolePicker } from '@/components/candidate/JobRolePicker'
 import { updateCandidate } from '@/lib/candidate'
 import { toast } from 'sonner'
 
@@ -32,7 +32,7 @@ export function ProfessionalSkillsSection({
 }: ProfessionalSkillsSectionProps) {
   const t = useTranslations('candidateDashboard.professionalSkills')
   const tCommon = useTranslations('candidateDashboard.common')
-  const tSkill = useTranslations('registration.skillSearch')
+  const tp = useTranslations('registration.jobRolePicker')
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [formData, setFormData] = useState({
@@ -40,6 +40,8 @@ export function ProfessionalSkillsSection({
     secondarySkill: skillId(candidate.secondarySkill),
     tertiarySkill: skillId(candidate.tertiarySkill),
   })
+  const [showSecondary, setShowSecondary] = useState(Boolean(skillId(candidate.secondarySkill)))
+  const [showTertiary, setShowTertiary] = useState(Boolean(skillId(candidate.tertiarySkill)))
   const [error, setError] = useState<string | null>(null)
 
   const handleSave = async () => {
@@ -92,12 +94,14 @@ export function ProfessionalSkillsSection({
       secondarySkill: skillId(candidate.secondarySkill),
       tertiarySkill: skillId(candidate.tertiarySkill),
     })
+    setShowSecondary(Boolean(skillId(candidate.secondarySkill)))
+    setShowTertiary(Boolean(skillId(candidate.tertiarySkill)))
     setError(null)
     setIsEditing(false)
   }
 
   return (
-    <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
+    <Card id="skills" className="scroll-mt-24 rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       <div className="mb-4 flex items-center justify-between sm:mb-6">
         <div className="flex items-center gap-2">
           <Award className="size-5 text-[#282828] sm:size-6" />
@@ -133,34 +137,61 @@ export function ProfessionalSkillsSection({
       </div>
 
       {isEditing ? (
-        <div className="space-y-4">
-          <SkillSearch
-            inputId="dashboard-primary-skill"
-            label={tSkill('primaryLabel')}
+        <div className="space-y-6">
+          <JobRolePicker
+            label={tp('primaryLabel')}
             value={formData.primarySkill}
             onValueChange={(id) => setFormData((prev) => ({ ...prev, primarySkill: id }))}
             excludeSkillIds={[formData.secondarySkill, formData.tertiarySkill].filter(Boolean)}
           />
-          <SkillSearch
-            inputId="dashboard-secondary-skill"
-            label={tSkill('secondaryLabel')}
-            placeholder={tSkill('optionalPlaceholder')}
-            value={formData.secondarySkill}
-            onValueChange={(id) =>
-              setFormData((prev) => ({ ...prev, secondarySkill: id || '' }))
-            }
-            excludeSkillIds={[formData.primarySkill, formData.tertiarySkill].filter(Boolean)}
-          />
-          <SkillSearch
-            inputId="dashboard-tertiary-skill"
-            label={tSkill('tertiaryLabel')}
-            placeholder={tSkill('optionalPlaceholder')}
-            value={formData.tertiarySkill}
-            onValueChange={(id) =>
-              setFormData((prev) => ({ ...prev, tertiarySkill: id || '' }))
-            }
-            excludeSkillIds={[formData.primarySkill, formData.secondarySkill].filter(Boolean)}
-          />
+
+          {showSecondary ? (
+            <JobRolePicker
+              label={tp('secondaryLabel')}
+              value={formData.secondarySkill}
+              forceOpen={!formData.secondarySkill}
+              onValueChange={(id) =>
+                setFormData((prev) => ({ ...prev, secondarySkill: id || '' }))
+              }
+              excludeSkillIds={[formData.primarySkill, formData.tertiarySkill].filter(Boolean)}
+              onRemove={() => {
+                setFormData((prev) => ({ ...prev, secondarySkill: '' }))
+                setShowSecondary(false)
+              }}
+            />
+          ) : (
+            formData.primarySkill && (
+              <AddJobRoleButton
+                label={tp('addSecond')}
+                onClick={() => setShowSecondary(true)}
+              />
+            )
+          )}
+
+          {showTertiary ? (
+            <JobRolePicker
+              label={tp('tertiaryLabel')}
+              value={formData.tertiarySkill}
+              forceOpen={!formData.tertiarySkill}
+              onValueChange={(id) =>
+                setFormData((prev) => ({ ...prev, tertiarySkill: id || '' }))
+              }
+              excludeSkillIds={[formData.primarySkill, formData.secondarySkill].filter(Boolean)}
+              onRemove={() => {
+                setFormData((prev) => ({ ...prev, tertiarySkill: '' }))
+                setShowTertiary(false)
+              }}
+            />
+          ) : (
+            showSecondary &&
+            formData.secondarySkill && (
+              <AddJobRoleButton
+                label={tp('addThird')}
+                onClick={() => setShowTertiary(true)}
+              />
+            )
+          )}
+
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
       ) : (

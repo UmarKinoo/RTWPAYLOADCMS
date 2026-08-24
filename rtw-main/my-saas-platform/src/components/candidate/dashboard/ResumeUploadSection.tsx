@@ -139,7 +139,7 @@ export function ResumeUploadSection({ candidate, onUpdate }: ResumeUploadSection
   }
 
   return (
-    <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
+    <Card id="resume-upload" className="scroll-mt-24 rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       {/* Header */}
       <div className="mb-4 text-center sm:mb-6">
         <h3 className="text-base font-semibold text-[#4644b8] sm:text-lg">{t('resumeCv')}</h3>

@@ -244,13 +244,43 @@ export function verificationEmailTemplate(email: string, token: string, userType
 export function welcomeEmailTemplate(email: string, userType: 'candidate' | 'employer' = 'candidate'): string {
   const appUrl = getAppUrl()
   // Use default locale for dashboard URLs to ensure proper routing
-  const dashboardUrl = userType === 'employer' 
-    ? `${appUrl}/${defaultLocale}/employer/dashboard`
-    : `${appUrl}/${defaultLocale}/dashboard`
+  const dashboardUrl =
+    userType === 'employer'
+      ? `${appUrl}/${defaultLocale}/employer/dashboard`
+      : `${appUrl}/${defaultLocale}/dashboard?complete=1`
   const userTypeLabel = userType === 'employer' ? 'employer' : 'candidate'
-  
-  const content = `
-    <h1 class="email-title">Welcome to Ready to Work! 🎉</h1>
+
+  const candidateContent = `
+    <h1 class="email-title">Welcome to Ready to Work!</h1>
+    <p class="email-content">
+      Hi there,
+    </p>
+    <p class="email-content">
+      Your email has been verified and your candidate account is ready. Complete the required profile fields so employers can find and hire you faster.
+    </p>
+    <div class="alert alert-success">
+      <strong>Account verified</strong>
+      <p style="margin-top: 8px; font-size: 14px;">Next step: finish your hire-ready profile (CV, About me, and contact details).</p>
+    </div>
+    <div style="text-align: center;">
+      <a href="${dashboardUrl}" class="button">Complete your profile</a>
+    </div>
+    <div class="divider"></div>
+    <p class="email-content">
+      <strong>What's next?</strong>
+    </p>
+    <ul style="color: #16252d; line-height: 1.8; margin-left: 20px;">
+      <li>Upload your resume / CV</li>
+      <li>Write a short About me</li>
+      <li>Confirm WhatsApp and availability</li>
+    </ul>
+    <p class="email-content">
+      If you have any questions, our support team is here to help!
+    </p>
+  `
+
+  const employerContent = `
+    <h1 class="email-title">Welcome to Ready to Work!</h1>
     <p class="email-content">
       Hi there,
     </p>
@@ -258,7 +288,7 @@ export function welcomeEmailTemplate(email: string, userType: 'candidate' | 'emp
       Your email has been successfully verified! Your ${userTypeLabel} account is now fully activated and ready to use.
     </p>
     <div class="alert alert-success">
-      <strong>✅ Account Verified</strong>
+      <strong>Account Verified</strong>
       <p style="margin-top: 8px; font-size: 14px;">You can now access all features of your account.</p>
     </div>
     <div style="text-align: center;">
@@ -269,17 +299,19 @@ export function welcomeEmailTemplate(email: string, userType: 'candidate' | 'emp
       <strong>What's next?</strong>
     </p>
     <ul style="color: #16252d; line-height: 1.8; margin-left: 20px;">
-      ${userType === 'employer' 
-        ? '<li>Browse and search qualified candidates</li><li>Schedule interviews with top talent</li><li>Access candidate contact details</li>'
-        : '<li>Complete your profile to increase visibility</li><li>Browse available job opportunities</li><li>Get matched with employers</li>'
-      }
+      <li>Browse and search qualified candidates</li>
+      <li>Schedule interviews with top talent</li>
+      <li>Access candidate contact details</li>
     </ul>
     <p class="email-content">
       If you have any questions, our support team is here to help!
     </p>
   `
-  
-  return baseEmailTemplate(content, 'Welcome to Ready to Work')
+
+  return baseEmailTemplate(
+    userType === 'candidate' ? candidateContent : employerContent,
+    'Welcome to Ready to Work',
+  )
 }
 
 /**
