@@ -55,11 +55,50 @@ Nothing changes on the backend — we still store skill IDs on primary/secondary
 
 ---
 
+## Test accounts
+
+**Live site:** [https://readytowork.sa](https://readytowork.sa)  
+**Login:** [https://readytowork.sa/en/login](https://readytowork.sa/en/login)
+
+Both accounts use the same password: **`AzizTest2026!`**
+
+### Candidate — job role picker + profile strength
+
+| | |
+|---|---|
+| **Email** | `aziz.qa.candidate@readybot-qa.example.test` |
+| **Password** | `AzizTest2026!` |
+
+Profile is partially complete — **Complete now** shows missing items (photo, resume, about me, education, job preferences, benefits, etc.).
+
+**Try:**
+- [Dashboard](https://readytowork.sa/en/dashboard) → tap **Complete now** at the bottom
+- [Dashboard with sheet open](https://readytowork.sa/en/dashboard?complete=1)
+- Job Roles section → browse Industry → Category → Role, or search
+- [Registration job role step](https://readytowork.sa/en/register?step=jobRole) (log out first if needed)
+
+### Employer — pricing plans (Basic / Standard / Premium)
+
+| | |
+|---|---|
+| **Email** | `aziz.qa.employer@readybot-qa.example.test` |
+| **Password** | `AzizTest2026!` |
+
+No plan active yet — use this to test purchasing.  
+*(If login fails, register at [Employer registration](https://readytowork.sa/en/register?collection=employers) with the same email/password, or ask Umar to run `pnpm seed:aziz-qa` on the live database.)*
+
+**Try:**
+- [Pricing (EN)](https://readytowork.sa/en/pricing) / [Pricing (AR)](https://readytowork.sa/ar/pricing)
+- Click **Get started** on Basic, Standard, or Premium (mock checkout — no real payment)
+- [Employer dashboard](https://readytowork.sa/en/employer/dashboard) → check subscription card (credits, expiry, unlimited)
+
+---
+
 ## How to test (quick)
 
-1. **Pricing:** `/en/pricing` — three plans, Premium highlighted, no Saudi plan.
-2. **Job role:** Candidate registration step 3 or dashboard → Job Roles — browse or search.
-3. **Profile strength:** Incomplete candidate dashboard → tap **Complete now** pill → full checklist with +% badges.
+1. **Pricing:** Log in as **employer** → `/en/pricing` → purchase a plan → check dashboard.
+2. **Job role:** Log in as **candidate** → dashboard → Job Roles — browse or search.
+3. **Profile strength:** Log in as **candidate** → dashboard → tap **Complete now** pill.
 
 ---
 

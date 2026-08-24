@@ -39,6 +39,7 @@
     "report:contact-duplicates": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/report-contact-duplicates.ts",
     "create:test-candidate": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/create-test-candidate.ts",
     "seed:readybot-test-candidates": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-readybot-test-candidates.ts",
+    "seed:aziz-qa": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-aziz-qa-accounts.ts",
     "verify:cv-upload": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/verify-cv-upload.ts",
     "readybot:scan": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/readybot-scan.ts",
     "readybot:followup": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/readybot-followup.ts",
