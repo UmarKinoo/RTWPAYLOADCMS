@@ -37,7 +37,7 @@ const PLANS = [
     slug: 'basic',
     title: 'Basic',
     title_en: 'Basic',
-    title_ar: 'أساسي',
+    title_ar: 'الباقة الأساسية',
     price: 350,
     currency: 'SAR',
     entitlements: {
@@ -54,7 +54,7 @@ const PLANS = [
     slug: 'standard',
     title: 'Standard',
     title_en: 'Standard',
-    title_ar: 'قياسي',
+    title_ar: 'الباقة القياسية',
     price: 450,
     currency: 'SAR',
     entitlements: {
@@ -71,7 +71,7 @@ const PLANS = [
     slug: 'premium',
     title: 'Premium',
     title_en: 'Premium',
-    title_ar: 'مميز',
+    title_ar: 'الباقة المميزة',
     price: 600,
     currency: 'SAR',
     entitlements: {
