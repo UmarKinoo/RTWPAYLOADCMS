@@ -1160,14 +1160,20 @@
       "bannerDescription": "Your profile is {percent}% complete — {count} required {count, plural, one {item} other {items}} left.",
       "bannerCta": "See what to fill",
       "fields": {
+        "profilePicture": "Profile photo",
         "resume": "Resume / CV",
         "location": "Current location",
+        "nationality": "Nationality",
         "visaStatus": "Visa status",
         "availabilityDate": "Availability date",
         "experienceYears": "Years of experience",
         "jobTitle": "Job title",
-        "primarySkill": "Primary skill",
+        "primarySkill": "Primary job role",
         "aboutMe": "About me",
+        "education": "Education",
+        "languages": "Languages",
+        "jobPreferences": "Job preferences",
+        "jobBenefits": "Preferred benefits",
         "whatsappNumber": "WhatsApp number"
       },
       "actions": {
@@ -1175,6 +1181,18 @@
         "upload": "Upload",
         "confirm": "Confirm"
       }
+    },
+    "profileStrength": {
+      "title": "Profile strength",
+      "strengthLabel": "Profile strength: {percent}%",
+      "completedCount": "{filled} of {total} completed",
+      "motivator": "Profiles at 100% get seen first by employers",
+      "pointsBadge": "+{points}%",
+      "completedGroup": "Completed ({count})",
+      "completeNow": "Complete now",
+      "itemDone": "Done",
+      "doneTitle": "Profile complete!",
+      "doneDescription": "Your hire-ready profile is live."
     },
     "resumeUpload": {
       "resumeCv": "Resume/CV",

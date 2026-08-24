@@ -18,6 +18,7 @@ import { JobPreferencesSection } from './dashboard/JobPreferencesSection'
 import { JobBenefitsSection } from './dashboard/JobBenefitsSection'
 import { ProfileCompletenessCard } from './dashboard/ResumeQualityWidget'
 import { IncompleteProfileBanner } from './dashboard/IncompleteProfileBanner'
+import { ProfileStrengthDock } from './dashboard/ProfileStrengthDock'
 import { ResumeUploadSection } from './dashboard/ResumeUploadSection'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@/components/ui/visually-hidden'
@@ -26,6 +27,8 @@ import { Menu } from 'lucide-react'
 import { BottomNav } from '@/components/homepage/BottomNav'
 import type { CandidateNotification } from '@/lib/payload/candidate-notifications'
 import { ProfileModerationBanner } from './dashboard/ProfileModerationBanner'
+import { getProfileCompleteness } from '@/lib/candidates/profile-completeness'
+import { cn } from '@/lib/utils'
 
 interface CandidateDashboardContentProps {
   candidate: Candidate
@@ -42,12 +45,16 @@ export function CandidateDashboardContent({
   const searchParams = useSearchParams()
   const [candidate, setCandidate] = useState(initialCandidate)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [strengthSheetOpen, setStrengthSheetOpen] = useState(false)
+
+  const { missing: missingProfileFields } = getProfileCompleteness(candidate)
+  const showStrengthDock = missingProfileFields.length > 0
 
   const handleUpdate = (updatedData: Partial<Candidate>) => {
     setCandidate((prev) => ({ ...prev, ...updatedData } as Candidate))
   }
 
-  // Welcome email / deep links: scroll to completeness card or hash section
+  // Welcome email / deep links: open profile strength sheet or scroll to hash section
   useEffect(() => {
     const scrollToId = (id: string) => {
       const el = document.getElementById(id)
@@ -62,8 +69,11 @@ export function CandidateDashboardContent({
     const wantsComplete = searchParams.get('complete') === '1'
 
     const timer = window.setTimeout(() => {
-      if (hash && scrollToId(hash)) return
-      if (wantsComplete) scrollToId('profile-completeness')
+      if (wantsComplete) {
+        setStrengthSheetOpen(true)
+        return
+      }
+      if (hash) scrollToId(hash)
     }, 150)
 
     return () => window.clearTimeout(timer)
@@ -106,7 +116,7 @@ export function CandidateDashboardContent({
       </Sheet>
 
       {/* Main Content */}
-      <div className="px-4 pb-20 md:pb-8 pt-16 sm:px-6 lg:ml-[220px] lg:pr-6 lg:pt-6">
+      <div className={cn('px-4 pt-16 sm:px-6 lg:ml-[220px] lg:pr-6 lg:pt-6', showStrengthDock ? 'pb-32 md:pb-8' : 'pb-20 md:pb-8')}>
         <DashboardHeader
           candidate={candidate}
           unreadNotificationsCount={unreadNotificationsCount}
@@ -114,7 +124,10 @@ export function CandidateDashboardContent({
         />
 
         <ProfileModerationBanner candidate={candidate} />
-        <IncompleteProfileBanner candidate={candidate} />
+        <IncompleteProfileBanner
+          candidate={candidate}
+          onOpenChecklist={() => setStrengthSheetOpen(true)}
+        />
 
         <div className="mt-4 sm:mt-6 flex flex-col gap-4 xl:flex-row">
           <div className="flex flex-1 flex-col gap-3 sm:gap-4">
@@ -138,6 +151,12 @@ export function CandidateDashboardContent({
       </div>
 
       <BottomNav candidate={candidate} />
+
+      <ProfileStrengthDock
+        candidate={candidate}
+        open={strengthSheetOpen}
+        onOpenChange={setStrengthSheetOpen}
+      />
     </div>
   )
 }

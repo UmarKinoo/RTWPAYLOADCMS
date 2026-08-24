@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { getProfileCompleteness } from '@/lib/candidates/profile-completeness'
+import { getAllProfileFieldStatuses, getProfileCompleteness } from '@/lib/candidates/profile-completeness'
 
 interface ProfileCompletenessCardProps {
   candidate: Candidate
@@ -17,7 +17,9 @@ interface ProfileCompletenessCardProps {
 
 export function ProfileCompletenessCard({ candidate, className }: ProfileCompletenessCardProps) {
   const t = useTranslations('candidateDashboard.profileCompleteness')
+  const tStrength = useTranslations('candidateDashboard.profileStrength')
   const { percent, filled, total, missing } = getProfileCompleteness(candidate)
+  const allFields = getAllProfileFieldStatuses(candidate)
   const isComplete = missing.length === 0
 
   return (
@@ -65,20 +67,39 @@ export function ProfileCompletenessCard({ candidate, className }: ProfileComplet
           <p className="text-center text-xs font-semibold text-[#282828] sm:text-sm">
             {t('checklistTitle')}
           </p>
-          <ul className="space-y-2">
-            {missing.map((item) => (
+          <ul className="max-h-[420px] space-y-2 overflow-y-auto">
+            {allFields.map((item) => (
               <li key={item.field}>
                 <Link
                   href={item.href}
-                  className="group flex items-center gap-2.5 rounded-lg border border-[#e7e9ef] bg-[#fafafa] px-3 py-2.5 transition-colors hover:border-[#4644b8]/40 hover:bg-[#ecf2ff]/60"
+                  className={cn(
+                    'group flex items-center gap-2.5 rounded-lg border px-3 py-2.5 transition-colors',
+                    item.isComplete
+                      ? 'border-[#e7e9ef] bg-[#f9fafb] hover:bg-[#f5f5f5]'
+                      : 'border-[#4644b8]/20 bg-[#fafafa] hover:border-[#4644b8]/40 hover:bg-[#ecf2ff]/60',
+                  )}
                 >
-                  <Circle className="h-4 w-4 shrink-0 text-[#4644b8]" />
-                  <span className="min-w-0 flex-1 text-xs font-medium text-[#16252d] sm:text-sm">
+                  {item.isComplete ? (
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-[#2d6a4f]" />
+                  ) : (
+                    <Circle className="h-4 w-4 shrink-0 text-[#4644b8]" />
+                  )}
+                  <span
+                    className={cn(
+                      'min-w-0 flex-1 text-xs font-medium sm:text-sm',
+                      item.isComplete ? 'text-[#515151]' : 'text-[#16252d]',
+                    )}
+                  >
                     {t(`fields.${item.i18nKey}`)}
                   </span>
-                  <span className="shrink-0 text-[10px] font-semibold text-[#4644b8] sm:text-xs">
-                    {t(`actions.${item.actionKey}`)}
+                  <span className="shrink-0 rounded-full bg-[#e8f5ee] px-2 py-0.5 text-[10px] font-bold text-[#2d6a4f] sm:text-[11px]">
+                    {tStrength('pointsBadge', { points: item.points })}
                   </span>
+                  {!item.isComplete && (
+                    <span className="shrink-0 text-[10px] font-semibold text-[#4644b8] sm:text-xs">
+                      {t(`actions.${item.actionKey}`)}
+                    </span>
+                  )}
                   <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#4644b8] opacity-60 group-hover:opacity-100" />
                 </Link>
               </li>

@@ -4,45 +4,50 @@ import { useTranslations } from 'next-intl'
 import { Sparkles } from 'lucide-react'
 import type { Candidate } from '@/payload-types'
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import { getProfileCompleteness } from '@/lib/candidates/profile-completeness'
 import { cn } from '@/lib/utils'
 
 interface IncompleteProfileBannerProps {
   candidate: Candidate
   className?: string
+  onOpenChecklist?: () => void
 }
 
-export function IncompleteProfileBanner({ candidate, className }: IncompleteProfileBannerProps) {
+export function IncompleteProfileBanner({
+  candidate,
+  className,
+  onOpenChecklist,
+}: IncompleteProfileBannerProps) {
   const t = useTranslations('candidateDashboard.profileCompleteness')
   const { percent, missing } = getProfileCompleteness(candidate)
 
   if (missing.length === 0) return null
 
-  const scrollToCard = () => {
-    const el = document.getElementById('profile-completeness')
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   return (
     <div
       className={cn(
-        'mt-4 flex flex-col gap-3 rounded-xl border border-[#4644b8]/25 bg-[#ecf2ff] p-4 sm:mt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4',
+        'mt-4 flex flex-col gap-3 rounded-xl border border-[#4644b8]/20 bg-[#ecf2ff]/80 p-3 sm:mt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4',
         className,
       )}
       role="status"
     >
-      <div className="flex items-start gap-3">
-        <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#4644b8]" />
-        <div>
-          <p className="text-sm font-semibold text-[#16252d]">{t('bannerTitle')}</p>
-          <p className="mt-0.5 text-xs text-[#515151] sm:text-sm">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <Sparkles className="h-5 w-5 shrink-0 text-[#4644b8]" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <p className="text-sm font-semibold text-[#16252d]">{t('bannerTitle')}</p>
+            <p className="text-xs font-bold text-[#4644b8] sm:text-sm">{percent}%</p>
+          </div>
+          <Progress value={percent} className="mt-2 h-1.5 max-w-xs" />
+          <p className="mt-1.5 text-xs text-[#515151]">
             {t('bannerDescription', { percent, count: missing.length })}
           </p>
         </div>
       </div>
       <Button
         type="button"
-        onClick={scrollToCard}
+        onClick={onOpenChecklist}
         className="h-9 shrink-0 rounded-lg bg-[#4644b8] px-4 text-sm font-semibold text-white hover:bg-[#3a3aa0]"
       >
         {t('bannerCta')}

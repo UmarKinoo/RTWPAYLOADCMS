@@ -254,3 +254,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .profile-strength-highlight {
+    @apply ring-2 ring-[#4644b8] ring-offset-2 transition-shadow duration-300;
+    animation: profile-strength-pulse 2.2s ease-out;
+  }
+}
+
+@keyframes profile-strength-pulse {
+  0%,
+  15% {
+    box-shadow: 0 0 0 0 rgb(70 68 184 / 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgb(70 68 184 / 0.12);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(70 68 184 / 0);
+  }
+}

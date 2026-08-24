@@ -1160,14 +1160,20 @@
       "bannerDescription": "ملفك مكتمل بنسبة {percent}% — يتبقى {count} {count, plural, one {عنصر مطلوب} other {عناصر مطلوبة}}.",
       "bannerCta": "عرض ما يجب إكماله",
       "fields": {
+        "profilePicture": "صورة الملف الشخصي",
         "resume": "السيرة الذاتية",
         "location": "الموقع الحالي",
+        "nationality": "الجنسية",
         "visaStatus": "حالة التأشيرة",
         "availabilityDate": "تاريخ التوفر",
         "experienceYears": "سنوات الخبرة",
         "jobTitle": "المسمى الوظيفي",
-        "primarySkill": "المهارة الأساسية",
+        "primarySkill": "الدور الوظيفي الأساسي",
         "aboutMe": "نبذة عني",
+        "education": "التعليم",
+        "languages": "اللغات",
+        "jobPreferences": "تفضيلات الوظيفة",
+        "jobBenefits": "المزايا المفضلة",
         "whatsappNumber": "رقم الواتساب"
       },
       "actions": {
@@ -1175,6 +1181,18 @@
         "upload": "رفع",
         "confirm": "تأكيد"
       }
+    },
+    "profileStrength": {
+      "title": "قوة الملف الشخصي",
+      "strengthLabel": "قوة الملف: {percent}%",
+      "completedCount": "{filled} من {total} مكتمل",
+      "motivator": "الملفات المكتملة 100% تظهر أولاً لأصحاب العمل",
+      "pointsBadge": "+{points}%",
+      "completedGroup": "مكتمل ({count})",
+      "completeNow": "أكمل الآن",
+      "itemDone": "مكتمل",
+      "doneTitle": "الملف مكتمل!",
+      "doneDescription": "ملفك جاهز للتوظيف."
     },
     "resumeUpload": {
       "resumeCv": "السيرة الذاتية",

@@ -126,7 +126,7 @@ export function ProfileSection({ candidate, onUpdate }: ProfileSectionProps) {
   }
 
   return (
-    <Card className="rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
+    <Card id="profile" className="scroll-mt-24 rounded-xl bg-white p-4 shadow-sm sm:rounded-2xl sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
         {/* Profile Photo */}
         <button
