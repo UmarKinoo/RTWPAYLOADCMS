@@ -70,12 +70,37 @@ async function runCustomMigrations(pool: Pool): Promise<{ run: number; skipped: 
   return { run, skipped }
 }
 
+/** Dev-mode schema push writes batch=-1 rows; Payload migrate prompts interactively (breaks Vercel). */
+async function clearDevPushMarkers(pool: Pool): Promise<number> {
+  try {
+    const result = await pool.query<{ name: string }>(
+      'DELETE FROM payload_migrations WHERE batch = -1 RETURNING name',
+    )
+    const count = result.rowCount ?? 0
+    if (count > 0) {
+      console.log(`  🧹 Cleared ${count} dev-push marker(s) from payload_migrations`)
+    }
+    return count
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    if (msg.includes('does not exist') || msg.includes('relation')) {
+      return 0
+    }
+    throw err
+  }
+}
+
 function runPayloadMigrate(): void {
   console.log('\n📦 Running Payload migrations...')
   execSync('pnpm payload migrate', {
     stdio: 'inherit',
     cwd: root,
-    env: { ...process.env, NODE_OPTIONS: '--no-deprecation' },
+    env: {
+      ...process.env,
+      NODE_OPTIONS: '--no-deprecation',
+      // Non-TTY CI: avoid prompts hanging the build (dev markers cleared above).
+      CI: process.env.CI || process.env.VERCEL ? 'true' : process.env.CI,
+    },
   })
 }
 
@@ -100,6 +125,7 @@ async function main(): Promise<void> {
     console.log('📂 Custom SQL migrations (supabase/migrations)...')
     const { run, skipped } = await runCustomMigrations(pool)
     console.log(`   Applied: ${run}, already applied: ${skipped}`)
+    await clearDevPushMarkers(pool)
     runPayloadMigrate()
     console.log('\n✅ db:migrate complete.\n')
   } catch (err) {
