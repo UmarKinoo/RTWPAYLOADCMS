@@ -24,6 +24,8 @@ interface LocationVisaStepProps {
 export function LocationVisaStep({ register, errors, control, setValue }: LocationVisaStepProps) {
   const t = useTranslations('registration.locationVisa')
   const watchedVisaExpiry = useWatch({ control, name: 'visaExpiry' })
+  const visaStatus = useWatch({ control, name: 'visaStatus' })
+  const requiresVisaProfession = visaStatus !== 'none'
   const [visaExpiryDate, setVisaExpiryDate] = useState<Date | undefined>(
     watchedVisaExpiry ? new Date(watchedVisaExpiry) : undefined
   )
@@ -53,7 +55,15 @@ export function LocationVisaStep({ register, errors, control, setValue }: Locati
           name="visaStatus"
           control={control}
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select
+              value={field.value}
+              onValueChange={(value) => {
+                field.onChange(value)
+                if (value === 'none') {
+                  setValue('visaProfession', '', { shouldValidate: true })
+                }
+              }}
+            >
               <SelectTrigger className="w-full h-12">
                 <SelectValue placeholder={t('selectVisaStatus')} />
               </SelectTrigger>
@@ -104,33 +114,19 @@ export function LocationVisaStep({ register, errors, control, setValue }: Locati
           {errors.visaExpiry && <FieldError>{errors.visaExpiry.message}</FieldError>}
         </Field>
 
-        <Field data-invalid={!!errors.visaProfession}>
-          <FieldLabel htmlFor="visaProfession">{t('jobPositionInVisaOptional')}</FieldLabel>
-          <Input
-            id="visaProfession"
-            {...register('visaProfession')}
-            placeholder={t('enterJobPositionInVisa')}
-            className="h-12"
-          />
-          {errors.visaProfession && <FieldError>{errors.visaProfession.message}</FieldError>}
-        </Field>
+        {requiresVisaProfession && (
+          <Field data-invalid={!!errors.visaProfession}>
+            <FieldLabel htmlFor="visaProfession">{t('jobPositionInVisa')}</FieldLabel>
+            <Input
+              id="visaProfession"
+              {...register('visaProfession')}
+              placeholder={t('enterJobPositionInVisa')}
+              className="h-12"
+            />
+            {errors.visaProfession && <FieldError>{errors.visaProfession.message}</FieldError>}
+          </Field>
+        )}
       </div>
     </div>
   )
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

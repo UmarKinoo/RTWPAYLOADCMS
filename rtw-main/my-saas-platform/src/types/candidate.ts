@@ -27,12 +27,28 @@ export type CandidateEducationEntry = {
   description?: string | null
 }
 
+export type CandidateJobPreferences = {
+  preferredJobTitle?: string | null
+  preferredLocation?: string | null
+  preferredSalary?: string | null
+  workType?: string | null
+  shiftPreference?: string | null
+}
+
+export type CandidatePreferredBenefit = {
+  benefit: string
+  otherBenefit?: string | null
+  id?: string | null
+}
+
 export interface CandidateDetail extends CandidateListItem {
   phone: string
   whatsapp: string | null
   gender: 'male' | 'female'
   dob: string
   languages: string
+  currentlyInKSA: boolean
+  industryExperience: string
   aboutMe: string | null
   education: CandidateEducationEntry[]
   /** Full job-matrix path at signup: discipline, category, subcategory, skill (comma-separated, localized). */
@@ -42,6 +58,8 @@ export interface CandidateDetail extends CandidateListItem {
   visaStatus: 'active' | 'expired' | 'nearly_expired' | 'none'
   visaExpiry: string | null
   visaProfession: string | null
+  jobPreferences: CandidateJobPreferences | null
+  preferredBenefits: CandidatePreferredBenefit[]
   createdAt: string
   updatedAt: string
 }

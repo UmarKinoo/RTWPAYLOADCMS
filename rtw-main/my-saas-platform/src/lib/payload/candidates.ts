@@ -58,6 +58,11 @@ function toListItem(doc: Candidate): CandidateListItem {
  * Transform raw Candidate doc to CandidateDetail
  */
 function toDetail(doc: Candidate, locale: string): CandidateDetail {
+  const prefs = doc.jobPreferences
+  const hasPrefs =
+    prefs &&
+    Object.values(prefs).some((v) => typeof v === 'string' && v.trim() && v !== 'any')
+
   return {
     ...toListItem(doc),
     phone: doc.phone,
@@ -65,6 +70,8 @@ function toDetail(doc: Candidate, locale: string): CandidateDetail {
     gender: doc.gender,
     dob: doc.dob,
     languages: doc.languages,
+    currentlyInKSA: doc.currentlyInKSA !== false,
+    industryExperience: doc.industryExperience || '',
     aboutMe: doc.aboutMe?.trim() || null,
     education: (doc.education ?? []).map((entry) => ({
       degree: entry.degree,
@@ -79,6 +86,20 @@ function toDetail(doc: Candidate, locale: string): CandidateDetail {
     visaStatus: doc.visaStatus,
     visaExpiry: doc.visaExpiry || null,
     visaProfession: doc.visaProfession || null,
+    jobPreferences: hasPrefs
+      ? {
+          preferredJobTitle: prefs.preferredJobTitle || null,
+          preferredLocation: prefs.preferredLocation || null,
+          preferredSalary: prefs.preferredSalary || null,
+          workType: prefs.workType || null,
+          shiftPreference: prefs.shiftPreference || null,
+        }
+      : null,
+    preferredBenefits: (doc.preferredBenefits ?? []).map((b) => ({
+      benefit: b.benefit,
+      otherBenefit: b.otherBenefit,
+      id: b.id,
+    })),
     // resume/CV is intentionally NOT exposed here — employers must never receive
     // the CV URL (candidate self-view and moderation use their own data paths)
     createdAt: doc.createdAt,

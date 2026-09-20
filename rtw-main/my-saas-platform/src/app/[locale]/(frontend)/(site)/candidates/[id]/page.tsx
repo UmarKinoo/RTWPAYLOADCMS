@@ -134,6 +134,45 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
     none: t('visaNone'),
   }
 
+  const workTypeLabels: Record<string, string> = {
+    'full-time': t('workTypeFullTime'),
+    'part-time': t('workTypePartTime'),
+    contract: t('workTypeContract'),
+    freelance: t('workTypeFreelance'),
+    any: t('workTypeAny'),
+  }
+
+  const shiftLabels: Record<string, string> = {
+    day: t('shiftDay'),
+    night: t('shiftNight'),
+    rotating: t('shiftRotating'),
+    any: t('shiftAny'),
+  }
+
+  const benefitLabels: Record<string, string> = {
+    health_insurance: t('benefitHealthInsurance'),
+    accommodation: t('benefitAccommodation'),
+    transportation: t('benefitTransportation'),
+    annual_leave: t('benefitAnnualLeave'),
+    end_of_service: t('benefitEndOfService'),
+    training: t('benefitTraining'),
+    performance_bonus: t('benefitPerformanceBonus'),
+    overtime_pay: t('benefitOvertimePay'),
+    meal_allowance: t('benefitMealAllowance'),
+    other: t('benefitOther'),
+  }
+
+  const formatDate = (value: string | null | undefined) => {
+    if (!value) return null
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return value
+    return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
+  }
+
   // Languages as list
   const languagesList = candidate.languages
     .split(',')
@@ -147,6 +186,9 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
   const packageLabel = packageLabelKey
     ? t(packageLabelKey as 'packageEssential' | 'packageSkilled' | 'packageSpecialty' | 'packageElite' | 'packageSaudiNationals')
     : null
+
+  const prefs = candidate.jobPreferences
+  const benefits = candidate.preferredBenefits
 
   // Locked view for non-employers: teaser + CTA only
   if (!hasEmployerAccess) {
@@ -217,17 +259,51 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
 
           {/* Right: Info Cards Grid */}
           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 content-start">
-            {/* Row 1: Visa Status + Saudi Experience */}
+            <InfoCard title={t('dateOfBirth')}>
+              {formatDate(candidate.dob) ?? '—'}
+            </InfoCard>
+
+            <InfoCard title={t('nationality')}>{candidate.nationality}</InfoCard>
+
+            <InfoCard title={t('currentlyInKSA')}>
+              {candidate.currentlyInKSA ? t('yes') : t('no')}
+            </InfoCard>
+
             <InfoCard title={t('visaStatus')}>
               {visaStatusLabels[candidate.visaStatus]}
+            </InfoCard>
+
+            {candidate.visaProfession && (
+              <InfoCard title={t('visaProfession')}>{candidate.visaProfession}</InfoCard>
+            )}
+
+            {candidate.visaExpiry && (
+              <InfoCard title={t('visaExpiry')}>
+                {formatDate(candidate.visaExpiry) ?? candidate.visaExpiry}
+              </InfoCard>
+            )}
+
+            <InfoCard title={t('jobName')}>{candidate.jobTitle}</InfoCard>
+
+            <InfoCard title={t('yearsOfExperience')}>
+              {formatExperience(candidate.experienceYears)}
+            </InfoCard>
+
+            <InfoCard title={t('industryExperience')}>
+              {candidate.industryExperience || '—'}
             </InfoCard>
 
             <InfoCard title={t('yearsInSaudi')}>
               {candidate.saudiExperience} {t('yearsSuffix')}
             </InfoCard>
 
-            {/* Row 2: Job name + languages */}
-            <InfoCard title={t('jobName')}>{candidate.jobTitle}</InfoCard>
+            {candidate.currentEmployer && (
+              <InfoCard title={t('currentEmployer')}>{candidate.currentEmployer}</InfoCard>
+            )}
+
+            <InfoCard title={t('availabilityDate')}>
+              {formatDate(candidate.availabilityDate) ?? candidate.availabilityDate}
+            </InfoCard>
 
             <InfoCard title={t('languages')}>
               <ul className="list-disc list-inside space-y-1">
@@ -258,8 +334,73 @@ export default async function CandidateDetailPage({ params: paramsPromise }: Arg
           </div>
         </div>
 
-        {candidate.aboutMe && (
+        {prefs && (
           <div className="mt-8 sm:mt-10 lg:mt-12">
+            <InfoCard title={t('jobPreferences')} className="w-full">
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {prefs.preferredJobTitle && (
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-[#757575] mb-1">
+                      {t('preferredJobTitle')}
+                    </dt>
+                    <dd>{prefs.preferredJobTitle}</dd>
+                  </div>
+                )}
+                {prefs.preferredLocation && (
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-[#757575] mb-1">
+                      {t('preferredLocation')}
+                    </dt>
+                    <dd>{prefs.preferredLocation}</dd>
+                  </div>
+                )}
+                {prefs.preferredSalary && (
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-[#757575] mb-1">
+                      {t('preferredSalary')}
+                    </dt>
+                    <dd>{prefs.preferredSalary}</dd>
+                  </div>
+                )}
+                {prefs.workType && prefs.workType !== 'any' && (
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-[#757575] mb-1">
+                      {t('workType')}
+                    </dt>
+                    <dd>{workTypeLabels[prefs.workType] ?? prefs.workType}</dd>
+                  </div>
+                )}
+                {prefs.shiftPreference && prefs.shiftPreference !== 'any' && (
+                  <div>
+                    <dt className="text-xs uppercase tracking-wide text-[#757575] mb-1">
+                      {t('shiftPreference')}
+                    </dt>
+                    <dd>{shiftLabels[prefs.shiftPreference] ?? prefs.shiftPreference}</dd>
+                  </div>
+                )}
+              </dl>
+            </InfoCard>
+          </div>
+        )}
+
+        {benefits.length > 0 && (
+          <div className="mt-6 sm:mt-8">
+            <InfoCard title={t('jobBenefits')} className="w-full">
+              <ul className="list-disc list-inside space-y-1">
+                {benefits.map((item, idx) => (
+                  <li key={item.id || `${item.benefit}-${idx}`}>
+                    {item.benefit === 'other' && item.otherBenefit
+                      ? item.otherBenefit
+                      : benefitLabels[item.benefit] ?? item.benefit}
+                  </li>
+                ))}
+              </ul>
+            </InfoCard>
+          </div>
+        )}
+
+        {candidate.aboutMe && (
+          <div className="mt-6 sm:mt-8">
             <InfoCard title={t('aboutMe')} className="w-full">
               <p className="whitespace-pre-wrap">{candidate.aboutMe}</p>
             </InfoCard>

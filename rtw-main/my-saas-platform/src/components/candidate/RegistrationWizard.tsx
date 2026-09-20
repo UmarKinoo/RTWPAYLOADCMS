@@ -115,6 +115,13 @@ const candidateSchema = z
       path: ['tertiarySkill'],
     },
   )
+  .refine(
+    (data) => data.visaStatus === 'none' || Boolean(data.visaProfession?.trim()),
+    {
+      message: 'Job position on visa is required',
+      path: ['visaProfession'],
+    },
+  )
 
 export type CandidateFormData = z.infer<typeof candidateSchema>
 
@@ -284,7 +291,7 @@ export function RegistrationWizard({ initialStep }: { initialStep?: number } = {
       2: ['firstName', 'lastName', 'phone', 'gender', 'dob', 'nationality', 'languages', 'location', 'currentlyInKSA'],
       3: ['primarySkill', 'secondarySkill', 'tertiarySkill'],
       4: ['jobTitle', 'experienceYears', 'industryExperience', 'saudiExperience', 'availabilityDate'],
-      5: ['visaStatus'],
+      5: ['visaStatus', 'visaProfession'],
       6: ['acceptPrivacyTerms', 'acceptDataConsent', 'acceptPlatformDisclaimer'],
     }[step] as (keyof CandidateFormData)[]
 
