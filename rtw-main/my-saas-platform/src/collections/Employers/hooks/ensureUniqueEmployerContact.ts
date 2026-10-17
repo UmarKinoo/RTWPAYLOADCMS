@@ -1,5 +1,9 @@
 import type { CollectionBeforeChangeHook } from 'payload'
-import { assertUniqueContact } from '@/lib/auth/assertUniqueContact'
+import {
+  assertUniqueContact,
+  isEmailBeingChanged,
+  isPhoneBeingChanged,
+} from '@/lib/auth/assertUniqueContact'
 
 /**
  * One email/phone across employers, candidates, and users (email).
@@ -20,15 +24,8 @@ export const ensureUniqueEmployerContact: CollectionBeforeChangeHook = async ({
     excludeId: operation === 'update' ? originalDoc?.id : undefined,
   }
 
-  const emailChanging =
-    operation === 'create'
-      ? data.email !== undefined && data.email !== null
-      : data.email !== undefined
-
-  const phoneChanging =
-    operation === 'create'
-      ? data.phone !== undefined && data.phone !== null && String(data.phone).trim() !== ''
-      : data.phone !== undefined
+  const emailChanging = isEmailBeingChanged(operation, data.email, originalDoc?.email)
+  const phoneChanging = isPhoneBeingChanged(operation, data.phone, originalDoc?.phone)
 
   if (!emailChanging && !phoneChanging) {
     return data

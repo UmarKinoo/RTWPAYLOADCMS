@@ -20,6 +20,41 @@ export function normalizeEmail(email: string): string {
   return email.toLowerCase().trim()
 }
 
+/**
+ * True only when this save is setting a new email.
+ * Updates that resend the current email (password reset, profile saves) are not a change.
+ */
+export function isEmailBeingChanged(
+  operation: 'create' | 'update',
+  next: unknown,
+  previous: unknown,
+): boolean {
+  if (operation === 'create') {
+    return next !== undefined && next !== null
+  }
+  if (typeof next !== 'string') return false
+  const prev = typeof previous === 'string' ? previous : ''
+  return normalizeEmail(next) !== normalizeEmail(prev)
+}
+
+/**
+ * True only when this save is setting a new phone.
+ * Empty on create is not a change. Same stored value on update is not a change.
+ */
+export function isPhoneBeingChanged(
+  operation: 'create' | 'update',
+  next: unknown,
+  previous: unknown,
+): boolean {
+  if (operation === 'create') {
+    return next !== undefined && next !== null && String(next).trim() !== ''
+  }
+  if (next === undefined) return false
+  const nextStr = next === null ? '' : String(next).trim()
+  const prevStr = previous === null || previous === undefined ? '' : String(previous).trim()
+  return nextStr !== prevStr
+}
+
 export function isContactConflictError(error: unknown): error is ContactConflictError {
   return error instanceof ContactConflictError ||
     (error instanceof Error &&
