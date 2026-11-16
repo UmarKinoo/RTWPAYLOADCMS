@@ -7,7 +7,6 @@ import { paymentSuccessEmailTemplate, paymentFailedEmailTemplate } from '@/lib/e
 import { getServerSideURL } from '@/utilities/getURL'
 import { defaultLocale } from '@/i18n/config'
 import { buildPlanPurchaseMessage, computePlanExpiresAt } from '@/lib/plan-access'
-import { withVat } from '@/lib/vat'
 
 /**
  * Notify the employer about the payment outcome (in-app + email).
@@ -256,14 +255,7 @@ export async function fulfillPurchaseByKey(
     companyName: employer.companyName || employer.email || 'there',
     planTitle: plan.title || plan.slug || 'selected',
     outcome: 'success',
-    price:
-      plan.price != null
-        ? (() => {
-            const total = withVat(Number(plan.price))
-            const cur = plan.currency || 'SAR'
-            return `${cur} ${Number.isInteger(total) ? total : total.toFixed(2)} (incl. VAT)`
-          })()
-        : undefined,
+    price: plan.price != null ? `${plan.currency || 'SAR'} ${plan.price}` : undefined,
     interviewCredits: interviewGranted,
     contactUnlockCredits: contactGranted,
     unlimitedInterviews,

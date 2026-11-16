@@ -7,7 +7,6 @@ import { revalidatePath } from 'next/cache'
 import { sendPayment } from '@/lib/myfatoorah'
 import { getServerSideURL } from '@/utilities/getURL'
 import { buildPlanPurchaseMessage, computePlanExpiresAt } from '@/lib/plan-access'
-import { priceBreakdown } from '@/lib/vat'
 
 export interface MockPurchaseResponse {
   success: boolean
@@ -76,13 +75,10 @@ export async function startPayment(planSlug: string): Promise<StartPaymentRespon
       (employer as any).companyName || (employer as any).responsiblePerson || employer.email || 'Customer'
     const customerEmail = employer.email || ''
 
-    const exclusive = Number(plan.price)
-    if (Number.isNaN(exclusive) || exclusive <= 0) {
+    const invoiceValue = Number(plan.price)
+    if (Number.isNaN(invoiceValue) || invoiceValue <= 0) {
       return { success: false, error: 'Invalid plan price.' }
     }
-    // Plan price in CMS is VAT-exclusive; charge exclusive + 15% VAT.
-    const { exclusive: base, vat, total: invoiceValue } = priceBreakdown(exclusive)
-    const planItemName = (plan.title || plan.slug || 'Plan').slice(0, 180)
     const result = await sendPayment({
       CustomerName: customerName,
       CustomerEmail: customerEmail,
@@ -95,14 +91,9 @@ export async function startPayment(planSlug: string): Promise<StartPaymentRespon
       UserDefinedField: String(purchase.id),
       InvoiceItems: [
         {
-          ItemName: planItemName,
+          ItemName: (plan.title || plan.slug || 'Plan').slice(0, 200),
           Quantity: 1,
-          UnitPrice: base,
-        },
-        {
-          ItemName: 'VAT 15%',
-          Quantity: 1,
-          UnitPrice: vat,
+          UnitPrice: invoiceValue,
         },
       ],
     })

@@ -129,14 +129,9 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
 
       <CardContent className="p-0 flex-1">
         {/* Price */}
-        <div className="mb-4 sm:mb-5">
-          <p className="text-2xl sm:text-3xl md:text-4xl font-bold font-inter text-[#16252d]">
-            {formatPrice()}
-          </p>
-          {!isCustom && plan.price !== null && (
-            <p className="mt-1 text-xs sm:text-sm text-[#757575] font-medium">{t('exclVat')}</p>
-          )}
-        </div>
+        <p className="text-2xl sm:text-3xl md:text-4xl font-bold font-inter text-[#16252d] mb-4 sm:mb-5">
+          {formatPrice()}
+        </p>
 
         {/* Features */}
         <div className="space-y-2.5">
@@ -240,8 +235,6 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
           ))}
         </div>
       )}
-
-      <p className="mt-6 text-center text-sm text-[#757575]">{t('pricesExclVat')}</p>
     </HomepageSection>
   )
 }
