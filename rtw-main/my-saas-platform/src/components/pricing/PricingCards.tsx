@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import { mockPurchase, startPayment } from '@/lib/purchases'
 import { useTranslations } from 'next-intl'
 import type { Plan } from '@/lib/payload/plans'
+import { priceBreakdown } from '@/lib/vat'
 
 interface PricingCardsProps {
   plans: Plan[]
@@ -43,10 +44,17 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
     }
   }
 
+  const currency = plan.currency || 'SAR'
+  const formatMoney = (amount: number) => {
+    const formatted = Number.isInteger(amount) ? String(amount) : amount.toFixed(2)
+    return `${currency} ${formatted}`
+  }
   const formatPrice = () => {
     if (plan.price === null) return 'N/A'
-    return `${plan.currency} ${plan.price}`
+    return formatMoney(plan.price)
   }
+  const breakdown =
+    !isCustom && plan.price != null && plan.price > 0 ? priceBreakdown(plan.price) : null
 
   const getSubtitle = () => {
     if (plan.slug === 'basic') return t('basicSubtitle')
@@ -129,9 +137,22 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
 
       <CardContent className="p-0 flex-1">
         {/* Price */}
-        <p className="text-2xl sm:text-3xl md:text-4xl font-bold font-inter text-[#16252d] mb-4 sm:mb-5">
-          {formatPrice()}
-        </p>
+        <div className="mb-4 sm:mb-5">
+          <p className="text-2xl sm:text-3xl md:text-4xl font-bold font-inter text-[#16252d]">
+            {formatPrice()}
+          </p>
+          {breakdown && (
+            <div className="mt-1 space-y-0.5">
+              <p className="text-xs sm:text-sm text-[#757575] font-medium">{t('exclVat')}</p>
+              <p className="text-xs sm:text-sm text-[#757575]">
+                {t('vatLine', { amount: formatMoney(breakdown.vat) })}
+              </p>
+              <p className="text-sm sm:text-base font-semibold text-[#16252d]">
+                {t('totalWithVat', { amount: formatMoney(breakdown.total) })}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Features */}
         <div className="space-y-2.5">
@@ -220,7 +241,7 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
     <HomepageSection className="pb-12 sm:pb-16 md:pb-20">
       {/* First Row - paid plans */}
       {paidPlans.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mb-4 sm:mb-5 md:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mb-4 sm:mb-5 md:mb-6 pt-4">
           {paidPlans.map((plan) => (
             <PricingCard key={plan.id} plan={plan} onPurchase={handlePurchase} />
           ))}
@@ -235,6 +256,8 @@ export const PricingCards: React.FC<PricingCardsProps> = ({
           ))}
         </div>
       )}
+
+      <p className="mt-6 text-center text-sm text-[#757575]">{t('pricesExclVat')}</p>
     </HomepageSection>
   )
 }

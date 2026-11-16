@@ -499,6 +499,10 @@
       "standardSubtitle": "Unlimited interviews · 2 CVs",
       "premiumSubtitle": "Unlimited interviews · 3 CVs",
       "custom": "Business",
+      "exclVat": "Excl. VAT",
+      "vatLine": "+ VAT 15% ({amount})",
+      "totalWithVat": "Total with VAT: {amount}",
+      "pricesExclVat": "All prices exclude VAT. 15% VAT is added at checkout.",
       "processing": "Processing...",
       "getStarted": "Get Started",
       "features": {

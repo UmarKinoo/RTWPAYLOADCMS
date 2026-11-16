@@ -55,7 +55,7 @@ const PLANS = [
     title: 'Standard',
     title_en: 'Standard',
     title_ar: 'الباقة القياسية',
-    price: 450,
+    price: 500,
     currency: 'SAR',
     entitlements: {
       interviewCreditsGranted: 0,
@@ -72,7 +72,7 @@ const PLANS = [
     title: 'Premium',
     title_en: 'Premium',
     title_ar: 'الباقة المميزة',
-    price: 600,
+    price: 700,
     currency: 'SAR',
     entitlements: {
       interviewCreditsGranted: 0,
