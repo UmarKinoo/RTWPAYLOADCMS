@@ -12,7 +12,6 @@ import { toast } from 'sonner'
 import { mockPurchase, startPayment } from '@/lib/purchases'
 import { useTranslations } from 'next-intl'
 import type { Plan } from '@/lib/payload/plans'
-import { priceBreakdown } from '@/lib/vat'
 
 interface PricingCardsProps {
   plans: Plan[]
@@ -44,17 +43,10 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
     }
   }
 
-  const currency = plan.currency || 'SAR'
-  const formatMoney = (amount: number) => {
-    const formatted = Number.isInteger(amount) ? String(amount) : amount.toFixed(2)
-    return `${currency} ${formatted}`
-  }
   const formatPrice = () => {
     if (plan.price === null) return 'N/A'
-    return formatMoney(plan.price)
+    return `${plan.currency || 'SAR'} ${plan.price}`
   }
-  const breakdown =
-    !isCustom && plan.price != null && plan.price > 0 ? priceBreakdown(plan.price) : null
 
   const getSubtitle = () => {
     if (plan.slug === 'basic') return t('basicSubtitle')
@@ -141,16 +133,8 @@ const PricingCard: React.FC<{ plan: Plan; onPurchase: (planSlug: string) => Prom
           <p className="text-2xl sm:text-3xl md:text-4xl font-bold font-inter text-[#16252d]">
             {formatPrice()}
           </p>
-          {breakdown && (
-            <div className="mt-1 space-y-0.5">
-              <p className="text-xs sm:text-sm text-[#757575] font-medium">{t('exclVat')}</p>
-              <p className="text-xs sm:text-sm text-[#757575]">
-                {t('vatLine', { amount: formatMoney(breakdown.vat) })}
-              </p>
-              <p className="text-sm sm:text-base font-semibold text-[#16252d]">
-                {t('totalWithVat', { amount: formatMoney(breakdown.total) })}
-              </p>
-            </div>
+          {!isCustom && plan.price !== null && (
+            <p className="mt-1 text-xs sm:text-sm text-[#757575] font-medium">{t('exclVat')}</p>
           )}
         </div>
 
