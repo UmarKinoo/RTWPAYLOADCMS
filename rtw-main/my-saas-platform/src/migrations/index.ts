@@ -17,6 +17,7 @@ import * as migration_20260729_170000_candidate_occupations_candidate_link from 
 import * as migration_20260810_120000_candidates_currently_in_ksa from './20260810_120000_candidates_currently_in_ksa';
 import * as migration_20260824_143000_plan_entitlements_expiry from './20260824_143000_plan_entitlements_expiry';
 import * as migration_20261123_120000_interview_outcome_and_other_job from './20261123_120000_interview_outcome_and_other_job';
+import * as migration_20261124_120000_candidates_primary_skill_nullable from './20261124_120000_candidates_primary_skill_nullable';
 
 export const migrations = [
   {
@@ -113,5 +114,10 @@ export const migrations = [
     up: migration_20261123_120000_interview_outcome_and_other_job.up,
     down: migration_20261123_120000_interview_outcome_and_other_job.down,
     name: '20261123_120000_interview_outcome_and_other_job',
+  },
+  {
+    up: migration_20261124_120000_candidates_primary_skill_nullable.up,
+    down: migration_20261124_120000_candidates_primary_skill_nullable.down,
+    name: '20261124_120000_candidates_primary_skill_nullable',
   },
 ];

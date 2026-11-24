@@ -69,6 +69,12 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     ALTER TABLE "candidates"
       ADD COLUMN IF NOT EXISTS "custom_other_job" varchar;
   `)
+
+  // Allow Other-job signup without a skills-tree primarySkill
+  await db.execute(sql`
+    ALTER TABLE "candidates"
+      ALTER COLUMN "primary_skill_id" DROP NOT NULL;
+  `)
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
