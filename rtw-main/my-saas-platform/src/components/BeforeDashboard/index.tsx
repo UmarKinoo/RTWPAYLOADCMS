@@ -9,6 +9,18 @@ const baseClass = 'before-dashboard'
 const BeforeDashboard: React.FC = () => {
   return (
     <div className={baseClass}>
+      <div className={`${baseClass}__moderator`}>
+        <div>
+          <h3 className={`${baseClass}__moderator-title`}>Moderator tools</h3>
+          <p className={`${baseClass}__moderator-copy`}>
+            Review pending interview requests, candidate profiles, and outcome history.
+          </p>
+        </div>
+        <a className={`${baseClass}__moderator-btn`} href="/en/moderator" target="_blank" rel="noreferrer">
+          Open Moderator Dashboard
+        </a>
+      </div>
+
       <Banner className={`${baseClass}__banner`} type="success">
         <h4>Welcome to your dashboard!</h4>
       </Banner>

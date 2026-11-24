@@ -5,6 +5,7 @@ import config from '@payload-config'
 import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { Interview } from '@/payload-types'
+import { appendInterviewOutcome } from '@/lib/admin/interview-outcome'
 
 export interface AcceptInterviewResponse {
   success: boolean
@@ -62,12 +63,19 @@ export async function acceptInterview(
       return { success: true, interview: interview as Interview }
     }
 
+    const now = new Date().toISOString()
+
     // Persist candidate acceptance (must change data — previously status-only no-op could stall clients)
     const updatedInterview = await payload.update({
       collection: 'interviews',
       id: interviewId,
       data: {
-        candidateAcceptedAt: new Date().toISOString(),
+        candidateAcceptedAt: now,
+        outcomeHistory: appendInterviewOutcome(interview as Interview, {
+          at: now,
+          actor: 'candidate',
+          action: 'accepted',
+        }),
       },
     }) as Interview
 
@@ -158,13 +166,24 @@ export async function rejectInterview(
       }
     }
 
-    // Update interview status to cancelled
+    const now = new Date().toISOString()
+    const rejectionReason = reason || 'Interview rejected by candidate.'
+
+    // Update interview status to cancelled; record candidate as actor
     await payload.update({
       collection: 'interviews',
       id: interviewId,
       data: {
         status: 'cancelled',
-        rejectionReason: reason || 'Interview rejected by candidate.',
+        rejectionReason,
+        rejectedBy: 'candidate',
+        rejectedAt: now,
+        outcomeHistory: appendInterviewOutcome(interview as Interview, {
+          at: now,
+          actor: 'candidate',
+          action: 'cancelled',
+          reason: rejectionReason,
+        }),
       },
     })
 

@@ -156,6 +156,74 @@ export const Interviews: CollectionConfig = {
       },
     },
     {
+      name: 'rejectedBy',
+      type: 'select',
+      options: [
+        { label: 'Candidate', value: 'candidate' },
+        { label: 'Moderator', value: 'moderator' },
+        { label: 'Employer', value: 'employer' },
+      ],
+      admin: {
+        description: 'Who rejected or cancelled this interview',
+      },
+    },
+    {
+      name: 'rejectedAt',
+      type: 'date',
+      admin: {
+        description: 'When the interview was rejected or cancelled',
+        date: {
+          pickerAppearance: 'dayAndTime',
+        },
+      },
+    },
+    {
+      name: 'outcomeHistory',
+      type: 'array',
+      admin: {
+        description: 'Basic history of approve / reject / cancel / accept outcomes',
+        readOnly: true,
+      },
+      fields: [
+        {
+          name: 'at',
+          type: 'date',
+          admin: {
+            date: { pickerAppearance: 'dayAndTime' },
+          },
+        },
+        {
+          name: 'actor',
+          type: 'select',
+          options: [
+            { label: 'Candidate', value: 'candidate' },
+            { label: 'Moderator', value: 'moderator' },
+            { label: 'Employer', value: 'employer' },
+            { label: 'System', value: 'system' },
+          ],
+        },
+        {
+          name: 'action',
+          type: 'select',
+          options: [
+            { label: 'Approved', value: 'approved' },
+            { label: 'Rejected', value: 'rejected' },
+            { label: 'Cancelled', value: 'cancelled' },
+            { label: 'Accepted', value: 'accepted' },
+            { label: 'Completed', value: 'completed' },
+          ],
+        },
+        {
+          name: 'reason',
+          type: 'text',
+        },
+        {
+          name: 'note',
+          type: 'text',
+        },
+      ],
+    },
+    {
       name: 'jobPosition',
       type: 'text',
       admin: {

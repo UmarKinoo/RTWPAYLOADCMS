@@ -172,18 +172,27 @@ export function ReviewStep({ formValues, sameAsPhone, control, errors, onEditSte
               )}
             </div>
             <div className="text-sm space-y-2">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{r('primarySkill')}</span>
-                <span className="font-medium">{formValues.primarySkill ? r('selected') : r('notProvided')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{r('secondarySkill')}</span>
-                <span className="font-medium">{formValues.secondarySkill ? r('selected') : r('notProvided')}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{r('tertiarySkill')}</span>
-                <span className="font-medium">{formValues.tertiarySkill ? r('selected') : r('notProvided')}</span>
-              </div>
+              {formValues.customOtherJob?.trim() ? (
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted-foreground shrink-0">{r('customOtherJob')}</span>
+                  <span className="font-medium text-right">{formValues.customOtherJob}</span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{r('primarySkill')}</span>
+                    <span className="font-medium">{formValues.primarySkill ? r('selected') : r('notProvided')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{r('secondarySkill')}</span>
+                    <span className="font-medium">{formValues.secondarySkill ? r('selected') : r('notProvided')}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{r('tertiarySkill')}</span>
+                    <span className="font-medium">{formValues.tertiarySkill ? r('selected') : r('notProvided')}</span>
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -151,7 +151,12 @@
       "yourPath": "Your career path",
       "editPath": "Edit career path",
       "selectIndustry": "Select industry",
-      "selectCategory": "Select category"
+      "selectCategory": "Select category",
+      "fromList": "Choose from list",
+      "otherJob": "Other (not listed)",
+      "otherJobLabel": "Your job title *",
+      "otherJobPlaceholder": "e.g. Scaffolding supervisor, Yacht steward…",
+      "otherJobHint": "Use this if your role is not in the skills tree. We’ll review it during moderation."
     },
     "location": {
       "currentLocationLabel": "Current Location (Saudi Arabia) *",
@@ -236,6 +241,7 @@
       "primarySkill": "Primary Skill:",
       "secondarySkill": "Second Skill:",
       "tertiarySkill": "Third Skill:",
+      "customOtherJob": "Other job title:",
       "industryExperience": "Industry Experience:",
       "selected": "Selected",
       "jobTitle": "Job Title:",

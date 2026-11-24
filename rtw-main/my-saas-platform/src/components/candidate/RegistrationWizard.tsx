@@ -40,10 +40,11 @@ const candidateSchema = z
     whatsapp: z.string().optional(),
     sameAsPhone: z.boolean().optional(),
 
-    // Smart Matrix
-    primarySkill: z.string().min(1, 'Please select your job role'),
+    // Smart Matrix — primarySkill OR customOtherJob required (see refine below)
+    primarySkill: z.string().optional(),
     secondarySkill: z.string().optional(),
     tertiarySkill: z.string().optional(),
+    customOtherJob: z.string().optional(),
 
     // Demographics
     gender: z.enum(['male', 'female'], { message: 'Gender is required' }),
@@ -97,6 +98,13 @@ const candidateSchema = z
     message: 'Only Saudi Arabia (KSA) phone numbers are accepted. Use +966...',
     path: ['phone'],
   })
+  .refine(
+    (data) => Boolean(data.primarySkill?.trim()) || Boolean(data.customOtherJob?.trim()),
+    {
+      message: 'Please select your job role or enter a custom job title',
+      path: ['primarySkill'],
+    },
+  )
   .refine((data) => !data.secondarySkill || data.secondarySkill !== data.primarySkill, {
     message: 'Secondary skill must be different from your primary skill',
     path: ['secondarySkill'],
@@ -150,6 +158,7 @@ const FIELD_TO_STEP: Partial<Record<keyof CandidateFormData, number>> = {
   primarySkill: 3,
   secondarySkill: 3,
   tertiarySkill: 3,
+  customOtherJob: 3,
   jobTitle: 4,
   experienceYears: 4,
   industryExperience: 4,
@@ -230,7 +239,12 @@ export function RegistrationWizard({ initialStep }: { initialStep?: number } = {
     if (!draft?.values) return
     const values = draft.values
     const hasContent = Boolean(
-      values.email || values.firstName || values.phone || values.primarySkill || values.jobTitle,
+      values.email ||
+        values.firstName ||
+        values.phone ||
+        values.primarySkill ||
+        values.customOtherJob ||
+        values.jobTitle,
     )
     if (!hasContent) return
     Object.entries(values).forEach(([field, value]) => {
@@ -255,7 +269,11 @@ export function RegistrationWizard({ initialStep }: { initialStep?: number } = {
       ...safeValues
     } = formValues
     const hasContent = Boolean(
-      safeValues.email || safeValues.firstName || safeValues.phone || safeValues.primarySkill,
+      safeValues.email ||
+        safeValues.firstName ||
+        safeValues.phone ||
+        safeValues.primarySkill ||
+        safeValues.customOtherJob,
     )
     if (!hasContent) return
     saveDraft({ step: currentStep, values: safeValues })
@@ -289,7 +307,7 @@ export function RegistrationWizard({ initialStep }: { initialStep?: number } = {
     const fieldsToValidate: (keyof CandidateFormData)[] = {
       1: ['email', 'password', 'confirmPassword'],
       2: ['firstName', 'lastName', 'phone', 'gender', 'dob', 'nationality', 'languages', 'location', 'currentlyInKSA'],
-      3: ['primarySkill', 'secondarySkill', 'tertiarySkill'],
+      3: ['primarySkill', 'secondarySkill', 'tertiarySkill', 'customOtherJob'],
       4: ['jobTitle', 'experienceYears', 'industryExperience', 'saudiExperience', 'availabilityDate'],
       5: ['visaStatus', 'visaProfession'],
       6: ['acceptPrivacyTerms', 'acceptDataConsent', 'acceptPlatformDisclaimer'],
@@ -365,6 +383,7 @@ export function RegistrationWizard({ initialStep }: { initialStep?: number } = {
         primarySkill: data.primarySkill,
         secondarySkill: data.secondarySkill,
         tertiarySkill: data.tertiarySkill,
+        customOtherJob: data.customOtherJob,
         gender: data.gender,
         dob: data.dob,
         nationality: data.nationality,
@@ -465,7 +484,10 @@ export function RegistrationWizard({ initialStep }: { initialStep?: number } = {
             primarySkill={primarySkill}
             secondarySkill={secondarySkill}
             tertiarySkill={tertiarySkill}
+            customOtherJob={watch('customOtherJob')}
             setValue={setValue}
+            register={register}
+            clearErrors={clearErrors}
             errors={errors}
           />
         )

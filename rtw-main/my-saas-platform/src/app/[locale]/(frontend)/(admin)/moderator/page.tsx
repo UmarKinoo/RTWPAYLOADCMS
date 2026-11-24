@@ -130,11 +130,16 @@ export default async function ModeratorDashboardPage() {
               Approve or reject employer interview requests before candidates are notified.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-2">
             <Button asChild variant="outline" className="w-full border-[#e5e5e5]">
               <Link href={`/${locale}/moderator/interviews/pending#moderator-pending-list`}>
                 <LayoutList className="mr-2 h-4 w-4" aria-hidden />
                 Review interviews ({pendingInterviewCount})
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="w-full text-[#4644b8] hover:bg-[#ecf2ff]">
+              <Link href={`/${locale}/moderator/interviews/history`}>
+                Outcome history (who rejected)
               </Link>
             </Button>
           </CardContent>

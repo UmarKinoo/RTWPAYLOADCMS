@@ -41,7 +41,7 @@ const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({
     }
   }
 
-  // Set billing class from primary skill
+  // Set billing class from primary skill; custom "Other" job defaults to B
   if (data.primarySkill) {
     try {
       let skillDoc
@@ -67,6 +67,8 @@ const setBillingClassAndGenerateEmbedding: CollectionBeforeChangeHook = async ({
     } catch (error) {
       console.error('Error fetching skill for billing class:', error)
     }
+  } else if (typeof data.customOtherJob === 'string' && data.customOtherJob.trim()) {
+    data.billingClass = data.billingClass || 'B'
   }
 
   // Generate bio embedding if we have the required fields
@@ -203,9 +205,20 @@ export const Candidates: CollectionConfig = {
       name: 'primarySkill',
       type: 'relationship',
       relationTo: 'skills',
-      required: true,
+      required: false,
       admin: {
-        description: 'Primary skill determines discipline, category, and subcategory',
+        description:
+          'Primary skill determines discipline, category, and subcategory. Optional when customOtherJob is set.',
+      },
+      validate: (value: unknown, args: { data?: Partial<Record<string, unknown>> }) => {
+        const other =
+          typeof args?.data?.customOtherJob === 'string'
+            ? args.data.customOtherJob.trim()
+            : ''
+        if (!value && !other) {
+          return 'Select a job role or enter a custom job title'
+        }
+        return true
       },
     },
     {
@@ -222,6 +235,14 @@ export const Candidates: CollectionConfig = {
       relationTo: 'skills',
       admin: {
         description: 'Optional third skill from the job matrix',
+      },
+    },
+    {
+      name: 'customOtherJob',
+      type: 'text',
+      admin: {
+        description:
+          'Free-text job title when the candidate could not find their role in the skills tree',
       },
     },
     // Billing Class - Automatically set from primarySkill

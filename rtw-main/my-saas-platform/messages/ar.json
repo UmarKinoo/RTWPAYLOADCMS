@@ -151,7 +151,12 @@
       "yourPath": "مسارك المهني",
       "editPath": "تعديل المسار المهني",
       "selectIndustry": "اختر المجال",
-      "selectCategory": "اختر الفئة"
+      "selectCategory": "اختر الفئة",
+      "fromList": "اختر من القائمة",
+      "otherJob": "أخرى (غير مدرجة)",
+      "otherJobLabel": "المسمى الوظيفي *",
+      "otherJobPlaceholder": "مثال: مشرف سقالات، مضيف يخت…",
+      "otherJobHint": "استخدم هذا الخيار إذا لم تجد دورك في شجرة المهارات. سنراجعه أثناء التدقيق."
     },
     "location": {
       "currentLocationLabel": "الموقع الحالي (المملكة العربية السعودية) *",
@@ -236,6 +241,7 @@
       "primarySkill": "المهارة الأساسية:",
       "secondarySkill": "المهارة الثانية:",
       "tertiarySkill": "المهارة الثالثة:",
+      "customOtherJob": "مسمى وظيفي آخر:",
       "industryExperience": "خبرة القطاع:",
       "selected": "محدد",
       "jobTitle": "المسمى الوظيفي:",

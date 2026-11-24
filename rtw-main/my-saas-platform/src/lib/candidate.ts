@@ -25,9 +25,11 @@ export interface RegisterCandidateData {
   whatsapp?: string
 
   // Smart Matrix
-  primarySkill: string // Skill ID
+  primarySkill?: string // Skill ID (optional when customOtherJob is set)
   secondarySkill?: string
   tertiarySkill?: string
+  /** Free-text role when not in the skills tree */
+  customOtherJob?: string
 
   // Demographics
   gender: 'male' | 'female'
@@ -172,6 +174,25 @@ export async function registerCandidate(
     const verificationToken = randomBytes(32).toString('hex')
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
+    const customOtherJob = data.customOtherJob?.trim() || undefined
+    const primarySkillId = data.primarySkill?.trim()
+      ? parseInt(data.primarySkill, 10)
+      : undefined
+
+    if (!primarySkillId && !customOtherJob) {
+      return {
+        success: false,
+        error: 'Please select a job role or enter a custom job title',
+      }
+    }
+
+    if (primarySkillId != null && Number.isNaN(primarySkillId)) {
+      return {
+        success: false,
+        error: 'Invalid job role selection',
+      }
+    }
+
     // Create candidate (this will also create auth user)
     const candidate = await payload.create({
       collection: 'candidates',
@@ -186,15 +207,17 @@ export async function registerCandidate(
         emailVerified: false,
         emailVerificationToken: verificationToken,
         emailVerificationExpires: verificationExpires.toISOString(),
-        primarySkill: parseInt(data.primarySkill, 10),
+        primarySkill: primarySkillId,
         secondarySkill: data.secondarySkill ? parseInt(data.secondarySkill, 10) : undefined,
         tertiarySkill: data.tertiarySkill ? parseInt(data.tertiarySkill, 10) : undefined,
+        customOtherJob,
+        ...(primarySkillId == null && customOtherJob ? { billingClass: 'B' as const } : {}),
         gender: data.gender,
         dob: formattedDob, // Required field, formatted as YYYY-MM-DD
         nationality: data.nationality,
         languages: data.languages,
         currentlyInKSA: data.currentlyInKSA !== false,
-        jobTitle: data.jobTitle,
+        jobTitle: data.jobTitle?.trim() || customOtherJob || data.jobTitle,
         experienceYears: data.experienceYears,
         industryExperience: data.industryExperience?.trim() || undefined,
         saudiExperience: data.saudiExperience,

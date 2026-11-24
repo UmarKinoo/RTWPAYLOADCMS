@@ -189,12 +189,17 @@ export function PendingInterviewsPage({
               {interviews.length} request{interviews.length !== 1 ? 's' : ''} awaiting your review
             </p>
           </div>
-          <Button variant="outline" className="w-full shrink-0 border-[#e5e5e5] sm:w-auto" asChild>
-            <Link href={`${base}/moderator`}>
-              Moderator dashboard
-              <ExternalLink className="ml-2 h-4 w-4 opacity-70" aria-hidden />
-            </Link>
-          </Button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button variant="outline" className="w-full border-[#e5e5e5] sm:w-auto" asChild>
+              <Link href={`${base}/moderator/interviews/history`}>Outcome history</Link>
+            </Button>
+            <Button variant="outline" className="w-full border-[#e5e5e5] sm:w-auto" asChild>
+              <Link href={`${base}/moderator`}>
+                Moderator dashboard
+                <ExternalLink className="ml-2 h-4 w-4 opacity-70" aria-hidden />
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="mb-6 rounded-lg border border-[#e5e5e5] bg-white p-4 shadow-sm">
@@ -255,14 +260,13 @@ export function PendingInterviewsPage({
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <CardTitle className="text-base font-semibold text-[#16252d] sm:text-lg">
-                          Request #{interview.id}
+                          {getCandidateName(interview)}
                         </CardTitle>
                         <CardDescription className="mt-2 space-y-1 text-sm text-[#515151]">
+                          <span className="font-medium text-[#16252d]">Request #{interview.id}</span>
+                          <span className="text-[#cbcbcb]"> · </span>
                           <span className="font-medium text-[#16252d]">Employer:</span>{' '}
                           {getEmployerName(interview)}
-                          <span className="text-[#cbcbcb]"> · </span>
-                          <span className="font-medium text-[#16252d]">Candidate:</span>{' '}
-                          {getCandidateName(interview)}
                         </CardDescription>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                           <Badge className="border-amber-200 bg-amber-50 font-medium text-amber-800">
@@ -344,21 +348,46 @@ export function PendingInterviewsPage({
                         )}
                       </div>
 
-                      {/* Candidate column */}
-                      <div className="rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-4">
+                      {/* Candidate column — emphasized for moderator review */}
+                      <div className="rounded-lg border border-[#4644b8]/30 bg-[#f7f6ff] p-4 ring-1 ring-[#4644b8]/10">
                         <div className="mb-3 flex items-center gap-2 font-semibold text-[#16252d]">
                           <User className="h-4 w-4 text-[#4644b8]" aria-hidden />
-                          Candidate
+                          Candidate to review
                         </div>
+                        <p className="mb-3 text-lg font-semibold text-[#16252d]">
+                          {getCandidateName(interview)}
+                        </p>
                         <ul className="space-y-2 text-sm text-[#515151]">
-                          <li>
-                            <span className="font-medium text-[#16252d]">Name:</span>{' '}
-                            {getCandidateName(interview)}
-                          </li>
-                          {candidateObj?.jobTitle && (
+                          {(candidateObj?.customOtherJob || candidateObj?.jobTitle) && (
                             <li className="flex items-start gap-2">
                               <Briefcase className="mt-0.5 h-4 w-4 shrink-0 text-[#757575]" aria-hidden />
-                              {candidateObj.jobTitle}
+                              <span>
+                                {candidateObj.customOtherJob || candidateObj.jobTitle}
+                                {candidateObj.customOtherJob && (
+                                  <span className="ml-2 rounded bg-white px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#4644b8] ring-1 ring-[#4644b8]/20">
+                                    Other job
+                                  </span>
+                                )}
+                              </span>
+                            </li>
+                          )}
+                          {typeof candidateObj?.primarySkill === 'object' &&
+                            candidateObj.primarySkill?.name && (
+                              <li>
+                                <span className="font-medium text-[#16252d]">Skill:</span>{' '}
+                                {candidateObj.primarySkill.name}
+                              </li>
+                            )}
+                          {candidateObj?.experienceYears != null && (
+                            <li>
+                              <span className="font-medium text-[#16252d]">Experience:</span>{' '}
+                              {candidateObj.experienceYears} years
+                            </li>
+                          )}
+                          {candidateObj?.nationality && (
+                            <li>
+                              <span className="font-medium text-[#16252d]">Nationality:</span>{' '}
+                              {candidateObj.nationality}
                             </li>
                           )}
                           {candidateObj?.email && (
@@ -381,7 +410,12 @@ export function PendingInterviewsPage({
                           )}
                         </ul>
                         {candidateId != null && (
-                          <Button variant="outline" size="sm" className="mt-4 w-full border-[#e5e5e5]" asChild>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="mt-4 w-full bg-[#4644b8] hover:bg-[#3a38a0]"
+                            asChild
+                          >
                             <Link href={`${base}/moderator/profiles/candidate/${candidateId}`}>
                               Open full candidate profile
                               <ExternalLink className="ml-2 h-3.5 w-3.5" aria-hidden />

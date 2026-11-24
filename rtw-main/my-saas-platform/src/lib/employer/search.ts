@@ -214,7 +214,10 @@ export async function searchCandidates(
                         id: c.id,
                         name: `${c.firstName} ${c.lastName}`,
                         jobTitle: c.jobTitle,
-                        primarySkill: typeof c.primarySkill === 'object' ? c.primarySkill.name : 'unknown'
+                        primarySkill:
+                          typeof c.primarySkill === 'object' && c.primarySkill
+                            ? c.primarySkill.name
+                            : 'unknown',
                       }))
                     )
                   }

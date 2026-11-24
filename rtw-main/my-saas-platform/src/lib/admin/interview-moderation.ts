@@ -8,6 +8,7 @@ import type { Interview } from '@/payload-types'
 import { sendEmail } from '@/lib/email'
 import { interviewInvitationEmailTemplate } from '@/lib/email-templates'
 import { canRequestInterview } from '@/lib/plan-access'
+import { appendInterviewOutcome } from '@/lib/admin/interview-outcome'
 
 export interface ApproveInterviewRequestData {
   scheduledAt?: string
@@ -87,11 +88,19 @@ export async function approveInterviewRequest(
       return { success: false, error: 'Employer has insufficient interview credits.' }
     }
 
+    const now = new Date().toISOString()
+
     // Update interview status and details
     const updateData: any = {
       status: 'scheduled',
-      approvedAt: new Date().toISOString(),
+      approvedAt: now,
       approvedBy: user.id,
+      outcomeHistory: appendInterviewOutcome(interview as Interview, {
+        at: now,
+        actor: 'moderator',
+        action: 'approved',
+        note: `Approved by user #${user.id}`,
+      }),
     }
 
     if (data?.scheduledAt) {
@@ -245,14 +254,26 @@ export async function rejectInterviewRequest(
       }
     }
 
-    // Update interview status
+    const now = new Date().toISOString()
+    const rejectionReason = reason || 'Interview request rejected by moderator.'
+
+    // Update interview status + who rejected
     await payload.update({
       collection: 'interviews',
       id: interviewId,
       data: {
         status: 'rejected',
-        rejectionReason: reason || 'Interview request rejected by moderator.',
+        rejectionReason,
+        rejectedBy: 'moderator',
+        rejectedAt: now,
         creditDeducted: false,
+        outcomeHistory: appendInterviewOutcome(interview as Interview, {
+          at: now,
+          actor: 'moderator',
+          action: 'rejected',
+          reason: rejectionReason,
+          note: `Rejected by user #${user.id}`,
+        }),
       },
     })
 

@@ -6,6 +6,7 @@ import { getRequestAuthUser } from '@/lib/payload-auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import type { Interview } from '@/payload-types'
 import { canRequestInterview } from '@/lib/plan-access'
+import { appendInterviewOutcome } from '@/lib/admin/interview-outcome'
 
 export interface RequestInterviewData {
   candidateId: number
@@ -87,11 +88,36 @@ export async function updateInterview(
       return { success: false, error: 'This request is pending moderator approval and can only be cancelled.' }
     }
 
+    const patch: Record<string, unknown> = { ...data }
+    if (data.status === 'cancelled') {
+      const now = new Date().toISOString()
+      const rejectionReason =
+        (interview as Interview).rejectionReason || 'Interview cancelled by employer.'
+      patch.rejectedBy = 'employer'
+      patch.rejectedAt = now
+      if (!(interview as Interview).rejectionReason) {
+        patch.rejectionReason = rejectionReason
+      }
+      patch.outcomeHistory = appendInterviewOutcome(interview as Interview, {
+        at: now,
+        actor: 'employer',
+        action: 'cancelled',
+        reason: rejectionReason,
+      })
+    } else if (data.status === 'completed') {
+      const now = new Date().toISOString()
+      patch.outcomeHistory = appendInterviewOutcome(interview as Interview, {
+        at: now,
+        actor: 'employer',
+        action: 'completed',
+      })
+    }
+
     // Update interview
     const updated = await payload.update({
       collection: 'interviews',
       id,
-      data: data as any,
+      data: patch as any,
     }) as Interview
 
     // Refund the interview credit when a still-pending request is cancelled
